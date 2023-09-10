@@ -1,0 +1,11 @@
+table.latexInputTable, #userInput, #resDisp {
+  width: 100%;
+}
+
+.latexInputTable td:first-child {
+  width: 30%;
+}
+
+.latexInputTable td:last-child {
+  width: 70%;
+}

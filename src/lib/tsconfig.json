@@ -1,0 +1,24 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es6",
+    "sourceMap": true,
+    "declarationMap": true,
+    "lib": [
+      "es6"
+    ],
+    "noImplicitAny": true,
+    "outDir": "../../dist/lib",
+    "rootDir": ".",
+    "allowJs": true,
+    "types": [
+      "base64-js",
+      "@types/node"
+    ],
+    "strict": true
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ]
+}
