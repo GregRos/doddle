@@ -157,6 +157,7 @@
   },
   "active": "fd26aa8cfc46067b",
   "lastOpenFiles": [
+    "node_modules/fsevents",
     "src/lib/lazy/operators/each.ts~",
     "package.json~",
     "src/lib/~syncthing~lazy.ts.tmp",
@@ -167,7 +168,6 @@
     "src/test/map.ts",
     "src/test/create.ts",
     "src/test/~syncthing~creates-simplifies.ts.tmp",
-    "src/lib/~syncthing~types.ts.tmp",
     "README.md",
     "node_modules/itertools-ts/README.md",
     "Zenesis Schema (1).svg",
