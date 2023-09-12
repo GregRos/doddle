@@ -1,6 +1,5 @@
 import { lazy, Lazy, LazyAsync, LazyStage, Pulled, PulledAwaited } from "@lib";
 
-
 it("lazy<1> for lazy 1", () => {
     const lz = lazy(() => 1) satisfies Lazy<number>;
     expect(lz).toBeInstanceOf(Lazy);
@@ -47,9 +46,7 @@ it("lazy<async<1>> for lazy async lazy async 1", async () => {
 });
 
 it("lazy<1> for new(new(", () => {
-    const lz = new Lazy(
-        () => new Lazy(() => 1)
-    ) satisfies Lazy<number>;
+    const lz = new Lazy(() => new Lazy(() => 1)) satisfies Lazy<number>;
     expect(lz.pull()).toBe<number>(1);
 });
 
@@ -80,8 +77,8 @@ it("lazy<T> for lazy lazy T", async () => {
 
 it("lazyAsync<T> for lazy lazy async T", async () => {
     async function generic<T extends { a: 1 }>(x: T) {
-        const lz = lazy(() => lazy(async () => x as T)) satisfies LazyAsync<T>
-        const pulled = await lz.pull() satisfies PulledAwaited<T>;
+        const lz = lazy(() => lazy(async () => x as T)) satisfies LazyAsync<T>;
+        const pulled = (await lz.pull()) satisfies PulledAwaited<T>;
         return pulled;
     }
     (await generic({ a: 1 })) satisfies { a: 1 };
@@ -89,9 +86,7 @@ it("lazyAsync<T> for lazy lazy async T", async () => {
 
 it("lazyAsync<T> for lazy async lazy T", async () => {
     async function generic<T>(x: T) {
-        const lz = lazy(async () =>
-            lazy(() => x)
-        ) satisfies LazyAsync<T>;
+        const lz = lazy(async () => lazy(() => x)) satisfies LazyAsync<T>;
         const pulled = (await lz.pull()) satisfies PulledAwaited<T>;
         return pulled;
     }
@@ -100,8 +95,10 @@ it("lazyAsync<T> for lazy async lazy T", async () => {
 });
 it("lazyAsync<T> for lazy async lazy async T", async <T>() => {
     async function generic<T>(x: T) {
-        const lz = lazy(async () => lazy(async () => null! as T)) satisfies LazyAsync<T>;
-        const pulled = await lz.pull() satisfies PulledAwaited<T>;
+        const lz = lazy(async () =>
+            lazy(async () => null! as T)
+        ) satisfies LazyAsync<T>;
+        const pulled = (await lz.pull()) satisfies PulledAwaited<T>;
         return pulled;
     }
     const pulled = await generic(1);

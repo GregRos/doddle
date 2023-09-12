@@ -64,11 +64,16 @@ export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
 
 export function isNextable<T>(value: any): value is Iterator<T> {
     // Checks if value is an iterator
-    return typeof value === "object" && value && "next" in value && typeof value.next === "function"
+    return (
+        typeof value === "object" &&
+        value &&
+        "next" in value &&
+        typeof value.next === "function"
+    );
 }
 
-export function pull<T>(value: Pulled<T>): Pulled<T>
+export function pull<T>(value: Pulled<T>): Pulled<T>;
 export function pull<T>(value: T | LazyLike<T>): Pulled<T>;
 export function pull<T>(value: T | LazyLike<T> | Pulled<T>): Pulled<T> {
-    return isLazyLike(value) ? value.pull() : value as any;
+    return isLazyLike(value) ? value.pull() : (value as any);
 }

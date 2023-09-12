@@ -131,7 +131,7 @@ it("lazy T map lazy async T", async () => {
             return lazy(async () => x satisfies PulledAwaited<T>);
         }) satisfies LazyAsync<PulledAwaited<T>>;
     }
-    await expect(generic(1).pull()).resolves.toBe(1)
+    await expect(generic(1).pull()).resolves.toBe(1);
 });
 it("lazy T map async lazy async T", () => {
     function generic<T>(x: T) {

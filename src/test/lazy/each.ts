@@ -6,7 +6,7 @@ const lza = lazy(async () => 1) satisfies LazyAsync<number>;
 it("lazy each doThing", () => {
     let i = "";
     expect(
-        lazy(() => i += "a")
+        lazy(() => (i += "a"))
             .each(x => {
                 expect(x).toBe("a");
                 i += "b";

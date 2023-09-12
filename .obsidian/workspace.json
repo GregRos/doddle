@@ -157,9 +157,9 @@
   },
   "active": "fd26aa8cfc46067b",
   "lastOpenFiles": [
+    "package.json~",
     "node_modules/fsevents",
     "src/lib/lazy/operators/each.ts~",
-    "package.json~",
     "src/lib/~syncthing~lazy.ts.tmp",
     "src/lib/~syncthing~util.ts.tmp",
     "src/test/~syncthing~create.ts.tmp",

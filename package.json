@@ -10,8 +10,8 @@
     "prepare": "husky install",
     "clean": "shx rm -rf dist",
     "rebuild": "run-s clean build",
-    "lint:fix": "./node_modules/.bin/prettier --write src/**/*.ts && ./node_modules/.bin/eslint --fix src/**/*.ts",
-    "lint:check": "./node_modules/.bin/prettier --check src/**/*.ts && ./node_modules/.bin/eslint src/**/*.ts"
+    "lint:fix": "prettier --write src/**/*.ts && eslint --fix src/**/*.ts",
+    "lint:check": "prettier --check src/**/*.ts && eslint src/**/*.ts"
   },
   "keywords": [
     "iterable",
