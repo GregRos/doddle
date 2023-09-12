@@ -11,10 +11,7 @@
     "outDir": "../../dist/lib",
     "rootDir": ".",
     "allowJs": true,
-    "types": [
-      "base64-js",
-      "@types/node"
-    ],
+
     "strict": true
   },
   "include": [

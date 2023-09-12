@@ -11,6 +11,14 @@
             "id": "b9f62d27e00c9319",
             "type": "leaf",
             "state": {
+              "type": "empty",
+              "state": {}
+            }
+          },
+          {
+            "id": "fd26aa8cfc46067b",
+            "type": "leaf",
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "README.md",
@@ -19,7 +27,8 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -146,19 +155,20 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b9f62d27e00c9319",
+  "active": "fd26aa8cfc46067b",
   "lastOpenFiles": [
-    "src/lib/containers/collect-exports.ts~",
-    "src/lib/util/iterable.ts~",
-    "dist/lib/util/iterable.js.map",
-    "dist/lib/util/iterable.js",
-    "dist/lib/util/iterable.d.ts.map",
-    "dist/lib/util/iterable.d.ts",
-    "dist/lib/util",
-    "src/lib/util/iterable.ts",
-    "src/lib/util",
-    "node_modules/itertools-ts/es/types.d.ts",
-    "node_modules/itertools-ts/es/transform.d.ts",
+    "src/lib/lazy/operators/each.ts~",
+    "package.json~",
+    "src/lib/~syncthing~lazy.ts.tmp",
+    "src/lib/~syncthing~util.ts.tmp",
+    "src/test/~syncthing~create.ts.tmp",
+    "src/test/~syncthing~map.ts.tmp",
+    "src/test/~syncthing~each.ts.tmp",
+    "src/test/map.ts",
+    "src/test/create.ts",
+    "src/test/~syncthing~creates-simplifies.ts.tmp",
+    "src/lib/~syncthing~types.ts.tmp",
+    "README.md",
     "node_modules/itertools-ts/README.md",
     "Zenesis Schema (1).svg",
     "Pasted image 20230909160621.png",

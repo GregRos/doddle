@@ -1,6 +1,6 @@
 {
   "name": "seqs",
-  "description": "A lazy, easy-going library for working with iterables.",
+  "description": "Lazies and iterables.",
   "version": "0.1.0",
   "main": "dist/lib/index.js",
   "repository": "github:gregros/seqs",
@@ -9,7 +9,6 @@
     "build": "tsc -b tsconfig.all.json",
     "clean": "shx rm -rf dist",
     "rebuild": "run-s clean build",
-    "prepare": "./node_modules/.bin/husky install",
     "lint:fix": "./node_modules/.bin/prettier --write src/**/*.ts && ./node_modules/.bin/eslint --fix src/**/*.ts",
     "lint:check": "./node_modules/.bin/prettier --check src/**/*.ts && ./node_modules/.bin/eslint src/**/*.ts"
   },
@@ -50,6 +49,5 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "lodash": "^4.17.21"
   }
 }
