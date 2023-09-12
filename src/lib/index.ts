@@ -7,8 +7,10 @@ import {
     LazyStage
 } from "./lazy/lazy-like";
 import { LazyAsync, Pulled, PulledAwaited } from "./lazy/types";
+import { seq } from "./seq/seq";
+import { Seq } from "./seq/wrapper";
 import { isLazyLike } from "./util";
-
+export * from "./seq/types";
 export {
     Lazy,
     LazyAsync,
@@ -19,5 +21,7 @@ export {
     LazyInitializer,
     Pulled,
     PulledAwaited,
-    lazy
+    lazy,
+    seq,
+    Seq
 };
