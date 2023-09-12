@@ -1,5 +1,5 @@
 import { Iteratee, Predicate, Reducer } from "./types";
-import { Lazy, lazy } from "..";
+import { Lazy, Pulled, lazy } from "..";
 
 export class Seq<E> implements Iterable<E> {
     [Symbol.iterator](): Iterator<E, any, undefined> {
@@ -10,6 +10,51 @@ export class Seq<E> implements Iterable<E> {
 
     private _wrap<T>(generator: (this: Seq<E>) => Iterable<T>): Seq<T> {
         return new Seq<T>(generator.call(this));
+    }
+
+    tap(fn: Iteratee<E, any>) {
+        const self = this;
+        return this._wrap(function* () {
+            let i = 0;
+            for (const item of self) {
+                fn.call(self, item, i++);
+                yield item;
+            }
+        });
+    }
+
+    forEach(fn: Iteratee<E, any>) {
+        let i = 0;
+        for (const item of this) {
+            fn.call(this, item, i++);
+        }
+    }
+
+    cache(): Seq<E> {
+        const self = this._iterable;
+        return this._wrap(function* () {
+            const cache: E[] = [];
+            let alreadyDone = false;
+            const iterator = self[Symbol.iterator]();
+            let i = 0;
+            for (;;) {
+                if (alreadyDone) {
+                    return;
+                }
+                if (i < cache.length) {
+                    yield cache[i++];
+                } else {
+                    const { done, value } = iterator.next();
+                    if (done) {
+                        alreadyDone = true;
+                        return;
+                    }
+                    cache.push(value);
+                    yield value;
+                    i++;
+                }
+            }
+        });
     }
 
     dematerialize(): Iterable<IteratorResult<E>> {
@@ -271,6 +316,22 @@ export class Seq<E> implements Iterable<E> {
                 yield* other;
             }
         });
+    }
+
+    scan<U>(fn: Reducer<E, U>, initial: U): Seq<U> {
+        const self = this;
+        return this._wrap(function* () {
+            let acc = initial;
+            let i = 0;
+            for (const item of self) {
+                acc = fn.call(self, acc, item, i++);
+                yield acc;
+            }
+        });
+    }
+
+    pull(): Pulled<E> | undefined {
+        return this.last().pull()
     }
 
     orderBy<U>(fn: Iteratee<E, U>): Seq<E> {

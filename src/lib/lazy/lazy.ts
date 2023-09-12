@@ -7,7 +7,7 @@ import { getClassName, isLazy, isLazyLike, isThenable } from "../util";
  */
 export class Lazy<T> implements LazyLike<T> {
     private _cached?: any;
-    stage: LazyStage = "lazy";
+    stage: LazyStage = "pending";
     private _desc = "<pending>";
     private _init?: LazyInitializer<T>;
 

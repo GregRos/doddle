@@ -195,3 +195,44 @@ it("orderBy", () => {
         .pull();
     expect(result).toEqual([1, 2, 3]);
 });
+
+it("each", () => {
+    const source = seq([1, 2, 3]);
+    const result: number[] = [];
+    source
+        .tap(x => result.push(x))
+        .toArray()
+        .pull();
+    expect(result).toEqual([1, 2, 3]);
+});
+
+it("cache", () => {
+    const source = seq([1, 2, 3]);
+    const result = source.cache().take(2).toArray().pull();
+    expect(result).toEqual([1, 2]);
+});
+
+it("cache sideffects", () => {
+    let count = 0;
+    const source = seq([1, 2, 3]);
+    const withSideEffect = source.tap(x => count++);
+    const sides = withSideEffect.cache();
+    sides.forEach(x => x);
+    sides.forEach(x => x);
+    expect(count).toEqual(3);
+});
+
+it("scan", () => {
+    const source = seq([1, 2, 3]);
+    const result = source
+        .scan((acc, x) => acc + x, 0)
+        .toArray()
+        .pull();
+    expect(result).toEqual([1, 3, 6]);
+});
+
+it("pull", () => {
+    const source = seq([1, 2, 3]);
+    const result = source.pull();
+    expect(result).toEqual(3);
+});
