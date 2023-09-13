@@ -14,21 +14,8 @@
               "type": "empty",
               "state": {}
             }
-          },
-          {
-            "id": "fd26aa8cfc46067b",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "README.md",
-                "mode": "source",
-                "source": false
-              }
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -94,7 +81,6 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -111,7 +97,6 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -133,9 +118,7 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {
-                "file": "README.md"
-              }
+              "state": {}
             }
           }
         ]
@@ -155,50 +138,31 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fd26aa8cfc46067b",
+  "active": "b9f62d27e00c9319",
   "lastOpenFiles": [
-    "coverage/lcov-report/sort-arrow-sprite.png",
-    "coverage/lcov-report/prettify.js",
-    "coverage/lcov-report/sorter.js",
-    "coverage/lcov-report/prettify.css",
-    "coverage/lcov-report/index.html",
-    "coverage/lcov-report/favicon.png",
-    "coverage/lcov-report/block-navigation.js",
-    "coverage/lcov-report/base.css",
-    "coverage/lcov.info",
-    "coverage/lcov-report",
-    "coverage",
-    "node_modules/caching-transform/node_modules/semver/bin/semver.js",
-    "node_modules/caching-transform/node_modules/write-file-atomic/README.md",
-    "node_modules/caching-transform/node_modules/write-file-atomic/CHANGELOG.md",
-    "node_modules/caching-transform/node_modules/semver/README.md",
-    "node_modules/caching-transform/node_modules/make-dir/readme.md",
-    "node_modules/caching-transform/readme.md",
-    "node_modules/spawn-wrap/README.md",
-    "node_modules/set-blocking/README.md",
-    "node_modules/nyc/node_modules/yargs-parser/README.md",
-    "node_modules/nyc/node_modules/yargs-parser/CHANGELOG.md",
-    "node_modules/nyc/node_modules/y18n/README.md",
-    "node_modules/nyc/node_modules/y18n/CHANGELOG.md",
-    "node_modules/nyc/node_modules/yargs/README.md",
-    "node_modules/nyc/node_modules/yargs/CHANGELOG.md",
-    "node_modules/nyc/node_modules/wrap-ansi/readme.md",
-    "node_modules/nyc/node_modules/string-width/readme.md",
-    "node_modules/nyc/node_modules/resolve-from/readme.md",
-    "node_modules/nyc/node_modules/semver/README.md",
-    "node_modules/nyc/node_modules/p-locate/readme.md",
-    "node_modules/nyc/node_modules/p-limit/readme.md",
-    "node_modules/nyc/node_modules/make-dir/readme.md",
-    "node_modules/nyc/node_modules/is-fullwidth-code-point/readme.md",
-    "node_modules/nyc/node_modules/locate-path/readme.md",
-    "node_modules/nyc/node_modules/istanbul-lib-instrument/README.md",
-    "node_modules/nyc/node_modules/find-up/readme.md",
-    "node_modules/nyc/node_modules/istanbul-lib-instrument/CHANGELOG.md",
+    "Test.md",
+    "~syncthing~package.json.tmp",
+    "src/lib/~syncthing~index.ts.tmp",
+    "src/lib/lazy/lazy.ts",
+    "src/test/lazy/create.ts",
+    "README.md",
+    "src/lib/seq/wrapper.ts",
+    "~syncthing~package-lock.json.tmp",
+    "src/test/seq/tests.ts",
+    "src/test/lazy/each.ts",
+    "src/lib/seq/seq.ts",
+    "src/test/lazy/map.ts",
+    "node_modules/itertools-ts/README.md",
     "Zenesis Schema (1).svg",
     "Pasted image 20230909160621.png",
     "Zenesis Schema.svg",
     "Zenesis Schema.png",
     "Zenesis Schema (1).png",
-    "Untitled.canvas"
+    "Untitled.canvas",
+    "node_modules/ts-node/README.md",
+    "node_modules/ts-node/dist-raw/README.md",
+    "node_modules/ts-node/dist-raw/NODE-LICENSE.md",
+    "node_modules/char-info/README.md",
+    "LICENSE.md"
   ]
 }

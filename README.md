@@ -1,2 +1,2 @@
-# seqs
-Defines lazies and sequences.
+# lazies
+Lazy values and sequences.

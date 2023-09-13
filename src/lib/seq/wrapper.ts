@@ -1,7 +1,7 @@
 import { Iteratee, Predicate, Reducer } from "./types";
-import { Lazy, Pulled, lazy } from "..";
+import { Lazy, lazy, Pulled } from "..";
 
-export class Seq<E> implements Iterable<E> {
+export class Seq<E> {
     [Symbol.iterator](): Iterator<E, any, undefined> {
         return this._iterable[Symbol.iterator]();
     }
@@ -330,8 +330,20 @@ export class Seq<E> implements Iterable<E> {
         });
     }
 
-    pull(): Pulled<E> | undefined {
-        return this.last().pull()
+    get isEmpty(): Lazy<boolean> {
+        return lazy(() => {
+            const iterator = this[Symbol.iterator]();
+            return !!iterator.next().done;
+        });
+    }
+
+    pull(): Seq<E> {
+        const iterator = this[Symbol.iterator]();
+        return new Seq({
+            [Symbol.iterator]: () => {
+                return iterator;
+            }
+        });
     }
 
     orderBy<U>(fn: Iteratee<E, U>): Seq<E> {

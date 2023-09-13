@@ -234,5 +234,9 @@ it("scan", () => {
 it("pull", () => {
     const source = seq([1, 2, 3]);
     const result = source.pull();
-    expect(result).toEqual(3);
+    let i = 1;
+    for (const item of result) {
+        expect(item).toBe(i++);
+    }
+    expect(result.isEmpty.pull()).toBe(true);
 });

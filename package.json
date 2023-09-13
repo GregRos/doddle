@@ -1,9 +1,9 @@
 {
-  "name": "seqs",
-  "description": "Lazies and iterables.",
+  "name": "lazies",
+  "description": "Lazy constructs for TypeScript",
   "version": "0.2.0",
   "main": "dist/lib/index.js",
-  "repository": "github:gregros/seqs",
+  "repository": "github:gregros/lazies",
   "scripts": {
     "test": "jest --coverage",
     "build": "tsc -b tsconfig.all.json",
@@ -29,8 +29,8 @@
   "author": "GregRos",
   "license": "MIT",
   "lint-staged": {
-    "*.{ts,js,mjs,mts,cjs,cts}": "node_modules/.bin/eslint --cache --fix",
-    "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "node_modules/.bin/prettier --write"
+    "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
+    "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
   },
   "devDependencies": {
     "@gregros/eslint-config": "^0.4.0",
