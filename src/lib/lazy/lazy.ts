@@ -11,12 +11,19 @@ export class Lazy<T> implements LazyLike<T> {
     private _desc = "<pending>";
     private _init?: LazyInitializer<T>;
 
+    get isReady() {
+        return this.stage === "ready";
+    }
+
     /**
      * Creates a new Lazy value backed by the given initializer function.
      * @param initializer The function that will be called to construct the value.
      */
     constructor(initializer: LazyInitializer<T>) {
         this._init = initializer;
+        this.pull = this.pull.bind(this);
+        this.each = this.each.bind(this) as any;
+        this.map = this.map.bind(this);
     }
 
     static create<T>(initializer: () => T | Lazy<T>): Lazy<T> {
@@ -35,7 +42,7 @@ export class Lazy<T> implements LazyLike<T> {
             // Correct way to return the error
             throw this._cached;
         }
-        if (this.stage === "done") {
+        if (this.stage === "ready") {
             return this._cached!;
         }
         let resource: any;
@@ -70,7 +77,7 @@ export class Lazy<T> implements LazyLike<T> {
             this._desc = `lazy ${getClassName(resource)}`;
         }
         this._cached = resource;
-        this.stage = "done";
+        this.stage = "ready";
 
         return resource;
     }

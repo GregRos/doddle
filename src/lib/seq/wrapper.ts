@@ -2,6 +2,10 @@ import { Iteratee, Predicate, Reducer } from "./types";
 import { Lazy, lazy, Pulled } from "..";
 
 export class Seq<E> {
+    static from<E>(iterable: Iterable<E>): Seq<E> {
+        return new Seq(iterable);
+    }
+
     [Symbol.iterator](): Iterator<E, any, undefined> {
         return this._iterable[Symbol.iterator]();
     }
@@ -208,13 +212,16 @@ export class Seq<E> {
         });
     }
 
-    filter(fn: Predicate<E>): Seq<E> {
+    filter<
+        X extends E,
+        F extends (this: Seq<E>, item: E, index: number) => item is X
+    >(fn: F): Seq<X> {
         const self = this;
         return this._wrap(function* () {
             let i = 0;
             for (const item of self) {
                 if (fn.call(self, item, i++)) {
-                    yield item;
+                    yield item as X;
                 }
             }
         });

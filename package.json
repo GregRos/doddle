@@ -1,7 +1,7 @@
 {
   "name": "lazies",
   "description": "Lazy constructs for TypeScript",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "main": "dist/lib/index.js",
   "repository": "github:gregros/lazies",
   "scripts": {

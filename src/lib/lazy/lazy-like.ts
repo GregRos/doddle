@@ -4,7 +4,7 @@ import { Lazy } from "./lazy";
 /**
  * The stage of a lazily initialized value.
  */
-export type LazyStage = "pending" | "done" | "failed";
+export type LazyStage = "pending" | "ready" | "failed";
 
 /**
  * An interface that represents a lazily initialized value.
