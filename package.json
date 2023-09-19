@@ -1,11 +1,11 @@
 {
   "name": "lazies",
-  "description": "Lazy constructs for TypeScript",
-  "version": "0.3.0",
+  "description": "The laziest of them all.",
+  "version": "0.4.0",
   "main": "dist/lib/index.js",
   "repository": "github:gregros/lazies",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest",
     "build": "tsc -b tsconfig.all.json",
     "prepare": "husky install",
     "clean": "shx rm -rf dist",

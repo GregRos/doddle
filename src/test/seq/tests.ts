@@ -1,4 +1,4 @@
-import { seq } from "../../lib/seq/seq";
+import { seq } from "@lib";
 
 it("dematerializes", () => {
     const source = seq([1, 2, 3]);
@@ -161,8 +161,28 @@ it("filter with index", () => {
     const result = source
         .filter((x, i) => i > 1)
         .toArray()
-        .pull();
+        .pull() satisfies number[];
     expect(result).toEqual([3]);
+});
+
+it("filter type", () => {
+    const source = seq([1, 2, undefined, 3]).as<
+        number | undefined
+    >() satisfies Iterable<number | undefined>;
+    const result = source
+        .filterAs<number>((x): x is number => x !== undefined)
+        .toArray()
+        .pull() satisfies number[];
+    expect(result).toEqual([1, 2, 3]);
+});
+
+it("ofTypes", () => {
+    const source = seq([new Error(), {}, new Array<number>()])
+        .ofTypes(Array, Error)
+        .map(x => x.constructor)
+        .toArray()
+        .pull();
+    expect(source).toEqual([Error, Array]);
 });
 
 it("groupBy", () => {

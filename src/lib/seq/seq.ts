@@ -3,6 +3,8 @@ import { isIterable, isLazy, isLazyLike, isNextable, pull } from "../util";
 import { Pulled } from "..";
 import { Seq } from "./wrapper";
 
+export function seq<E>(input: E[]): Seq<E>;
+export function seq<E>(input: SeqLike<E>): Seq<E>;
 export function seq<E>(input: SeqLike<E>) {
     if (input instanceof Seq) {
         return input;

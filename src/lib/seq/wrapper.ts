@@ -212,19 +212,32 @@ export class Seq<E> {
         });
     }
 
-    filter<
-        X extends E,
-        F extends (this: Seq<E>, item: E, index: number) => item is X
-    >(fn: F): Seq<X> {
+    filter(fn: Predicate<E>): Seq<E> {
         const self = this;
         return this._wrap(function* () {
             let i = 0;
             for (const item of self) {
                 if (fn.call(self, item, i++)) {
-                    yield item as X;
+                    yield item;
                 }
             }
         });
+    }
+
+    filterAs<T>(
+        fn: (this: Seq<E>, item: E | unknown, index: number) => item is T
+    ): Seq<T> {
+        return this.filter(fn).as<T>();
+    }
+
+    ofTypes<Ts extends unknown[]>(
+        ...ctors: {
+            [K in keyof Ts]: new (...args: any[]) => Ts[K];
+        }
+    ): Seq<Ts[number]> {
+        return this.filterAs(x => ctors.some(ctor => x instanceof ctor)).as<
+            Ts[number]
+        >();
     }
 
     take(n: number): Seq<E> {
