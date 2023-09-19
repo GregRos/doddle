@@ -235,9 +235,7 @@ export class Seq<E> {
             [K in keyof Ts]: new (...args: any[]) => Ts[K];
         }
     ): Seq<Ts[number]> {
-        return this.filterAs(x => ctors.some(ctor => x instanceof ctor)).as<
-            Ts[number]
-        >();
+        return this.filterAs((x): x is Ts[number] => ctors.some(ctor => x instanceof ctor));
     }
 
     take(n: number): Seq<E> {
