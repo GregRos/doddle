@@ -1,7 +1,9 @@
-export default {
+/** @type {import("jest").Config} */
+const config = {
     automock: false,
     preset: "ts-jest",
     testEnvironment: "node",
+    rootDir:".",
     testMatch: ["<rootDir>/src/test/**/*.ts"],
     // The default test threshold is 5s. That's way too low.
     slowTestThreshold: 500,
@@ -25,3 +27,5 @@ export default {
         }]
     }
 };
+
+export default config

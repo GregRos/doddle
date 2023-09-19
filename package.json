@@ -5,7 +5,7 @@
   "main": "dist/lib/index.js",
   "repository": "github:gregros/lazies",
   "scripts": {
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "tsc -b tsconfig.all.json",
     "prepare": "husky install",
     "clean": "shx rm -rf dist",

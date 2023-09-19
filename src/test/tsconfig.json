@@ -11,7 +11,6 @@
       "es2021.weakref"
     ],
     "outDir": "../../dist/test",
-    "rootDir": ".",
     "allowJs": true,
     "baseUrl": ".",
     "paths": {
