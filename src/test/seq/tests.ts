@@ -39,6 +39,29 @@ it("last", () => {
     expect(result).toEqual(3);
 });
 
+it("reduce", () => {
+    const source = seq([1, 2, 3]);
+    const result = source.reduce((acc, x) => acc + x, 0).pull();
+    expect(result).toEqual(6);
+});
+
+it("reduce without initial", () => {
+    const source = seq([1, 2, 3]);
+    const result = source.reduce((acc, x) => acc + x).pull();
+    expect(result).toEqual(6);
+});
+
+it("reduce with empty", () => {
+    const source = seq<number>([]);
+    const result = source.reduce((acc, x) => acc + x, 0).pull();
+    expect(result).toEqual(0);
+});
+
+it("reduce with empty without initial", () => {
+    const source = seq<number>([]);
+    expect(() => source.reduce((acc, x) => acc + x).pull()).toThrow();
+});
+
 it("last with predicate", () => {
     const source = seq([1, 2, 3]);
     const result = source.last(x => x < 3).pull();

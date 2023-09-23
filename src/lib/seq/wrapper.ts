@@ -171,12 +171,23 @@ export class Seq<E> {
         });
     }
 
-    reduce<U>(fn: Reducer<E, U>, initial: U): Lazy<U> {
+    reduce(fn: Reducer<E, E>): Lazy<E>;
+    reduce<U>(fn: Reducer<E, U>, initial: U): Lazy<U>;
+    reduce<U>(fn: Reducer<E, U>, initial?: U): Lazy<U> {
+        const hadInitial = arguments.length === 2;
         return lazy(() => {
-            let acc = initial;
+            let acc = initial as any;
             let i = 0;
             for (const item of this) {
-                acc = fn.call(this, acc, item, i++);
+                if (!hadInitial && i === 0) {
+                    acc = item;
+                } else {
+                    acc = fn.call(this, acc, item, i++);
+                }
+                i++;
+            }
+            if (!hadInitial && i === 0) {
+                throw new Error("Cannot reduce empty sequence without initial");
             }
             return acc;
         });
@@ -235,7 +246,9 @@ export class Seq<E> {
             [K in keyof Ts]: new (...args: any[]) => Ts[K];
         }
     ): Seq<Ts[number]> {
-        return this.filterAs((x): x is Ts[number] => ctors.some(ctor => x instanceof ctor));
+        return this.filterAs((x): x is Ts[number] =>
+            ctors.some(ctor => x instanceof ctor)
+        );
     }
 
     take(n: number): Seq<E> {
