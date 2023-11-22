@@ -283,3 +283,9 @@ it("pull", () => {
     }
     expect(result.isEmpty.pull()).toBe(true);
 });
+
+it("uniq", () => {
+    const source = seq([1, 2, 2, 3]);
+    const result = source.uniq().toArray().pull();
+    expect(result).toEqual([1, 2, 3]);
+});

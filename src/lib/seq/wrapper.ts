@@ -349,6 +349,19 @@ export class Seq<E> {
         });
     }
 
+    uniq(): Seq<E> {
+        const self = this._iterable;
+        return this._wrap(function* () {
+            const seen = new Set<E>();
+            for (const item of self) {
+                if (!seen.has(item)) {
+                    seen.add(item);
+                    yield item;
+                }
+            }
+        });
+    }
+
     scan<U>(fn: Reducer<E, U>, initial: U): Seq<U> {
         const self = this;
         return this._wrap(function* () {
