@@ -271,6 +271,15 @@ it("cache sideffects", () => {
     expect(count).toEqual(3);
 });
 
+it("uniqBy", () => {
+    const source = seq([1, 2, 3, 4, 5]);
+    const result = source
+        .uniqBy(x => x % 2)
+        .toArray()
+        .pull();
+    expect(result).toEqual([1, 2]);
+});
+
 it("scan", () => {
     const source = seq([1, 2, 3]);
     const result = source

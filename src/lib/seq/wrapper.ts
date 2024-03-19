@@ -60,7 +60,7 @@ export class Seq<E> {
                     yield value;
                     i++;
                 } else {
-                    return
+                    return;
                 }
             }
         });
@@ -350,6 +350,21 @@ export class Seq<E> {
             yield* self;
             for (const other of others) {
                 yield* other;
+            }
+        });
+    }
+
+    uniqBy<K>(fn: Iteratee<E, K>): Seq<E> {
+        const self = this;
+        return this._wrap(function* () {
+            const seen = new Set<K>();
+            let i = 0;
+            for (const item of self) {
+                const key = fn.call(self, item, i++);
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    yield item;
+                }
             }
         });
     }
