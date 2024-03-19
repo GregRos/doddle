@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@gregros/eslint-config": "^0.4.0",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^29.5.12",
     "@types/lodash": "^4.14.198",
     "@types/node": "^20.6.0",
     "@typescript-eslint/eslint-plugin": "^6.6.0",
@@ -50,5 +50,6 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
-  "types": "dist/lib/index.d.ts"
+  "types": "dist/lib/index.d.ts",
+  "packageManager": "yarn@4.1.1"
 }

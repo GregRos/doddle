@@ -40,18 +40,17 @@ export class Seq<E> {
 
     cache(): Seq<E> {
         const self = this._iterable;
+        const cache: E[] = [];
+        let alreadyDone = false;
+
         return this._wrap(function* () {
-            const cache: E[] = [];
-            let alreadyDone = false;
-            const iterator = self[Symbol.iterator]();
             let i = 0;
+            let iterator: Iterator<E>;
             for (;;) {
-                if (alreadyDone) {
-                    return;
-                }
                 if (i < cache.length) {
                     yield cache[i++];
-                } else {
+                } else if (!alreadyDone) {
+                    iterator ??= self[Symbol.iterator]();
                     const { done, value } = iterator.next();
                     if (done) {
                         alreadyDone = true;
@@ -60,6 +59,8 @@ export class Seq<E> {
                     cache.push(value);
                     yield value;
                     i++;
+                } else {
+                    return
                 }
             }
         });
