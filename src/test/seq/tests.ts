@@ -11,6 +11,12 @@ it("dematerializes", () => {
     ]);
 });
 
+it("double iterates", () => {
+    const source = seq([1, 2, 3]).map(x => x + 1);
+    const result = source.concat(source);
+    expect([...result]).toEqual([2, 3, 4, 2, 3, 4]);
+});
+
 it("index", () => {
     const source = seq([1, 2, 3]);
     const result = source.index();

@@ -13,7 +13,11 @@ export class Seq<E> {
     constructor(private _iterable: Iterable<E>) {}
 
     private _wrap<T>(generator: (this: Seq<E>) => Iterable<T>): Seq<T> {
-        return new Seq<T>(generator.call(this));
+        return new Seq<T>({
+            [Symbol.iterator]: () => {
+                return generator.call(this)[Symbol.iterator]();
+            }
+        });
     }
 
     tap(fn: Iteratee<E, any>) {

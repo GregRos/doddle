@@ -115,7 +115,6 @@ export class Lazy<T> implements LazyLike<T> {
         f: (value: PulledAwaited<S>) => R
     ): LazyAsync<R>;
     map<Y>(
-        this: Lazy<T>,
         projection: (value: PulledAwaited<T>) => Promise<LazyAsync<Y>>
     ): LazyAsync<Y>;
     map<X>(
