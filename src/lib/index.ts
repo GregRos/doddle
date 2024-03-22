@@ -1,4 +1,4 @@
-import { Lazy, lazy } from "./lazy/lazy";
+import { Lazy, lazy, memoize } from "./lazy/lazy";
 
 import {
     LazyAsyncLike,
@@ -24,5 +24,6 @@ export {
     PulledAwaited,
     lazy,
     seq,
+    memoize,
     Seq
 };

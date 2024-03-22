@@ -1,7 +1,7 @@
 {
   "name": "lazies",
   "description": "The laziest of them all.",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "main": "dist/lib/index.js",
   "repository": "github:gregros/lazies",
   "scripts": {

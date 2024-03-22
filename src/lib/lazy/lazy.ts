@@ -181,3 +181,13 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>;
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     return Lazy.create(initializer) as any;
 }
+
+export function memoize<T>(definition: () => T): () => Pulled<T> {
+    let value: T;
+    return lazy(() => {
+        if (value === undefined) {
+            value = definition();
+        }
+        return value;
+    }).pull;
+}
