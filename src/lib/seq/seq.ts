@@ -24,10 +24,11 @@ export function seq<E>(input: SeqLike<E>) {
                     ) {
                         yield item.value;
                     }
+                } else {
+                    throw new Error(
+                        `Got unexpected result from iterator constructor: ${result}`
+                    );
                 }
-                throw new Error(
-                    `Got unexpected result from iterator constructor: ${result}`
-                );
             }
         });
     }

@@ -2,6 +2,8 @@ import { LazyInitializer, LazyLike, LazyStage } from "./lazy-like";
 import { PulledAwaited, LazyAsync, Pulled } from "./types";
 import { getClassName, isLazy, isLazyLike, isThenable } from "../util";
 
+export const methodName = Symbol("methodName");
+export const ownerInstance = Symbol("ownerInstance");
 /**
  * Implements a lazily initialized value.
  */
@@ -21,9 +23,13 @@ export class Lazy<T> implements LazyLike<T> {
      */
     constructor(initializer: LazyInitializer<T>) {
         this._init = initializer;
-        this.pull = this.pull.bind(this);
-        this.each = this.each.bind(this) as any;
-        this.map = this.map.bind(this);
+
+        const anyMe = this as any;
+        for (const key of ["pull", "map", "each"]) {
+            anyMe[key] = anyMe[key].bind(this);
+            anyMe[key][ownerInstance] = this;
+            anyMe[key][methodName] = key;
+        }
     }
 
     static create<T>(initializer: () => T | Lazy<T>): Lazy<T> {
@@ -183,5 +189,9 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
 }
 
 export function memoize<T>(definition: () => T): () => Pulled<T> {
+    // Don't double memoize
+    if (ownerInstance in definition) {
+        return definition as any;
+    }
     return lazy(definition).pull;
 }
