@@ -1,7 +1,7 @@
 {
   "name": "lazies",
-  "description": "The laziest of them all.",
-  "version": "0.6.6",
+  "description": "Lazy primitives and iterables.",
+  "version": "0.7.0",
   "main": "dist/lib/index.js",
   "repository": "github:gregros/lazies",
   "scripts": {

@@ -218,14 +218,16 @@ export class Seq<E> {
         });
     }
 
-    concatMap<U>(fn: Iteratee<E, Iterable<U>>): Seq<U> {
+    concatMap<U extends Iterable<unknown>>(
+        fn: Iteratee<E, U>
+    ): Seq<U extends Iterable<infer T> ? T : never> {
         const self = this;
         return this._wrap(function* () {
             let i = 0;
             for (const item of self) {
                 yield* fn.call(self, item, i++);
             }
-        });
+        }) as any;
     }
 
     filter(fn: Predicate<E>): Seq<E> {
