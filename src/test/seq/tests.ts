@@ -199,7 +199,7 @@ it("filter type", () => {
         number | undefined
     >() satisfies Iterable<number | undefined>;
     const result = source
-        .filterAs<number>((x): x is number => x !== undefined)
+        .filterAs((x): x is number => x !== undefined)
         .toArray()
         .pull() satisfies number[];
     expect(result).toEqual([1, 2, 3]);
