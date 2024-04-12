@@ -33,8 +33,8 @@ it("should replace old key on conflicting", () => {
     const s = seqs.of(1, 2, 3).toMap(x => [x % 2, x]);
     expect(s.pull()).toBeEqual(
         new Map([
-            [1, 1],
-            [0, 3]
+            [0, 2],
+            [1, 3]
         ])
     );
 });

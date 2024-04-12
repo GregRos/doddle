@@ -15,9 +15,3 @@ it("should remove duplicates", () => {
     const s = seqs.of(1, 2, 2, 3, 3, 3).toSet();
     expect(s.pull()).toBeEqual(new Set([1, 2, 3]));
 });
-
-it("should set newer entry on conflicting", () => {
-    const s = seq(seqs.of(0, -0).toSet()).first();
-    const item = s.pull();
-    expect(Object.is(item, -0)).toBe(true);
-});

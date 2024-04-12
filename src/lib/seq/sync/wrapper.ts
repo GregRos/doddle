@@ -353,7 +353,7 @@ export class Seq<E> {
             let i = 0;
             for (const item of this) {
                 if (i >= count) {
-                    yield buffer[(count - i) % count];
+                    yield buffer[i % count];
                 }
                 buffer[i % count] = item;
                 i++;
