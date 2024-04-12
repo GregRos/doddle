@@ -1,5 +1,6 @@
 import { LazyLike } from "./lazy//lazy-like";
 import { Lazy, Pulled } from ".";
+import { AnyConstructor } from "type-plus";
 
 export function getClassName(something: any) {
     if (typeof something !== "object") {
@@ -77,3 +78,19 @@ export function pull<T>(value: T | LazyLike<T>): Pulled<T>;
 export function pull<T>(value: T | LazyLike<T> | Pulled<T>): Pulled<T> {
     return isLazyLike(value) ? value.pull() : (value as any);
 }
+export type Selector = AnyConstructor | keyof NamedTypes;
+export type GetTypeForSelector<T> = T extends keyof NamedTypes
+    ? NamedTypes[T]
+    : T extends AnyConstructor
+      ? InstanceType<T>
+      : never;
+export type NamedTypes = {
+    object: object;
+    string: string;
+    number: number;
+    boolean: boolean;
+    symbol: symbol;
+    bigint: bigint;
+    function: Function;
+    undefined: undefined;
+};

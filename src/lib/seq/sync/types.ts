@@ -1,4 +1,4 @@
-import { LazyLike } from "..";
+import { Lazy, LazyLike } from "../..";
 import { Seq } from "./wrapper";
 
 export type Iteratee<E, O> = (this: Seq<E>, element: E, index: number) => O;

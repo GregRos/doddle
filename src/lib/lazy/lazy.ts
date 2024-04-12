@@ -33,6 +33,10 @@ export class Lazy<T> implements LazyLike<T> {
     }
 
     static create<T>(initializer: () => T | Lazy<T>): Lazy<T> {
+        const asAny = initializer as any;
+        if (asAny[ownerInstance] && asAny[methodName] === "pull") {
+            return asAny[ownerInstance];
+        }
         return new Lazy(initializer) as any;
     }
 
@@ -194,4 +198,12 @@ export function memoize<T>(definition: () => T): () => Pulled<T> {
         return definition as any;
     }
     return lazy(definition).pull;
+}
+
+export function force<T>(input: Lazy<T> | T): Pulled<T> {
+    if (isLazyLike(input)) {
+        return input.pull();
+    } else {
+        return lazy(() => input).pull();
+    }
 }

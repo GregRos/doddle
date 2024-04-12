@@ -1,5 +1,6 @@
 import { Iteratee, Predicate, Reducer } from "./types";
-import { Lazy, lazy, Pulled } from "..";
+import { Lazy, lazy, Pulled } from "../..";
+import { GetTypeForSelector, Selector } from "../../util";
 
 export class Seq<E> {
     static from<E>(iterable: Iterable<E>): Seq<E> {
@@ -12,26 +13,37 @@ export class Seq<E> {
 
     constructor(private _iterable: Iterable<E>) {}
 
-    private _wrap<T>(generator: (this: Seq<E>) => Iterable<T>): Seq<T> {
-        return new Seq<T>({
-            [Symbol.iterator]: () => {
-                return generator.call(this)[Symbol.iterator]();
-            }
+    endWith<Xs extends unknown[]>(
+        ...items: Xs
+    ): Seq<E | Xs extends (infer U)[] ? U : never> {
+        const self = this._iterable;
+        return this._wrap(function* endWith() {
+            yield* self;
+            yield* items as any;
         });
-    }
-    private _toLazy<X>(transform: (this: this) => X): Lazy<X> {
-        return lazy(transform.bind(this));
     }
 
-    tap(fn: Iteratee<E, any>) {
-        const self = this;
-        return this._wrap(function* () {
-            let i = 0;
-            for (const item of self) {
-                fn.call(self, item, i++);
-                yield item;
+    startWith<Xs extends unknown[]>(
+        ...items: Xs
+    ): Seq<E | Xs extends (infer U)[] ? U : never> {
+        const self = this._iterable;
+        return this._wrap(function* startWith() {
+            yield* items;
+            yield* self as any;
+        });
+    }
+
+    private _wrap<T>(
+        generator: (this: Seq<E>, self: Seq<E>) => Iterable<T>
+    ): Seq<T> {
+        return new Seq<T>({
+            [Symbol.iterator]: () => {
+                return generator.call(this, this)[Symbol.iterator]();
             }
         });
+    }
+    private _toLazy<X>(transform: (this: this, self: this) => X): Lazy<X> {
+        return lazy(transform.bind(this, this));
     }
 
     forEach(fn: Iteratee<E, any>) {
@@ -69,7 +81,7 @@ export class Seq<E> {
         });
     }
 
-    dematerialize(): Iterable<IteratorResult<E>> {
+    dematerialize(): Seq<IteratorResult<E>> {
         const self = this._iterable;
         return this._wrap(function* dematerialize() {
             for (const item of self) {
@@ -83,6 +95,14 @@ export class Seq<E> {
         return this as any;
     }
 
+    toObject<K extends PropertyKey, V>(
+        fn: Iteratee<E, [K, V]>
+    ): Lazy<Record<K, V>> {
+        return this.map(x => fn.call(this, x, 0))
+            .toArray()
+            .map(Object.fromEntries);
+    }
+
     index(): Seq<[number, E]> {
         let i = 0;
         return this.map(function index(x) {
@@ -90,61 +110,56 @@ export class Seq<E> {
         });
     }
 
-    first(): Lazy<E | undefined>;
-    first(fn: Predicate<E>): Lazy<E | undefined>;
-    first(fn?: Predicate<E>): Lazy<E | undefined> {
-        return this._toLazy(function first() {
+    first(): Lazy<E | null>;
+    first<Alt>(alt: Alt): Lazy<E | Alt>;
+    first(alt = null): Lazy<E | null> {
+        return this.find(() => true, alt);
+    }
+
+    findLast(fn: Predicate<E>): Lazy<E | null>;
+    findLast<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | Alt | null>;
+    findLast<Alt>(fn: Predicate<E>, alt?: Alt): Lazy<E | Alt | null> {
+        return this.reduce<E | Alt | null>(
+            (acc, x, i) => (fn.call(this, x, i) ? x : acc) as E | Alt,
+            alt ?? null
+        );
+    }
+
+    find(fn: Predicate<E>): Lazy<E | null>;
+    find<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | null>;
+    find<Alt>(fn: Predicate<E>, alt?: Alt): Lazy<E | Alt | null> {
+        return this._toLazy(function find(self) {
             let i = 0;
-            for (const item of this) {
-                if (!fn || fn.call(this, item, i++)) {
+            for (const item of self) {
+                if (fn.call(self, item, i++)) {
                     return item;
                 }
             }
-            return undefined;
+            return alt ?? null;
         });
     }
 
-    last(): Lazy<E | undefined>;
-    last(fn: Predicate<E>): Lazy<E | undefined>;
-    last(fn?: Predicate<E>): Lazy<E | undefined> {
-        return this._toLazy(function last() {
-            let result: E | undefined = undefined;
-            let i = 0;
-            for (const item of this) {
-                if (!fn || fn.call(this, item, i++)) {
-                    result = item;
-                }
-            }
-            return result;
-        });
+    last(): Lazy<E | null>;
+    last<Alt>(alt: Alt): Lazy<E | Alt>;
+    last(fn?: Predicate<E>, alt = null): Lazy<E | null> {
+        return this.findLast(fn ?? (() => true), alt);
     }
 
-    at(index: number): Lazy<E | undefined> {
-        return this._toLazy(function at() {
-            let i = 0;
-            for (const item of this) {
-                if (i++ === index) {
-                    return item;
-                }
-            }
-            return undefined;
-        });
+    at(index: number): Lazy<E | null> {
+        if (index < 0) {
+            return this.findLast((_, i) => i === -index - 1);
+        }
+        return this.find((_, i) => i === index);
     }
 
     some(fn: Predicate<E>): Lazy<boolean> {
-        const a = this.first(fn).map(x => x !== undefined);
+        const a = this.find(fn).map(x => x !== null);
         return a;
     }
 
     every(fn: Predicate<E>): Lazy<boolean> {
-        return this._toLazy(function every() {
-            let i = 0;
-            for (const item of this) {
-                if (!fn.call(this, item, i++)) {
-                    return false;
-                }
-            }
-            return true;
+        return this.some(function not(x, i) {
+            return !fn.call(this, x, i);
         });
     }
 
@@ -175,16 +190,7 @@ export class Seq<E> {
     count(): Lazy<number>;
     count(fn: Predicate<E>): Lazy<number>;
     count(fn?: Predicate<E>): Lazy<number> {
-        return this._toLazy(function count() {
-            let i = 0;
-            let count = 0;
-            for (const item of this) {
-                if (!fn || fn.call(this, item, i++)) {
-                    count++;
-                }
-            }
-            return count;
-        });
+        return this.reduce((acc, x) => acc + 1, 0);
     }
 
     reduce(fn: Reducer<E, E>): Lazy<E>;
@@ -209,13 +215,10 @@ export class Seq<E> {
         });
     }
 
-    do(fn: (item: E) => void): Seq<E> {
-        const self = this._iterable;
-        return this._wrap(function* do_() {
-            for (const item of self) {
-                fn(item);
-                yield item;
-            }
+    do(fn: Iteratee<E, void>): Seq<E> {
+        return this.map((x, i) => {
+            fn.call(this, x, i);
+            return x;
         });
     }
 
@@ -267,27 +270,25 @@ export class Seq<E> {
         }).as<Exclude<E, R>>();
     }
 
-    ofTypes<Ts extends unknown[]>(
-        ...ctors: {
-            [K in keyof Ts]: new (...args: any[]) => Ts[K];
-        }
-    ): Seq<Ts[number]> {
-        return this.filterAs(function ofTypes(x): x is Ts[number] {
-            return ctors.some(ctor => x instanceof ctor);
-        });
+    ofTypes<Selectors extends Selector>(
+        ...specifiers: Selectors[]
+    ): Seq<GetTypeForSelector<Selectors>> {
+        return this.filterAs(
+            function ofTypes(x): x is GetTypeForSelector<Selectors> {
+                return specifiers.some(spec => {
+                    if (typeof spec === "function") {
+                        return x instanceof spec;
+                    } else {
+                        return typeof x === spec;
+                    }
+                });
+            }
+        );
     }
 
     take(n: number): Seq<E> {
         const self = this._iterable;
-        return this._wrap(function* take() {
-            let i = 0;
-            for (const item of self) {
-                if (i++ === n) {
-                    break;
-                }
-                yield item;
-            }
-        });
+        return this.takeWhile((_, i) => i < n);
     }
 
     takeWhile(fn: Predicate<E>): Seq<E> {
@@ -304,16 +305,7 @@ export class Seq<E> {
     }
 
     skip(n: number): Seq<E> {
-        const self = this._iterable;
-        return this._wrap(function* skip() {
-            let i = 0;
-            for (const item of self) {
-                if (i++ < n) {
-                    continue;
-                }
-                yield item;
-            }
-        });
+        return this.skipWhile((_, i) => i < n);
     }
 
     zip<Xs extends any[]>(
@@ -390,17 +382,8 @@ export class Seq<E> {
         });
     }
 
-    uniq(): Seq<E> {
-        const self = this._iterable;
-        return this._wrap(function* uniq() {
-            const seen = new Set<E>();
-            for (const item of self) {
-                if (!seen.has(item)) {
-                    seen.add(item);
-                    yield item;
-                }
-            }
-        });
+    get uniq(): Seq<E> {
+        return this.uniqBy(x => x);
     }
 
     scan<U>(fn: Reducer<E, U>, initial: U): Seq<U> {
@@ -408,14 +391,17 @@ export class Seq<E> {
         return this._wrap(function* scan() {
             let acc = initial;
             let i = 0;
+            const all = [initial];
+
             for (const item of self) {
                 acc = fn.call(self, acc, item, i++);
+                all.push(acc);
                 yield acc;
             }
         });
     }
 
-    get isEmpty(): Lazy<boolean> {
+    isEmpty(): Lazy<boolean> {
         return lazy(() => {
             const iterator = this[Symbol.iterator]();
             return !!iterator.next().done;
