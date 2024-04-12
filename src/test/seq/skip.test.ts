@@ -2,7 +2,7 @@
 import { Seq, seqs } from "@lib";
 it("should do nothing on empty", () => {
     const a = seqs.empty().skip(1);
-    expect(a.isEmpty().pull()).toBeEqual(true);
+    expect(a.some().pull()).toBeEqual(false);
 });
 
 it("should skip", () => {

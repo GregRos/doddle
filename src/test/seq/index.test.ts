@@ -2,7 +2,7 @@
 import { expect } from "@assertive-ts/core";
 it("should do nothing on empty", () => {
     const a = seqs.empty().index();
-    expect(a.isEmpty().pull()).toBe(true);
+    expect(a.some().pull()).toBe(false);
 });
 
 it("should attach index", () => {

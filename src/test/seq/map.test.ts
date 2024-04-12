@@ -2,7 +2,7 @@
 import { expect } from "@assertive-ts/core";
 it("should leave it empty", () => {
     const s = seqs.empty().map(X => 1);
-    expect(s.isEmpty().pull()).toBe(true);
+    expect(s.some().pull()).toBe(false);
 });
 
 it("should map", () => {

@@ -55,7 +55,6 @@
         "@assertive-ts/core": "^2.1.0",
         "@types/jest": "^29.5.12",
         "jest": "^29.7.0",
-        "jest-stare": "^2.5.1",
         "synchronous-promise": "^2.0.17",
         "ts-jest": "^29.1.2",
         "type-plus": "^7.6.2"

@@ -1,5 +1,5 @@
 import { Iteratee, Predicate, Reducer } from "./types";
-import { Lazy, lazy, Pulled } from "../..";
+import { Lazy, lazy, Pulled, seqs } from "../..";
 import { GetTypeForSelector, Selector } from "../../util";
 const unset = {};
 export class Seq<E> {
@@ -87,7 +87,7 @@ export class Seq<E> {
             for (const item of self) {
                 yield { value: item, done: false };
             }
-            yield { done: true } as any;
+            yield { done: true, value: undefined } as any;
         });
     }
 
@@ -118,16 +118,16 @@ export class Seq<E> {
 
     findLast(fn: Predicate<E>): Lazy<E | null>;
     findLast<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | Alt | null>;
-    findLast<Alt>(fn: Predicate<E>, alt?: Alt): Lazy<E | Alt | null> {
+    findLast<Alt>(fn: Predicate<E>, alt: any = null): Lazy<E | Alt | null> {
         return this.reduce<E | Alt | null>(
             (acc, x, i) => (fn.call(this, x, i) ? x : acc) as E | Alt,
-            alt ?? null
+            alt
         );
     }
 
     find(fn: Predicate<E>): Lazy<E | null>;
     find<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | null>;
-    find<Alt>(fn: Predicate<E>, alt?: Alt): Lazy<E | Alt | null> {
+    find(fn: Predicate<E>, alt: any = null): Lazy<any> {
         return this._toLazy(function find(self) {
             let i = 0;
             for (const item of self) {
@@ -135,28 +135,25 @@ export class Seq<E> {
                     return item;
                 }
             }
-            return alt ?? null;
+            return alt;
         });
     }
 
     last(): Lazy<E | null>;
     last<Alt>(alt: Alt): Lazy<E | Alt>;
-    last(fn?: Predicate<E>, alt = null): Lazy<E | null> {
-        return this.findLast(fn ?? (() => true), alt);
+    last(alt = null): Lazy<E | null> {
+        return this.findLast(x => true, alt);
     }
 
     at(index: number): Lazy<E | null>;
     at<V>(index: number, alt: V): Lazy<E | V>;
-    at<V>(index: number, alt?: any): Lazy<E | V> {
-        alt = arguments.length === 1 ? unset : alt;
+    at<V>(index: number, alt: any = null): Lazy<E | V> {
         const found =
-            index < 0
+            index >= 0
                 ? this.index().skip(index).first(alt)
-                : this.takeLast(-index).first(alt ?? null);
-        if (found == unset) {
-            throw new RangeError("Index out of range");
-        }
-        return found;
+                : this.index().takeLast(-index).first(alt);
+
+        return found.map(x => x?.[1] ?? null);
     }
 
     only(): Lazy<E> {
@@ -184,7 +181,7 @@ export class Seq<E> {
     every(fn: Predicate<E>): Lazy<boolean> {
         return this.some(function not(x, i) {
             return !fn.call(this, x, i);
-        });
+        }).map(x => !x);
     }
 
     includes(item: E): Lazy<boolean> {
@@ -323,30 +320,43 @@ export class Seq<E> {
     }
 
     takeLast(count: number): Seq<E> {
+        if (count === 0) {
+            return seqs.empty<E>();
+        }
         return this._wrap(function* takeLast() {
-            if (count == 0) {
-                return;
-            }
             const buffer = Array(count);
             let i = 0;
             for (const item of this) {
                 buffer[i++ % count] = item;
             }
-            for (let j = i; ; j = (j + 1) % count) {
+            if (i <= count) {
+                yield* buffer.slice(0, i);
+                return;
+            }
+            yield buffer[i % count];
+            for (
+                let j = (i + 1) % count;
+                j !== i % count;
+                j = (j + 1) % count
+            ) {
                 yield buffer[j];
             }
         });
     }
 
     skipLast(count: number): Seq<E> {
+        if (count === 0) {
+            return this;
+        }
         return this._wrap(function* skipLast() {
             const buffer = Array(count);
             let i = 0;
             for (const item of this) {
-                buffer[i++ % count] = item;
                 if (i >= count) {
-                    yield buffer[(i - count) % count];
+                    yield buffer[(count - i) % count];
                 }
+                buffer[i % count] = item;
+                i++;
             }
         });
     }
@@ -461,14 +471,7 @@ export class Seq<E> {
         });
     }
 
-    isEmpty(): Lazy<boolean> {
-        return lazy(() => {
-            const iterator = this[Symbol.iterator]();
-            return !!iterator.next().done;
-        });
-    }
-
-    pull(): Seq<E> {
+    shared(): Seq<E> {
         const iterator = this[Symbol.iterator]();
         return new Seq({
             [Symbol.iterator]: () => {

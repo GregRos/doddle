@@ -1,7 +1,7 @@
 import { lazy } from "../../lazy/lazy";
 import { LazyAsync } from "../../lazy/types";
 import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types";
-
+const unset = Symbol("❌lazies -- unset❌");
 export class ASeq<E> {
     constructor(private _iterable: AsyncIterable<E>) {}
     static from<E>(iterable: AsyncIterable<E>): ASeq<E> {
@@ -90,10 +90,6 @@ export class ASeq<E> {
         });
     }
 
-    take(n: number): ASeq<E> {
-        return this.takeWhile((_, i) => i < n);
-    }
-
     takeWhile(fn: AsyncPredicate<E>): ASeq<E> {
         return this._wrap(async function* (self) {
             let i = 0;
@@ -138,11 +134,15 @@ export class ASeq<E> {
     }
 
     first(): LazyAsync<E | null>;
-    first(fn: AsyncPredicate<E>): LazyAsync<E | null>;
-    first(fn?: AsyncPredicate<E>): LazyAsync<E | null> {
-        if (!fn) {
-            return this.at(0);
-        }
+    first<V>(alt: V): LazyAsync<E | V>;
+    first(alt?: any): LazyAsync<E | any> {
+        return this.find(() => true, alt).map(x => (x === null ? alt : x));
+    }
+
+    find(fn: AsyncPredicate<E>): LazyAsync<E | null>;
+    find<V>(fn: AsyncPredicate<E>, alt: V): LazyAsync<E | V>;
+    find(fn: AsyncPredicate<E>, alt?: any): LazyAsync<E | null> {
+        alt = arguments.length === 2 ? alt : null;
         return lazy(async () => {
             let i = 0;
             for await (const item of this) {
@@ -150,19 +150,8 @@ export class ASeq<E> {
                     return item;
                 }
             }
-            return null;
+            return alt;
         });
-    }
-
-    some(fn: AsyncPredicate<E>): LazyAsync<boolean> {
-        const nope = {};
-        return this.first(fn).map(x => x !== nope);
-    }
-
-    every(fn: AsyncPredicate<E>): LazyAsync<boolean> {
-        return this.first(
-            async (x, i) => !(await fn.call(this, x, i))
-        ) as LazyAsync<boolean>;
     }
 
     includes(value: E): LazyAsync<boolean> {
@@ -217,10 +206,6 @@ export class ASeq<E> {
         return this.filterAs(function ofTypes(x): x is Ts[number] {
             return ctors.some(ctor => x instanceof ctor);
         });
-    }
-
-    at(index: number): LazyAsync<E | null> {
-        return this.first((_, i) => i === index);
     }
 
     last(): LazyAsync<E | null>;
@@ -319,8 +304,10 @@ export class ASeq<E> {
         });
     }
 
-    get isEmpty(): LazyAsync<boolean> {
-        return this.first().map(x => x === null);
+    some(): LazyAsync<boolean>;
+    some(fn: AsyncPredicate<E>): LazyAsync<boolean>;
+    some(fn?: AsyncPredicate<E>): LazyAsync<boolean> {
+        return this.find(fn ?? (() => true), unset).map(x => x !== unset);
     }
 
     pull(): ASeq<E> {

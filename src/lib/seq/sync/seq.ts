@@ -1,13 +1,15 @@
 import { SeqLike } from "./types";
 import { isIterable, isLazy, isLazyLike, isNextable, pull } from "../../util";
-import { Pulled } from "../..";
+import { Lazy, Pulled } from "../..";
 import { Seq } from "./wrapper";
 import { LaziesError } from "../error";
 
 export function seq(): Seq<never>;
+export function seq<E>(input: Lazy<SeqLike<E>>): Seq<E>;
 export function seq<E>(input: E[]): Seq<E>;
 export function seq<E>(input: SeqLike<E>): Seq<E>;
-export function seq<E>(input?: SeqLike<E>) {
+export function seq<E>(input?: SeqLike<E> | Lazy<SeqLike<E>>) {
+    input = pull(input);
     if (!input) {
         return new Seq<never>([]);
     } else if (input instanceof Seq) {

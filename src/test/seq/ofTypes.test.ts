@@ -8,7 +8,7 @@ it("should filter prototypes", () => {
 
 it("should do nothing on empty", () => {
     const stuffs = seqs.empty().ofTypes(Map);
-    expect(stuffs.isEmpty().pull()).toBe(true);
+    expect(stuffs.some().pull()).toBe(false);
 });
 
 it("should work with Number objects", () => {});

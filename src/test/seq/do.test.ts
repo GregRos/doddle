@@ -8,6 +8,7 @@ it("nothing on empty", () => {
         .do(() => {
             i++;
         })
+        .toArray()
         .pull();
     expect(i).toBeEqual(0);
 });
@@ -19,6 +20,7 @@ it("once per element", () => {
         .do(() => {
             i++;
         })
+        .toArray()
         .pull();
     expect(i).toBeEqual(3);
 });

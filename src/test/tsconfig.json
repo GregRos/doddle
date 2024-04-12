@@ -11,8 +11,10 @@
         "lib": ["es2020", "es2021.weakref"],
         "types": ["jest"],
         "outDir": "../../dist/test",
+        "skipLibCheck": true,
         "allowJs": true,
         "noEmit": true,
+
         "baseUrl": ".",
         "paths": {
             "@lib": ["../lib"]

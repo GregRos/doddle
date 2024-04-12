@@ -1,6 +1,23 @@
-﻿import { Seq } from '@lib';
+﻿import { expect } from "@assertive-ts/core";
+import { Seq, seq, seqs } from "@lib";
 
-it('should work correctly', () => {
-    // TODO: Write tests for toSet
-    expect(true).toBe(true);
+it("should give empty set on empty", () => {
+    const s = seq().toSet();
+    expect(s.pull()).toBeEqual(new Set());
+});
+
+it("should convert to set", () => {
+    const s = seqs.of(1, 2, 3).toSet();
+    expect(s.pull()).toBeEqual(new Set([1, 2, 3]));
+});
+
+it("should remove duplicates", () => {
+    const s = seqs.of(1, 2, 2, 3, 3, 3).toSet();
+    expect(s.pull()).toBeEqual(new Set([1, 2, 3]));
+});
+
+it("should set newer entry on conflicting", () => {
+    const s = seq(seqs.of(0, -0).toSet()).first();
+    const item = s.pull();
+    expect(Object.is(item, -0)).toBe(true);
 });

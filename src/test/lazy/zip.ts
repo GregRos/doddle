@@ -1,5 +1,4 @@
 import { lazy } from "../../lib/lazy/lazy";
-import { expect } from "earl";
 import { LazyAsync } from "../../lib/lazy/types";
 it("zips only sync", () => {
     const [a, b, c] = [lazy(() => 1 as const), lazy(() => 2), lazy(() => 3)];
