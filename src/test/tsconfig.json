@@ -12,6 +12,7 @@
         "types": ["jest"],
         "outDir": "../../dist/test",
         "allowJs": true,
+        "noEmit": true,
         "baseUrl": ".",
         "paths": {
             "@lib": ["../lib"]

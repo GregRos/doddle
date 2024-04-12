@@ -7,7 +7,6 @@ const config = {
     testMatch: ["<rootDir>/src/test/**/*.test.ts"],
     // The default test threshold is 5s. That's way too low.
     slowTestThreshold: 500,
-
     // Should be set via --coverage option
     collectCoverage: false,
     collectCoverageFrom: ["<rootDir>/src/lib/**/*.ts"],

@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>jest-stare!</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="css/diff2html.min.css" rel="stylesheet" type="text/css">
+    <link href="css/jest-stare.css" rel="stylesheet" type="text/css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/holder.js"></script>
+    <script src="js/diff2html.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/view.js"></script>
+</head>
+
+<body>
+    <header>
+        <!-- Fixed navbar -->
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+            <a class="navbar-brand" id="navbar-title" href="#">jest-stare</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="coverage-link" class="nav-link disabled" href="#">Coverage</a>
+                    </li>
+                    <li class="nav-item">
+                        <div class="onoff-switch mr-sm-2 ml-sm-2">
+                            <input type="checkbox" name="off-switch" class="off-switch-checkbox" id="lab-passoff-switch" checked>
+                            <label class="onoff-switch-label" for="lab-passoff-switch">
+                                <span class="pass off-switch-inner"></span>
+                                <span class="off-switch-switch"></span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="onoff-switch mr-sm-2 ml-sm-2">
+                            <input type="checkbox" name="off-switch" class="off-switch-checkbox" id="lab-failoff-switch" checked>
+                            <label class="onoff-switch-label" for="lab-failoff-switch">
+                                <span class="fail off-switch-inner"></span>
+                                <span class="off-switch-switch"></span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="onoff-switch mr-sm-2 ml-sm-2">
+                            <input type="checkbox" name="off-switch" class="off-switch-checkbox" id="lab-pendingoff-switch" checked>
+                            <label class="onoff-switch-label" for="lab-pendingoff-switch">
+                                <span class="pending off-switch-inner"></span>
+                                <span class="off-switch-switch"></span>
+                            </label>
+                        </div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="onoff-switch mr-sm-2 ml-sm-2">
+                            <input type="checkbox" name="off-switch" class="off-switch-checkbox" id="lab-todooff-switch" checked>
+                            <label class="onoff-switch-label" for="lab-todooff-switch">
+                                <span class="todo off-switch-inner"></span>
+                                <span class="off-switch-switch"></span>
+                            </label>
+                        </div>
+                    </li>
+                </ul>
+                <!-- <form class="form-inline mt-2 mt-md-0">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search" disabled>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" disabled>Search</button>
+                </form> -->
+            </div>
+        </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+
+        <h1 class="mt-5"></h1>
+
+        <!-- Three columns of text below the carousel -->
+        <div class="row">
+            <div class="col-lg-4">
+                <canvas id="test-suites-canvas" width="100" height="100"></canvas>
+                <h2>Test Suites</h2>
+                <div class="list-group">
+                    <p id="test-suites-results" class="list-group-item list-group-item-action">23 passed, 29 total</p>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+            <div class="col-lg-4">
+                <canvas id="tests-canvas" width="100" height="100"></canvas>
+                <h2>Tests</h2>
+                <div class="list-group">
+                    <p id="tests-results" class="list-group-item list-group-item-action">51 passed, 59 total</p>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+            <div class="col-lg-4" id="snapshots-group">
+                <canvas id="snapshots-canvas" width="100" height="100"></canvas>
+                <h2>Snapshots</h2>
+                <div class="list-group">
+                    <p id="snapshots-results" class="list-group-item list-group-item-action">0 passed, 0 total</p>
+                </div>
+            </div>
+            <!-- /.col-lg-4 -->
+        </div>
+
+        <div id="loading-info" class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0"
+                aria-valuemax="100" style="width: 100%"></div>
+        </div>
+
+        <div class="d-none" id="test-summary"></div>
+        <div class="d-none" id="test-config">{
+  &quot;additionalResultsProcessors&quot;: [],
+  &quot;resultDir&quot;: &quot;.&#x2F;jest-stare&#x2F;&quot;,
+  &quot;resultHtml&quot;: &quot;index.html&quot;,
+  &quot;resultJson&quot;: &quot;jest-results.json&quot;
+}</div>
+        <div id="accordion">
+            <div class="d-none" id="test-results">{
+  &quot;numFailedTestSuites&quot;: 6,
+  &quot;numFailedTests&quot;: 8,
+  &quot;numPassedTestSuites&quot;: 23,
+  &quot;numPassedTests&quot;: 51,
+  &quot;numPendingTestSuites&quot;: 0,
+  &quot;numPendingTests&quot;: 0,
+  &quot;numRuntimeErrorTestSuites&quot;: 2,
+  &quot;numTodoTests&quot;: 0,
+  &quot;numTotalTestSuites&quot;: 29,
+  &quot;numTotalTests&quot;: 59,
+  &quot;openHandles&quot;: [],
+  &quot;snapshot&quot;: {
+    &quot;added&quot;: 0,
+    &quot;didUpdate&quot;: false,
+    &quot;failure&quot;: false,
+    &quot;filesAdded&quot;: 0,
+    &quot;filesRemoved&quot;: 0,
+    &quot;filesRemovedList&quot;: [],
+    &quot;filesUnmatched&quot;: 0,
+    &quot;filesUpdated&quot;: 0,
+    &quot;matched&quot;: 0,
+    &quot;total&quot;: 0,
+    &quot;unchecked&quot;: 0,
+    &quot;uncheckedKeysByFile&quot;: [],
+    &quot;unmatched&quot;: 0,
+    &quot;updated&quot;: 0
+  },
+  &quot;startTime&quot;: 1712936813326,
+  &quot;success&quot;: false,
+  &quot;testResults&quot;: [
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817531,
+        &quot;runtime&quot;: 3605,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813926
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\toMap.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 52,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817709,
+        &quot;runtime&quot;: 120,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817589
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\takeWhile.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 1,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817708,
+        &quot;runtime&quot;: 3860,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813848
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\do.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 23,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;nothing on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;nothing on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m0\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n    at new \n    at NumberAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\do.test.ts:17:15)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m0\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n    at new \n    at NumberAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\do.test.ts:17:15)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;once per element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;once per element&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: &quot;\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1monce per element\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31m0\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be deep equal\u001b[0m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m 15 |\u001b[39m         i\u001b[33m++\u001b[39m\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 16 |\u001b[39m     })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 17 |\u001b[39m     expect(i)\u001b[33m.\u001b[39mtoBeEqual(\u001b[35m3\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m               \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 18 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 19 |\u001b[39m\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat NumberAssertion.toBeEqual (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:334:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;do.test.ts\u001b[39m\u001b[0m\u001b[2m:17:15)\u001b[22m\u001b[2m\u001b[22m\n&quot;
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 2,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817714,
+        &quot;runtime&quot;: 3866,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813848
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\at.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 53,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;get at 0&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;get at 0&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 3,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mundefined\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mSymbol(NoThrow)\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected the function to throw when called\u001b[0m\n\nDifference:\n\n  Comparing two different types of values. Expected \u001b[32mundefined\u001b[39m but received \u001b[31msymbol\u001b[39m.\n    at new \n    at FunctionAssertion.toThrowError (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\FunctionAssertion.ts:103:13)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\at.test.ts:11:27)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mundefined\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mSymbol(NoThrow)\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected the function to throw when called\u001b[0m\n\nDifference:\n\n  Comparing two different types of values. Expected \u001b[32mundefined\u001b[39m but received \u001b[31msymbol\u001b[39m.\n    at new \n    at FunctionAssertion.toThrowError (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\FunctionAssertion.ts:103:13)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\at.test.ts:11:27)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;get at missing index is range error&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;get at missing index is range error&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m1\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n    at new \n    at NumberAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\at.test.ts:16:29)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m1\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n    at new \n    at NumberAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\at.test.ts:16:29)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;get at negative index&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;get at negative index&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: &quot;\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mget at missing index is range error\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32mundefined\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31mSymbol(NoThrow)\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected the function to throw when called\u001b[0m\n\n    Difference:\n\n      Comparing two different types of values. Expected \u001b[32mundefined\u001b[39m but received \u001b[31msymbol\u001b[39m.\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m  9 |\u001b[39m it(\u001b[32m\&quot;get at missing index is range error\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m 10 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39m\u001b[36mof\u001b[39m(\u001b[35m1\u001b[39m\u001b[33m,\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m \u001b[35m3\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 11 |\u001b[39m     expect(() \u001b[33m&#x3D;&gt;\u001b[39m s\u001b[33m.\u001b[39mat(\u001b[35m3\u001b[39m))\u001b[33m.\u001b[39mtoThrowError(\u001b[33mRangeError\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m                           \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 12 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 13 |\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 14 |\u001b[39m it(\u001b[32m\&quot;get at negative index\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat FunctionAssertion.toThrowError (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;FunctionAssertion.ts\u001b[2m:103:13)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;at.test.ts\u001b[39m\u001b[0m\u001b[2m:11:27)\u001b[22m\u001b[2m\u001b[22m\n\n\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mget at negative index\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32m3\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31m1\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be deep equal\u001b[0m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m 14 |\u001b[39m it(\u001b[32m\&quot;get at negative index\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m 15 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39m\u001b[36mof\u001b[39m(\u001b[35m1\u001b[39m\u001b[33m,\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m \u001b[35m3\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 16 |\u001b[39m     expect(s\u001b[33m.\u001b[39mat(\u001b[33m-\u001b[39m\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBeEqual(\u001b[35m3\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m                             \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 17 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 18 |\u001b[39m\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat NumberAssertion.toBeEqual (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:334:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;at.test.ts\u001b[39m\u001b[0m\u001b[2m:16:29)\u001b[22m\u001b[2m\u001b[22m\n&quot;
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 8,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817748,
+        &quot;runtime&quot;: 3864,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813884
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\concatMap.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 37,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with empty input&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with empty input&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with single element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with single element&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with multiple elements&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with multiple elements&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with empty output&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with empty output&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with single input and array output&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with single input and array output&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 0,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with single input and seq output&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with single input and seq output&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with single input and set output&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with single input and set output&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with single input and map output&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with single input and map output&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 4,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817787,
+        &quot;runtime&quot;: 3864,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813923
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\filter.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 44,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;empty sequence&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;empty sequence&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;single element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;single element&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;multiple elements&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;multiple elements&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;no elements&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;no elements&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817765,
+        &quot;runtime&quot;: 3873,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813892
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\reduce.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 22,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should default on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should default on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should reduce&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should reduce&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 3,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817783,
+        &quot;runtime&quot;: 3911,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813872
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\includes.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 32,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should not find in empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should not find in empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should find&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should find&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should not find&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should not find&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 2,
+      &quot;numPassingTests&quot;: 0,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817746,
+        &quot;runtime&quot;: 3905,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813841
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\dematerialize.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 24,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n\nDifference:\n\n\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n\u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n\u001b[2m    },\u001b[22m\n\u001b[2m  ]\u001b[22m\n    at new \n    at ArrayAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\dematerialize.test.ts:5:32)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n\nDifference:\n\n\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[2m  Array [\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n\u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n\u001b[2m    },\u001b[22m\n\u001b[2m  ]\u001b[22m\n    at new \n    at ArrayAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\dematerialize.test.ts:5:32)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;empty sequence&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;empty sequence&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n\nDifference:\n\n\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[33m@@ -3,8 +3,7 @@\u001b[39m\n\u001b[2m      \&quot;done\&quot;: false,\u001b[22m\n\u001b[2m      \&quot;value\&quot;: 1,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n\u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n\u001b[2m    },\u001b[22m\n\u001b[2m  ]\u001b[22m\n    at new \n    at ArrayAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\dematerialize.test.ts:10:32)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be deep equal\u001b[0m\n\nDifference:\n\n\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[33m@@ -3,8 +3,7 @@\u001b[39m\n\u001b[2m      \&quot;done\&quot;: false,\u001b[22m\n\u001b[2m      \&quot;value\&quot;: 1,\u001b[22m\n\u001b[2m    },\u001b[22m\n\u001b[2m    Object {\u001b[22m\n\u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n\u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n\u001b[2m    },\u001b[22m\n\u001b[2m  ]\u001b[22m\n    at new \n    at ArrayAssertion.toBeEqual (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:334:19)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\dematerialize.test.ts:10:32)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;single element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;single element&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: &quot;\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mempty sequence\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be deep equal\u001b[0m\n\n    Difference:\n\n    \u001b[32m- Expected\u001b[39m\n    \u001b[31m+ Received\u001b[39m\n\n    \u001b[2m  Array [\u001b[22m\n    \u001b[2m    Object {\u001b[22m\n    \u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n    \u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n    \u001b[2m    },\u001b[22m\n    \u001b[2m  ]\u001b[22m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m 3 |\u001b[39m it(\u001b[32m\&quot;empty sequence\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m 4 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39mempty()\u001b[33m.\u001b[39mdematerialize()\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 5 |\u001b[39m     expect(s\u001b[33m.\u001b[39mtoArray()\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBeEqual([{ value\u001b[33m:\u001b[39m undefined\u001b[33m,\u001b[39m done\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m }])\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m   |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 6 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 7 |\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 8 |\u001b[39m it(\u001b[32m\&quot;single element\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat ArrayAssertion.toBeEqual (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:334:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;dematerialize.test.ts\u001b[39m\u001b[0m\u001b[2m:5:32)\u001b[22m\u001b[2m\u001b[22m\n\n\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1msingle element\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true, \&quot;value\&quot;: undefined}]\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31m[{\&quot;done\&quot;: false, \&quot;value\&quot;: 1}, {\&quot;done\&quot;: true}]\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be deep equal\u001b[0m\n\n    Difference:\n\n    \u001b[32m- Expected\u001b[39m\n    \u001b[31m+ Received\u001b[39m\n\n    \u001b[33m@@ -3,8 +3,7 @@\u001b[39m\n    \u001b[2m      \&quot;done\&quot;: false,\u001b[22m\n    \u001b[2m      \&quot;value\&quot;: 1,\u001b[22m\n    \u001b[2m    },\u001b[22m\n    \u001b[2m    Object {\u001b[22m\n    \u001b[2m      \&quot;done\&quot;: true,\u001b[22m\n    \u001b[32m-     \&quot;value\&quot;: undefined,\u001b[39m\n    \u001b[2m    },\u001b[22m\n    \u001b[2m  ]\u001b[22m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m  8 |\u001b[39m it(\u001b[32m\&quot;single element\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m  9 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39m\u001b[36mof\u001b[39m(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mdematerialize()\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 10 |\u001b[39m     expect(s\u001b[33m.\u001b[39mtoArray()\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBeEqual([\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m                                \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 11 |\u001b[39m         { value\u001b[33m:\u001b[39m \u001b[35m1\u001b[39m\u001b[33m,\u001b[39m done\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m }\u001b[33m,\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 12 |\u001b[39m         { value\u001b[33m:\u001b[39m undefined\u001b[33m,\u001b[39m done\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m }\u001b[22m\n\u001b[2m     \u001b[90m 13 |\u001b[39m     ])\u001b[33m;\u001b[39m\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat ArrayAssertion.toBeEqual (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:334:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;dematerialize.test.ts\u001b[39m\u001b[0m\u001b[2m:10:32)\u001b[22m\u001b[2m\u001b[22m\n&quot;
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 3,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817815,
+        &quot;runtime&quot;: 3909,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813906
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\first.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 23,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should return null for empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return null for empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;accepts default value&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;accepts default value&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should return first element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return first element&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 3,
+      &quot;numPassingTests&quot;: 0,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817876,
+        &quot;runtime&quot;: 4032,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813844
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 30,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:5:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:5:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;true on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;true on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mfalse\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mtrue\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:10:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mfalse\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mtrue\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:10:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;false on once&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;false on once&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 7,
+          &quot;failureDetails&quot;: [
+            {
+              &quot;message&quot;: &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:15:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+            }
+          ],
+          &quot;failureMessages&quot;: [
+            &quot;\u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n\u001b[0mReceived:\u001b[0m\n\u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n\u001b[0m\u001b[0m\n\u001b[0mMessage:\u001b[0m\n\u001b[0m  Expected both values to be the same\u001b[0m\n    at new \n    at BooleanAssertion.toBeSame (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:426:19)\n    at BooleanAssertion.toBe (C:\\codegr\\lazies\\node_modules\\@assertive-ts\\core\\src\\lib\\Assertion.ts:482:17)\n    at Object.&lt;anonymous&gt; (C:\\codegr\\lazies\\src\\test\\seq\\every.test.ts:15:22)\n    at Promise.then.completed (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:298:28)\n    at new Promise (&lt;anonymous&gt;)\n    at callAsyncCircusFn (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\utils.js:231:10)\n    at _callCircusTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:316:40)\n    at processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)\n    at _runTest (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:252:3)\n    at _runTestsForDescribeBlock (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:126:9)\n    at run (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\run.js:71:3)\n    at runAndTransformResultsToJestFormat (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapterInit.js:122:21)\n    at jestAdapter (C:\\codegr\\lazies\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:79:19)\n    at runTestInternal (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:367:16)\n    at runTest (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n    at Object.worker (C:\\codegr\\lazies\\node_modules\\jest-runner\\build\\testWorker.js:106:12)&quot;
+          ],
+          &quot;fullName&quot;: &quot;evaluates&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;failed&quot;,
+          &quot;title&quot;: &quot;evaluates&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: &quot;\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mtrue on empty\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be the same\u001b[0m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m 3 |\u001b[39m it(\u001b[32m\&quot;true on empty\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m 4 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39mempty()\u001b[33m.\u001b[39mevery(() \u001b[33m&#x3D;&gt;\u001b[39m \u001b[36mfalse\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 5 |\u001b[39m     expect(s\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m   |\u001b[39m                      \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 6 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 7 |\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 8 |\u001b[39m it(\u001b[32m\&quot;false on once\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBeSame (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:426:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBe (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:482:17)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;every.test.ts\u001b[39m\u001b[0m\u001b[2m:5:22)\u001b[22m\u001b[2m\u001b[22m\n\n\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mfalse on once\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32mfalse\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31mtrue\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be the same\u001b[0m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m  8 |\u001b[39m it(\u001b[32m\&quot;false on once\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m  9 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39m\u001b[36mof\u001b[39m(\u001b[35m1\u001b[39m)\u001b[33m.\u001b[39mevery(() \u001b[33m&#x3D;&gt;\u001b[39m \u001b[36mfalse\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 10 |\u001b[39m     expect(s\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBe(\u001b[36mfalse\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m                      \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 11 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 12 |\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 13 |\u001b[39m it(\u001b[32m\&quot;evaluates\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBeSame (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:426:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBe (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:482:17)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;every.test.ts\u001b[39m\u001b[0m\u001b[2m:10:22)\u001b[22m\u001b[2m\u001b[22m\n\n\u001b[1m\u001b[31m  \u001b[1m● \u001b[22m\u001b[1mevaluates\u001b[39m\u001b[22m\n\n    \u001b[0mExpected value \u001b[0m  \u001b[32mtrue\u001b[39m\n    \u001b[0mReceived:\u001b[0m\n    \u001b[0m\u001b[0m  \u001b[31mfalse\u001b[39m\u001b[0m\u001b[0m\n    \u001b[0m\u001b[0m\n    \u001b[0mMessage:\u001b[0m\n    \u001b[0m  Expected both values to be the same\u001b[0m\n        at new\n\u001b[2m\u001b[22m\n\u001b[2m    \u001b[0m \u001b[90m 13 |\u001b[39m it(\u001b[32m\&quot;evaluates\&quot;\u001b[39m\u001b[33m,\u001b[39m () \u001b[33m&#x3D;&gt;\u001b[39m {\u001b[22m\n\u001b[2m     \u001b[90m 14 |\u001b[39m     \u001b[36mconst\u001b[39m s \u001b[33m&#x3D;\u001b[39m seqs\u001b[33m.\u001b[39m\u001b[36mof\u001b[39m(\u001b[35m1\u001b[39m\u001b[33m,\u001b[39m \u001b[35m2\u001b[39m\u001b[33m,\u001b[39m \u001b[35m3\u001b[39m)\u001b[33m.\u001b[39mevery(v \u001b[33m&#x3D;&gt;\u001b[39m v \u001b[33m&lt;\u001b[39m \u001b[35m4\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m    \u001b[31m\u001b[1m&gt;\u001b[22m\u001b[2m\u001b[39m\u001b[90m 15 |\u001b[39m     expect(s\u001b[33m.\u001b[39mpull())\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m    |\u001b[39m                      \u001b[31m\u001b[1m^\u001b[22m\u001b[2m\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 16 |\u001b[39m })\u001b[33m;\u001b[39m\u001b[22m\n\u001b[2m     \u001b[90m 17 |\u001b[39m\u001b[0m\u001b[22m\n\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBeSame (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:426:19)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat BooleanAssertion.toBe (\u001b[22m\u001b[2mnode_modules&#x2F;@assertive-ts&#x2F;core&#x2F;src&#x2F;lib&#x2F;Assertion.ts\u001b[2m:482:17)\u001b[22m\u001b[2m\u001b[22m\n\u001b[2m      \u001b[2mat Object.&lt;anonymous&gt; (\u001b[22m\u001b[2m\u001b[0m\u001b[36msrc&#x2F;test&#x2F;seq&#x2F;every.test.ts\u001b[39m\u001b[0m\u001b[2m:15:22)\u001b[22m\u001b[2m\u001b[22m\n&quot;
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 3,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817848,
+        &quot;runtime&quot;: 4008,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936813840
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\ofTypes.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 34,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should filter prototypes&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should filter prototypes&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should do nothing on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should do nothing on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 0,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work with Number objects&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work with Number objects&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817906,
+        &quot;runtime&quot;: 144,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817762
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\forEach.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should not call func on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should not call func on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should call func for each element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should call func for each element&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817913,
+        &quot;runtime&quot;: 95,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817818
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\as.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should do nothing&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should do nothing&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817929,
+        &quot;runtime&quot;: 75,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817854
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\take.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936817981,
+        &quot;runtime&quot;: 87,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817894
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\index.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should do nothing on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should do nothing on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should attach index&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should attach index&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818023,
+        &quot;runtime&quot;: 87,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817936
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\cache.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should not mess up seq&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should not mess up seq&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should not show side effects&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should not show side effects&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 3,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818052,
+        &quot;runtime&quot;: 89,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817963
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\last.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should return null for empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return null for empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;accepts default value&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;accepts default value&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should return first element&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return first element&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 3,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818085,
+        &quot;runtime&quot;: 87,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936817998
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\count.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [
+            &quot;Seq&quot;,
+            &quot;#count&quot;
+          ],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;Seq #count should return the number of items in the sequence&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return the number of items in the sequence&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [
+            &quot;Seq&quot;,
+            &quot;#count&quot;
+          ],
+          &quot;duration&quot;: 0,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;Seq #count should return 0 for an empty sequence&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should return 0 for an empty sequence&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [
+            &quot;Seq&quot;,
+            &quot;#count&quot;
+          ],
+          &quot;duration&quot;: 0,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;Seq #count should count the number of items that satisfy a predicate&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should count the number of items that satisfy a predicate&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818111,
+        &quot;runtime&quot;: 74,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818037
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\toArray.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818143,
+        &quot;runtime&quot;: 71,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818072
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\map.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should leave it empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should leave it empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should map&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should map&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818160,
+        &quot;runtime&quot;: 55,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818105
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\zip.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 1,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 2,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818201,
+        &quot;runtime&quot;: 70,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818131
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\skip.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 2,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should do nothing on empty&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should do nothing on empty&quot;
+        },
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should skip&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 0,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should skip&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818208,
+        &quot;runtime&quot;: 55,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818153
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\toSet.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 1,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818229,
+        &quot;runtime&quot;: 52,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818177
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\excludeAs.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 1,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818241,
+        &quot;runtime&quot;: 51,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818190
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\toObject.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 1,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 1,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 1712936818271,
+        &quot;runtime&quot;: 51,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 1712936818220
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\filterAs.test.ts&quot;,
+      &quot;testResults&quot;: [
+        {
+          &quot;ancestorTitles&quot;: [],
+          &quot;duration&quot;: 1,
+          &quot;failureDetails&quot;: [],
+          &quot;failureMessages&quot;: [],
+          &quot;fullName&quot;: &quot;should work correctly&quot;,
+          &quot;invocations&quot;: 1,
+          &quot;location&quot;: null,
+          &quot;numPassingAsserts&quot;: 1,
+          &quot;retryReasons&quot;: [],
+          &quot;status&quot;: &quot;passed&quot;,
+          &quot;title&quot;: &quot;should work correctly&quot;
+        }
+      ],
+      &quot;failureMessage&quot;: null
+    },
+    {
+      &quot;failureMessage&quot;: &quot;  \u001b[1m● \u001b[22mTest suite failed to run\n\n    Your test suite must contain at least one test.\n\n      \u001b[2mat onResult (\u001b[22mnode_modules&#x2F;@jest&#x2F;core&#x2F;build&#x2F;TestScheduler.js\u001b[2m:133:18)\u001b[22m\n      \u001b[2mat \u001b[22mnode_modules&#x2F;@jest&#x2F;core&#x2F;build&#x2F;TestScheduler.js\u001b[2m:254:19\u001b[22m\n      \u001b[2mat \u001b[22mnode_modules&#x2F;emittery&#x2F;index.js\u001b[2m:363:13\u001b[22m\n          at Array.map (&lt;anonymous&gt;)\n      \u001b[2mat Emittery.emit (\u001b[22mnode_modules&#x2F;emittery&#x2F;index.js\u001b[2m:361:23)\u001b[22m\n&quot;,
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 0,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 0,
+        &quot;runtime&quot;: 0,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 0
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testExecError&quot;: {
+        &quot;message&quot;: &quot;Your test suite must contain at least one test.&quot;,
+        &quot;stack&quot;: &quot;Error: Your test suite must contain at least one test.\n    at onResult (C:\\codegr\\lazies\\node_modules\\@jest\\core\\build\\TestScheduler.js:133:18)\n    at C:\\codegr\\lazies\\node_modules\\@jest\\core\\build\\TestScheduler.js:254:19\n    at C:\\codegr\\lazies\\node_modules\\emittery\\index.js:363:13\n    at Array.map (&lt;anonymous&gt;)\n    at Emittery.emit (C:\\codegr\\lazies\\node_modules\\emittery\\index.js:361:23)\n    at process.processTicksAndRejections (node:internal&#x2F;process&#x2F;task_queues:95:5)&quot;
+      },
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\some.test.ts&quot;,
+      &quot;testResults&quot;: []
+    },
+    {
+      &quot;failureMessage&quot;: &quot;  \u001b[1m● \u001b[22mTest suite failed to run\n\n    \u001b[96msrc&#x2F;test&#x2F;seq&#x2F;from.test.ts\u001b[0m:\u001b[93m2\u001b[0m:\u001b[93m24\u001b[0m - \u001b[91merror\u001b[0m\u001b[90m TS2307: \u001b[0mCannot find module &#39;earl&#39; or its corresponding type declarations.\n\n    \u001b[7m2\u001b[0m import { expect } from \&quot;earl\&quot;;\n    \u001b[7m \u001b[0m \u001b[91m                       ~~~~~~\u001b[0m\n&quot;,
+      &quot;leaks&quot;: false,
+      &quot;numFailingTests&quot;: 0,
+      &quot;numPassingTests&quot;: 0,
+      &quot;numPendingTests&quot;: 0,
+      &quot;numTodoTests&quot;: 0,
+      &quot;openHandles&quot;: [],
+      &quot;perfStats&quot;: {
+        &quot;end&quot;: 0,
+        &quot;runtime&quot;: 0,
+        &quot;slow&quot;: false,
+        &quot;start&quot;: 0
+      },
+      &quot;skipped&quot;: false,
+      &quot;snapshot&quot;: {
+        &quot;added&quot;: 0,
+        &quot;fileDeleted&quot;: false,
+        &quot;matched&quot;: 0,
+        &quot;unchecked&quot;: 0,
+        &quot;uncheckedKeys&quot;: [],
+        &quot;unmatched&quot;: 0,
+        &quot;updated&quot;: 0
+      },
+      &quot;testExecError&quot;: &quot;\u001b[96msrc&#x2F;test&#x2F;seq&#x2F;from.test.ts\u001b[0m:\u001b[93m2\u001b[0m:\u001b[93m24\u001b[0m - \u001b[91merror\u001b[0m\u001b[90m TS2307: \u001b[0mCannot find module &#39;earl&#39; or its corresponding type declarations.\n\n\u001b[7m2\u001b[0m import { expect } from \&quot;earl\&quot;;\n\u001b[7m \u001b[0m \u001b[91m                       ~~~~~~\u001b[0m&quot;,
+      &quot;testFilePath&quot;: &quot;C:\\codegr\\lazies\\src\\test\\seq\\from.test.ts&quot;,
+      &quot;testResults&quot;: []
+    }
+  ],
+  &quot;wasInterrupted&quot;: false
+}</div>
+        </div>
+        <div class="d-none" id="test-global-config">{
+  &quot;bail&quot;: 0,
+  &quot;changedFilesWithAncestor&quot;: false,
+  &quot;ci&quot;: false,
+  &quot;collectCoverage&quot;: true,
+  &quot;collectCoverageFrom&quot;: [
+    &quot;src&#x2F;lib&#x2F;**&#x2F;*.ts&quot;
+  ],
+  &quot;coverageDirectory&quot;: &quot;C:\\codegr\\lazies\\coverage&quot;,
+  &quot;coverageProvider&quot;: &quot;babel&quot;,
+  &quot;coverageReporters&quot;: [
+    &quot;json&quot;,
+    &quot;text&quot;,
+    &quot;lcov&quot;,
+    &quot;clover&quot;
+  ],
+  &quot;detectLeaks&quot;: false,
+  &quot;detectOpenHandles&quot;: false,
+  &quot;errorOnDeprecated&quot;: false,
+  &quot;expand&quot;: false,
+  &quot;findRelatedTests&quot;: false,
+  &quot;forceExit&quot;: true,
+  &quot;json&quot;: false,
+  &quot;lastCommit&quot;: false,
+  &quot;listTests&quot;: false,
+  &quot;logHeapUsage&quot;: false,
+  &quot;maxConcurrency&quot;: 5,
+  &quot;maxWorkers&quot;: 11,
+  &quot;noStackTrace&quot;: false,
+  &quot;nonFlagArgs&quot;: [],
+  &quot;notify&quot;: false,
+  &quot;notifyMode&quot;: &quot;failure-change&quot;,
+  &quot;onlyChanged&quot;: false,
+  &quot;onlyFailures&quot;: false,
+  &quot;openHandlesTimeout&quot;: 1000,
+  &quot;passWithNoTests&quot;: false,
+  &quot;projects&quot;: [],
+  &quot;reporters&quot;: [
+    [
+      &quot;C:\\codegr\\lazies\\node_modules\\jest-stare\\lib\\index.js&quot;,
+      {}
+    ]
+  ],
+  &quot;rootDir&quot;: &quot;C:\\codegr\\lazies&quot;,
+  &quot;runTestsByPath&quot;: false,
+  &quot;seed&quot;: 724815399,
+  &quot;skipFilter&quot;: false,
+  &quot;snapshotFormat&quot;: {
+    &quot;escapeString&quot;: false,
+    &quot;printBasicPrototype&quot;: false
+  },
+  &quot;testFailureExitCode&quot;: 1,
+  &quot;testPathPattern&quot;: &quot;&quot;,
+  &quot;testSequencer&quot;: &quot;C:\\codegr\\lazies\\node_modules\\@jest\\test-sequencer\\build\\index.js&quot;,
+  &quot;updateSnapshot&quot;: &quot;new&quot;,
+  &quot;useStderr&quot;: false,
+  &quot;watch&quot;: false,
+  &quot;watchAll&quot;: false,
+  &quot;watchman&quot;: true,
+  &quot;workerThreads&quot;: false
+}</div>
+
+    </main>
+    <hr>
+    <footer class="footer">
+        <div class="container">
+            <span class="text-muted">jest-stare 2022</span>
+        </div>
+    </footer>
+</body>
+
+</html>
+

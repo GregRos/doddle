@@ -1,7 +1,7 @@
 import { Iteratee, Predicate, Reducer } from "./types";
 import { Lazy, lazy, Pulled } from "../..";
 import { GetTypeForSelector, Selector } from "../../util";
-
+const unset = {};
 export class Seq<E> {
     static from<E>(iterable: Iterable<E>): Seq<E> {
         return new Seq(iterable);
@@ -145,15 +145,39 @@ export class Seq<E> {
         return this.findLast(fn ?? (() => true), alt);
     }
 
-    at(index: number): Lazy<E | null> {
-        if (index < 0) {
-            return this.findLast((_, i) => i === -index - 1);
+    at(index: number): Lazy<E | null>;
+    at<V>(index: number, alt: V): Lazy<E | V>;
+    at<V>(index: number, alt?: any): Lazy<E | V> {
+        alt = arguments.length === 1 ? unset : alt;
+        const found =
+            index < 0
+                ? this.index().skip(index).first(alt)
+                : this.takeLast(-index).first(alt ?? null);
+        if (found == unset) {
+            throw new RangeError("Index out of range");
         }
-        return this.find((_, i) => i === index);
+        return found;
     }
 
-    some(fn: Predicate<E>): Lazy<boolean> {
-        const a = this.find(fn).map(x => x !== null);
+    only(): Lazy<E> {
+        const found = this.take(2)
+            .toArray()
+            .map(pair => {
+                if (pair.length !== 1) {
+                    throw new RangeError(
+                        "Expected exactly one element, but sequence had more."
+                    );
+                }
+                return pair[0];
+            });
+
+        return found;
+    }
+
+    some(): Lazy<boolean>;
+    some(fn: Predicate<E>): Lazy<boolean>;
+    some(fn?: Predicate<E>): Lazy<boolean> {
+        const a = this.find(fn ?? (() => true), unset).map(x => x !== unset);
         return a;
     }
 
@@ -190,7 +214,14 @@ export class Seq<E> {
     count(): Lazy<number>;
     count(fn: Predicate<E>): Lazy<number>;
     count(fn?: Predicate<E>): Lazy<number> {
-        return this.reduce((acc, x) => acc + 1, 0);
+        if (!fn) {
+            return this.reduce((acc, x) => acc + 1, 0);
+        } else {
+            return this.reduce(
+                (acc, x, i) => (fn.call(this, x, i) ? acc + 1 : acc),
+                0
+            );
+        }
     }
 
     reduce(fn: Reducer<E, E>): Lazy<E>;
@@ -289,6 +320,35 @@ export class Seq<E> {
     take(n: number): Seq<E> {
         const self = this._iterable;
         return this.takeWhile((_, i) => i < n);
+    }
+
+    takeLast(count: number): Seq<E> {
+        return this._wrap(function* takeLast() {
+            if (count == 0) {
+                return;
+            }
+            const buffer = Array(count);
+            let i = 0;
+            for (const item of this) {
+                buffer[i++ % count] = item;
+            }
+            for (let j = i; ; j = (j + 1) % count) {
+                yield buffer[j];
+            }
+        });
+    }
+
+    skipLast(count: number): Seq<E> {
+        return this._wrap(function* skipLast() {
+            const buffer = Array(count);
+            let i = 0;
+            for (const item of this) {
+                buffer[i++ % count] = item;
+                if (i >= count) {
+                    yield buffer[(i - count) % count];
+                }
+            }
+        });
     }
 
     takeWhile(fn: Predicate<E>): Seq<E> {
