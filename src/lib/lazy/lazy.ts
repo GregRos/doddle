@@ -12,7 +12,6 @@ export class Lazy<T> implements LazyLike<T> {
     stage: LazyStage = "pending";
     private _desc = "<pending>";
     private _init?: LazyInitializer<T>;
-
     get isReady() {
         return this.stage === "ready";
     }
@@ -176,6 +175,36 @@ export class Lazy<T> implements LazyLike<T> {
             return lazy(() => {
                 return result;
             }).map(() => x);
+        });
+    }
+
+    zip<Others extends readonly [Lazy<unknown>, ...Lazy<unknown>[]]>(
+        ...others: Others
+    ): LazyAsync<any> extends [this, ...Others][number]
+        ? LazyAsync<
+              [
+                  PulledAwaited<T>,
+                  ...{
+                      [K in keyof Others]: PulledAwaited<Others[K]>;
+                  }
+              ]
+          >
+        : Lazy<
+              [
+                  Pulled<T>,
+                  ...{
+                      [K in keyof Others]: Pulled<Others[K]>;
+                  }
+              ]
+          >;
+
+    zip(...others: Lazy<any>[]): LazyAsync<any> {
+        return lazy(async () => {
+            const values = [this, ...others].map(x => x.pull());
+            if (values.some(isThenable)) {
+                return Promise.all(values);
+            }
+            return values;
         });
     }
 }

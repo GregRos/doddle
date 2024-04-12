@@ -1,3 +1,4 @@
+import { expect } from "@assertive-ts/core";
 import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from "@lib";
 
 const lz = lazy(() => 1) satisfies Lazy<number>;
@@ -26,7 +27,7 @@ it("lazy async each doThing", async () => {
                 return lazy(() => (i += "c"));
             })
             .pull()
-    ).resolves.toBe("a");
+    ).toBeResolvedWith("a");
     expect(i).toBe("abc");
 });
 
@@ -40,7 +41,7 @@ it("lazy each doThing", async () => {
                 return lazy(() => (i += "c"));
             })
             .pull()
-    ).resolves.toBe("a");
+    ).toBe("a");
     expect(i).toBe("abc");
 });
 

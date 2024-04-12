@@ -3,8 +3,8 @@ const config = {
     automock: false,
     preset: "ts-jest",
     testEnvironment: "node",
-    rootDir:".",
-    testMatch: ["<rootDir>/src/test/**/*.ts"],
+    rootDir: ".",
+    testMatch: ["<rootDir>/src/test/**/*.test.ts"],
     // The default test threshold is 5s. That's way too low.
     slowTestThreshold: 500,
 
@@ -21,11 +21,14 @@ const config = {
         defaults: {}
     },
     transform: {
-        "^.+\\.tsx?$": ["ts-jest", {
-            tsconfig: "src/test/tsconfig.json",
-            transpileOnly: true
-        }]
+        "^.+\\.tsx?$": [
+            "ts-jest",
+            {
+                tsconfig: "src/test/tsconfig.json",
+                transpileOnly: true
+            }
+        ]
     }
 };
 
-export default config
+export default config;

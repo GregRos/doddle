@@ -1,29 +1,21 @@
 {
-  "extends": "../tsconfig.base.json",
-  "references": [{
-    "path": "../lib/tsconfig.json"
-  }],
-  "compilerOptions": {
-    "target": "es2020",
-    "sourceMap": true,
-    "lib": [
-      "es2020",
-      "es2021.weakref"
+    "extends": "../tsconfig.base.json",
+    "references": [
+        {
+            "path": "../lib/tsconfig.json"
+        }
     ],
-    "types": [
-      "jest"
-    ],
-    "outDir": "../../dist/test",
-    "allowJs": true,
-    "baseUrl": ".",
-    "paths": {
-      "@lib": [
-        "../lib"
-      ]
-    }
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.js"
-  ]
+    "compilerOptions": {
+        "target": "es2020",
+        "sourceMap": true,
+        "lib": ["es2020", "es2021.weakref"],
+        "types": ["jest"],
+        "outDir": "../../dist/test",
+        "allowJs": true,
+        "baseUrl": ".",
+        "paths": {
+            "@lib": ["../lib"]
+        }
+    },
+    "include": ["**/*.ts", "**/*.js"]
 }
