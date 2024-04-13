@@ -1,6 +1,12 @@
 import { Lazy, ownerInstance } from "./lazy";
 import { LazyAsync, Pulled } from "./types";
 
+/**
+ * Reduces an async function that returns a lazy async value to a lazy async value.
+ * @param initializer The async function that returns a lazy async value.
+ * @example
+ *
+ */
 export function lazy<X>(
     initializer: () => Promise<Lazy<Promise<X>>>
 ): LazyAsync<X>;

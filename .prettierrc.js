@@ -3,5 +3,10 @@ module.exports = {
     arrowParens: "avoid",
     trailingComma: "none",
     printWidth: 80,
-    semi: true
-}
+    semi: false,
+    plugins: [
+        "prettier-plugin-organize-imports",
+        "prettier-plugin-packagejson",
+        "prettier-plugin-jsdoc"
+    ]
+};
