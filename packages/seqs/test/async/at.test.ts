@@ -1,4 +1,7 @@
-﻿it("get at 0", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("get at 0", async () => {
     const s = aseqs.of(1, 2, 3)
     expect(await s.at(0).pull()).toBeEqual(1)
 })

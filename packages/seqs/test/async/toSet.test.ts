@@ -1,4 +1,7 @@
-﻿it("should give empty set on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should give empty set on empty", async () => {
     const s = await aseq().toSet().pull()
     expect(s).toBeEqual(new Set())
 })

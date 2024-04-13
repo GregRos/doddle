@@ -1,4 +1,7 @@
-﻿it("should not call func on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should not call func on empty", async () => {
     let i = 0
 
     await aseqs.empty().forEach(async () => {

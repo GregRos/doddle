@@ -1,4 +1,7 @@
-﻿describe("no predicate", () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+describe("no predicate", () => {
     it("gives false if empty", async () => {
         expect(await aseqs.empty<number>().some().pull()).toBeEqual(false)
     })

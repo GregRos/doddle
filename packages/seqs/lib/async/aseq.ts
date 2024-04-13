@@ -4,7 +4,7 @@ import { ASeqLike } from "./types"
 import { ASeq } from "./async-wrapper"
 import { SeqLike } from "../sync/types"
 
-export function aseq<E>(): ASeq<E>
+export function aseq<E = never>(): ASeq<E>
 export function aseq<E>(input: readonly E[]): ASeq<E>
 export function aseq<E>(input: SeqLike<E>): ASeq<Awaited<E>>
 export function aseq<E>(input: ASeqLike<E>): ASeq<E>

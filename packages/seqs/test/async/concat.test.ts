@@ -1,3 +1,6 @@
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
 it("should concat empty sequences", async () => {
     const s1 = aseqs.empty<number>()
     const s2 = aseqs.empty<number>()

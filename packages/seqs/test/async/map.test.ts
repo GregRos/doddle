@@ -1,11 +1,12 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
-it("should leave it empty", () => {
-    const s = seqs.empty().map(X => 1)
-    expect(s.some().pull()).toBe(false)
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should leave it empty", async () => {
+    const s = aseqs.empty().map(X => 1)
+    expect(await s.some().pull()).toBe(false)
 })
 
-it("should map", () => {
-    const s = seqs.of(1, 2, 3).map(v => v + 1)
-    expect(s.toArray().pull()).toBeEqual([2, 3, 4])
+it("should map", async () => {
+    const s = aseqs.of(1, 2, 3).map(v => v + 1)
+    expect(await s.toArray().pull()).toBeEqual([2, 3, 4])
 })

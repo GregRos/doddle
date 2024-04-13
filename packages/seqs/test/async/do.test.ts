@@ -1,4 +1,7 @@
-﻿it("nothing on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("nothing on empty", async () => {
     let i = 0
 
     const s = aseqs

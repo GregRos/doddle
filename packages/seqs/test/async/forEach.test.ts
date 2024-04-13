@@ -1,19 +1,19 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
 
 it("should not call func on empty", () => {
     let i = 0
 
-    seqs.empty().forEach(() => {
+    aseqs.empty().forEach(() => {
         i++
     })
     expect(i).toBeEqual(0)
 })
 
-it("should call func for each element", () => {
+it("should call func for each element", async () => {
     let i = 0
 
-    seqs.of(1, 2, 3).forEach(() => {
+    await aseqs.of(1, 2, 3).forEach(() => {
         i++
     })
     expect(i).toBeEqual(3)

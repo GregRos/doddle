@@ -1,4 +1,7 @@
-﻿it("should default on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should default on empty", async () => {
     expect(
         await aseqs
             .empty()

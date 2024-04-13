@@ -1,4 +1,7 @@
-﻿it("true on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("true on empty", async () => {
     const s = aseqs.empty().every(async () => false)
     expect(await s.pull()).toBe(true)
 })

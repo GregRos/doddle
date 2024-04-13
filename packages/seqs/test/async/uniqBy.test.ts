@@ -1,3 +1,6 @@
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
 it("should return unique elements based on key function", async () => {
     const s = aseqs.of(
         { id: 1, name: "John" },

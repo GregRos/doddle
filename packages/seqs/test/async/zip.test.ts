@@ -1,4 +1,7 @@
-﻿it("should give empty array on empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should give empty array on empty", async () => {
     const s = await aseqs.empty().toArray().pull()
     expect(s).toBeEqual([])
 })

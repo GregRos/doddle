@@ -1,4 +1,7 @@
-﻿it("empty sequence", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("empty sequence", async () => {
     const s = aseqs.empty().filter(async () => false)
     expect(await s.toArray().pull()).toBeEqual([])
 })

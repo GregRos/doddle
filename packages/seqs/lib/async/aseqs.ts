@@ -2,7 +2,7 @@ import { aseq } from "./aseq"
 import { ASeq } from "./async-wrapper"
 
 export namespace aseqs {
-    export function empty<E = never>(): Seq<E> {
+    export function empty<E = never>(): ASeq<E> {
         return aseq().as<E>()
     }
     export function of<Es extends unknown[]>(...elements: Es): ASeq<Es[number]> {
@@ -26,13 +26,13 @@ export namespace aseqs {
         }
     }
 
-    export function range(start: number, end: number): Seq<number> {
+    export function range(start: number, end: number): ASeq<number> {
         const len = Math.abs(end - start)
         const sign = Math.sign(end - start)
         return inf.nat.map(x => x * sign + start).take(len)
     }
 
-    export function repeat<E>(element: E, times: number): Seq<E> {
+    export function repeat<E>(element: E, times: number): ASeq<E> {
         return inf.value(element).take(times)
     }
 }

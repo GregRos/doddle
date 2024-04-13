@@ -2,6 +2,7 @@ import { LazyAsync, lazy } from "lazies"
 import { GetTypeForSelector, Selector } from "../util"
 import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
 import { aseq } from "./aseq"
+import { Iteratee } from "../sync/types"
 const unset = {}
 export class ASeq<E> {
     static from<E>(iterable: AsyncIterable<E>): ASeq<E> {
@@ -409,7 +410,7 @@ export class ASeq<E> {
         })
     }
 
-    concat<U>(...others: Iterable<U>[]): ASeq<U | E> {
+    concat<U>(...others: AsyncIterable<U>[]): ASeq<U | E> {
         const self = this._iterable
         return this._wrap(async function* concat() {
             yield* self
@@ -460,7 +461,7 @@ export class ASeq<E> {
         })
     }
 
-    orderBy<U>(fn: AsyncIteratee<E, U>): ASeq<E> {
+    orderBy<U>(fn: Iteratee<E, U, ASeq<E>>): ASeq<E> {
         return this._wrap(async function* orderBy(self) {
             const items = await self.toArray().pull()
             let i = 0

@@ -1,4 +1,7 @@
-﻿it("should return null for empty", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should return null for empty", async () => {
     expect(await aseqs.empty().first().pull()).toBe(null)
 })
 

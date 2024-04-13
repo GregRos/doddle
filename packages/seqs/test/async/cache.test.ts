@@ -1,4 +1,7 @@
-﻿it("should not mess up seq", async () => {
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should not mess up seq", async () => {
     const s = aseqs.of(1, 2, 3).cache()
     expect(await s.toArray().pull()).toBeEqual([1, 2, 3])
 })

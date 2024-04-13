@@ -1,13 +1,14 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
-it("should do nothing on empty", () => {
-    const a = seqs.empty().index()
-    expect(a.some().pull()).toBe(false)
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
+it("should do nothing on empty", async () => {
+    const a = aseqs.empty().index()
+    expect(await a.some().pull()).toBe(false)
 })
 
-it("should attach index", () => {
-    const a = seqs.of(1, 2, 3).index()
-    expect(a.toArray().pull()).toBeEqual([
+it("should attach index", async () => {
+    const a = aseqs.of(1, 2, 3).index()
+    expect(await a.toArray().pull()).toBeEqual([
         [0, 1],
         [1, 2],
         [2, 3]

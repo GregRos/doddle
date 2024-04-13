@@ -1,3 +1,6 @@
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
 it("should perform scan operation", async () => {
     const s = aseqs.of(1, 2, 3, 4, 5)
     const result = await s

@@ -1,3 +1,6 @@
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
 it("should do nothing", () => {
     const s = aseq()
     expect(s.as<number>()).toBeEqual(s)

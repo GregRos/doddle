@@ -1,3 +1,6 @@
+import { aseq, aseqs, ASeq } from "@lib"
+import { expect } from "@assertive-ts/core"
+
 it("empty on empty", async () => {
     const a = aseqs.empty().takeLast(1)
     expect(await a.some().pull()).toBe(false)
