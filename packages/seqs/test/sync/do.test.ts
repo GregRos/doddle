@@ -12,7 +12,6 @@ it("nothing on empty", () => {
         .pull()
     expect(i).toBeEqual(0)
 })
-
 it("once per element", () => {
     let i = 0
     const s = seqs

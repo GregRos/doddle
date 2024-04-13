@@ -437,7 +437,7 @@ export class ASeq<E> {
         return this.uniqBy(async x => x)
     }
 
-    scan<U>(fn: AsyncReducer<E, U>, initial: U): Seq<U> {
+    scan<U>(fn: AsyncReducer<E, U>, initial: U): ASeq<U> {
         return this._wrap(async function* scan(self) {
             let acc = initial
             let i = 0
