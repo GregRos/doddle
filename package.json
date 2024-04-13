@@ -4,13 +4,14 @@
         "packages/*"
     ],
     "scripts": {
-        "build": "tsc -b tsconfig.json",
-        "watch": "tsc -b tsconfig.json --watch",
+        "build": "tsc -b .",
+        "watch": "tsc -b . --watch",
         "prepare": "husky install",
         "rebuild": "run-s clean build",
         "clean": "shx rm -rf packages/*/dist",
         "lint:fix": "prettier --write . && eslint ./packages/*/{lib,test}/**/*.ts",
-        "lint:check": "prettier --check . && eslint src/**/*.ts"
+        "lint:check": "prettier --check . && eslint src/**/*.ts",
+        "test": "yarn workspaces foreach -Apt run test"
     },
     "lint-staged": {
         "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
@@ -43,5 +44,8 @@
         "tslib": "^2.6.2",
         "typescript": "^5.4.5"
     },
-    "packageManager": "yarn@4.1.1"
+    "packageManager": "yarn@4.1.1",
+    "resolutions": {
+        "lazies": "portal:./packages/lazies"
+    }
 }

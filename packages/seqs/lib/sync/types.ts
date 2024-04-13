@@ -1,4 +1,4 @@
-import { Seq } from "./wrapper"
+import { Seq } from "./sync-wrapper"
 
 export type Iteratee<E, O> = (this: Seq<E>, element: E, index: number) => O
 export type Predicate<E> = Iteratee<E, boolean>

@@ -12,7 +12,7 @@ export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
     )
 }
 
-export function isNextable<T>(value: any): value is Iterator<T> {
+export function isNextable<T>(value: any): value is Iterator<T> | AsyncIterator<T> {
     // Checks if value is an iterator
     return typeof value === "object" && value && "next" in value && typeof value.next === "function"
 }

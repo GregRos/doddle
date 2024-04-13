@@ -1,17 +1,23 @@
 import { LaziesError } from "../error"
 import { isAsyncIterable, isIterable, isNextable } from "../util"
 import { ASeqLike } from "./types"
-import { ASeq } from "./wrapper"
+import { ASeq } from "./async-wrapper"
+import { SeqLike } from "../sync/types"
 
-export function aseq<E>(input: E[]): ASeq<E>
+export function aseq<E>(): ASeq<E>
+export function aseq<E>(input: readonly E[]): ASeq<E>
+export function aseq<E>(input: SeqLike<E>): ASeq<Awaited<E>>
 export function aseq<E>(input: ASeqLike<E>): ASeq<E>
-export function aseq<E>(input: ASeqLike<E>) {
+export function aseq<E>(input?: ASeqLike<E> | SeqLike<E>) {
+    if (!input) {
+        return new ASeq<E>((async function* () {})())
+    }
     if (input instanceof ASeq) {
         return input
     } else if (isAsyncIterable<E>(input)) {
         return new ASeq<E>(input)
     } else if (isIterable<E>(input)) {
-        return new ASeq<E>({
+        return new ASeq<Awaited<E>>({
             async *[Symbol.asyncIterator]() {
                 yield* input
             }

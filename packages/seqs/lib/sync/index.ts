@@ -1,3 +1,3 @@
 export { seq } from "./seq"
 export { seqs } from "./seqs"
-export { Seq } from "./wrapper"
+export { Seq } from "./sync-wrapper"

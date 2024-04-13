@@ -1,6 +1,8 @@
 import { Lazy, lazy } from "lazies"
 import { GetTypeForSelector, Selector } from "../util"
 import { Iteratee, Predicate, Reducer } from "./types"
+import { ASeq } from "../async/async-wrapper"
+import { aseq } from "../async/aseq"
 
 const unset = {}
 export class Seq<E> {
@@ -299,7 +301,6 @@ export class Seq<E> {
     }
 
     take(n: number): Seq<E> {
-        const self = this._iterable
         return this.takeWhile((_, i) => i < n)
     }
 
@@ -432,7 +433,7 @@ export class Seq<E> {
         })
     }
 
-    get uniq(): Seq<E> {
+    uniq(): Seq<E> {
         return this.uniqBy(x => x)
     }
 
@@ -449,6 +450,10 @@ export class Seq<E> {
                 yield acc
             }
         })
+    }
+
+    get a(): ASeq<Awaited<E>> {
+        return aseq(this)
     }
 
     shared(): Seq<E> {

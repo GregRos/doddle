@@ -1,5 +1,5 @@
 import { seq } from "./seq"
-import { Seq } from "./wrapper"
+import { Seq } from "./sync-wrapper"
 
 export namespace seqs {
     export function empty<E = never>(): Seq<E> {

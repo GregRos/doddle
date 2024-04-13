@@ -6,6 +6,6 @@ it("should do nothing", () => {
     expect(s.as<number>()).toBeEqual(s)
     s satisfies Seq<never>
     s.as<number>() satisfies Seq<number>
-    // @ts-expect-error
+    // @ts-expect-error Should be strongly typed
     s.as<number>() satisfies Seq<string>
 })
