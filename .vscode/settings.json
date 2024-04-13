@@ -19,7 +19,6 @@
         "**/dist_aux": true,
         "coverage": true,
         ".nyc_output": true,
-        ".yarn": true,
-        "packages": true
+        ".yarn": true
     }
 }

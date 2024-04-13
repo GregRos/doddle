@@ -1043,21 +1043,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^20.12.7":
   version: 20.12.7
   resolution: "@types/node@npm:20.12.7"
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10c0/dce80d63a3b91892b321af823d624995c61e39c6a223cc0ac481a44d337640cc46931d33efb3beeed75f5c85c3bda1d97cef4c5cd4ec333caf5dee59cff6eca0
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.6.0":
-  version: 20.11.30
-  resolution: "@types/node@npm:20.11.30"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/867cfaf969c6d8850d8d7304e7ab739898a50ecb1395b61ff2335644f5f48d7a46fbc4a14cee967aed65ec134b61a746edae70d1f32f11321ccf29165e3bc4e6
   languageName: node
   linkType: hard
 
@@ -3816,6 +3807,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "lazies@workspace:packages/lazies"
   dependencies:
+    "@types/jest": "npm:^29.5.12"
+    "@types/node": "npm:^20.12.7"
     jest: "npm:^29.7.0"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"
@@ -4829,7 +4822,7 @@ __metadata:
     "@gregros/eslint-config": "npm:^0.4.0"
     "@types/jest": "npm:^29.5.12"
     "@types/lodash": "npm:^4.14.198"
-    "@types/node": "npm:^20.6.0"
+    "@types/node": "npm:^20.12.7"
     "@typescript-eslint/eslint-plugin": "npm:^6.6.0"
     "@typescript-eslint/parser": "npm:^6.6.0"
     eslint: "npm:^8.49.0"
@@ -4918,6 +4911,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "seqs@workspace:packages/seqs"
   dependencies:
+    "@types/jest": "npm:^29.5.12"
+    "@types/node": "npm:^20.12.7"
     jest: "npm:^29.7.0"
     lazies: "npm:^1.0.0"
     ts-jest: "npm:^29.1.2"

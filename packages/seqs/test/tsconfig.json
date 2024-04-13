@@ -11,8 +11,7 @@
         "paths": {
             "@lib": ["../lib"],
             "@lib/*": ["../lib/*"]
-        },
-        "types": ["jest", "node"]
+        }
     },
     "include": ["**/*.ts", "**/*.js"]
 }

@@ -1,37 +1,4 @@
 {
     "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "name": "TESfqs",
-            "request": "launch",
-            "program": "${workspaceFolder:root}/node_modules/.bin/jest",
-            "args": ["--selectProjects", "seqs"],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "presentation": {
-                "group": "test"
-            },
-            "windows": {
-                "program": "${workspaceFolder:root}/node_modules/jest/bin/jest"
-            }
-        },
-        {
-            "type": "node",
-            "name": "TEST all",
-            "request": "launch",
-            "program": "${workspaceFolder:root}/node_modules/.bin/jest",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "presentation": {
-                "group": "test"
-            },
-            "windows": {
-                "program": "${workspaceFolder:root}/node_modules/jest/bin/jest"
-            }
-        }
-    ]
+    "configurations": []
 }

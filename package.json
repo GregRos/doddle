@@ -14,7 +14,7 @@
         "watch": "tsc -b tsconfig.json --watch",
         "prepare": "husky install",
         "rebuild": "run-s clean build",
-        "clean": "shx rm -rf dist",
+        "clean": "shx rm -rf packages/*/dist",
         "lint:fix": "prettier --write src/**/*.ts && eslint --fix src/**/*.ts",
         "lint:check": "prettier --check src/**/*.ts && eslint src/**/*.ts"
     },
@@ -23,7 +23,7 @@
         "@gregros/eslint-config": "^0.4.0",
         "@types/jest": "^29.5.12",
         "@types/lodash": "^4.14.198",
-        "@types/node": "^20.6.0",
+        "@types/node": "^20.12.7",
         "@typescript-eslint/eslint-plugin": "^6.6.0",
         "@typescript-eslint/parser": "^6.6.0",
         "eslint": "^8.49.0",

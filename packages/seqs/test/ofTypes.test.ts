@@ -2,12 +2,12 @@
 import { expect } from "@assertive-ts/core";
 it("should filter prototypes", () => {
     const stuffs = seqs.of(1, new Map(), new Set());
-    const filtered = stuffs.ofTypes(Map);
+    const filtered = stuffs.extractTypes(Map);
     expect(filtered.toArray().pull()).toBeEqual([new Map()]);
 });
 
 it("should do nothing on empty", () => {
-    const stuffs = seqs.empty().ofTypes(Map);
+    const stuffs = seqs.empty().extractTypes(Map);
     expect(stuffs.some().pull()).toBe(false);
 });
 

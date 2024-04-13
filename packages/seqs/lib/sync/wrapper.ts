@@ -1,7 +1,6 @@
 import { GetTypeForSelector, Selector } from "../util";
 import { Iteratee, Predicate, Reducer } from "./types";
 import { Lazy, lazy, Pulled } from "lazies";
-import { seqs } from "./seqs";
 
 const unset = {};
 export class Seq<E> {
@@ -286,13 +285,13 @@ export class Seq<E> {
         });
     }
 
-    filterAs<X, R extends X>(
+    extract<X, R extends X>(
         fn: (this: Seq<E>, item: X, index: number) => item is R
     ): Seq<R> {
         return this.filter(fn as any).as<R>();
     }
 
-    excludeAs<X extends E, R extends X>(
+    exclude<X extends E, R extends X>(
         fn: (this: Seq<E>, item: X, index: number) => item is R
     ): Seq<Exclude<E, R>> {
         return this.filter(function excludeAs(x, i) {
@@ -300,10 +299,10 @@ export class Seq<E> {
         }).as<Exclude<E, R>>();
     }
 
-    ofTypes<Selectors extends Selector>(
+    extractTypes<Selectors extends Selector>(
         ...specifiers: Selectors[]
     ): Seq<GetTypeForSelector<Selectors>> {
-        return this.filterAs(
+        return this.extract(
             function ofTypes(x): x is GetTypeForSelector<Selectors> {
                 return specifiers.some(spec => {
                     if (typeof spec === "function") {
@@ -323,7 +322,7 @@ export class Seq<E> {
 
     takeLast(count: number): Seq<E> {
         if (count === 0) {
-            return seqs.empty<E>();
+            return new Seq([]);
         }
         return this._wrap(function* takeLast() {
             const buffer = Array(count);

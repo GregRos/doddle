@@ -1,1 +1,1 @@
-export * from "./sync/index.js";
+export { Seq, seq, seqs } from "./sync";

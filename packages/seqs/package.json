@@ -1,7 +1,7 @@
 {
     "name": "seqs",
     "version": "1.0.0",
-    "description": "Simple, strongly typed iteration utilities.",
+    "description": "The missing sequence library for TypeScript.",
     "author": "GregRos",
     "license": "MIT",
     "main": "./dist/lib/index.js",
@@ -34,6 +34,8 @@
         "lazies": "^1.0.0"
     },
     "devDependencies": {
+        "@types/jest": "^29.5.12",
+        "@types/node": "^20.12.7",
         "jest": "^29.7.0",
         "ts-jest": "^29.1.2",
         "ts-node": "^10.9.2",
