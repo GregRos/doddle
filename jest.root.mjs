@@ -1,5 +1,5 @@
 /** @type {import("jest").Config} */
-const commons = {
+const common = {
     moduleNameMapper: {
         "^@lib/(.*)$": "<rootDir>/lib/$1",
         "^@lib$": "<rootDir>/lib"
@@ -16,25 +16,8 @@ const commons = {
     testEnvironment: "node",
     testMatch: ["<rootDir>/test/**/*.test.ts"],
     collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],
-    coverageDirectory: "../../coverage"
-};
-const config = {
-    automock: false,
-    preset: "ts-jest",
-    projects: [
-        {
-            displayName: "lazies",
-            rootDir: `<rootDir>/packages/lazies`,
-            ...commons
-        },
-        {
-            displayName: "seqs",
-            rootDir: `<rootDir>/packages/seqs`,
-            ...commons
-        }
-    ],
-    rootDir: ".",
+    coverageDirectory: "../../coverage",
     collectCoverage: false
 };
 
-export default config;
+export default common;

@@ -4918,6 +4918,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "seqs@workspace:packages/seqs"
   dependencies:
+    jest: "npm:^29.7.0"
     lazies: "npm:^1.0.0"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"

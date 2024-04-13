@@ -5,14 +5,8 @@
     "main": "dist/lib/index.js",
     "repository": "github:gregros/lazies",
     "scripts": {
-        "test": "jest --coverage",
-        "build": "tsc -b lib/tsconfig.json",
-        "watch": "tsc -b  lib/tsconfig.json --watch",
-        "prepare": "husky install",
-        "rebuild": "run-s clean build",
-        "clean": "shx rm -rf dist",
-        "lint:fix": "prettier --write src/**/*.ts && eslint --fix src/**/*.ts",
-        "lint:check": "prettier --check src/**/*.ts && eslint src/**/*.ts"
+        "test": "jest",
+        "test:coverage": "jest --coverage"
     },
     "author": "GregRos",
     "license": "MIT",

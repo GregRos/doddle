@@ -20,5 +20,6 @@
         "coverage": true,
         ".nyc_output": true,
         ".yarn": true,
+        "packages": true
     }
 }

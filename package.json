@@ -8,7 +8,8 @@
         "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
     },
     "scripts": {
-        "test": "jest --coverage",
+        "test": "jest",
+        "test:coverage": "jest --coverage",
         "build": "tsc -b tsconfig.json",
         "watch": "tsc -b tsconfig.json --watch",
         "prepare": "husky install",

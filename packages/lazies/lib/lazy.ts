@@ -207,8 +207,8 @@ export class Lazy<T> implements LazyLike<T> {
               ]
           >;
 
-    zip(...others: Lazy<any>[]): LazyAsync<any> {
-        return lazy(async () => {
+    zip(...others: Lazy<any>[]): Lazy<any> {
+        return lazy(() => {
             const values = [this, ...others].map(x => x.pull());
             if (values.some(isThenable)) {
                 return Promise.all(values);

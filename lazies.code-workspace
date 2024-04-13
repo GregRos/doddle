@@ -1,0 +1,19 @@
+{
+    "folders": [
+        {
+            "path": "./packages/lazies",
+            "name": "lazies"
+        },
+        {
+            "path": "./packages/seqs",
+            "name": "seqs"
+        },
+        {
+            "path": ".",
+            "name": "root"
+        }
+    ],
+    "settings": {
+        "jest.disabledWorkspaceFolders": ["root"]
+    }
+}

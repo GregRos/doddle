@@ -3,31 +3,35 @@
     "configurations": [
         {
             "type": "node",
-            "name": "vscode-jest-tests.v2",
+            "name": "TESfqs",
             "request": "launch",
-            "program": "${workspaceFolder}/node_modules/.bin/jest",
-            "args": [
-                "--runInBand",
-                "--watchAll=false",
-                "--testNamePattern",
-                "${jest.testNamePattern}",
-                "--runTestsByPath",
-                "${jest.testFile}"
-            ],
+            "program": "${workspaceFolder:root}/node_modules/.bin/jest",
+            "args": ["--selectProjects", "seqs"],
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen",
+            "presentation": {
+                "group": "test"
+            },
             "windows": {
-                "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+                "program": "${workspaceFolder:root}/node_modules/jest/bin/jest"
             }
         },
         {
             "type": "node",
+            "name": "TEST all",
             "request": "launch",
-            "runtimeArgs": ["--enable-source-maps", "--stack-trace-limit=1000"],
-            "name": "Start Example (Debug)",
+            "program": "${workspaceFolder:root}/node_modules/.bin/jest",
+            "args": [],
+            "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
-            "cwd": "${workspaceFolder}"
+            "internalConsoleOptions": "neverOpen",
+            "presentation": {
+                "group": "test"
+            },
+            "windows": {
+                "program": "${workspaceFolder:root}/node_modules/jest/bin/jest"
+            }
         }
     ]
 }
