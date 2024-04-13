@@ -10,6 +10,8 @@ module.exports = {
         project: projects
     },
     rules: {
-        "no-invalid-this": "off"
+        "no-invalid-this": "off",
+        //disalbe namespace rule:
+        "@typescript-eslint/no-namespace": "off"
     }
 }
