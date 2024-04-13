@@ -1,33 +1,40 @@
 /** @type {import("jest").Config} */
-const config = {
-    automock: false,
-    preset: "ts-jest",
-    testEnvironment: "node",
-    rootDir: ".",
-    testMatch: ["<rootDir>/src/test/**/*.test.ts"],
-    // The default test threshold is 5s. That's way too low.
-    slowTestThreshold: 500,
-    // Should be set via --coverage option
-    collectCoverage: false,
-    collectCoverageFrom: ["<rootDir>/src/lib/**/*.ts"],
-    coverageDirectory: "<rootDir>/coverage",
-    forceExit: true,
+const commons = {
     moduleNameMapper: {
-        "^@lib/(.*)$": "<rootDir>/src/lib/$1",
-        "^@lib$": "<rootDir>/src/lib"
-    },
-    globals: {
-        defaults: {}
+        "^@lib/(.*)$": "<rootDir>/lib/$1",
+        "^@lib$": "<rootDir>/lib"
     },
     transform: {
         "^.+\\.tsx?$": [
             "ts-jest",
             {
-                tsconfig: "src/test/tsconfig.json",
+                tsconfig: "<rootDir>/test/tsconfig.json",
                 transpileOnly: true
             }
         ]
-    }
+    },
+    testEnvironment: "node",
+    testMatch: ["<rootDir>/test/**/*.test.ts"],
+    collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],
+    coverageDirectory: "../../coverage"
+};
+const config = {
+    automock: false,
+    preset: "ts-jest",
+    projects: [
+        {
+            displayName: "lazies",
+            rootDir: `<rootDir>/packages/lazies`,
+            ...commons
+        },
+        {
+            displayName: "seqs",
+            rootDir: `<rootDir>/packages/seqs`,
+            ...commons
+        }
+    ],
+    rootDir: ".",
+    collectCoverage: false
 };
 
 export default config;

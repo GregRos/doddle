@@ -1,0 +1,37 @@
+{
+    "name": "seqs",
+    "version": "1.0.0",
+    "description": "Simple, strongly typed iteration utilities.",
+    "author": "GregRos",
+    "license": "MIT",
+    "main": "./dist/lib/index.js",
+    "exports": {
+        ".": {
+            "require": "./dist/lib/index.js",
+            "types": "./dist/lib/index.d.ts"
+        }
+    },
+    "keywords": [
+        "iteration",
+        "iterable",
+        "seq",
+        "async-iterable",
+        "linq",
+        "lodash",
+        "iterator",
+        "functional",
+        "sequence",
+        "stream",
+        "yield"
+    ],
+    "types": "dist/lib/index.d.ts",
+    "packageManager": "yarn@4.1.1",
+    "dependencies": {
+        "lazies": "^1.0.0"
+    },
+    "devDependencies": {
+        "ts-jest": "^29.1.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    }
+}

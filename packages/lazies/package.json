@@ -1,0 +1,42 @@
+{
+    "name": "lazies",
+    "description": "Simple, strongly-typed, debuggable,  asyncable lazy primitive.",
+    "version": "1.0.0",
+    "main": "dist/lib/index.js",
+    "repository": "github:gregros/lazies",
+    "scripts": {
+        "test": "jest --coverage",
+        "build": "tsc -b lib/tsconfig.json",
+        "watch": "tsc -b  lib/tsconfig.json --watch",
+        "prepare": "husky install",
+        "rebuild": "run-s clean build",
+        "clean": "shx rm -rf dist",
+        "lint:fix": "prettier --write src/**/*.ts && eslint --fix src/**/*.ts",
+        "lint:check": "prettier --check src/**/*.ts && eslint src/**/*.ts"
+    },
+    "author": "GregRos",
+    "license": "MIT",
+    "exports": {
+        ".": {
+            "require": "./dist/lib/index.js",
+            "types": "./dist/lib/index.d.ts"
+        }
+    },
+    "keywords": [
+        "async",
+        "sync",
+        "lazy-value",
+        "lazy",
+        "asyncable",
+        "lazy-initialization",
+        "functional"
+    ],
+    "types": "dist/lib/index.d.ts",
+    "packageManager": "yarn@4.1.1",
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "ts-jest": "^29.1.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.4.5"
+    }
+}

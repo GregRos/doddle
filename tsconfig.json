@@ -1,0 +1,15 @@
+{
+    "references": [
+        {
+            "path": "./packages/lazies/lib/tsconfig.json"
+        },
+        {
+            "path": "./packages/seqs/lib/tsconfig.json"
+        }
+    ],
+    "compilerOptions": {
+        "module": "commonjs",
+        "sourceMap": true
+    },
+    "files": []
+}
