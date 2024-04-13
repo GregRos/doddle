@@ -1,21 +1,7 @@
 {
     "name": "lazies",
-    "description": "A TypeScript-first, strongly-typed, and debuggable lazy primitive.",
     "version": "1.0.0",
-    "main": "dist/lib/index.js",
-    "repository": "github:gregros/lazies",
-    "scripts": {
-        "test": "jest",
-        "test:coverage": "jest --coverage"
-    },
-    "author": "GregRos",
-    "license": "MIT",
-    "exports": {
-        ".": {
-            "require": "./dist/lib/index.js",
-            "types": "./dist/lib/index.d.ts"
-        }
-    },
+    "description": "A TypeScript-first, strongly-typed, and debuggable lazy primitive.",
     "keywords": [
         "async",
         "sync",
@@ -25,8 +11,21 @@
         "lazy-initialization",
         "functional"
     ],
+    "repository": "github:gregros/lazies",
+    "license": "MIT",
+    "author": "GregRos",
+    "exports": {
+        ".": {
+            "require": "./dist/lib/index.js",
+            "types": "./dist/lib/index.d.ts"
+        }
+    },
+    "main": "dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
-    "packageManager": "yarn@4.1.1",
+    "scripts": {
+        "test": "jest",
+        "test:coverage": "jest --coverage"
+    },
     "devDependencies": {
         "@types/jest": "^29.5.12",
         "@types/node": "^20.12.7",
@@ -34,5 +33,6 @@
         "ts-jest": "^29.1.2",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
-    }
+    },
+    "packageManager": "yarn@4.1.1"
 }

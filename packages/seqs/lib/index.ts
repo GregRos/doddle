@@ -1,1 +1,1 @@
-export { Seq, seq, seqs } from "./sync";
+export { Seq, seq, seqs } from "./sync"

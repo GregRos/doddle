@@ -2,19 +2,6 @@
     "name": "seqs",
     "version": "1.0.0",
     "description": "The missing sequence library for TypeScript.",
-    "author": "GregRos",
-    "license": "MIT",
-    "main": "./dist/lib/index.js",
-    "exports": {
-        ".": {
-            "require": "./dist/lib/index.js",
-            "types": "./dist/lib/index.d.ts"
-        }
-    },
-    "scripts": {
-        "test": "jest",
-        "test:coverage": "jest --coverage"
-    },
     "keywords": [
         "iteration",
         "iterable",
@@ -28,8 +15,20 @@
         "stream",
         "yield"
     ],
+    "license": "MIT",
+    "author": "GregRos",
+    "exports": {
+        ".": {
+            "require": "./dist/lib/index.js",
+            "types": "./dist/lib/index.d.ts"
+        }
+    },
+    "main": "./dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
-    "packageManager": "yarn@4.1.1",
+    "scripts": {
+        "test": "jest",
+        "test:coverage": "jest --coverage"
+    },
     "dependencies": {
         "lazies": "^1.0.0"
     },
@@ -40,5 +39,6 @@
         "ts-jest": "^29.1.2",
         "ts-node": "^10.9.2",
         "typescript": "^5.4.5"
-    }
+    },
+    "packageManager": "yarn@4.1.1"
 }

@@ -1,17 +1,17 @@
-export { lazy, memoize } from "./ctor";
+export { lazy, memoize } from "./ctor"
 
 export {
     LazyAsync,
-    Pulled,
-    PulledAwaited,
     LazyAsyncLike,
     LazyInitializer,
     LazyLike,
     LazyStage,
+    Pulled,
+    PulledAwaited,
+    getClassName,
     isLazy,
     isLazyLike,
-    isThenable,
-    getClassName
-} from "./types";
+    isThenable
+} from "./types"
 
-export { Lazy } from "./lazy";
+export { Lazy } from "./lazy"

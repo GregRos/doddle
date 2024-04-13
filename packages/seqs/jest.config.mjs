@@ -1,8 +1,8 @@
-import common from "../../jest.root.mjs";
+import common from "../../jest.root.mjs"
 
 /** @type {import("jest").Config} */
 const config = {
     ...common
-};
+}
 
-export default config;
+export default config

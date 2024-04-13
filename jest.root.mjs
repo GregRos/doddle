@@ -18,6 +18,6 @@ const common = {
     collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],
     coverageDirectory: "../../coverage",
     collectCoverage: false
-};
+}
 
-export default common;
+export default common

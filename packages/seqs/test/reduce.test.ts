@@ -1,13 +1,13 @@
-﻿import { expect } from "@assertive-ts/core";
-import { Seq, seqs } from "@lib";
+﻿import { expect } from "@assertive-ts/core"
+import { seqs } from "@lib"
 it("should default on empty", () => {
     expect(
         seqs
             .empty()
             .reduce((a, b) => a + b, 0)
             .pull()
-    ).toBeEqual(0);
-});
+    ).toBeEqual(0)
+})
 
 it("should reduce", () => {
     expect(
@@ -15,5 +15,5 @@ it("should reduce", () => {
             .of(1, 2, 3)
             .reduce((a, b) => a + b, 0)
             .pull()
-    ).toBeEqual(6);
-});
+    ).toBeEqual(6)
+})
