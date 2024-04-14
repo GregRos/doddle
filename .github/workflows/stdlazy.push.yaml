@@ -1,4 +1,4 @@
-name: Publish stdseq
+name: Publish stdlazy
 on:
   push:
     branches:
@@ -45,11 +45,12 @@ jobs:
       - name: lint:check
         run: yarn workspace stdlazy run lint:check
       - name: test
-        run: yarn workspace stdlazy run test
+        run: yarn workspace stdlazy run test:coverage
       - name: code coverage
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/stdlazy
       - name: Setup token
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
       - name: publish seqs

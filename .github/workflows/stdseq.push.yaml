@@ -45,11 +45,12 @@ jobs:
       - name: lint:check
         run: yarn workspace stdseq run lint:check
       - name: test
-        run: yarn workspace stdseq run test
+        run: yarn workspace stdseq run test:coverage
       - name: code coverage
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          base-path: packages/stdseq
       - name: Setup token
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
       - name: publish seqs

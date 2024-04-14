@@ -16,7 +16,7 @@ const common = {
     testEnvironment: "node",
     testMatch: ["<rootDir>/test/**/*.test.ts"],
     collectCoverageFrom: ["<rootDir>/lib/**/*.ts"],
-    coverageDirectory: "../../coverage",
+    coverageDirectory: "./coverage",
     collectCoverage: false
 }
 
