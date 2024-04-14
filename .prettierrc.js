@@ -11,5 +11,13 @@ module.exports = {
         "prettier-plugin-organize-imports",
         "prettier-plugin-packagejson",
         "prettier-plugin-jsdoc"
+    ],
+    overrides: [
+        {
+            files: "*.{yaml,json}",
+            options: {
+                tabWidth: 2
+            }
+        }
     ]
 }

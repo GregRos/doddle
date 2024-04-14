@@ -1,0 +1,59 @@
+name: Publish stdseq
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "packages/stdseq/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build_deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version:
+          - 20.9.0
+    env:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enable corepack
+        run: corepack enable
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.9.0"
+          cache: yarn
+          registry-url: "https://registry.yarnpkg.com"
+
+      - name: Set yarn version
+        run: yarn set version stable
+      - name: Install dependencies
+        run: yarn install --immutable
+      - name: build
+        run: yarn workspace stdseq run build
+      - name: lint:check
+        run: yarn workspace stdseq run lint:check
+      - name: test
+        run: yarn workspace stdseq run test
+      - name: code coverage
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup token
+        run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
+      - name: publish seqs
+        working-directory: packages/stdseq
+        run: yarn publish --access public
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
