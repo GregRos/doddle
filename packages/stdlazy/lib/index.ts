@@ -8,9 +8,8 @@ export {
     LazyStage,
     Pulled,
     PulledAwaited,
-    getClassName,
     isLazy,
-    isLazyLike,
+    isPullable,
     isThenable,
     LazySyncness
 } from "./types"

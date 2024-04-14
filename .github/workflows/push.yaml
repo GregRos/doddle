@@ -51,12 +51,12 @@ jobs:
             - name: Setup token
               run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
             - name: publish seqs
-              working-directory: packages/seqs
+              working-directory: packages/stdseq
               run: yarn publish --access public
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
             - name: Publish lazies
-              working-directory: packages/lazies
+              working-directory: packages/stdlazy
               run: yarn publish --access public
               env:
                   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

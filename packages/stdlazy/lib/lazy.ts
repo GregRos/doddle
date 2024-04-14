@@ -9,7 +9,7 @@ import {
     PulledAwaited,
     getClassName,
     getInitializerName,
-    isLazyLike,
+    isPullable,
     isThenable
 } from "./types"
 
@@ -54,7 +54,7 @@ export class Lazy<T> implements LazyLike<T> {
         this._init = initializer
 
         const anyMe = this as any
-        for (const key of ["pull", "map", "each", "zip", "assemble"]) {
+        for (const key of ["pull", "map", "do", "zip", "assemble"]) {
             anyMe[key] = anyMe[key].bind(this)
             anyMe[key][ownerInstance] = this
             anyMe[key][methodName] = key
@@ -111,7 +111,7 @@ export class Lazy<T> implements LazyLike<T> {
         let resource: any
         try {
             const result = this._init!()
-            resource = isLazyLike(result) ? result.pull() : result
+            resource = isPullable(result) ? result.pull() : result
         } catch (e) {
             this._cached = e
             info.stage = "failed"
@@ -124,7 +124,7 @@ export class Lazy<T> implements LazyLike<T> {
         if (isThenable(resource)) {
             info.syncness = "async"
             resource = resource.then(value => {
-                if (isLazyLike(value)) {
+                if (isPullable(value)) {
                     value = value.pull()
                 }
                 info.stage = "ready"
@@ -178,7 +178,7 @@ export class Lazy<T> implements LazyLike<T> {
      * Projects the result of this {@link Lazy} primitive using the given function.
      * @see {@link Array.map} for a similar method on arrays.
      * @see {@link Promise.then} for a similar method on promises.
-     * @see {@link Lazy.each} for a similar method that doesn't change the result.
+     * @see {@link Lazy.do} for a similar method that doesn't change the result.
      */
     map<S, R>(
         this: LazyAsync<S>,
@@ -224,9 +224,9 @@ export class Lazy<T> implements LazyLike<T> {
      * await it before returning the same value as **this**.
      *
      * @example
-     *     const lazy = lazy(() => 1).each(x => console.log(x)) satisfies Lazy<number>
+     *     const lazy = lazy(() => 1).do(x => console.log(x)) satisfies Lazy<number>
      *     expect(lazy.pull()).toBe(1) // Logs "1" to the console as a side effect.
-     *     const wait30 = lazy(() => 1).each(
+     *     const wait30 = lazy(() => 1).do(
      *         async x => new Promise(r => setTimeout(r, 30))
      *     ) satisfies Lazy<number>
      *     await expect(wait30.pull()).resolves.toBe(1) // Waits 30ms before returning 1.
@@ -234,19 +234,19 @@ export class Lazy<T> implements LazyLike<T> {
      * @param callback The callback
      * @summary Applies the given callback to the result of this {@link Lazy} primitive.
      */
-    each<S>(
+    do<S>(
         this: LazyAsync<S>,
         callback: (
             value: S
         ) => any | Lazy<any> | Promise<any> | Promise<LazyAsync<any>> | LazyAsync<any>
     ): LazyAsync<S>
-    each<T>(
+    do<T>(
         this: Lazy<T>,
         callback: (value: PulledAwaited<T>) => Promise<any> | LazyAsync<any>
     ): LazyAsync<T>
-    each<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => Lazy<any>): Lazy<T>
-    each<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => any): Lazy<T>
-    each<T>(this: LazyAsync<T>, callback: (value: any) => any): any {
+    do<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => Lazy<any>): Lazy<T>
+    do<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => any): Lazy<T>
+    do<T>(this: LazyAsync<T>, callback: (value: any) => any): any {
         return this.map(x => {
             const result = callback(x)
             return lazy(() => {

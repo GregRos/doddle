@@ -11,8 +11,12 @@
             "id": "b9f62d27e00c9319",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {}
+              "type": "markdown",
+              "state": {
+                "file": "packages/stdlazy/README.md",
+                "mode": "source",
+                "source": false
+              }
             }
           }
         ]
@@ -81,6 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "packages/stdlazy/README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -97,6 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "packages/stdlazy/README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -118,7 +124,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "packages/stdlazy/README.md"
+              }
             }
           },
           {
@@ -152,6 +160,8 @@
   },
   "active": "b9f62d27e00c9319",
   "lastOpenFiles": [
+    "README.md",
+    "packages/stdlazy/README.md",
     "packages/stdseq/dist/lib/sync/types.js.map",
     "packages/stdseq/dist/lib/sync/types.js",
     "packages/stdseq/dist/lib/sync/types.d.ts.map",
@@ -162,11 +172,8 @@
     "packages/stdseq/dist/lib/sync/seq.js.map",
     "packages/stdseq/dist/lib/sync/sync-wrapper.d.ts",
     "packages/stdseq/dist/lib/sync/seqs.js.map",
-    "packages/stdseq/dist/lib/sync/seqs.js",
     "packages/lazies/README.md",
-    "packages/stdlazy/README.md",
     "Test.md",
-    "README.md",
     "node_modules/itertools-ts/README.md",
     "Zenesis Schema (1).svg",
     "Pasted image 20230909160621.png",

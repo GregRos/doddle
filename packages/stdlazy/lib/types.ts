@@ -32,7 +32,7 @@ export function getInitializerName(initializer: Function) {
  *
  * @param what The value to check.
  */
-export function isLazyLike<T = unknown>(what: unknown): what is LazyLike<T> {
+export function isPullable<T = unknown>(what: unknown): what is LazyLike<T> {
     return (
         typeof what === "object" &&
         what != null &&

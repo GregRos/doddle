@@ -4,11 +4,11 @@ import { lazy, Lazy, LazyAsync } from "@lib"
 const lz = lazy(() => 1) satisfies Lazy<number>
 const lza = lazy(async () => 1) satisfies LazyAsync<number>
 
-it("lazy each doThing", () => {
+it("lazy do doThing", () => {
     let i = ""
     expect(
         lazy(() => (i += "a"))
-            .each(x => {
+            .do(x => {
                 expect(x).toBe("a")
                 i += "b"
             })
@@ -17,11 +17,11 @@ it("lazy each doThing", () => {
     expect(i).toBe("ab")
 })
 
-it("lazy async each doThing", async () => {
+it("lazy async do doThing", async () => {
     let i = ""
     await expect(
         lazy(async () => (i += "a"))
-            .each(x => {
+            .do(x => {
                 expect(i).toBe("a")
                 i += "b"
                 return lazy(() => (i += "c"))
@@ -31,11 +31,11 @@ it("lazy async each doThing", async () => {
     expect(i).toBe("abc")
 })
 
-it("lazy each doThing", async () => {
+it("lazy do doThing", async () => {
     let i = ""
     await expect(
         lazy(() => (i += "a"))
-            .each(async x => {
+            .do(async x => {
                 expect(x).toBe("a")
                 i += "b"
                 return lazy(() => (i += "c"))
@@ -45,10 +45,10 @@ it("lazy each doThing", async () => {
     expect(i).toBe("abc")
 })
 
-it("lazy async each doThing", async () => {
+it("lazy async do doThing", async () => {
     let i = ""
     await lazy(async () => (i += "a"))
-        .each(async x => {
+        .do(async x => {
             expect(x).toBe("a")
             i += "b"
             return lazy(() => (i += "c"))
@@ -57,10 +57,10 @@ it("lazy async each doThing", async () => {
     expect(i).toBe("abc")
 })
 
-it("lazy each doThing", () => {
+it("lazy do doThing", () => {
     let i = ""
     lazy(() => (i += "a"))
-        .each(x => {
+        .do(x => {
             expect(x).toBe("a")
             i += "b"
             return lazy(() => (i += "c"))

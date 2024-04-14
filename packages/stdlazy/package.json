@@ -4,10 +4,11 @@
     "description": "A TypeScript-first lazy primitive.",
     "keywords": [
         "async",
+        "promise",
         "sync",
         "initialization",
         "lazy",
-        "lazy-initialization",
+        "lazy-evaluation",
         "functional",
         "map",
         "zip"
