@@ -31,6 +31,10 @@ export function getClassName(something: any) {
     const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object"
     return ctorName
 }
+
+export function getInitializerName(initializer: Function) {
+    return initializer.name || null
+}
 /**
  * Checks if the given value is a LazyLike, i.e. that it has a `pull` method.
  *
@@ -59,8 +63,8 @@ export function isLazy(value: any): value is Lazy<any> {
 }
 
 /** The stage of a lazily initialized value. */
-export type LazyStage = "pending" | "resolving" | "ready" | "failed"
-
+export type LazyStage = "pending" | "pulled" | "ready" | "failed"
+export type LazySyncness = "sync" | "async" | "pending"
 /** An interface that represents a lazily initialized value. */
 export interface LazyLike<T> {
     /**
@@ -75,3 +79,8 @@ export interface LazyLike<T> {
 export type LazyInitializer<T> = () => T | Lazy<T>
 
 export type LazyAsyncLike<T> = LazyLike<PromiseLike<T>>
+export interface LazyInfo {
+    stage: LazyStage
+    syncness: LazySyncness
+    name: string | null
+}

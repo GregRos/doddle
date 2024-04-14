@@ -26,7 +26,6 @@ import { LazyAsync, Pulled } from "./types"
  *   be synchronous or asynchronous and will also handle nested lazy primitives.
  */
 export function lazy<X>(initializer: () => Promise<LazyAsync<X>>): LazyAsync<X>
-/** @param initializer An async function returning a {@link Lazy}. */
 export function lazy<X>(initializer: () => Promise<Lazy<X>>): LazyAsync<X>
 
 export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>

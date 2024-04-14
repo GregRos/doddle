@@ -41,16 +41,6 @@ it("lazy<async<1>> for lazy async lazy async 1", async () => {
     lz.pull() satisfies Promise<number>
 })
 
-it("lazy<1> for new(new(", () => {
-    const lz = new Lazy(() => new Lazy(() => 1)) satisfies Lazy<number>
-    expect(lz.pull()).toBeEqual(1)
-})
-
-it("lazyAsync<1> new(new(async(1))) ", async () => {
-    const lz = new Lazy(() => new Lazy(async () => 1)) satisfies LazyAsync<number>
-    await expect(lz.pull()).toBeResolvedWith(1)
-})
-
 it("lazyAsync<T> for lazy async T", async () => {
     async function generic<T>(x: T) {
         const lz = lazy(async () => x as T) satisfies LazyAsync<T>

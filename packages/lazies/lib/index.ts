@@ -11,7 +11,8 @@ export {
     getClassName,
     isLazy,
     isLazyLike,
-    isThenable
+    isThenable,
+    LazySyncness
 } from "./types"
 
 export { Lazy } from "./lazy"
