@@ -6,6 +6,7 @@ on:
     paths:
       - "packages/stdlazy/**"
       - ".github/workflows/stdlazy.push.yaml"
+      - "yarn.lock"
   workflow_dispatch:
 
 permissions:
