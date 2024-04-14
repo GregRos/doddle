@@ -1,4 +1,4 @@
-import { aseq, aseqs, ASeq } from "@lib"
+import { aseq, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
 
 it("should do nothing", () => {

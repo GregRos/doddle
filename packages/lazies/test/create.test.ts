@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { expect } from "@assertive-ts/core"
 import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from "@lib"
 
@@ -93,4 +94,5 @@ it("lazyAsync<T> for lazy async lazy async T", async <T>() => {
         return pulled
     }
     const pulled = await generic(1)
+    return
 })

@@ -59,7 +59,7 @@ export function isLazy(value: any): value is Lazy<any> {
 }
 
 /** The stage of a lazily initialized value. */
-export type LazyStage = "pending" | "ready" | "failed"
+export type LazyStage = "pending" | "resolving" | "ready" | "failed"
 
 /** An interface that represents a lazily initialized value. */
 export interface LazyLike<T> {

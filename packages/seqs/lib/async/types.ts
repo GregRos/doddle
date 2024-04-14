@@ -1,4 +1,4 @@
-import { Seq } from "../sync"
+import { SeqLike } from "../sync/types"
 import { ASeq } from "./async-wrapper"
 export type MaybePromise<T> = T | Promise<T>
 export type AsyncIteratee<E, O> = (this: ASeq<E>, element: E, index: number) => MaybePromise<O>
@@ -10,3 +10,4 @@ export type AsyncReducer<E, O> = (
     index: number
 ) => MaybePromise<O>
 export type ASeqLike<E> = ASeq<E> | AsyncIterator<E> | (() => AsyncIterable<E> | AsyncIterator<E>)
+export type AnySeqLike<E> = ASeqLike<E> | SeqLike<E>

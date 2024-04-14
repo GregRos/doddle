@@ -13,14 +13,35 @@ import {
 
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
-/** Implements a lazily initialized value. */
+/**
+ * A simple, debuggable, and strongly-typed lazy value that works in both synchronous and
+ * asynchronous contexts.
+ */
 export class Lazy<T> implements LazyLike<T> {
+    /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
-    stage: LazyStage = "pending"
+    /**
+     * Returns the current stage of the {@link Lazy} value, which can be one of:
+     *
+     * - `"pending"`: The initializer has not been called yet.
+     * - `"resolving"`: The initializer has been called and is pending completion.
+     * - `"ready"`: The initializer has returned a value.
+     * - `"failed"`: The initializer has been called and threw an error.
+     */
+    get stage() {
+        return this.#stage
+    }
+    #stage: LazyStage = "pending"
+    /** A cached description of the current state of the Lazy value, used for debugging purposes. */
     private _desc = "<pending>"
+    /**
+     * The initializer function that will be called to construct the value. It will be cleared after
+     * the value is constructed.
+     */
     private _init?: LazyInitializer<T>
+    /** Has the initialized returned a value? */
     get isReady() {
-        return this.stage === "ready"
+        return this.#stage === "ready"
     }
 
     /**
@@ -53,11 +74,11 @@ export class Lazy<T> implements LazyLike<T> {
     }
 
     pull(): Pulled<T> {
-        if (this.stage === "failed") {
+        if (this.#stage === "failed") {
             // Correct way to return the error
             throw this._cached
         }
-        if (this.stage === "ready") {
+        if (this.#stage === "ready") {
             return this._cached!
         }
         let resource: any
@@ -67,7 +88,7 @@ export class Lazy<T> implements LazyLike<T> {
         } catch (e) {
             this._cached = e
             this._desc = "lazy <failed>"
-            this.stage = "failed"
+            this.#stage = "failed"
             throw e
         }
         // No need to keep holding a reference to the constructor.
@@ -92,7 +113,7 @@ export class Lazy<T> implements LazyLike<T> {
             this._desc = `lazy ${getClassName(resource)}`
         }
         this._cached = resource
-        this.stage = "ready"
+        this.#stage = "ready"
 
         return resource
     }
