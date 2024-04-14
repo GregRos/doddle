@@ -1,4 +1,4 @@
-import { LazyAsync, lazy } from "lazies"
+import { LazyAsync, lazy } from "stdlazy"
 import { GetTypeForSelector, Selector } from "../util"
 import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
 import { aseq } from "./aseq"

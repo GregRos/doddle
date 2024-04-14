@@ -1,4 +1,4 @@
-import { Lazy, lazy } from "lazies"
+import { Lazy, lazy } from "stdlazy"
 import { isIterable, isNextable } from "../util"
 import { SeqLike } from "./types"
 import { Seq } from "./sync-wrapper"
