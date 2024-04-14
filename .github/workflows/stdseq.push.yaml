@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: build
-        run: yarn workspace stdseq run build
+        run: yarn workspaces foreach --include=stdlazy,stdseq run build
       - name: lint:check
         run: yarn workspace stdseq run lint:check
       - name: test
@@ -56,6 +56,6 @@ jobs:
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
       - name: publish seqs
         working-directory: packages/stdseq
-        run: yarn publish --access public
+        run: yarn npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
