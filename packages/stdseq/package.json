@@ -1,7 +1,7 @@
 {
   "name": "stdseq",
-  "version": "1.0.2",
-  "description": "The missing sequence library for TypeScript.",
+  "version": "1.0.3",
+  "description": "TypeScript-first sequence manipulatio.",
   "keywords": [
     "iteration",
     "iterable",
@@ -31,9 +31,6 @@
     "test": "jest",
     "test:coverage": "jest --coverage"
   },
-  "dependencies": {
-    "stdlazy": "^1.0.0"
-  },
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",
@@ -41,6 +38,9 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"
+  },
+  "peerDependencies": {
+    "stdlazy": "^1.0.0"
   },
   "packageManager": "yarn@4.1.1"
 }
