@@ -1,5 +1,5 @@
-dist/test/
-src/
+dist/test
+test/
 .obsidian/
 tsconfig.*
 .vscode/
