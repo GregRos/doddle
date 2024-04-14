@@ -3954,25 +3954,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lazies@portal:./packages/lazies::locator=root-workspace-0b6124%40workspace%3A.":
-  version: 0.0.0-use.local
-  resolution: "lazies@portal:./packages/lazies::locator=root-workspace-0b6124%40workspace%3A."
-  languageName: node
-  linkType: soft
-
-"lazies@workspace:packages/lazies":
-  version: 0.0.0-use.local
-  resolution: "lazies@workspace:packages/lazies"
-  dependencies:
-    "@types/jest": "npm:^29.5.12"
-    "@types/node": "npm:^20.12.7"
-    jest: "npm:^29.7.0"
-    ts-jest: "npm:^29.1.2"
-    ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.4.5"
-  languageName: unknown
-  linkType: soft
-
 "leven@npm:^3.1.0":
   version: 3.1.0
   resolution: "leven@npm:3.1.0"
@@ -5370,20 +5351,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"seqs@workspace:packages/seqs":
-  version: 0.0.0-use.local
-  resolution: "seqs@workspace:packages/seqs"
-  dependencies:
-    "@types/jest": "npm:^29.5.12"
-    "@types/node": "npm:^20.12.7"
-    jest: "npm:^29.7.0"
-    lazies: "npm:^1.0.0"
-    ts-jest: "npm:^29.1.2"
-    ts-node: "npm:^10.9.2"
-    typescript: "npm:^5.4.5"
-  languageName: unknown
-  linkType: soft
-
 "set-function-length@npm:^1.2.1":
   version: 1.2.2
   resolution: "set-function-length@npm:1.2.2"
@@ -5666,6 +5633,39 @@ __metadata:
   checksum: 10c0/651c9f87667e077584bbe848acaecc6049bc71979f1e9a46c7b920cad4431c388df0f51b8ad7cfd6eed3db97a2878d0fc8b3122979439ea8bac29c61c95eec8a
   languageName: node
   linkType: hard
+
+"stdlazy@portal:./packages/stdlazy::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "stdlazy@portal:./packages/stdlazy::locator=root-workspace-0b6124%40workspace%3A."
+  languageName: node
+  linkType: soft
+
+"stdlazy@workspace:packages/stdlazy":
+  version: 0.0.0-use.local
+  resolution: "stdlazy@workspace:packages/stdlazy"
+  dependencies:
+    "@types/jest": "npm:^29.5.12"
+    "@types/node": "npm:^20.12.7"
+    jest: "npm:^29.7.0"
+    ts-jest: "npm:^29.1.2"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
+
+"stdseq@workspace:packages/stdseq":
+  version: 0.0.0-use.local
+  resolution: "stdseq@workspace:packages/stdseq"
+  dependencies:
+    "@types/jest": "npm:^29.5.12"
+    "@types/node": "npm:^20.12.7"
+    jest: "npm:^29.7.0"
+    stdlazy: "npm:^1.0.0"
+    ts-jest: "npm:^29.1.2"
+    ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
 
 "string-argv@npm:0.3.2":
   version: 0.3.2

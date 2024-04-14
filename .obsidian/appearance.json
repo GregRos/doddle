@@ -1,6 +1,8 @@
 {
-    "accentColor": "",
-    "cssTheme": "Dracula Gemini",
-    "enabledCssSnippets": ["wider-lines"],
-    "baseFontSize": 19
+  "accentColor": "",
+  "cssTheme": "Dracula Gemini",
+  "enabledCssSnippets": [
+    "wider-lines"
+  ],
+  "baseFontSize": 19
 }

@@ -1,17 +1,20 @@
 {
-    "name": "lazies",
+    "name": "stdseq",
     "version": "1.0.0",
-    "description": "A TypeScript-first, strongly-typed, and debuggable lazy primitive.",
+    "description": "The missing sequence library for TypeScript.",
     "keywords": [
-        "async",
-        "sync",
-        "lazy-value",
-        "lazy",
-        "asyncable",
-        "lazy-initialization",
-        "functional"
+        "iteration",
+        "iterable",
+        "seq",
+        "async-iterable",
+        "linq",
+        "lodash",
+        "iterator",
+        "functional",
+        "sequence",
+        "stream",
+        "yield"
     ],
-    "repository": "github:gregros/lazies",
     "license": "MIT",
     "author": "GregRos",
     "exports": {
@@ -20,11 +23,14 @@
             "types": "./dist/lib/index.d.ts"
         }
     },
-    "main": "dist/lib/index.js",
+    "main": "./dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
     "scripts": {
         "test": "jest",
         "test:coverage": "jest --coverage"
+    },
+    "dependencies": {
+        "stdlazy": "^1.0.0"
     },
     "devDependencies": {
         "@types/jest": "^29.5.12",

@@ -46,6 +46,6 @@
     },
     "packageManager": "yarn@4.1.1",
     "resolutions": {
-        "lazies": "portal:./packages/lazies"
+        "stdlazy": "portal:./packages/stdlazy"
     }
 }

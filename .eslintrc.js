@@ -1,5 +1,5 @@
 const path = require("path")
-const projects = ["lazies", "seqs"].flatMap(pkg =>
+const projects = ["stdlazy", "stdseq"].flatMap(pkg =>
     ["lib", "test"].map(dir => path.join(__dirname, "packages", pkg, dir, "tsconfig.json"))
 )
 /** @type {import("eslint").Linter.Config} */

@@ -36,12 +36,45 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     return Lazy.create(initializer) as any
 }
 
-export function memoize<T>(definition: () => T): () => Pulled<T> {
+/**
+ * Memoizes the given function, caching its result and making sure it's only executed once.
+ *
+ * Internally, the function generates a {@link Lazy} instance to handle the memoization. This allows
+ * the benefit of using the library without needing to expose its types in your own interfaces.
+ *
+ * To accomplish this, the return type will try to avoid using utility types like {@link Pulled} and
+ * {@link PulledAwaited} as much as possible. However, if the return value of the function explicitly
+ * involves an {@link Lazy}, those utility types will be used to ensure the return type is properly
+ * flattened.
+ *
+ * This does mean that generic types can lead to unsoundness in some cases.
+ *
+ * @example
+ *     // Synchronous memoization:
+ *     let count = 0
+ *     const func = () => count++
+ *     const memFunc = memoize(func) satisfies () => number
+ *     memFunc() // 0
+ *     memFunc() // 0
+ *     // Asynchronous memoization:
+ *     let count = 0
+ *     const func = async () => count++
+ *     const memFunc = memoize(func) satisfies () => Promise<number>
+ *     await memFunc() // 0
+ *
+ * @param definition The function to memoize. It can be synchronous, asynchronous, or return a lazy
+ *   primitive.
+ * @returns A function that will execute the memoized function and return its result.
+ */
+export function memoize<T>(definition: 0 extends 1 & T ? any : never): () => any
+export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Pulled<T>
+export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Pulled<T>
+export function memoize<T extends Lazy<any>>(definition: () => T): () => Pulled<T>
+export function memoize<T>(definition: () => T): () => T
+export function memoize<T>(definition: () => T): () => T {
     // Don't double memoize
     if (ownerInstance in definition) {
         return definition as any
     }
-    return lazy(definition).pull
+    return lazy(definition).pull as any
 }
-
-lazy(() => 5)

@@ -120,6 +120,18 @@
               "type": "outline",
               "state": {}
             }
+          },
+          {
+            "id": "37e431bb1c142c3f",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              }
+            }
           }
         ]
       }
@@ -140,18 +152,21 @@
   },
   "active": "b9f62d27e00c9319",
   "lastOpenFiles": [
+    "packages/stdseq/dist/lib/sync/types.js.map",
+    "packages/stdseq/dist/lib/sync/types.js",
+    "packages/stdseq/dist/lib/sync/types.d.ts.map",
+    "packages/stdseq/dist/lib/sync/sync-wrapper.js.map",
+    "packages/stdseq/dist/lib/sync/types.d.ts",
+    "packages/stdseq/dist/lib/sync/sync-wrapper.js",
+    "packages/stdseq/dist/lib/sync/sync-wrapper.d.ts.map",
+    "packages/stdseq/dist/lib/sync/seq.js.map",
+    "packages/stdseq/dist/lib/sync/sync-wrapper.d.ts",
+    "packages/stdseq/dist/lib/sync/seqs.js.map",
+    "packages/stdseq/dist/lib/sync/seqs.js",
+    "packages/lazies/README.md",
+    "packages/stdlazy/README.md",
     "Test.md",
-    "~syncthing~package.json.tmp",
-    "src/lib/~syncthing~index.ts.tmp",
-    "src/lib/lazy/lazy.ts",
-    "src/test/lazy/create.ts",
     "README.md",
-    "src/lib/seq/wrapper.ts",
-    "~syncthing~package-lock.json.tmp",
-    "src/test/seq/tests.ts",
-    "src/test/lazy/each.ts",
-    "src/lib/seq/seq.ts",
-    "src/test/lazy/map.ts",
     "node_modules/itertools-ts/README.md",
     "Zenesis Schema (1).svg",
     "Pasted image 20230909160621.png",

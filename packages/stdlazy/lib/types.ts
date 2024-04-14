@@ -1,18 +1,10 @@
 import { Lazy } from "./lazy"
 
 export type Pulled<T> =
-    T extends PromiseLike<infer X>
-        ? Promise<PulledAwaited<X>>
-        : T extends LazyLike<infer X>
-          ? Pulled<X>
-          : T
+    T extends Promise<infer X> ? Promise<PulledAwaited<X>> : T extends Lazy<infer X> ? Pulled<X> : T
 
 export type PulledAwaited<T> =
-    T extends LazyLike<infer R>
-        ? PulledAwaited<R>
-        : T extends PromiseLike<infer R>
-          ? PulledAwaited<R>
-          : T
+    T extends Lazy<infer R> ? PulledAwaited<R> : T extends Promise<infer R> ? PulledAwaited<R> : T
 
 export type ReplaceValue<Lz, T> =
     Lz extends Lazy<infer R>

@@ -1,12 +1,12 @@
 {
     "folders": [
         {
-            "path": "./packages/lazies",
-            "name": "lazies"
+            "path": "./packages/stdlazy",
+            "name": "stdlazy"
         },
         {
-            "path": "./packages/seqs",
-            "name": "seqs"
+            "path": "./packages/stdseq",
+            "name": "stdseq"
         },
         {
             "path": ".",

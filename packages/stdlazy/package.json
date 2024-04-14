@@ -1,20 +1,18 @@
 {
-    "name": "seqs",
+    "name": "stdlazy",
     "version": "1.0.0",
-    "description": "The missing sequence library for TypeScript.",
+    "description": "A TypeScript-first lazy primitive.",
     "keywords": [
-        "iteration",
-        "iterable",
-        "seq",
-        "async-iterable",
-        "linq",
-        "lodash",
-        "iterator",
+        "async",
+        "sync",
+        "initialization",
+        "lazy",
+        "lazy-initialization",
         "functional",
-        "sequence",
-        "stream",
-        "yield"
+        "map",
+        "zip"
     ],
+    "repository": "github:gregros/lazies",
     "license": "MIT",
     "author": "GregRos",
     "exports": {
@@ -23,14 +21,11 @@
             "types": "./dist/lib/index.d.ts"
         }
     },
-    "main": "./dist/lib/index.js",
+    "main": "dist/lib/index.js",
     "types": "dist/lib/index.d.ts",
     "scripts": {
         "test": "jest",
         "test:coverage": "jest --coverage"
-    },
-    "dependencies": {
-        "lazies": "^1.0.0"
     },
     "devDependencies": {
         "@types/jest": "^29.5.12",
