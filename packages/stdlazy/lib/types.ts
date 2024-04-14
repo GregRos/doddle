@@ -1,7 +1,11 @@
 import { Lazy } from "./lazy"
 
 export type Pulled<T> =
-    T extends Promise<infer X> ? Promise<PulledAwaited<X>> : T extends Lazy<infer X> ? Pulled<X> : T
+    T extends PromiseLike<infer X>
+        ? Promise<PulledAwaited<X>>
+        : T extends Lazy<infer X>
+          ? Pulled<X>
+          : T
 
 export type PulledAwaited<T> =
     T extends Lazy<infer R> ? PulledAwaited<R> : T extends Promise<infer R> ? PulledAwaited<R> : T

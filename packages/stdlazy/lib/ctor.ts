@@ -13,12 +13,16 @@ import { LazyAsync, Pulled } from "./types"
  * @example
  *     // Simple initializer:
  *     const regular = lazy(() => 1) satisfies Lazy<number>
+ *
  *     // Initializer returning another lazily primitive is flattened:
  *     const lazyNested = lazy(() => lazy(() => 1)) satisfies Lazy<number>
+ *
  *     // Async initializer gives a `LazyAsync` instance:
  *     const lazyAsync = lazy(async () => 1) satisfies LazyAsync<number>
+ *
  *     // Async initializer returning another lazily primitive is flattened:
  *     const asyncLazy = lazy(async () => lazy(() => 1)) satisfies LazyAsync<number>
+ *
  *     // Async initializer returning another lazily async primitive is flattened:
  *     const asyncLazyAsync = lazy(async () => lazy(async () => 1)) satisfies LazyAsync<number>
  *

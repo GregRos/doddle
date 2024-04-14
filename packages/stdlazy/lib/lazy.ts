@@ -18,7 +18,7 @@ export const ownerInstance = Symbol("ownerInstance")
 
 /**
  * A simple, debuggable, and strongly-typed lazy value that works in both synchronous and
- * asynchronous contexts.
+ * asynchronous contexts. All method are context-bound.
  *
  * To force the evaluation of a lazy value, call the {@link pull} method. This will execute the
  * initializer function and cache the result for future calls.
