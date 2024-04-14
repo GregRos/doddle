@@ -1,6 +1,7 @@
 # stdlazy
 
 A TypeScript-first lazy primitive that brings all the best bits of promises to lazy evaluation.
+
 -   🦥 On-demand evaluation.
 -   ⌚ Support for async initializers.
 -   ⚙️ Multiple strongly-typed operators.
@@ -22,43 +23,44 @@ npm install --save stdlazy
 
 ## Pullables
 
-A _Pullable_ is an object that provides a `pull()` that returns a value, which is also called its _pull value_. The `pull` method is **idempotent** – calling it more than once should return the same result and cause no additional side-effects. 
+A _Pullable_ is an object that provides a `pull()` that returns a value, which is also called its _pull value_. The `pull` method is **idempotent** – calling it more than once should return the same result and cause no additional side-effects.
 
 Like a _Thenable_, a _Pullable_ will never produce another _Pullable_. If this would happen, it will instead **pull** it by invoking the `pull()` method, and return whatever it returns. This means _Pullables_ can be chained transparently, just like promises.
 
-The type operator that gives the *pull value* of a type `T` (which might be a *Pullable*) is `Pulled<T>`. It works just like `Awaited<T>`
+The type operator that gives the _pull value_ of a type `T` (which might be a _Pullable_) is `Pulled<T>`. It works just like `Awaited<T>`
 
 The `Lazy` object offered by `stdlazy` is a _Pullable_, but has a lot more functionality besides.
 
 ## Construction
 
-Use the `lazy` factory function to wrap another function. This function can be sync or async, and can even return another *Pullable* that will be flattened.
+Use the `lazy` factory function to wrap another function. This function can be sync or async, and can even return another _Pullable_ that will be flattened.
 
 ```typescript
 import { lazy } from "stdlazy"
 
-
 const lz = lazy(() => 1) satisfies Lazy<number>
 
-const lzLz = lazy(() => lazy1).pull() + 1 satisfies number
+const lzLz = (lazy(() => lazy1).pull() + 1) satisfies number
 
 const lzAsync = lazy(async () => 1) satisfies LazyAsync<number>
 ```
 
-`stdlazy` uses the same type – `Lazy<T>` – to represent both sync and async lazy values. An async lazy value is just a `Lazy<Promise<T>>`, which is also referred under the alias `LazyAsync<T>`. 
+`stdlazy` uses the same type – `Lazy<T>` – to represent both sync and async lazy values. An async lazy value is just a `Lazy<Promise<T>>`, which is also referred under the alias `LazyAsync<T>`.
 
 This is also known as its **FINAL FORM**. The factory function will flatten all standard compositions of the `Lazy` and `Promise` types into this **FINAL FORM**.
 
 ```typescript
 lazy(async () => {
-	return lazy(async () => {
-		return 5
-	})
+    return lazy(async () => {
+        return 5
+    })
 }) satisfies LazyAsync<number>
 ```
+
 ## Operators
 
 The `Lazy` type implements several operators for working with lazy values.
+
 ### Map
 
 _Project the (awaited) pull value of a Lazy instance._
@@ -73,7 +75,7 @@ const asyncLz = lazy(async () => 1).map(x + 1)
 console.log(await lz.pull()) // 2
 ```
 
-The `map` operator creates a new `Lazy` value, backed by an existing one. When it’s **pulled**, it will **pull** the existing instance and project its (awaited) pull value using a function. 
+The `map` operator creates a new `Lazy` value, backed by an existing one. When it’s **pulled**, it will **pull** the existing instance and project its (awaited) pull value using a function.
 
 This callback won’t be executed until the `pull()` method on the outermost `Lazy` instance is called and, if it returns a Promise, that Promise resolves.
 

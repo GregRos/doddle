@@ -1,51 +1,51 @@
 {
-    "private": true,
-    "workspaces": [
-        "packages/*"
-    ],
-    "scripts": {
-        "build": "tsc -b .",
-        "watch": "tsc -b . --watch",
-        "prepare": "husky install",
-        "rebuild": "run-s clean build",
-        "clean": "shx rm -rf packages/*/dist || true",
-        "lint:fix": "prettier --write . && eslint ./packages/*/{lib,test}/**/*.ts",
-        "lint:check": "prettier --check . && eslint ./packages/*/{lib,test}/**/*.ts",
-        "test": "yarn workspaces foreach -Apt run test"
-    },
-    "lint-staged": {
-        "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
-        "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
-    },
-    "resolutions": {
-        "stdlazy": "portal:./packages/stdlazy"
-    },
-    "dependencies": {
-        "@types/eslint": "^8.56.9"
-    },
-    "devDependencies": {
-        "@assertive-ts/core": "^2.1.0",
-        "@gregros/eslint-config": "^0.6.0",
-        "@types/jest": "^29.5.12",
-        "@types/lodash": "^4.14.198",
-        "@types/node": "^20.12.7",
-        "@types/prettier": "^3.0.0",
-        "@typescript-eslint/eslint-plugin": "^7.6.0",
-        "@typescript-eslint/parser": "^7.6.0",
-        "eslint": "^8",
-        "husky": "^8.0.3",
-        "jest": "^29.7.0",
-        "lint-staged": "^14.0.1",
-        "npm-run-all": "^4.1.5",
-        "prettier": "^3.2.5",
-        "prettier-plugin-jsdoc": "^1.3.0",
-        "prettier-plugin-organize-imports": "^3.2.4",
-        "prettier-plugin-packagejson": "^2.5.0",
-        "shx": "^0.3.4",
-        "ts-jest": "^29.1.2",
-        "ts-node": "^10.9.2",
-        "tslib": "^2.6.2",
-        "typescript": "^5.4.5"
-    },
-    "packageManager": "yarn@4.1.1"
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsc -b .",
+    "watch": "tsc -b . --watch",
+    "prepare": "husky install",
+    "rebuild": "run-s clean build",
+    "clean": "shx rm -rf packages/*/dist || true",
+    "lint:fix": "prettier --write . && eslint ./packages/*/{lib,test}/**/*.ts",
+    "lint:check": "prettier --check . && eslint ./packages/*/{lib,test}/**/*.ts",
+    "test": "yarn workspaces foreach -Apt run test"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
+    "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
+  },
+  "resolutions": {
+    "stdlazy": "portal:./packages/stdlazy"
+  },
+  "dependencies": {
+    "@types/eslint": "^8.56.9"
+  },
+  "devDependencies": {
+    "@assertive-ts/core": "^2.1.0",
+    "@gregros/eslint-config": "^0.6.0",
+    "@types/jest": "^29.5.12",
+    "@types/lodash": "^4.14.198",
+    "@types/node": "^20.12.7",
+    "@types/prettier": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.6.0",
+    "@typescript-eslint/parser": "^7.6.0",
+    "eslint": "^8",
+    "husky": "^8.0.3",
+    "jest": "^29.7.0",
+    "lint-staged": "^14.0.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.2.5",
+    "prettier-plugin-jsdoc": "^1.3.0",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prettier-plugin-packagejson": "^2.5.0",
+    "shx": "^0.3.4",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.2",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "yarn@4.1.1"
 }

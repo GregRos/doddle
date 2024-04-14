@@ -1,24 +1,24 @@
 {
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "**/__pycache__": true,
-        "**/.idea": true,
-        "**/.mypy_cache": true,
-        "**/*.aux": true,
-        "**/*.bbl": true,
-        "**/*.fdb_latexmk": true,
-        "**/*.fls": true,
-        "**/*.log": true,
-        "**/*.out": true,
-        "**/*.synctex.gz": true,
-        "**/dist_aux": true,
-        "coverage": true,
-        ".nyc_output": true,
-        ".yarn": true
-    }
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/__pycache__": true,
+    "**/.idea": true,
+    "**/.mypy_cache": true,
+    "**/*.aux": true,
+    "**/*.bbl": true,
+    "**/*.fdb_latexmk": true,
+    "**/*.fls": true,
+    "**/*.log": true,
+    "**/*.out": true,
+    "**/*.synctex.gz": true,
+    "**/dist_aux": true,
+    "coverage": true,
+    ".nyc_output": true,
+    ".yarn": true
+  }
 }

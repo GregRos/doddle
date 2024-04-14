@@ -1,40 +1,42 @@
 {
-    "name": "stdlazy",
-    "version": "1.0.0",
-    "description": "A TypeScript-first lazy primitive.",
-    "keywords": [
-        "async",
-        "promise",
-        "sync",
-        "initialization",
-        "lazy",
-        "lazy-evaluation",
-        "functional",
-        "map",
-        "zip"
-    ],
-    "repository": "github:gregros/lazies",
-    "license": "MIT",
-    "author": "GregRos",
-    "exports": {
-        ".": {
-            "require": "./dist/lib/index.js",
-            "types": "./dist/lib/index.d.ts"
-        }
-    },
-    "main": "dist/lib/index.js",
-    "types": "dist/lib/index.d.ts",
-    "scripts": {
-        "test": "jest",
-        "test:coverage": "jest --coverage"
-    },
-    "devDependencies": {
-        "@types/jest": "^29.5.12",
-        "@types/node": "^20.12.7",
-        "jest": "^29.7.0",
-        "ts-jest": "^29.1.2",
-        "ts-node": "^10.9.2",
-        "typescript": "^5.4.5"
-    },
-    "packageManager": "yarn@4.1.1"
+  "name": "stdlazy",
+  "version": "1.0.0",
+  "description": "A TypeScript-first lazy primitive.",
+  "keywords": [
+    "async",
+    "promise",
+    "sync",
+    "initialization",
+    "lazy",
+    "lazy-evaluation",
+    "functional",
+    "map",
+    "zip"
+  ],
+  "repository": "github:gregros/lazies",
+  "license": "MIT",
+  "author": "GregRos",
+  "exports": {
+    ".": {
+      "require": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    }
+  },
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "scripts": {
+    "build": "tsc -b .",
+    "clean": "shx rm -rf dist",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.7",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "yarn@4.1.1"
 }
