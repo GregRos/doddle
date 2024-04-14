@@ -5,6 +5,7 @@ on:
       - master
     paths:
       - "packages/stdseq/**"
+      - ".github/workflows/stdseq.push.yaml"
   workflow_dispatch:
 
 permissions:

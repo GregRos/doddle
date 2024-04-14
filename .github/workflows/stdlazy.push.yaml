@@ -5,6 +5,7 @@ on:
       - master
     paths:
       - "packages/stdlazy/**"
+      - ".github/workflows/stdlazy.push.yaml"
   workflow_dispatch:
 
 permissions:
