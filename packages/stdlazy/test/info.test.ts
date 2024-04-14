@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback */
 import { expect } from "@assertive-ts/core"
-import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from "@lib"
+import { lazy } from "@lib"
 
 it("no name normalizes to null", () => {
     const lz = lazy(() => 1)

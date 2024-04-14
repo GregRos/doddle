@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should give empty array on empty", async () => {
     const s = await aseqs.empty().toArray().pull()

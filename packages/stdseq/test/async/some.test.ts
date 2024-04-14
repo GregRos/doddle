@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 describe("no predicate", () => {
     it("gives false if empty", async () => {

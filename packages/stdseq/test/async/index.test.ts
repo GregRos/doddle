@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should do nothing on empty", async () => {
     const a = aseqs.empty().index()

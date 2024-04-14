@@ -1,8 +1,8 @@
 import { lazy } from "./ctor"
 import { cannotRecurseSync } from "./errors"
-import { LazyInfo } from "./types"
 import {
     LazyAsync,
+    LazyInfo,
     LazyInitializer,
     LazyLike,
     Pulled,

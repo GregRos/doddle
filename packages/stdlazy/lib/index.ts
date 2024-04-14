@@ -6,12 +6,12 @@ export {
     LazyInitializer,
     LazyLike,
     LazyStage,
+    LazySyncness,
     Pulled,
     PulledAwaited,
     isLazy,
     isPullable,
-    isThenable,
-    LazySyncness
+    isThenable
 } from "./types"
 
 export { Lazy } from "./lazy"

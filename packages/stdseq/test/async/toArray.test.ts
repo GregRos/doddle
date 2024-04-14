@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should convert sequence to array", async () => {
     const s = aseqs.of(1, 2, 3)

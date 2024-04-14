@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq } from "@lib"
 
 function isInt(x: any): x is number {
     return Number.isInteger(x)

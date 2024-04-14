@@ -1,8 +1,8 @@
 import { LaziesError } from "../error"
-import { isAsyncIterable, isIterable, isNextable } from "../util"
-import { ASeqLike } from "./types"
-import { ASeq } from "./async-wrapper"
 import { SeqLike } from "../sync/types"
+import { isAsyncIterable, isIterable, isNextable } from "../util"
+import { ASeq } from "./async-wrapper"
+import { ASeqLike } from "./types"
 
 export function aseq<E = never>(): ASeq<E>
 export function aseq<E>(input: readonly E[]): ASeq<E>

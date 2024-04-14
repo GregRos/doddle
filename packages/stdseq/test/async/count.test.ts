@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq } from "@lib"
 
 it("should return the number of items in the sequence", async () => {
     const seq = aseq([1, 2, 3, 4, 5])

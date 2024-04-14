@@ -17,6 +17,9 @@
         "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
         "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
     },
+    "resolutions": {
+        "stdlazy": "portal:./packages/stdlazy"
+    },
     "dependencies": {
         "@types/eslint": "^8.56.9"
     },
@@ -44,8 +47,5 @@
         "tslib": "^2.6.2",
         "typescript": "^5.4.5"
     },
-    "packageManager": "yarn@4.1.1",
-    "resolutions": {
-        "stdlazy": "portal:./packages/stdlazy"
-    }
+    "packageManager": "yarn@4.1.1"
 }

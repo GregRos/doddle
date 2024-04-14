@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should work with empty input", async () => {
     const s = aseqs.empty().concatMap(async x => aseqs.of(x, x))

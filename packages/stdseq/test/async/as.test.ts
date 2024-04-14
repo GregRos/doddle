@@ -1,5 +1,5 @@
-import { aseq, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq, ASeq } from "@lib"
 
 it("should do nothing", () => {
     const s = aseq()

@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq } from "@lib"
 
 it("should take elements from the sequence while the predicate is true", async () => {
     const seq = aseq([1, 2, 3, 4, 5])

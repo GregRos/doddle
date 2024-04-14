@@ -1,8 +1,8 @@
 import { LazyAsync, lazy } from "stdlazy"
-import { GetTypeForSelector, Selector } from "../util"
-import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
-import { aseq } from "./aseq"
 import { Iteratee } from "../sync/types"
+import { GetTypeForSelector, Selector } from "../util"
+import { aseq } from "./aseq"
+import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
 const unset = {}
 export class ASeq<E> {
     static from<E>(iterable: AsyncIterable<E>): ASeq<E> {

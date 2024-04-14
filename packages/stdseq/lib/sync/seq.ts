@@ -1,7 +1,7 @@
 import { Lazy, lazy } from "stdlazy"
 import { isIterable, isNextable } from "../util"
-import { SeqLike } from "./types"
 import { Seq } from "./sync-wrapper"
+import { SeqLike } from "./types"
 
 export function seq(): Seq<never>
 export function seq<E>(input: Lazy<SeqLike<E>>): Seq<E>

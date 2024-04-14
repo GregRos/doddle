@@ -1,7 +1,7 @@
 {
-  "accentColor": "",
-  "cssTheme": "Dracula Gemini",
-  "enabledCssSnippets": [],
-  "baseFontSize": 19,
-  "monospaceFontFamily": "FiraCode Nerd Font,Consolas"
+    "accentColor": "",
+    "cssTheme": "Dracula Gemini",
+    "enabledCssSnippets": [],
+    "baseFontSize": 19,
+    "monospaceFontFamily": "FiraCode Nerd Font,Consolas"
 }

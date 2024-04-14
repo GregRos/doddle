@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq } from "@lib"
 
 it("should take 0 elements from the sequence", async () => {
     const seq = aseq([1, 2, 3, 4, 5])

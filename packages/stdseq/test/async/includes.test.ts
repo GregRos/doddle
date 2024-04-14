@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should not find in empty", async () => {
     expect(await aseqs.empty<number>().includes(1).pull()).toBe(false)

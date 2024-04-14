@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseq, aseqs } from "@lib"
 
 // Tests for Seq.toMap
 it("should give empty map on empty", async () => {

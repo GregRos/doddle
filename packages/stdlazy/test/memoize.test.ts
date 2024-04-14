@@ -1,5 +1,5 @@
 import { expect } from "@assertive-ts/core"
-import { lazy, Lazy, LazyAsync, memoize, Pulled, PulledAwaited } from "@lib"
+import { lazy, memoize, Pulled, PulledAwaited } from "@lib"
 
 it("memoizes sync", () => {
     let count = 0

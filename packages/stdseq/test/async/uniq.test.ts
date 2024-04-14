@@ -1,5 +1,5 @@
-import { aseq, aseqs, ASeq } from "@lib"
 import { expect } from "@assertive-ts/core"
+import { aseqs } from "@lib"
 
 it("should return unique elements", async () => {
     const s = aseqs.of(1, 2, 2, 3, 4, 4, 5)

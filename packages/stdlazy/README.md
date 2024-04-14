@@ -27,7 +27,7 @@ A _Pullable_ is an object that provides a `pull()` that returns a value, which i
 
 Like a _Thenable_, a _Pullable_ should never produce another _Pullable_. If this would happen, it should instead **pull** it by invoking the `pull()` method, and return whatever it returns. This means _Pullables_ can be chained transparently.
 
-This *pulling* is represented as the utility type `Pulled<T>`, which works just like `Awaited<T>` but for pullables. The related utility type `PulledAwaited<T>` returns the inner type of composition of *Pullables* and *Thenables*.
+This _pulling_ is represented as the utility type `Pulled<T>`, which works just like `Awaited<T>` but for pullables. The related utility type `PulledAwaited<T>` returns the inner type of composition of _Pullables_ and _Thenables_.
 
 The `Lazy` object offered by `stdlazy` is a _Pullable_, but has a lot more functionality besides.
 
@@ -80,7 +80,6 @@ const asyncLz = lazy(async () => 1).map(x + 1)
 console.log(await lz.pull()) // 2
 ```
 
-
 The `map` operator creates a new `Lazy` instance, backed by an existing one. When it’s **pulled**, it will **pull** the existing instance and project its pull value using a function. However, it doesn’t do anything until the `pull` method is called.
 
 If the projection returns another _Pullable_, its `pull` method will be called automatically. This allows chaining _Pullables_ just like chaining promises.
@@ -104,6 +103,7 @@ The `do` operator produces a new `Lazy` instance, backed by an existing one. Whe
 -   [`rxjs/do`](https://www.learnrxjs.io/learn-rxjs/operators/utility/do)
 
 If either the current `Lazy` instance or the callback is async, the result will be `LazyAsync`.
+
 ### Zip
 
 _Combines a `Lazy` with one or more pullables into a pullable returning an array._
