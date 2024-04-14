@@ -20,3 +20,5 @@ coverage
 .idea/
 .git/
 .eslintrc.js
+*.tsbuildinfo
+jest.*
