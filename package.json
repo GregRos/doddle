@@ -10,7 +10,7 @@
         "rebuild": "run-s clean build",
         "clean": "shx rm -rf packages/*/dist || true",
         "lint:fix": "prettier --write . && eslint ./packages/*/{lib,test}/**/*.ts",
-        "lint:check": "prettier --check . && eslint src/**/*.ts",
+        "lint:check": "prettier --check . && eslint ./packages/*/{lib,test}/**/*.ts",
         "test": "yarn workspaces foreach -Apt run test"
     },
     "lint-staged": {
