@@ -36,7 +36,7 @@ export function getInitializerName(initializer: Function) {
  *
  * @param what The value to check.
  */
-export function isPullable<T = unknown>(what: unknown): what is LazyLike<T> {
+export function isPullable<T = unknown>(what: unknown): what is Pullable<T> {
     return (
         typeof what === "object" &&
         what != null &&
@@ -62,7 +62,7 @@ export function isLazy(value: any): value is Lazy<any> {
 export type LazyStage = "pending" | "pulled" | "ready" | "failed"
 export type LazySyncness = "sync" | "async" | "pending"
 /** An interface that represents a lazily initialized value. */
-export interface LazyLike<T> {
+export interface Pullable<T> {
     /**
      * Tells the object to pull a value.
      *
@@ -74,7 +74,7 @@ export interface LazyLike<T> {
 /** The initializer function for a lazy value. */
 export type LazyInitializer<T> = () => T | Lazy<T>
 
-export type LazyAsyncLike<T> = LazyLike<PromiseLike<T>>
+export type LazyAsyncLike<T> = Pullable<PromiseLike<T>>
 export interface LazyInfo {
     stage: LazyStage
     syncness: LazySyncness

@@ -4,7 +4,7 @@ import {
     LazyAsync,
     LazyInfo,
     LazyInitializer,
-    LazyLike,
+    Pullable,
     Pulled,
     PulledAwaited,
     getClassName,
@@ -17,16 +17,12 @@ export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
 /**
- * A simple, debuggable, and strongly-typed lazy value that works in both synchronous and
- * asynchronous contexts. All method are context-bound.
+ * A TypeScript-first lazy evaluation primitive. A {@link Pullable} that will only evaluate its
+ * initializer function when the {@link pull} method is called.
  *
- * To force the evaluation of a lazy value, call the {@link pull} method. This will execute the
- * initializer function and cache the result for future calls.
- *
- * Nestings of {@link Lazy} and {@link Promise} will be flattened, so that the {@link pull} method will
- * never return another {@link Lazy} or an irregular nesting of {@link Promise}.
+ * The initializer can return another {@link Lazy}, which will be chained like a promise.
  */
-export class Lazy<T> implements LazyLike<T> {
+export class Lazy<T> implements Pullable<T> {
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _desc: string
@@ -83,8 +79,8 @@ export class Lazy<T> implements LazyLike<T> {
     }
 
     /**
-     * Pulls **this** {@link Lazy} value, executing the initializer function if it hasn't been
-     * called. If the initializer is async, it will return a {@link Promise}.
+     * Evaluates this {@link Lazy} instance, flattening any nested {@link Lazy} or {@link Promise}
+     * types.
      *
      * @returns The value produced by the initializer, after flattening any nested {@link Lazy} or
      *   {@link Promise} instances.
@@ -148,10 +144,7 @@ export class Lazy<T> implements LazyLike<T> {
     /**
      * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and return its
      * result, projected using the given function. If the Lazy primitive is async, the projection
-     * function will receive the awaited value.
-     *
-     * This method is strongly typed and will return a {@link Lazy} or {@link LazyAsync} instance
-     * based on both the return type of the projection function and the syncness of **this**.
+     * will receive the awaited value.
      *
      * @example
      *     // sync projectionL
@@ -220,9 +213,6 @@ export class Lazy<T> implements LazyLike<T> {
      * callback to the result. The new {@link Lazy} will still return the same value as **this**,
      * only waiting for the handler to finish first.
      *
-     * If the handler returns a {@link Lazy} or a {@link Promise}, the new {@link Lazy} will pull or
-     * await it before returning the same value as **this**.
-     *
      * @example
      *     const lazy = lazy(() => 1).do(x => console.log(x)) satisfies Lazy<number>
      *     expect(lazy.pull()).toBe(1) // Logs "1" to the console as a side effect.
@@ -270,7 +260,7 @@ export class Lazy<T> implements LazyLike<T> {
      * @param others One or more {@link Lazy} primitives to zip with **this**.
      * @summary Turns multiple lazy values into a single lazy value producing an array.
      */
-    zip<Others extends readonly [LazyLike<unknown>, ...LazyLike<unknown>[]]>(
+    zip<Others extends readonly [Pullable<unknown>, ...Pullable<unknown>[]]>(
         ...others: Others
     ): LazyAsync<any> extends [this, ...Others][number]
         ? LazyAsync<
@@ -290,7 +280,7 @@ export class Lazy<T> implements LazyLike<T> {
               ]
           >
 
-    zip(...others: LazyLike<any>[]): Lazy<any> {
+    zip(...others: Pullable<any>[]): Lazy<any> {
         // eslint-disable-next-line @typescript-eslint/promise-function-async
         return lazy(() => {
             const values = [this, ...others].map(x => x.pull())
@@ -327,7 +317,7 @@ export class Lazy<T> implements LazyLike<T> {
      *   input object, plus the key `"this"`, with the pulled results.
      * @summary Converts an object of {@link Lazy} values into a {@link Lazy} value producing an object.
      */
-    assemble<X extends Record<keyof X, LazyLike<unknown>>>(
+    assemble<X extends Record<keyof X, Pullable<unknown>>>(
         assembly: X
     ): LazyAsync<any> extends X[keyof X] | this
         ? LazyAsync<

@@ -2,13 +2,8 @@ import { Lazy, ownerInstance } from "./lazy"
 import { LazyAsync, Pulled } from "./types"
 
 /**
- * A constructor for a lazily initialized primitive, backed by an initializer function that will
- * only be executed once. It will intelligently construct a synchronous {@link Lazy} or an
- * asynchronous {@link LazyAsync} based on the return type of the function.
- *
- * This constructor will flatten various nestings of {@link Lazy} and {@link Promise}, such as async
- * functions returning other lazy primitives, in the same way that {@link Promise} will flatten
- * nested promises.
+ * Creates a lazy primitive around the given function, making sure it's only executed once. Works
+ * for both synchronous and asynchronous evaluation.
  *
  * @example
  *     // Simple initializer:
@@ -41,17 +36,8 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
 }
 
 /**
- * Memoizes the given function, caching its result and making sure it's only executed once.
- *
- * Internally, the function generates a {@link Lazy} instance to handle the memoization. This allows
- * the benefit of using the library without needing to expose its types in your own interfaces.
- *
- * To accomplish this, the return type will try to avoid using utility types like {@link Pulled} and
- * {@link PulledAwaited} as much as possible. However, if the return value of the function explicitly
- * involves an {@link Lazy}, those utility types will be used to ensure the return type is properly
- * flattened.
- *
- * This does mean that generic types can lead to unsoundness in some cases.
+ * Memoizes the given function, caching its result and making sure it's only executed once. Uses
+ * {@link Lazy} under the hood.
  *
  * @example
  *     // Synchronous memoization:

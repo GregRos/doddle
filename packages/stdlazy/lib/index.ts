@@ -4,7 +4,7 @@ export {
     LazyAsync,
     LazyAsyncLike,
     LazyInitializer,
-    LazyLike,
+    Pullable,
     LazyStage,
     LazySyncness,
     Pulled,
