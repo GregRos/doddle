@@ -1,11 +1,6 @@
 # stdlazy
 
-A TypeScript-first lazy primitive that brings all the best bits of promises to lazy evaluation.
-
--   🦥 On-demand evaluation.
--   ⌚ Support for async initializers.
--   ⚙️ Multiple strongly-typed operators.
--   🫥 Use the `Lazy` type directly or return it as a `() => T` for a cleaner API.
+TypeScript-first lazy evaluation for people used to promises.
 
 ## Install
 
@@ -19,6 +14,18 @@ Or npm:
 
 ```typescript
 npm install --save stdlazy
+```
+
+## Usage
+
+```typescript
+const syncLazy = lazy(() => {
+	console.log("Running sync operation")
+	return syncOperation()
+}
+
+const asyncLazy = lazy(async () => {}
+)
 ```
 
 ## Pullables

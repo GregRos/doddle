@@ -1,6 +1,6 @@
 {
   "name": "stdseq",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "TypeScript-first sequence manipulatio.",
   "keywords": [
     "iteration",
@@ -20,7 +20,9 @@
   "exports": {
     ".": {
       "require": "./dist/lib/index.js",
-      "types": "./dist/lib/index.d.ts"
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.js",
+      "node": "./dist/lib/index.js"
     }
   },
   "main": "./dist/lib/index.js",

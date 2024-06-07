@@ -452,7 +452,7 @@ export class Seq<E> {
         })
     }
 
-    get a(): ASeq<Awaited<E>> {
+    get a(): ASeq<E> {
         return aseq(this)
     }
 

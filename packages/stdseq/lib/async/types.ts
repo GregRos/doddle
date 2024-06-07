@@ -9,5 +9,5 @@ export type AsyncReducer<E, O> = (
     element: E,
     index: number
 ) => MaybePromise<O>
-export type ASeqLike<E> = ASeq<E> | AsyncIterator<E> | (() => AsyncIterable<E> | AsyncIterator<E>)
+export type ASeqLike<E> = ASeq<E> | AsyncIterable<E> | (() => AsyncIterable<E> | AsyncIterator<E>)
 export type AnySeqLike<E> = ASeqLike<E> | SeqLike<E>
