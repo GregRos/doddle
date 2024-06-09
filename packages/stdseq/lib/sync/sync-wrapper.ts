@@ -2,6 +2,7 @@ import { Lazy, lazy } from "stdlazy"
 import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
 import { GetTypeForSelector, Selector } from "../util"
+import type { Chunk } from "./chunk"
 import { Iteratee, Predicate, Reducer } from "./types"
 
 const unset = {}
@@ -48,6 +49,33 @@ export class Seq<E> {
         for (const item of this) {
             fn.call(this, item, i++)
         }
+    }
+
+    sample(count: number) {
+        const self = this
+        return this._wrap(function* sample() {
+            const items = [...self]
+            const len = items.length
+            for (let i = 0; i < count; i++) {
+                yield items[Math.floor(Math.random() * len)]
+            }
+        })
+    }
+
+    chunk<N extends number>(size: N): Seq<Chunk<E, N>> {
+        return this._wrap(function* chunk() {
+            let group: E[] = []
+            for (const item of this) {
+                group.push(item)
+                if (group.length === size) {
+                    yield group as any
+                    group = []
+                }
+            }
+            if (group.length) {
+                yield group as any
+            }
+        })
     }
 
     cache(): Seq<E> {
@@ -246,6 +274,32 @@ export class Seq<E> {
             let i = 0
             for (const item of self) {
                 yield fn.call(self, item, i++)
+            }
+        })
+    }
+
+    drain(): Lazy<void> {
+        return this._toLazy(function drain() {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            for (const _ of this) {
+                // Drain the iterator
+            }
+        })
+    }
+
+    equals(other: Iterable<E>): Lazy<boolean> {
+        return lazy(() => {
+            const a = this[Symbol.iterator]()
+            const b = other[Symbol.iterator]()
+            for (;;) {
+                const aResult = a.next()
+                const bResult = b.next()
+                if (aResult.done || bResult.done) {
+                    return aResult.done === bResult.done
+                }
+                if (aResult.value !== bResult.value) {
+                    return false
+                }
             }
         })
     }
