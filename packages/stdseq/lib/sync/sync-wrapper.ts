@@ -3,7 +3,7 @@ import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
 import { GetTypeForSelector, Selector } from "../util"
 import type { Chunk } from "./chunk"
-import { Iteratee, Predicate, Reducer } from "./types"
+import { Iteratee, Predicate, Reducer, type SeqLike } from "./types"
 
 const unset = {}
 export class Seq<E> {
@@ -287,7 +287,16 @@ export class Seq<E> {
         })
     }
 
-    equals(other: Iterable<E>): Lazy<boolean> {
+    pull() {
+        return this.toArray().pull()
+    }
+
+    equals<E2 extends E>(other: SeqLike<E2>): Lazy<boolean>
+    equals<S2 extends SeqLike<any>>(
+        this: Seq<E> extends S2 ? Seq<E> : never,
+        other: S2
+    ): Lazy<boolean>
+    equals(other: Iterable<any>): Lazy<boolean> {
         return lazy(() => {
             const a = this[Symbol.iterator]()
             const b = other[Symbol.iterator]()

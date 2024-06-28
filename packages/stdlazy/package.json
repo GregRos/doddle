@@ -1,7 +1,7 @@
 {
   "name": "stdlazy",
-  "version": "1.0.5",
-  "description": "A TypeScript-first lazy primitive.",
+  "version": "1.0.6",
+  "description": "Flexible and debuggable lazy primitive.",
   "keywords": [
     "async",
     "promise",

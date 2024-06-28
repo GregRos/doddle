@@ -1,7 +1,7 @@
 {
   "name": "stdseq",
-  "version": "1.1.0",
-  "description": "TypeScript-first sequence manipulatio.",
+  "version": "1.2.0",
+  "description": "TypeScript toolbox for sync and async iteration.",
   "keywords": [
     "iteration",
     "iterable",

@@ -35,4 +35,22 @@ export namespace seqs {
     export function repeat<E>(element: E, times: number): Seq<E> {
         return inf.value(element).take(times)
     }
+
+    export function cycle<E>(elements: E[], times: number): Seq<E> {
+        return seq(function* () {
+            for (let i = 0; i < times; times === Infinity || i++) {
+                for (const element of elements) {
+                    yield element
+                }
+            }
+        })
+    }
+
+    export function repeatedly<E>(generator: () => E): Seq<E> {
+        return seq(function* () {
+            while (true) {
+                yield generator()
+            }
+        })
+    }
 }
