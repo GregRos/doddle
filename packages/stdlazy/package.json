@@ -1,6 +1,6 @@
 {
   "name": "stdlazy",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "description": "Flexible and debuggable lazy primitive.",
   "keywords": [
     "async",
@@ -18,14 +18,30 @@
   "author": "GregRos",
   "exports": {
     ".": {
-      "require": "./dist/lib/index.js",
-      "types": "./dist/lib/index.d.ts",
-      "import": "./dist/lib/index.js",
-      "node": "./dist/lib/index.js"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "node": "./dist/index.js"
+    },
+    "./utils": {
+      "require": "./dist/utils.js",
+      "types": "./dist/utils.d.ts",
+      "import": "./dist/utils.js",
+      "node": "./dist/utils.js"
     }
   },
-  "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ],
+      "utils": [
+        "./dist/utils.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsc -b .",
     "clean": "shx rm -rf dist",

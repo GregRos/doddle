@@ -1,20 +1,19 @@
-import { expect } from "@assertive-ts/core"
 import { lazy, memoize, Pulled, PulledAwaited } from "@lib"
 
 it("memoizes sync", () => {
     let count = 0
     const func = () => count++
     const memFunc = memoize(func) satisfies () => number
-    expect(memFunc()).toBeEqual(0)
-    expect(memFunc()).toBeEqual(0)
+    expect(memFunc()).toEqual(0)
+    expect(memFunc()).toEqual(0)
 })
 
 it("memoizes async", async () => {
     let count = 0
     const func = async () => count++
     const memFunc = memoize(func) satisfies () => Promise<number>
-    await expect(memFunc()).toBeResolvedWith(0)
-    await expect(memFunc()).toBeResolvedWith(0)
+    await expect(memFunc()).resolves.toBe(0)
+    await expect(memFunc()).resolves.toBe(0)
 })
 
 it("doesn't memoize twice", () => {

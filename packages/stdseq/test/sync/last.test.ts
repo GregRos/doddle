@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 
 it("should return null for empty", () => {
     expect(seqs.empty().first().pull()).toBe(null)

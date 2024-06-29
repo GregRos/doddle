@@ -1,22 +1,21 @@
 import { LazyAsync, lazy } from "stdlazy"
+import {
+    GetTypeForSelector,
+    Selector,
+    isAsyncIterable,
+    isIterable,
+    isNextable
+} from "stdlazy/utils"
 import { Iteratee } from "../sync/types"
-import { GetTypeForSelector, Selector } from "../util"
 import { aseq } from "./aseq"
-import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
+import { AsyncIteratee, AsyncPredicate, AsyncReducer, type AnyPromisedSeqLike } from "./types"
 const unset = {}
-export class ASeq<E> {
-    static from<E>(iterable: AsyncIterable<E>): ASeq<E> {
-        return new ASeq(iterable)
-    }
 
-    [Symbol.asyncIterator](): AsyncIterator<E, any, undefined> {
-        return this._iterable[Symbol.asyncIterator]()
-    }
-
-    constructor(private _iterable: AsyncIterable<E>) {}
+export abstract class ASeq<E> {
+    abstract [Symbol.asyncIterator](): AsyncIterator<E, any, undefined>
 
     endWith<Xs extends unknown[]>(...items: Xs): ASeq<E | Xs extends (infer U)[] ? U : never> {
-        const self = this._iterable
+        const self = this
         return this._wrap(async function* endWith() {
             yield* self
             yield* items as any
@@ -24,7 +23,7 @@ export class ASeq<E> {
     }
 
     startWith<Xs extends unknown[]>(...items: Xs): ASeq<E | Xs extends (infer U)[] ? U : never> {
-        const self = this._iterable
+        const self = this
         return this._wrap(async function* startWith() {
             yield* items
             yield* self as any
@@ -32,11 +31,7 @@ export class ASeq<E> {
     }
 
     private _wrap<T>(generator: (this: ASeq<E>, self: ASeq<E>) => AsyncIterable<T>): ASeq<T> {
-        return new ASeq<T>({
-            [Symbol.asyncIterator]: () => {
-                return generator.call(this, this)[Symbol.asyncIterator]()
-            }
-        })
+        return new ASeqOperated(this, generator)
     }
     private _toLazy<X>(transform: (this: this, self: this) => Promise<X>): LazyAsync<X> {
         return lazy(transform.bind(this, this))
@@ -50,7 +45,7 @@ export class ASeq<E> {
     }
 
     cache(): ASeq<E> {
-        const self = this._iterable
+        const self = this
         const cache: E[] = []
         let alreadyDone = false
 
@@ -78,7 +73,7 @@ export class ASeq<E> {
     }
 
     dematerialize(): ASeq<IteratorResult<E>> {
-        const self = this._iterable
+        const self = this
         return this._wrap(async function* dematerialize() {
             for await (const item of self) {
                 yield { value: item, done: false }
@@ -411,7 +406,7 @@ export class ASeq<E> {
     }
 
     concat<U>(...others: AsyncIterable<U>[]): ASeq<U | E> {
-        const self = this._iterable
+        const self = this
         return this._wrap(async function* concat() {
             yield* self
             for (const other of others) {
@@ -454,11 +449,7 @@ export class ASeq<E> {
 
     shared(): ASeq<E> {
         const iterator = this[Symbol.asyncIterator]()
-        return new ASeq({
-            [Symbol.asyncIterator]: () => {
-                return iterator
-            }
-        })
+        return new ASeqFrom(() => iterator)
     }
 
     orderBy<U>(fn: Iteratee<E, U, ASeq<E>>): ASeq<E> {
@@ -479,5 +470,51 @@ export class ASeq<E> {
             })
             yield* items
         })
+    }
+}
+
+export class ASeqFrom<E> extends ASeq<E> {
+    constructor(private readonly _internal: AnyPromisedSeqLike<E>) {
+        super()
+    }
+
+    async *[Symbol.asyncIterator](): AsyncIterator<E, any, undefined> {
+        const items = await this._internal
+        if (isIterable(items)) {
+            for (const item of items) {
+                yield await item
+            }
+        } else if (isAsyncIterable(items)) {
+            for await (const item of items) {
+                yield await item
+            }
+        }
+        if (typeof items === "function") {
+            const result = items()
+            if (isAsyncIterable(result)) {
+                yield* result
+            } else if (isIterable(result)) {
+                yield* result
+            } else if (isNextable(result)) {
+                for (let item = await result.next(); !item.done; item = await result.next()) {
+                    yield item.value
+                }
+            } else {
+                throw new Error(`Got unexpected result from iterator constructor: ${result}`)
+            }
+        }
+    }
+}
+
+export class ASeqOperated<From, To> extends ASeq<To> {
+    constructor(
+        private readonly _internal: ASeq<From>,
+        private readonly _generator: (self: ASeq<From>) => AsyncIterable<To>
+    ) {
+        super()
+    }
+
+    async *[Symbol.asyncIterator](): AsyncIterator<To, any, undefined> {
+        yield* this._generator.call(this._internal, this._internal)
     }
 }

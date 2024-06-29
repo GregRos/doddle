@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { Seq } from "@lib"
+﻿import { Seq } from "@lib"
 
 describe("Seq", () => {
     describe("#count", () => {

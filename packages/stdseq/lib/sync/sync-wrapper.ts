@@ -1,7 +1,7 @@
 import { Lazy, lazy } from "stdlazy"
+import { GetTypeForSelector, Selector, isIterable } from "stdlazy/utils"
 import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
-import { GetTypeForSelector, Selector } from "../util"
 import type { Chunk } from "./chunk"
 import { Iteratee, Predicate, Reducer, type SeqLike } from "./types"
 
@@ -11,14 +11,29 @@ export class Seq<E> {
         return new Seq(iterable)
     }
 
-    [Symbol.iterator](): Iterator<E, any, undefined> {
-        return this._iterable[Symbol.iterator]()
+    *[Symbol.iterator](): Iterator<E, any, undefined> {
+        if (typeof this._internal === "function") {
+            const result = this._internal()
+            if (isIterable(result)) {
+                yield* result
+            } else {
+                for (;;) {
+                    const { done, value } = result.next()
+                    if (done) {
+                        return
+                    }
+                    yield value
+                }
+            }
+        } else {
+            yield* this._internal
+        }
     }
 
-    constructor(private _iterable: Iterable<E>) {}
+    constructor(private _internal: SeqLike<E>) {}
 
     endWith<Xs extends unknown[]>(...items: Xs): Seq<E | Xs extends (infer U)[] ? U : never> {
-        const self = this._iterable
+        const self = this
         return this._wrap(function* endWith() {
             yield* self
             yield* items as any
@@ -26,7 +41,7 @@ export class Seq<E> {
     }
 
     startWith<Xs extends unknown[]>(...items: Xs): Seq<E | Xs extends (infer U)[] ? U : never> {
-        const self = this._iterable
+        const self = this
         return this._wrap(function* startWith() {
             yield* items
             yield* self as any
@@ -79,7 +94,7 @@ export class Seq<E> {
     }
 
     cache(): Seq<E> {
-        const self = this._iterable
+        const self = this
         const cache: E[] = []
         let alreadyDone = false
 
@@ -107,7 +122,7 @@ export class Seq<E> {
     }
 
     dematerialize(): Seq<IteratorResult<E>> {
-        const self = this._iterable
+        const self = this
         return this._wrap(function* dematerialize() {
             for (const item of self) {
                 yield { value: item, done: false }
@@ -472,7 +487,7 @@ export class Seq<E> {
     }
 
     concat<U>(...others: Iterable<U>[]): Seq<U | E> {
-        const self = this._iterable
+        const self = this
         return this._wrap(function* concat() {
             yield* self
             for (const other of others) {
@@ -515,7 +530,7 @@ export class Seq<E> {
         })
     }
 
-    get a(): ASeq<E> {
+    async(): ASeq<E> {
         return aseq(this)
     }
 

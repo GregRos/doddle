@@ -1,13 +1,12 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 
 describe("no predicate", () => {
     it("gives false if empty", () => {
-        expect(seqs.empty<number>().some().pull()).toBeEqual(false)
+        expect(seqs.empty<number>().some().pull()).toEqual(false)
     })
 
     it("gives true if single element", () => {
-        expect(seqs.of(1).some().pull()).toBeEqual(true)
+        expect(seqs.of(1).some().pull()).toEqual(true)
     })
 })
 describe("predicate", () => {
@@ -17,7 +16,7 @@ describe("predicate", () => {
                 .empty<number>()
                 .some(() => true)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 
     it("gives true if single element", () => {
@@ -26,7 +25,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(() => true)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives false if predicate is false", () => {
@@ -35,7 +34,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(() => false)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 
     it("gives true if predicate is true", () => {
@@ -44,7 +43,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(() => true)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives true if predicate is true for some", () => {
@@ -53,7 +52,7 @@ describe("predicate", () => {
                 .of(1, 2, 3)
                 .some(v => v === 2)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives false if predicate is false for all", () => {
@@ -62,6 +61,6 @@ describe("predicate", () => {
                 .of(1, 2, 3)
                 .some(v => v === 4)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 })

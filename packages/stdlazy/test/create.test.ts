@@ -1,34 +1,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { expect } from "@assertive-ts/core"
+
 import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from "@lib"
 
 it("lazy<1> for lazy 1", () => {
     const lz = lazy(() => 1) satisfies Lazy<number>
     expect(lz).toBeInstanceOf(Lazy)
-    expect(lz.pull()).toBeEqual(1)
+    expect(lz.pull()).toEqual(1)
 })
 
 it("lazyAsync<1> for lazy async 1", async () => {
     const lz = lazy(async () => 1) satisfies LazyAsync<number> satisfies Lazy<Promise<number>>
     expect(lz).toBeInstanceOf(Lazy)
-    await expect(lz.pull() satisfies Promise<number>).toBeResolvedWith(1)
+    await expect(lz.pull() satisfies Promise<number>).resolves.toBe(1)
 })
 
 it("lazy<async<1>> for lazy thenable 1", async () => {
     const lz = lazy(() => ({
         then: Promise.resolve(1).then.bind(Promise.resolve(1))
     }))
-    await expect(lz.pull() satisfies PromiseLike<number>).toBeResolvedWith(1)
+    await expect(lz.pull() satisfies PromiseLike<number>).resolves.toBe(1)
 })
 
 it("lazy<1> for lazy lazy 1", () => {
     const lz = lazy(() => lazy(() => 1)).map(x => x) satisfies Lazy<number>
-    expect(lz.pull()).toBeEqual(1)
+    expect(lz.pull()).toEqual(1)
 })
 
 it("lazy<async<1>> for lazy lazy async 1", async () => {
     const lz = lazy(() => lazy(async () => 1)) satisfies LazyAsync<number>
-    await expect(lz.pull()).toBeResolvedWith(1)
+    await expect(lz.pull()).resolves.toBe(1)
 })
 
 it("lazy<async<1>> lazy async lazy 1", async () => {
@@ -75,7 +75,7 @@ it("lazyAsync<T> for lazy async lazy T", async () => {
         return pulled
     }
     const pulled = await generic(1)
-    expect(pulled).toBeEqual(1)
+    expect(pulled).toEqual(1)
 })
 it("lazyAsync<T> for lazy async lazy async T", async <T>() => {
     async function generic<T>(x: T) {

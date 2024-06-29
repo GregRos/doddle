@@ -7,10 +7,14 @@
     "build": "tsc -b .",
     "watch": "tsc -b . --watch",
     "prepare": "husky install",
-    "rebuild": "run-s clean build",
+    "build:clean": "run-s clean build",
     "clean": "shx rm -rf packages/*/dist || true",
-    "lint:fix": "prettier --write . && eslint ./packages/*/{lib,test}/**/*.ts",
-    "lint:check": "prettier --check . && eslint ./packages/*/{lib,test}/**/*.ts",
+    "prettier:fix": "prettier --write .",
+    "eslint:fix": "eslint ./packages/*/{lib,test}/**/*.ts",
+    "eslint:check": "eslint ./packages/*/{lib,test}/**/*.ts",
+    "prettier:check": "prettier --check .",
+    "lint:fix": "run-s eslint:fix prettier:fix",
+    "lint:check": "run-s eslint:check prettier:check",
     "test": "yarn workspaces foreach -Apt run test"
   },
   "lint-staged": {

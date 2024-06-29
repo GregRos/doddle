@@ -11,3 +11,7 @@ export type AsyncReducer<E, O> = (
 ) => MaybePromise<O>
 export type ASeqLike<E> = ASeq<E> | AsyncIterable<E> | (() => AsyncIterable<E> | AsyncIterator<E>)
 export type AnySeqLike<E> = ASeqLike<E> | SeqLike<E>
+export type AnyPromisedSeqLike<E> =
+    | AnySeqLike<E>
+    | AnySeqLike<PromiseLike<E>>
+    | PromiseLike<AnySeqLike<E>>

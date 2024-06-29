@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseq } from "@lib"
 
 it("should return the number of items in the sequence", async () => {

@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 it("true on empty", () => {
     const s = seqs.empty().every(() => false)
     expect(s.pull()).toBe(true)

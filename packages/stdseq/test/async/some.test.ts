@@ -1,13 +1,12 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 describe("no predicate", () => {
     it("gives false if empty", async () => {
-        expect(await aseqs.empty<number>().some().pull()).toBeEqual(false)
+        expect(await aseqs.empty<number>().some().pull()).toEqual(false)
     })
 
     it("gives true if single element", async () => {
-        expect(await aseqs.of(1).some().pull()).toBeEqual(true)
+        expect(await aseqs.of(1).some().pull()).toEqual(true)
     })
 })
 
@@ -18,7 +17,7 @@ describe("predicate", () => {
                 .empty<number>()
                 .some(async () => true)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 
     it("gives true if single element", async () => {
@@ -27,7 +26,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(async () => true)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives false if predicate is false", async () => {
@@ -36,7 +35,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(async () => false)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 
     it("gives true if predicate is true", async () => {
@@ -45,7 +44,7 @@ describe("predicate", () => {
                 .of(1)
                 .some(async () => true)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives true if predicate is true for some", async () => {
@@ -54,7 +53,7 @@ describe("predicate", () => {
                 .of(1, 2, 3)
                 .some(async v => v === 2)
                 .pull()
-        ).toBeEqual(true)
+        ).toEqual(true)
     })
 
     it("gives false if predicate is false for all", async () => {
@@ -63,6 +62,6 @@ describe("predicate", () => {
                 .of(1, 2, 3)
                 .some(async v => v === 4)
                 .pull()
-        ).toBeEqual(false)
+        ).toEqual(false)
     })
 })

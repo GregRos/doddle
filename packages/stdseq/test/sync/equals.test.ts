@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seq } from "@lib"
+﻿import { seq } from "@lib"
 it("empty are equal", () => {
     const s1 = seq()
     const s2 = seq()

@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should perform scan operation", async () => {
@@ -7,7 +6,7 @@ it("should perform scan operation", async () => {
         .scan(async (acc, x) => acc + x, 0)
         .toArray()
         .pull()
-    expect(result).toBeEqual([1, 3, 6, 10, 15])
+    expect(result).toEqual([1, 3, 6, 10, 15])
 })
 
 it("should return empty sequence for empty input", async () => {
@@ -16,5 +15,5 @@ it("should return empty sequence for empty input", async () => {
         .scan(async (acc, x) => acc + x, 0)
         .toArray()
         .pull()
-    expect(result).toBeEqual([])
+    expect(result).toEqual([])
 })

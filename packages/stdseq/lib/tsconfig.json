@@ -6,7 +6,7 @@
   ],
   "extends": "../../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "../dist/lib",
+    "outDir": "../dist",
     "rootDir": ".",
     "noEmit": false
   },

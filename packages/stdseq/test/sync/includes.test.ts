@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 
 it("should not find in empty", () => {
     expect(seqs.empty<number>().includes(1).pull()).toBe(false)

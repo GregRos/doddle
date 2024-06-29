@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should order elements based on key function", async () => {
@@ -7,7 +6,7 @@ it("should order elements based on key function", async () => {
         .orderBy(x => x)
         .toArray()
         .pull()
-    expect(result).toBeEqual([1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9])
+    expect(result).toEqual([1, 1, 2, 3, 3, 4, 5, 5, 5, 6, 9])
 })
 
 it("should return empty sequence for empty input", async () => {
@@ -16,5 +15,5 @@ it("should return empty sequence for empty input", async () => {
         .orderBy(async x => x)
         .toArray()
         .pull()
-    expect(result).toBeEqual([])
+    expect(result).toEqual([])
 })

@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("true on empty", async () => {

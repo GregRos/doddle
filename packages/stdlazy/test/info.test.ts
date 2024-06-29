@@ -1,67 +1,67 @@
 /* eslint-disable prefer-arrow-callback */
-import { expect } from "@assertive-ts/core"
+
 import { lazy } from "@lib"
 
 it("no name normalizes to null", () => {
     const lz = lazy(() => 1)
-    expect(lz.info.name).toBeEqual(null)
+    expect(lz.info.name).toEqual(null)
 })
 
 it("name is recovered", () => {
     const lz = lazy(function foo() {
         return 1
     })
-    expect(lz.info.name).toBeEqual("foo")
-    expect(lz.toString()).toBeEqual("lazy(foo) <pending>")
+    expect(lz.info.name).toEqual("foo")
+    expect(lz.toString()).toEqual("lazy(foo) <untouched>")
 })
 
-it("starts out pending", () => {
+it("starts out untouched", () => {
     const lz = lazy(() => 1)
-    expect(lz.info).toBeEqual({
+    expect(lz.info).toEqual({
         name: null,
-        stage: "pending",
-        syncness: "pending"
+        stage: "untouched",
+        syncness: "untouched"
     })
 })
 
 it("pulling changes stage (in sync)", () => {
     const lz = lazy(() => {
-        expect(lz.info.stage).toBeEqual("pulled")
+        expect(lz.info.stage).toEqual("executing")
     })
     lz.pull()
-    expect(lz.info.stage).toBeEqual("ready")
+    expect(lz.info.stage).toEqual("done")
 })
 
 it("pulling changes stage (in async)", async () => {
     const lz = lazy(async () => {
-        expect(lz.info.stage).toBeEqual("pulled")
-        expect(lz.toString()).toBeEqual("lazy <pulled>")
+        expect(lz.info.stage).toEqual("executing")
+        expect(lz.toString()).toEqual("lazy <executing>")
         return 5
     })
     const p = lz.pull()
-    expect(lz.info.stage).toBeEqual("pulled")
+    expect(lz.info.stage).toEqual("executing")
     await p
-    expect(lz.info.stage).toBeEqual("ready")
-    expect(lz.toString()).toBeEqual("lazy async number")
+    expect(lz.info.stage).toEqual("done")
+    expect(lz.toString()).toEqual("lazy async number")
 })
 
 it("pulling changes syncness (in sync)", () => {
     const lz = lazy(() => {
-        expect(lz.info.syncness).toBeEqual("pending")
+        expect(lz.info.syncness).toEqual("untouched")
     })
     lz.pull()
-    expect(lz.toString()).toBeEqual("lazy sync undefined")
-    expect(lz.info.syncness).toBeEqual("sync")
+    expect(lz.toString()).toEqual("lazy sync undefined")
+    expect(lz.info.syncness).toEqual("sync")
 })
 
 it("pulling changes syncness (in async)", async () => {
     const lz = lazy(async () => {
-        expect(lz.info.syncness).toBeEqual("pending")
-        expect(lz.toString()).toBeEqual("lazy <pulled>")
+        expect(lz.info.syncness).toEqual("untouched")
+        expect(lz.toString()).toEqual("lazy <executing>")
     })
     const p = lz.pull()
-    expect(lz.info.syncness).toBeEqual("async")
-    expect(lz.toString()).toBeEqual("lazy async <pulled>")
+    expect(lz.info.syncness).toEqual("async")
+    expect(lz.toString()).toEqual("lazy async <executing>")
     await p
-    expect(lz.info.syncness).toBeEqual("async")
+    expect(lz.info.syncness).toEqual("async")
 })

@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should return unique elements based on key function", async () => {
@@ -12,7 +11,7 @@ it("should return unique elements based on key function", async () => {
         .uniqBy(async x => x.id)
         .toArray()
         .pull()
-    expect(result).toBeEqual([
+    expect(result).toEqual([
         { id: 1, name: "John" },
         { id: 2, name: "Jane" },
         { id: 3, name: "Alice" }
@@ -25,5 +24,5 @@ it("should return empty sequence for empty input", async () => {
         .uniqBy(async x => x.id)
         .toArray()
         .pull()
-    expect(result).toBeEqual([])
+    expect(result).toEqual([])
 })

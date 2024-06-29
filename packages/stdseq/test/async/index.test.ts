@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should do nothing on empty", async () => {
@@ -8,7 +7,7 @@ it("should do nothing on empty", async () => {
 
 it("should attach index", async () => {
     const a = aseqs.of(1, 2, 3).index()
-    expect(await a.toArray().pull()).toBeEqual([
+    expect(await a.toArray().pull()).toEqual([
         [0, 1],
         [1, 2],
         [2, 3]

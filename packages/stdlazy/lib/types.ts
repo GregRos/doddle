@@ -28,7 +28,7 @@ export function getClassName(something: any) {
     return ctorName
 }
 
-export function getInitializerName(initializer: Function) {
+export function getInitializerName(initializer: (...args: any[]) => any) {
     return initializer.name || null
 }
 /**
@@ -59,8 +59,8 @@ export function isLazy(value: any): value is Lazy<any> {
 }
 
 /** The stage of a lazily initialized value. */
-export type LazyStage = "pending" | "pulled" | "ready" | "failed"
-export type LazySyncness = "sync" | "async" | "pending"
+export type LazyStage = "untouched" | "executing" | "done" | "threw"
+export type LazySyncness = "sync" | "async" | "untouched"
 /** An interface that represents a lazily initialized value. */
 export interface Pullable<T> {
     /**
@@ -73,10 +73,17 @@ export interface Pullable<T> {
 
 /** The initializer function for a lazy value. */
 export type LazyInitializer<T> = () => T | Lazy<T>
-
+export type CompleteLazyInitializer<F extends (...args: any[]) => any> = {
+    name?: string
+    function: F
+    thisArg: ThisParameterType<F>
+} & (Parameters<F> extends [] ? {} : { args: Parameters<F> })
 export type LazyAsyncLike<T> = Pullable<PromiseLike<T>>
 export interface LazyInfo {
     stage: LazyStage
     syncness: LazySyncness
     name: string | null
 }
+
+export type _IterationType<T> = T extends Iterable<infer R> ? R : T
+export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T

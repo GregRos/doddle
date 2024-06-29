@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 
 it("should not call func on empty", () => {
     let i = 0
@@ -7,7 +6,7 @@ it("should not call func on empty", () => {
     seqs.empty().forEach(() => {
         i++
     })
-    expect(i).toBeEqual(0)
+    expect(i).toEqual(0)
 })
 
 it("should call func for each element", () => {
@@ -16,5 +15,5 @@ it("should call func for each element", () => {
     seqs.of(1, 2, 3).forEach(() => {
         i++
     })
-    expect(i).toBeEqual(3)
+    expect(i).toEqual(3)
 })

@@ -3,7 +3,15 @@ export function isIterable<T>(value: any): value is Iterable<T> {
         typeof value === "object" && value != null && typeof value[Symbol.iterator] === "function"
     )
 }
-
+export function getBoolEnvVar(name: string): boolean {
+    if (!(name in process.env)) {
+        return false
+    }
+    if (process.env.name === "false") {
+        return false
+    }
+    return true
+}
 export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
     return (
         typeof value === "object" &&

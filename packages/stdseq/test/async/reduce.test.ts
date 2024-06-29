@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should default on empty", async () => {
@@ -7,7 +6,7 @@ it("should default on empty", async () => {
             .empty()
             .reduce(async (a, b) => a + b, 0)
             .pull()
-    ).toBeEqual(0)
+    ).toEqual(0)
 })
 
 it("should reduce", async () => {
@@ -16,5 +15,5 @@ it("should reduce", async () => {
             .of(1, 2, 3)
             .reduce(async (a, b) => a + b, 0)
             .pull()
-    ).toBeEqual(6)
+    ).toEqual(6)
 })

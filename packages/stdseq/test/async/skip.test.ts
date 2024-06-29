@@ -1,22 +1,21 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("should do nothing on empty", async () => {
     const a = aseqs.empty().skip(1)
-    expect(await a.some().pull()).toBeEqual(false)
+    expect(await a.some().pull()).toEqual(false)
 })
 
 it("should skip", async () => {
     const a = aseqs.of(1, 2, 3).skip(1)
-    expect(await a.toArray().pull()).toBeEqual([2, 3])
+    expect(await a.toArray().pull()).toEqual([2, 3])
 })
 
 it("should skip all", async () => {
     const a = aseqs.of(1, 2, 3).skip(3)
-    expect(await a.toArray().pull()).toBeEqual([])
+    expect(await a.toArray().pull()).toEqual([])
 })
 
 it("should skip more than all", async () => {
     const a = aseqs.of(1, 2, 3).skip(4)
-    expect(await a.toArray().pull()).toBeEqual([])
+    expect(await a.toArray().pull()).toEqual([])
 })

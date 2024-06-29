@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { lazy, Lazy, LazyAsync } from "@lib"
 
 const lz = lazy(() => 1) satisfies Lazy<number>
@@ -27,7 +26,7 @@ it("lazy async do doThing", async () => {
                 return lazy(() => (i += "c"))
             })
             .pull()
-    ).toBeResolvedWith("a")
+    ).resolves.toBe("a")
     expect(i).toBe("abc")
 })
 
@@ -41,7 +40,7 @@ it("lazy do doThing", async () => {
                 return lazy(() => (i += "c"))
             })
             .pull()
-    ).toBeResolvedWith("a")
+    ).resolves.toBe("a")
     expect(i).toBe("abc")
 })
 

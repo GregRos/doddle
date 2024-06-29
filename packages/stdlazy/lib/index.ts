@@ -1,3 +1,5 @@
+import { lazy } from "./ctor"
+
 export { lazy, memoize } from "./ctor"
 
 export {
@@ -15,3 +17,7 @@ export {
 } from "./types"
 
 export { Lazy } from "./lazy"
+function aa(this: unknown, a: number): number {
+    return 2
+}
+const a = lazy(async () => lazy(() => 1))

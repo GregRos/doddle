@@ -1,7 +1,7 @@
 {
   "name": "stdseq",
-  "version": "1.2.0",
-  "description": "TypeScript toolbox for sync and async iteration.",
+  "version": "2.0.0",
+  "description": "Simple, flexible, and strongly-typed iteration.",
   "keywords": [
     "iteration",
     "iterable",
@@ -19,14 +19,21 @@
   "author": "GregRos",
   "exports": {
     ".": {
-      "require": "./dist/lib/index.js",
-      "types": "./dist/lib/index.d.ts",
-      "import": "./dist/lib/index.js",
-      "node": "./dist/lib/index.js"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "node": "./dist/index.js"
     }
   },
-  "main": "./dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsc -b .",
     "clean": "shx rm -rf dist",
@@ -42,7 +49,7 @@
     "typescript": "^5.4.5"
   },
   "peerDependencies": {
-    "stdlazy": "^1.0.0"
+    "stdlazy": "^2.0.0"
   },
   "packageManager": "yarn@4.1.1"
 }

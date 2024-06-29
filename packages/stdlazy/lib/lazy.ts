@@ -1,18 +1,19 @@
+import * as config from "./config"
 import { lazy } from "./ctor"
 import { cannotRecurseSync } from "./errors"
 import {
     LazyAsync,
     LazyInfo,
-    LazyInitializer,
     Pullable,
     Pulled,
     PulledAwaited,
     getClassName,
     getInitializerName,
     isPullable,
-    isThenable
+    isThenable,
+    type _IterationType
 } from "./types"
-
+import { isAsyncIterable, isIterable } from "./utils"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
@@ -22,7 +23,9 @@ export const ownerInstance = Symbol("ownerInstance")
  *
  * The initializer can return another {@link Lazy}, which will be chained like a promise.
  */
-export class Lazy<T> implements Pullable<T> {
+export class Lazy<T>
+    implements Pullable<T>, Iterable<_IterationType<T>>, AsyncIterable<_IterationType<T>>
+{
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _desc: string
@@ -32,18 +35,36 @@ export class Lazy<T> implements Pullable<T> {
     }
     /**
      * The initializer function that will be called to construct the value. It will be cleared after
-     * the value is constructed.
+     * the value is constructed, unless `LAZY_NOCLEAR` is set.
      */
-    private _init?: LazyInitializer<T>
+    private _init: null | ((...args: any[]) => T)
+
     /** Has the initializer finished executing? */
     get isReady() {
-        return this._info.stage === "ready"
+        return this._info.stage === "done"
     }
 
-    private constructor(initializer: LazyInitializer<T>) {
+    *[Symbol.iterator](): Iterator<any> {
+        const inner = this.pull()
+        if (isIterable(inner)) {
+            yield* inner
+        }
+        yield inner
+    }
+
+    async *[Symbol.asyncIterator](): AsyncIterator<any> {
+        // eslint-disable @typescript-eslint/await-thenable
+        const inner = await this.pull()
+        if (isAsyncIterable(inner)) {
+            yield* inner
+        }
+        yield inner
+    }
+
+    private constructor(initializer: (...args: any[]) => any) {
         this._info = {
-            stage: "pending",
-            syncness: "pending",
+            stage: "untouched",
+            syncness: "untouched",
             name: getInitializerName(initializer)
         }
         this._desc = this._makeDescription()
@@ -57,18 +78,14 @@ export class Lazy<T> implements Pullable<T> {
         }
     }
 
-    static create<T>(initializer: () => T | Lazy<T>): Lazy<T> {
-        const asAny = initializer as any
-        if (asAny[ownerInstance] && asAny[methodName] === "pull") {
-            return asAny[ownerInstance]
-        }
-        return new Lazy(initializer) as any
+    static create<T>(f: () => T): Lazy<T> {
+        return new Lazy(f)
     }
 
     private _makeDescription(resolved?: any) {
-        const asyncPart = this._info.syncness === "pending" ? [] : [this._info.syncness]
+        const asyncPart = this._info.syncness === "untouched" ? [] : [this._info.syncness]
         const stagePart =
-            this._info.stage === "ready" ? getClassName(resolved) : `<${this._info.stage}>`
+            this._info.stage === "done" ? getClassName(resolved) : `<${this._info.stage}>`
         const name = this._info.name ? `lazy(${this._info.name})` : "lazy"
         return [name, ...asyncPart, stagePart].join(" ")
     }
@@ -88,21 +105,21 @@ export class Lazy<T> implements Pullable<T> {
      */
     pull(): Pulled<T> {
         const info = this._info
-        if (info.stage === "failed") {
+        if (info.stage === "threw") {
             // Correct way to return the error
             throw this._cached
         }
-        if (info.stage === "pulled") {
+        if (info.stage === "executing") {
             if (info.syncness === "async") {
                 return this._cached
             } else {
                 throw cannotRecurseSync()
             }
         }
-        if (info.stage === "ready") {
+        if (info.stage === "done") {
             return this._cached!
         }
-        info.stage = "pulled"
+        info.stage = "executing"
         this._desc = this._makeDescription()
         let resource: any
         try {
@@ -110,26 +127,27 @@ export class Lazy<T> implements Pullable<T> {
             resource = isPullable(result) ? result.pull() : result
         } catch (e) {
             this._cached = e
-            info.stage = "failed"
+            info.stage = "threw"
             this._desc = this._makeDescription()
             throw e
         }
         // No need to keep holding a reference to the constructor.
-        this._init = undefined
-
+        if (!config.LAZY_NOCLEAR) {
+            this._init = null
+        }
         if (isThenable(resource)) {
             info.syncness = "async"
             resource = resource.then(value => {
                 if (isPullable(value)) {
                     value = value.pull()
                 }
-                info.stage = "ready"
+                info.stage = "done"
                 this._desc = this._makeDescription(value)
                 return value
             })
         } else {
             info.syncness = "sync"
-            info.stage = "ready"
+            info.stage = "done"
         }
         this._cached = resource
         this._desc = this._makeDescription()
@@ -252,10 +270,10 @@ export class Lazy<T> implements Pullable<T> {
      *
      * @example
      *     const a = lazy(() => 1).zip(lazy(() => 2)) satisfies Lazy<[number, number]>
-     *     expect(a.pull()).toBeEqual([1, 2])
+     *     expect(a.pull()).toEqual([1, 2])
      *
      *     const b = lazy(async () => 1).zip(lazy(() => 2)) satisfies LazyAsync<[number, number]>
-     *     await expect(b.pull()).resolves.toBeEqual([1, 2])
+     *     await expect(b.pull()).resolves.toEqual([1, 2])
      *
      * @param others One or more {@link Lazy} primitives to zip with **this**.
      * @summary Turns multiple lazy values into a single lazy value producing an array.
@@ -304,13 +322,13 @@ export class Lazy<T> implements Pullable<T> {
      *         a: lazy(() => 2),
      *         b: lazy(() => 3)
      *     })
-     *     expect(self.pull()).toBeEqual({ this: 1, a: 2, b: 3 })
+     *     expect(self.pull()).toEqual({ this: 1, a: 2, b: 3 })
      *
      *     const asyncSelf = lazy(async () => 1).assemble({
      *         a: lazy(() => 2),
      *         b: lazy(() => 3)
      *     })
-     *     await expect(asyncSelf.pull()).resolves.toBeEqual({ this: 1, a: 2, b: 3 })
+     *     await expect(asyncSelf.pull()).resolves.toEqual({ this: 1, a: 2, b: 3 })
      *
      * @param assembly An object with {@link Lazy} values.
      * @returns A new {@link Lazy} primitive that will return an object with the same keys as the

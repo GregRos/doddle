@@ -1,4 +1,3 @@
-import { expect } from "@assertive-ts/core"
 import { aseqs } from "@lib"
 
 it("nothing on empty", async () => {
@@ -11,8 +10,8 @@ it("nothing on empty", async () => {
         })
         .toArray()
         .pull()
-    expect(await s).toBeEqual([])
-    expect(i).toBeEqual(0)
+    expect(await s).toEqual([])
+    expect(i).toEqual(0)
 })
 
 it("once per element", async () => {
@@ -24,6 +23,6 @@ it("once per element", async () => {
         })
         .toArray()
         .pull()
-    expect(await s).toBeEqual([1, 2, 3])
-    expect(i).toBeEqual(3)
+    expect(await s).toEqual([1, 2, 3])
+    expect(i).toEqual(3)
 })

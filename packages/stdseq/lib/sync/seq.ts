@@ -1,5 +1,5 @@
 import { Lazy, lazy } from "stdlazy"
-import { isIterable, isNextable } from "../util"
+import { isIterable } from "stdlazy/utils"
 import { Seq } from "./sync-wrapper"
 import { SeqLike } from "./types"
 
@@ -12,22 +12,7 @@ export function seq<E>(input?: SeqLike<E> | Lazy<SeqLike<E>>) {
     if (!input) {
         return new Seq<never>([])
     } else if (typeof input === "function") {
-        return new Seq<E>({
-            *[Symbol.iterator]() {
-                const result = input()
-                if (isIterable<E>(result)) {
-                    yield* result
-                } else if (isNextable<E>(result)) {
-                    for (let item = result.next(); !item.done; item = result.next()) {
-                        yield item.value
-                    }
-                } else {
-                    throw new TypeError(
-                        `Got unexpected result from iterator constructor: ${result}`
-                    )
-                }
-            }
-        })
+        return new Seq<E>(input)
     } else if (input instanceof Seq) {
         return input
     } else if (isIterable(input)) {

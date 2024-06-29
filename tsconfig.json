@@ -7,9 +7,6 @@
       "path": "./packages/stdseq/tsconfig.json"
     }
   ],
-  "compilerOptions": {
-    "module": "commonjs",
-    "sourceMap": true
-  },
+  "compilerOptions": {},
   "files": []
 }

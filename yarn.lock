@@ -5658,7 +5658,7 @@ __metadata:
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.4.5"
   peerDependencies:
-    stdlazy: ^1.0.0
+    stdlazy: ^2.0.0
   languageName: unknown
   linkType: soft
 

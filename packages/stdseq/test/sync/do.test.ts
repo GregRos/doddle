@@ -1,5 +1,4 @@
-﻿import { expect } from "@assertive-ts/core"
-import { seqs } from "@lib"
+﻿import { seqs } from "@lib"
 it("nothing on empty", () => {
     let i = 0
 
@@ -10,7 +9,7 @@ it("nothing on empty", () => {
         })
         .toArray()
         .pull()
-    expect(i).toBeEqual(0)
+    expect(i).toEqual(0)
 })
 it("once per element", () => {
     let i = 0
@@ -21,5 +20,5 @@ it("once per element", () => {
         })
         .toArray()
         .pull()
-    expect(i).toBeEqual(3)
+    expect(i).toEqual(3)
 })
