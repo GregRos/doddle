@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/await-thenable */
 import * as config from "./config"
 import { lazy } from "./ctor"
 import { cannotRecurseSync } from "./errors"

@@ -18,7 +18,7 @@
     "test": "yarn workspaces foreach -Apt run test"
   },
   "lint-staged": {
-    "*.{ts,js,mjs,mts,cjs,cts}": "eslint --cache --fix",
+    "*.{ts,js,mjs,mts,cjs,cts}": "eslint --fix",
     "*.{ts,js,mts,mjs,cts,cjs,css,md,yml,yaml,json}": "prettier --write"
   },
   "resolutions": {
