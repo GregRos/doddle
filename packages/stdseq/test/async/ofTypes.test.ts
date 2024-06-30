@@ -1,13 +1,13 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("should filter prototypes", async () => {
-    const stuffs = aseqs.of(1, new Map(), new Set())
+    const stuffs = aseq.of(1, new Map(), new Set())
     const filtered = stuffs.extractTypes(Map)
     expect(await filtered.toArray().pull()).toEqual([new Map()])
 })
 
 it("should do nothing on empty", async () => {
-    const stuffs = aseqs.empty().extractTypes(Map)
+    const stuffs = aseq.empty().extractTypes(Map)
     expect(await stuffs.some().pull()).toBe(false)
 })
 

@@ -1,4 +1,4 @@
-﻿import { seq, seqs } from "@lib"
+﻿import { seq } from "@lib"
 
 // Tests for Seq.toMap
 it("should give empty map on empty", () => {
@@ -7,7 +7,7 @@ it("should give empty map on empty", () => {
 })
 
 it("should convert to map", () => {
-    const s = seqs.of(1, 2, 3).toMap(x => [x, x])
+    const s = seq.of(1, 2, 3).toMap(x => [x, x])
     expect(s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -18,7 +18,7 @@ it("should convert to map", () => {
 })
 
 it("should convert to map with different keys", () => {
-    const s = seqs.of(1, 2, 3).toMap(x => [x + 1, x])
+    const s = seq.of(1, 2, 3).toMap(x => [x + 1, x])
     expect(s.pull()).toEqual(
         new Map([
             [2, 1],
@@ -29,7 +29,7 @@ it("should convert to map with different keys", () => {
 })
 
 it("should replace old key on conflicting", () => {
-    const s = seqs.of(1, 2, 3).toMap(x => [x % 2, x])
+    const s = seq.of(1, 2, 3).toMap(x => [x % 2, x])
     expect(s.pull()).toEqual(
         new Map([
             [0, 2],

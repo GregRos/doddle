@@ -1,12 +1,12 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 
 it("should give empty array on empty", () => {
-    const s = seqs.empty().toArray()
+    const s = seq.empty().toArray()
     expect(s.pull()).toEqual([])
 })
 it("should zip two sequences", () => {
-    const s1 = seqs.of(1, 2, 3)
-    const s2 = seqs.of("a", "b", "c")
+    const s1 = seq.of(1, 2, 3)
+    const s2 = seq.of("a", "b", "c")
     const zipped = s1.zip(s2)
     expect(zipped.toArray().pull()).toEqual([
         [1, "a"],
@@ -16,8 +16,8 @@ it("should zip two sequences", () => {
 })
 
 it("should end on shorter sequence", () => {
-    const s1 = seqs.of(1, 2)
-    const s2 = seqs.of("a", "b", "c")
+    const s1 = seq.of(1, 2)
+    const s2 = seq.of("a", "b", "c")
     const zipped = s1.zip(s2)
     expect(zipped.toArray().pull()).toEqual([
         [1, "a"],
@@ -26,11 +26,11 @@ it("should end on shorter sequence", () => {
 })
 
 it("should be able to do 5 sequences", () => {
-    const s1 = seqs.of(1, 2, 3)
-    const s2 = seqs.of("a", "b", "c")
-    const s3 = seqs.of(true, false, true)
-    const s4 = seqs.of(0, 1, 2)
-    const s5 = seqs.of("x", "y", "z")
+    const s1 = seq.of(1, 2, 3)
+    const s2 = seq.of("a", "b", "c")
+    const s3 = seq.of(true, false, true)
+    const s4 = seq.of(0, 1, 2)
+    const s5 = seq.of("x", "y", "z")
     const zipped = s1.zip(s2, s3, s4, s5)
     expect(zipped.toArray().pull()).toEqual([
         [1, "a", true, 0, "x"],

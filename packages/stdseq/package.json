@@ -1,6 +1,6 @@
 {
   "name": "stdseq",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Simple, flexible, and strongly-typed iteration.",
   "keywords": [
     "iteration",

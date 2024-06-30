@@ -1,12 +1,12 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("empty sequence", async () => {
-    const s = aseqs.empty().dematerialize()
+    const s = aseq.empty().dematerialize()
     expect(await s.toArray().pull()).toEqual([{ value: undefined, done: true }])
 })
 
 it("single element", async () => {
-    const s = aseqs.of(1).dematerialize()
+    const s = aseq.of(1).dematerialize()
     expect(await s.toArray().pull()).toEqual([
         { value: 1, done: false },
         { value: undefined, done: true }

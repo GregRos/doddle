@@ -1,11 +1,11 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 it("empty sequence", () => {
-    const s = seqs.empty().dematerialize()
+    const s = seq.empty().dematerialize()
     expect(s.toArray().pull()).toEqual([{ value: undefined, done: true }])
 })
 
 it("single element", () => {
-    const s = seqs.of(1).dematerialize()
+    const s = seq.of(1).dematerialize()
     expect(s.toArray().pull()).toEqual([
         { value: 1, done: false },
         { value: undefined, done: true }

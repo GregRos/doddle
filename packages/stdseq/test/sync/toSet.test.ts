@@ -1,4 +1,4 @@
-﻿import { seq, seqs } from "@lib"
+﻿import { seq } from "@lib"
 
 it("should give empty set on empty", () => {
     const s = seq().toSet()
@@ -6,11 +6,11 @@ it("should give empty set on empty", () => {
 })
 
 it("should convert to set", () => {
-    const s = seqs.of(1, 2, 3).toSet()
+    const s = seq.of(1, 2, 3).toSet()
     expect(s.pull()).toEqual(new Set([1, 2, 3]))
 })
 
 it("should remove duplicates", () => {
-    const s = seqs.of(1, 2, 2, 3, 3, 3).toSet()
+    const s = seq.of(1, 2, 2, 3, 3, 3).toSet()
     expect(s.pull()).toEqual(new Set([1, 2, 3]))
 })

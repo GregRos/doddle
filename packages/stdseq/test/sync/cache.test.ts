@@ -1,12 +1,12 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 it("should not mess up seq", () => {
-    const s = seqs.of(1, 2, 3).cache()
+    const s = seq.of(1, 2, 3).cache()
     expect(s.toArray().pull()).toEqual([1, 2, 3])
 })
 
 it("should not show side effects", () => {
     let i = 0
-    const s = seqs
+    const s = seq
         .of(1, 2, 3)
         .map(x => i++)
         .cache()

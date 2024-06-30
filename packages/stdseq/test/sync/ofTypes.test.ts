@@ -1,12 +1,12 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 it("should filter prototypes", () => {
-    const stuffs = seqs.of(1, new Map(), new Set())
+    const stuffs = seq.of(1, new Map(), new Set())
     const filtered = stuffs.extractTypes(Map)
     expect(filtered.toArray().pull()).toEqual([new Map()])
 })
 
 it("should do nothing on empty", () => {
-    const stuffs = seqs.empty().extractTypes(Map)
+    const stuffs = seq.empty().extractTypes(Map)
     expect(stuffs.some().pull()).toBe(false)
 })
 

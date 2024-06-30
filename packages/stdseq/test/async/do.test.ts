@@ -1,9 +1,9 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("nothing on empty", async () => {
     let i = 0
 
-    const s = aseqs
+    const s = aseq
         .empty()
         .do(async () => {
             i++
@@ -16,7 +16,7 @@ it("nothing on empty", async () => {
 
 it("once per element", async () => {
     let i = 0
-    const s = aseqs
+    const s = aseq
         .of(1, 2, 3)
         .do(async () => {
             i++

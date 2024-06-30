@@ -1,7 +1,7 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("should perform scan operation", async () => {
-    const s = aseqs.of(1, 2, 3, 4, 5)
+    const s = aseq.of(1, 2, 3, 4, 5)
     const result = await s
         .scan(async (acc, x) => acc + x, 0)
         .toArray()
@@ -10,7 +10,7 @@ it("should perform scan operation", async () => {
 })
 
 it("should return empty sequence for empty input", async () => {
-    const s = aseqs.empty<number>()
+    const s = aseq.empty<number>()
     const result = await s
         .scan(async (acc, x) => acc + x, 0)
         .toArray()

@@ -1,7 +1,7 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 it("should default on empty", () => {
     expect(
-        seqs
+        seq
             .empty()
             .reduce((a, b) => a + b, 0)
             .pull()
@@ -10,7 +10,7 @@ it("should default on empty", () => {
 
 it("should reduce", () => {
     expect(
-        seqs
+        seq
             .of(1, 2, 3)
             .reduce((a, b) => a + b, 0)
             .pull()

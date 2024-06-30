@@ -1,8 +1,8 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("should default on empty", async () => {
     expect(
-        await aseqs
+        await aseq
             .empty()
             .reduce(async (a, b) => a + b, 0)
             .pull()
@@ -11,7 +11,7 @@ it("should default on empty", async () => {
 
 it("should reduce", async () => {
     expect(
-        await aseqs
+        await aseq
             .of(1, 2, 3)
             .reduce(async (a, b) => a + b, 0)
             .pull()

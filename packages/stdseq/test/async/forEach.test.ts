@@ -1,9 +1,9 @@
-import { aseqs } from "@lib"
+import { aseq } from "@lib"
 
 it("should not call func on empty", async () => {
     let i = 0
 
-    await aseqs.empty().forEach(() => {
+    await aseq.empty().forEach(() => {
         i++
     })
     expect(i).toEqual(0)
@@ -12,7 +12,7 @@ it("should not call func on empty", async () => {
 it("should call func for each element", async () => {
     let i = 0
 
-    await aseqs.of(1, 2, 3).forEach(() => {
+    await aseq.of(1, 2, 3).forEach(() => {
         i++
     })
     expect(i).toEqual(3)

@@ -1,18 +1,18 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 
 describe("no predicate", () => {
     it("gives false if empty", () => {
-        expect(seqs.empty<number>().some().pull()).toEqual(false)
+        expect(seq.empty<number>().some().pull()).toEqual(false)
     })
 
     it("gives true if single element", () => {
-        expect(seqs.of(1).some().pull()).toEqual(true)
+        expect(seq.of(1).some().pull()).toEqual(true)
     })
 })
 describe("predicate", () => {
     it("gives false if empty", () => {
         expect(
-            seqs
+            seq
                 .empty<number>()
                 .some(() => true)
                 .pull()
@@ -21,7 +21,7 @@ describe("predicate", () => {
 
     it("gives true if single element", () => {
         expect(
-            seqs
+            seq
                 .of(1)
                 .some(() => true)
                 .pull()
@@ -30,7 +30,7 @@ describe("predicate", () => {
 
     it("gives false if predicate is false", () => {
         expect(
-            seqs
+            seq
                 .of(1)
                 .some(() => false)
                 .pull()
@@ -39,7 +39,7 @@ describe("predicate", () => {
 
     it("gives true if predicate is true", () => {
         expect(
-            seqs
+            seq
                 .of(1)
                 .some(() => true)
                 .pull()
@@ -48,7 +48,7 @@ describe("predicate", () => {
 
     it("gives true if predicate is true for some", () => {
         expect(
-            seqs
+            seq
                 .of(1, 2, 3)
                 .some(v => v === 2)
                 .pull()
@@ -57,7 +57,7 @@ describe("predicate", () => {
 
     it("gives false if predicate is false for all", () => {
         expect(
-            seqs
+            seq
                 .of(1, 2, 3)
                 .some(v => v === 4)
                 .pull()

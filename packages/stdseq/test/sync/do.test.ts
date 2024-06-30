@@ -1,8 +1,8 @@
-﻿import { seqs } from "@lib"
+﻿import { seq } from "@lib"
 it("nothing on empty", () => {
     let i = 0
 
-    const s = seqs
+    const s = seq
         .empty()
         .do(() => {
             i++
@@ -13,7 +13,7 @@ it("nothing on empty", () => {
 })
 it("once per element", () => {
     let i = 0
-    const s = seqs
+    const s = seq
         .of(1, 2, 3)
         .do(() => {
             i++
