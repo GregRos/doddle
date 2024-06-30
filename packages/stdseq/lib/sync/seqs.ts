@@ -1,12 +1,12 @@
 import { seq } from "./seq"
-import { Seq } from "./sync-wrapper"
+import { Seq, SeqFrom } from "./sync-wrapper"
 
 export namespace seqs {
     export function empty<E = never>(): Seq<E> {
         return seq().as<E>()
     }
     export function of<Es extends unknown[]>(...elements: Es): Seq<Es[number]> {
-        return new Seq(elements)
+        return new SeqFrom(elements)
     }
 
     export namespace inf {

@@ -28,5 +28,5 @@ it("type predicate", () => {
     s satisfies Seq<number>
     // @ts-expect-error bounding the type from above
     s satisfies Seq<string>
-    expect(s.toArray().pull()).toEqual([2])
+    expect(s.toArray().pull()).toEqual([1, 2, 3])
 })

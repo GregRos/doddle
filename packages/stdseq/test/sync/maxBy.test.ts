@@ -12,7 +12,7 @@ it("single element", () => {
 
 it("multiple elements", () => {
     const s = seq.of(3, 1, 2).maxBy(x => x)
-    expect(s.pull()).toBe(1)
+    expect(s.pull()).toBe(3)
 })
 
 it("multiple elements with key", () => {

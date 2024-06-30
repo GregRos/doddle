@@ -1,7 +1,7 @@
 ﻿import { seq } from "@lib"
 
 it("should return null for empty", () => {
-    expect(seq.empty().first().pull()).toBe(null)
+    expect(seq.empty().first().pull()).toBe(undefined)
 })
 
 it("accepts default value", () => {

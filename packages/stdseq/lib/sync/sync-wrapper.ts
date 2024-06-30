@@ -6,31 +6,11 @@ import type { Chunk } from "./chunk"
 import { Iteratee, Predicate, Reducer, type SeqLike, type TypePredicate } from "./types"
 
 const unset = {}
-export class Seq<E> {
-    static from<E>(iterable: Iterable<E>): Seq<E> {
-        return new Seq(iterable)
-    }
-
-    *[Symbol.iterator](): Iterator<E, any, undefined> {
-        if (typeof this._internal === "function") {
-            const result = this._internal()
-            if (isIterable(result)) {
-                yield* result
-            } else {
-                for (;;) {
-                    const { done, value } = result.next()
-                    if (done) {
-                        return
-                    }
-                    yield value
-                }
-            }
-        } else {
-            yield* this._internal
-        }
-    }
-
-    constructor(private _internal: SeqLike<E>) {}
+export abstract class Seq<E> {
+    abstract [Symbol.iterator](): Iterator<E>
+    protected abstract _innerArray: E[] | undefined
+    protected abstract _innerSet: Set<E> | undefined
+    protected abstract _innerMap: Map<any, any> | undefined
 
     endWith<Xs extends unknown[]>(...items: Xs): Seq<E | Xs extends (infer U)[] ? U : never> {
         const self = this
@@ -49,11 +29,7 @@ export class Seq<E> {
     }
 
     private _wrap<T>(generator: (this: Seq<E>, self: Seq<E>) => Iterable<T>): Seq<T> {
-        return new Seq<T>({
-            [Symbol.iterator]: () => {
-                return generator.call(this, this)[Symbol.iterator]()
-            }
-        })
+        return new SeqOperated(this, generator)
     }
     private _toLazy<X>(transform: (this: this, self: this) => X): Lazy<X> {
         return lazy(transform.bind(this, this))
@@ -69,7 +45,7 @@ export class Seq<E> {
     sample(count: number) {
         const self = this
         return this._wrap(function* sample() {
-            const items = Array.isArray(this._internal) ? this._internal : [...self]
+            const items = this._innerArray ?? [...self]
             const len = items.length
             for (let i = 0; i < count; i++) {
                 yield items[Math.floor(Math.random() * len)]
@@ -94,11 +70,7 @@ export class Seq<E> {
     }
 
     private get _isInnerCollection(): boolean {
-        return (
-            Array.isArray(this._internal) ||
-            this._internal instanceof Set ||
-            this._internal instanceof Map
-        )
+        return !!(this._innerArray || this._innerSet || this._innerMap)
     }
 
     cache(): Seq<E> {
@@ -161,10 +133,10 @@ export class Seq<E> {
 
     first(): Lazy<E | null>
     first<Alt>(alt: Alt): Lazy<E | Alt>
-    first(alt = null): Lazy<E | null> {
+    first(alt?: any): Lazy<E | null> {
         return this._toLazy(function first() {
-            if (Array.isArray(this._internal)) {
-                return this._internal[0] ?? alt
+            if (this._innerArray) {
+                return this._innerArray[0] ?? alt
             }
             return this.find(() => true, alt)
         })
@@ -189,8 +161,8 @@ export class Seq<E> {
 
     find(fn: Predicate<E>, alt: any = null): Lazy<any> {
         return this._toLazy(self => {
-            if (Array.isArray(this._internal)) {
-                return this._internal.find(fn) ?? alt
+            if (this._innerArray) {
+                return this._innerArray.find(fn) ?? alt
             }
             let i = 0
             for (const item of self) {
@@ -204,10 +176,10 @@ export class Seq<E> {
 
     last(): Lazy<E | null>
     last<Alt>(alt: Alt): Lazy<E | Alt>
-    last(alt = null): Lazy<E | null> {
+    last(alt?: any): Lazy<E | null> {
         return this._toLazy(function last() {
-            if (Array.isArray(this._internal)) {
-                return this._internal[this._internal.length - 1] ?? alt
+            if (this._innerArray) {
+                return this._innerArray[this._innerArray.length - 1] ?? alt
             }
             return this.findLast(x => true, alt)
         })
@@ -217,8 +189,9 @@ export class Seq<E> {
     at<V>(index: number, alt: V): Lazy<E | V>
     at<V>(index: number, alt: any = null): Lazy<E | V> {
         return this._toLazy(function at() {
-            if (Array.isArray(this._internal)) {
-                return this._internal[index] ?? alt
+            if (this._innerArray) {
+                index = index < 0 ? this._innerArray.length + index : index
+                return this._innerArray[index] ?? alt
             }
             const found =
                 index >= 0
@@ -250,11 +223,8 @@ export class Seq<E> {
     }
 
     every(fn: Predicate<E>): Lazy<boolean> {
-        if (Array.isArray(this._internal)) {
-            const internal = this._internal
-            return this._toLazy(() => {
-                return internal.every(fn)
-            })
+        if (this._innerArray) {
+            return lazy(() => this._innerArray!.every(fn))
         }
         return this.some(function not(x, i) {
             return !fn.call(this, x, i)
@@ -262,9 +232,8 @@ export class Seq<E> {
     }
 
     includes(item: E): Lazy<boolean> {
-        if (this._internal instanceof Set) {
-            const internal = this._internal
-            return lazy(() => internal.has(item))
+        if (this._innerArray) {
+            return lazy(() => this._innerArray!.includes(item))
         }
         return this.some(x => {
             return x === item
@@ -293,13 +262,13 @@ export class Seq<E> {
     count(fn: Predicate<E>): Lazy<number>
     count(fn?: Predicate<E>): Lazy<number> {
         return lazy(() => {
-            if ("size" in this._internal) {
-                return this._internal.size as number
-            }
-            if ("length" in this._internal) {
-                return this._internal.length as number
-            }
             if (!fn) {
+                if (this._innerSet || this._innerMap) {
+                    return this._innerSet?.size ?? this._innerMap?.size ?? 0
+                }
+                if (this._innerArray) {
+                    return this._innerArray.length
+                }
                 return this.reduce((acc, x) => acc + 1, 0)
             } else {
                 return this.reduce((acc, x, i) => (fn.call(this, x, i) ? acc + 1 : acc), 0)
@@ -434,11 +403,11 @@ export class Seq<E> {
         })
     }
 
-    minBy<U>(fn: Iteratee<E, U>): Lazy<E | null> {
+    minBy<U>(fn: Iteratee<E, U>): Lazy<E | undefined> {
         const self = this
         return this._toLazy(function minBy() {
-            let min: E | null = null
-            let minVal: U | null = null
+            let min: E | undefined = undefined
+            let minVal: U | undefined = undefined
             let i = 0
             for (const item of self) {
                 const val = fn.call(this, item, i++)
@@ -451,11 +420,11 @@ export class Seq<E> {
         })
     }
 
-    maxBy<U>(fn: Iteratee<E, U>): Lazy<E | null> {
+    maxBy<U>(fn: Iteratee<E, U>): Lazy<E | undefined> {
         const self = this
         return this._toLazy(function maxBy() {
-            let max: E | null = null
-            let maxVal: U | null = null
+            let max: E | undefined = undefined
+            let maxVal: U | undefined = undefined
             let i = 0
             for (const item of self) {
                 const val = fn.call(this, item, i++)
@@ -478,7 +447,7 @@ export class Seq<E> {
 
     takeLast<E2 = E>(count: number, ellipsisItem?: E2): Seq<E | E2> {
         if (count === 0) {
-            return new Seq([])
+            return new SeqFrom([])
         }
         return this._wrap(function* takeLast() {
             const buffer = Array(count)
@@ -620,7 +589,7 @@ export class Seq<E> {
     }
 
     uniq(): Seq<E> {
-        if (this._internal instanceof Set || this._internal instanceof Map) {
+        if (this._innerSet || this._innerMap) {
             return this
         }
         return this.uniqBy(x => x)
@@ -646,12 +615,12 @@ export class Seq<E> {
     }
 
     shared(): Seq<E> {
-        const iterator = this[Symbol.iterator]()
-        return new Seq({
-            [Symbol.iterator]: () => {
-                return iterator
+        const iterator = lazy(() => this[Symbol.iterator]() as any)
+        return new SeqFrom({
+            [Symbol.iterator]() {
+                return iterator as any
             }
-        })
+        }) as any
     }
 
     orderBy<U>(fn: Iteratee<E, U>): Seq<E> {
@@ -673,5 +642,60 @@ export class Seq<E> {
             })
             yield* items
         })
+    }
+}
+
+export class SeqFrom<E> extends Seq<E> {
+    constructor(private _internal: SeqLike<E>) {
+        super()
+    }
+    *[Symbol.iterator](): Iterator<E, any, undefined> {
+        if (typeof this._internal === "function") {
+            const result = this._internal()
+            if (isIterable(result)) {
+                yield* result
+            } else {
+                for (;;) {
+                    const { done, value } = result.next()
+                    if (done) {
+                        return
+                    }
+                    yield value
+                }
+            }
+        } else {
+            yield* this._internal
+        }
+    }
+    get _innerArray() {
+        return Array.isArray(this._internal) ? this._internal : undefined
+    }
+    get _innerSet() {
+        return this._internal instanceof Set ? this._internal : undefined
+    }
+
+    get _innerMap() {
+        return this._internal instanceof Map ? this._internal : undefined
+    }
+}
+
+export class SeqOperated<From, To> extends Seq<To> {
+    constructor(
+        private _base: Seq<From>,
+        private _operator: (this: Seq<From>, from: Seq<From>) => Iterable<To>
+    ) {
+        super()
+    }
+    *[Symbol.iterator](): Iterator<To> {
+        yield* this._operator.call(this._base, this._base)
+    }
+    get _innerArray() {
+        return undefined
+    }
+    get _innerSet() {
+        return undefined
+    }
+    get _innerMap() {
+        return undefined
     }
 }

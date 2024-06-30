@@ -17,5 +17,5 @@ it("multiple elements", () => {
 
 it("multiple elements with key", () => {
     const s = seq.of(3, 1, 2).minBy(x => x)
-    expect(s.pull()).toBe(3)
+    expect(s.pull()).toBe(1)
 })
