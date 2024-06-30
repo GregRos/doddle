@@ -160,7 +160,39 @@ export abstract class ASeq<E> {
 
         return found
     }
+    minBy<U>(fn: AsyncIteratee<E, U>): LazyAsync<E | null> {
+        const self = this
+        return this._toLazy(async function minBy() {
+            let min: E | null = null
+            let minVal: U | null = null
+            let i = 0
+            for await (const item of self) {
+                const val = await fn.call(this, item, i++)
+                if (minVal == null || val < minVal) {
+                    min = item
+                    minVal = val
+                }
+            }
+            return min
+        })
+    }
 
+    maxBy<U>(fn: AsyncIteratee<E, U>): LazyAsync<E | null> {
+        const self = this
+        return this._toLazy(async function maxBy() {
+            let max: E | null = null
+            let maxVal: U | null = null
+            let i = 0
+            for await (const item of self) {
+                const val = await fn.call(this, item, i++)
+                if (maxVal == null || val > maxVal) {
+                    max = item
+                    maxVal = val
+                }
+            }
+            return max
+        })
+    }
     some(): LazyAsync<boolean>
     some(fn: AsyncPredicate<E>): LazyAsync<boolean>
     some(fn?: AsyncPredicate<E>): LazyAsync<boolean> {

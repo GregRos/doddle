@@ -378,8 +378,46 @@ export class Seq<E> {
         })
     }
 
+    minBy<U>(fn: Iteratee<E, U>): Lazy<E | null> {
+        const self = this
+        return this._toLazy(function minBy() {
+            let min: E | null = null
+            let minVal: U | null = null
+            let i = 0
+            for (const item of self) {
+                const val = fn.call(this, item, i++)
+                if (minVal == null || val < minVal) {
+                    min = item
+                    minVal = val
+                }
+            }
+            return min
+        })
+    }
+
+    maxBy<U>(fn: Iteratee<E, U>): Lazy<E | null> {
+        const self = this
+        return this._toLazy(function maxBy() {
+            let max: E | null = null
+            let maxVal: U | null = null
+            let i = 0
+            for (const item of self) {
+                const val = fn.call(this, item, i++)
+                if (maxVal == null || val > maxVal) {
+                    max = item
+                    maxVal = val
+                }
+            }
+            return max
+        })
+    }
+
     take(n: number): Seq<E> {
         return this.takeWhile((_, i) => i < n)
+    }
+
+    strJoin(separator = ""): Lazy<string> {
+        return this.toArray().map(arr => arr.join(separator))
     }
 
     takeLast(count: number): Seq<E> {
