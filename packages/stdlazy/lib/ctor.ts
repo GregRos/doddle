@@ -30,7 +30,7 @@ export function lazy<X>(initializer: () => Promise<Lazy<X>>): LazyAsync<X>
 export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>
 
 export function lazy<T>(initializer: () => Lazy<T>): Lazy<T>
-export function lazy<T>(initializer: () => T): Lazy<T>
+export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     return Lazy.create(initializer) as any
 }

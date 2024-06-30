@@ -1,4 +1,4 @@
-﻿import { seq } from "@lib"
+﻿import { seq, type Seq } from "@lib"
 
 it("empty sequence", () => {
     const s = seq.empty().filter(() => false)
@@ -18,4 +18,15 @@ it("multiple elements", () => {
 it("no elements", () => {
     const s = seq.of(1, 2, 3).filter(() => false)
     expect(s.toArray().pull()).toEqual([])
+})
+
+it("type predicate", () => {
+    const s = seq
+        .of(1, 2, 3)
+        .as<number | string>()
+        .filter(v => typeof v === "number")
+    s satisfies Seq<number>
+    // @ts-expect-error bounding the type from above
+    s satisfies Seq<string>
+    expect(s.toArray().pull()).toEqual([2])
 })

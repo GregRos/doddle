@@ -3,7 +3,7 @@ import { GetTypeForSelector, Selector, isIterable } from "stdlazy/utils"
 import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
 import type { Chunk } from "./chunk"
-import { Iteratee, Predicate, Reducer, type SeqLike } from "./types"
+import { Iteratee, Predicate, Reducer, type SeqLike, type TypePredicate } from "./types"
 
 const unset = {}
 export class Seq<E> {
@@ -69,7 +69,7 @@ export class Seq<E> {
     sample(count: number) {
         const self = this
         return this._wrap(function* sample() {
-            const items = [...self]
+            const items = Array.isArray(this._internal) ? this._internal : [...self]
             const len = items.length
             for (let i = 0; i < count; i++) {
                 yield items[Math.floor(Math.random() * len)]
@@ -93,7 +93,18 @@ export class Seq<E> {
         })
     }
 
+    private get _isInnerCollection(): boolean {
+        return (
+            Array.isArray(this._internal) ||
+            this._internal instanceof Set ||
+            this._internal instanceof Map
+        )
+    }
+
     cache(): Seq<E> {
+        if (this._isInnerCollection) {
+            return this
+        }
         const self = this
         const cache: E[] = []
         let alreadyDone = false
@@ -151,11 +162,19 @@ export class Seq<E> {
     first(): Lazy<E | null>
     first<Alt>(alt: Alt): Lazy<E | Alt>
     first(alt = null): Lazy<E | null> {
-        return this.find(() => true, alt)
+        return this._toLazy(function first() {
+            if (Array.isArray(this._internal)) {
+                return this._internal[0] ?? alt
+            }
+            return this.find(() => true, alt)
+        })
     }
+    findLast<T extends E>(fn: TypePredicate<E, T>): Lazy<T | null>
+    findLast<T extends E, Alt>(fn: TypePredicate<E, T>, alt: Alt): Lazy<T | Alt>
 
     findLast(fn: Predicate<E>): Lazy<E | null>
-    findLast<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | Alt | null>
+    findLast<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | Alt>
+
     findLast<Alt>(fn: Predicate<E>, alt: any = null): Lazy<E | Alt | null> {
         return this.reduce<E | Alt | null>(
             (acc, x, i) => (fn.call(this, x, i) ? x : acc) as E | Alt,
@@ -164,9 +183,15 @@ export class Seq<E> {
     }
 
     find(fn: Predicate<E>): Lazy<E | null>
-    find<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | null>
+    find<T extends E>(fn: TypePredicate<E, T>): Lazy<T | null>
+    find<Alt>(fn: Predicate<E>, alt: Alt): Lazy<E | Alt>
+    find<T extends E, Alt>(fn: TypePredicate<E, T>, alt: Alt): Lazy<T | Alt>
+
     find(fn: Predicate<E>, alt: any = null): Lazy<any> {
         return this._toLazy(self => {
+            if (Array.isArray(this._internal)) {
+                return this._internal.find(fn) ?? alt
+            }
             let i = 0
             for (const item of self) {
                 if (fn.call(self, item, i++)) {
@@ -180,18 +205,28 @@ export class Seq<E> {
     last(): Lazy<E | null>
     last<Alt>(alt: Alt): Lazy<E | Alt>
     last(alt = null): Lazy<E | null> {
-        return this.findLast(x => true, alt)
+        return this._toLazy(function last() {
+            if (Array.isArray(this._internal)) {
+                return this._internal[this._internal.length - 1] ?? alt
+            }
+            return this.findLast(x => true, alt)
+        })
     }
 
     at(index: number): Lazy<E | null>
     at<V>(index: number, alt: V): Lazy<E | V>
     at<V>(index: number, alt: any = null): Lazy<E | V> {
-        const found =
-            index >= 0
-                ? this.index().skip(index).first(alt)
-                : this.index().takeLast(-index).first(alt)
+        return this._toLazy(function at() {
+            if (Array.isArray(this._internal)) {
+                return this._internal[index] ?? alt
+            }
+            const found =
+                index >= 0
+                    ? this.index().skip(index).first(alt)
+                    : this.index().takeLast(-index).first(alt)
 
-        return found.map(x => x?.[1] ?? null)
+            return found.map(x => x?.[1] ?? null)
+        })
     }
 
     only(): Lazy<E> {
@@ -215,12 +250,22 @@ export class Seq<E> {
     }
 
     every(fn: Predicate<E>): Lazy<boolean> {
+        if (Array.isArray(this._internal)) {
+            const internal = this._internal
+            return this._toLazy(() => {
+                return internal.every(fn)
+            })
+        }
         return this.some(function not(x, i) {
             return !fn.call(this, x, i)
         }).map(x => !x)
     }
 
     includes(item: E): Lazy<boolean> {
+        if (this._internal instanceof Set) {
+            const internal = this._internal
+            return lazy(() => internal.has(item))
+        }
         return this.some(x => {
             return x === item
         })
@@ -247,11 +292,19 @@ export class Seq<E> {
     count(): Lazy<number>
     count(fn: Predicate<E>): Lazy<number>
     count(fn?: Predicate<E>): Lazy<number> {
-        if (!fn) {
-            return this.reduce((acc, x) => acc + 1, 0)
-        } else {
-            return this.reduce((acc, x, i) => (fn.call(this, x, i) ? acc + 1 : acc), 0)
-        }
+        return lazy(() => {
+            if ("size" in this._internal) {
+                return this._internal.size as number
+            }
+            if ("length" in this._internal) {
+                return this._internal.length as number
+            }
+            if (!fn) {
+                return this.reduce((acc, x) => acc + 1, 0)
+            } else {
+                return this.reduce((acc, x, i) => (fn.call(this, x, i) ? acc + 1 : acc), 0)
+            }
+        })
     }
 
     reduce(fn: Reducer<E, E>): Lazy<E>
@@ -340,6 +393,9 @@ export class Seq<E> {
         }) as any
     }
 
+    filter<T extends E>(fn: TypePredicate<E, T>): Seq<T>
+    filter(fn: Predicate<E>): Seq<E>
+
     filter(fn: Predicate<E>): Seq<E> {
         const self = this
         return this._wrap(function* filter() {
@@ -412,15 +468,15 @@ export class Seq<E> {
         })
     }
 
-    take(n: number): Seq<E> {
-        return this.takeWhile((_, i) => i < n)
+    take<E2 = E>(n: number, ellipsisItem?: E2): Seq<E | E2> {
+        return this.takeWhile((_, i) => i < n, ellipsisItem)
     }
 
     strJoin(separator = ""): Lazy<string> {
         return this.toArray().map(arr => arr.join(separator))
     }
 
-    takeLast(count: number): Seq<E> {
+    takeLast<E2 = E>(count: number, ellipsisItem?: E2): Seq<E | E2> {
         if (count === 0) {
             return new Seq([])
         }
@@ -429,6 +485,9 @@ export class Seq<E> {
             let i = 0
             for (const item of this) {
                 buffer[i++ % count] = item
+            }
+            if (i === count && ellipsisItem !== undefined) {
+                yield ellipsisItem as E2
             }
             if (i <= count) {
                 yield* buffer.slice(0, i)
@@ -441,14 +500,17 @@ export class Seq<E> {
         })
     }
 
-    skipLast(count: number): Seq<E> {
+    skipLast<E2 = E>(count: number, ellipsisItem?: E2): Seq<E | E2> {
         if (count === 0) {
-            return this
+            return this as any
         }
         return this._wrap(function* skipLast() {
             const buffer = Array(count)
             let i = 0
             for (const item of this) {
+                if (i === count && ellipsisItem !== undefined) {
+                    yield ellipsisItem as E2
+                }
                 if (i >= count) {
                     yield buffer[i % count]
                 }
@@ -458,12 +520,15 @@ export class Seq<E> {
         })
     }
 
-    takeWhile(fn: Predicate<E>): Seq<E> {
+    takeWhile<E2 = E>(fn: Predicate<E>, ellipsisItem?: E2): Seq<E | E2> {
         const self = this
         return this._wrap(function* takeWhile() {
             let i = 0
             for (const item of self) {
                 if (!fn.call(self, item, i++)) {
+                    if (ellipsisItem !== undefined) {
+                        yield ellipsisItem as E2
+                    }
                     break
                 }
                 yield item
@@ -471,8 +536,8 @@ export class Seq<E> {
         })
     }
 
-    skip(n: number): Seq<E> {
-        return this.skipWhile((_, i) => i < n)
+    skip<E2 = E>(n: number, ellipsisItem?: E2): Seq<E | E2> {
+        return this.skipWhile((_, i) => i < n, ellipsisItem)
     }
 
     zip<Xs extends any[]>(
@@ -493,15 +558,20 @@ export class Seq<E> {
         })
     }
 
-    skipWhile(fn: Predicate<E>): Seq<E> {
+    skipWhile<E2 = E>(fn: Predicate<E>, ellipsisItem?: E2): Seq<E | E2> {
         const self = this
         return this._wrap(function* skipWhile() {
             let i = 0
             let skip = true
+            let sentEllipsis = false
             for (const item of self) {
                 if (skip && fn.call(self, item, i++)) {
                     continue
                 }
+                if (!sentEllipsis && ellipsisItem !== undefined) {
+                    yield ellipsisItem as E2
+                }
+                sentEllipsis = true
                 skip = false
                 yield item
             }
@@ -550,6 +620,9 @@ export class Seq<E> {
     }
 
     uniq(): Seq<E> {
+        if (this._internal instanceof Set || this._internal instanceof Map) {
+            return this
+        }
         return this.uniqBy(x => x)
     }
 

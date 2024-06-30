@@ -3,6 +3,9 @@ import { lazy } from "./ctor"
 export { lazy, memoize } from "./ctor"
 
 export {
+    isLazy,
+    isPullable,
+    isThenable,
     LazyAsync,
     LazyAsyncLike,
     LazyInitializer,
@@ -10,14 +13,9 @@ export {
     LazySyncness,
     Pullable,
     Pulled,
-    PulledAwaited,
-    isLazy,
-    isPullable,
-    isThenable
+    PulledAwaited
 } from "./types"
 
 export { Lazy } from "./lazy"
-function aa(this: unknown, a: number): number {
-    return 2
-}
+
 const a = lazy(async () => lazy(() => 1))
