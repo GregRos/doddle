@@ -1,2 +1,2 @@
-export { ASeq, aseq } from "./async"
-export { Seq, seq } from "./sync"
+export { ASeq, aseq, ASeqLike } from "./async"
+export { Seq, seq, SeqLike } from "./sync"

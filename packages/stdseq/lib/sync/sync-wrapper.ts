@@ -4,6 +4,7 @@ import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
 import type { Chunk } from "./chunk"
 import { Iteratee, Predicate, Reducer, type SeqLike, type TypePredicate } from "./types"
+import { seq } from "."
 
 const unset = {}
 export abstract class Seq<E> {
@@ -18,6 +19,10 @@ export abstract class Seq<E> {
             yield* self
             yield* items as any
         })
+    }
+
+    sumBy(fn: Iteratee<E, number>): Lazy<number> {
+        return this.reduce((acc, x, i) => acc + fn.call(this, x, i), 0)
     }
 
     startWith<Xs extends unknown[]>(...items: Xs): Seq<E | Xs extends (infer U)[] ? U : never> {
@@ -222,14 +227,7 @@ export abstract class Seq<E> {
         return a
     }
 
-    every(fn: Predicate<E>): Lazy<boolean> {
-        if (this._innerArray) {
-            return lazy(() => this._innerArray!.every(fn))
-        }
-        return this.some(function not(x, i) {
-            return !fn.call(this, x, i)
-        }).map(x => !x)
-    }
+    every(fn: Predicate<E>): Lazy<boolean> {}
 
     includes(item: E): Lazy<boolean> {
         if (this._innerArray) {
@@ -328,24 +326,47 @@ export abstract class Seq<E> {
         return this.toArray().pull()
     }
 
-    equals<E2 extends E>(other: SeqLike<E2>): Lazy<boolean>
+    private _setEquals(other: SeqLike<E>): boolean {
+        const thisSet = this.toSet().pull()
+        let otherLength = 0
+        for (const item of seq(other)) {
+            if (otherLength++ >= thisSet.size) {
+                return false
+            }
+            if (!thisSet.has(item)) {
+                return false
+            }
+        }
+        return otherLength === thisSet.size
+    }
+
+    private _seqEquals(other: SeqLike<E>): boolean {
+        const a = this[Symbol.iterator]()
+        const b = seq(other)[Symbol.iterator]()
+        for (;;) {
+            const aResult = a.next()
+            const bResult = b.next()
+            if (aResult.done || bResult.done) {
+                return aResult.done === bResult.done
+            }
+            if (aResult.value !== bResult.value) {
+                return false
+            }
+        }
+    }
+
+    equals<E2 extends E>(other: SeqLike<E2>, equality?: "seq" | "set"): Lazy<boolean>
     equals<S2 extends SeqLike<any>>(
         this: Seq<E> extends S2 ? Seq<E> : never,
-        other: S2
+        other: S2,
+        equality?: "seq" | "set"
     ): Lazy<boolean>
-    equals(other: Iterable<any>): Lazy<boolean> {
+    equals(other: Iterable<any>, equality: "seq" | "set" = "seq"): Lazy<boolean> {
         return lazy(() => {
-            const a = this[Symbol.iterator]()
-            const b = other[Symbol.iterator]()
-            for (;;) {
-                const aResult = a.next()
-                const bResult = b.next()
-                if (aResult.done || bResult.done) {
-                    return aResult.done === bResult.done
-                }
-                if (aResult.value !== bResult.value) {
-                    return false
-                }
+            if (equality === "set") {
+                return this._setEquals(other)
+            } else {
+                return this._seqEquals(other)
             }
         })
     }
@@ -465,6 +486,22 @@ export abstract class Seq<E> {
             yield buffer[i % count]
             for (let j = (i + 1) % count; j !== i % count; j = (j + 1) % count) {
                 yield buffer[j]
+            }
+        })
+    }
+
+    shuffle(): Seq<E> {
+        const self = this
+        return this._wrap(function* shuffle() {
+            const items = this._innerArray ?? [...self]
+            const len = items.length
+            const indices = Array.from({ length: len }, (_, i) => i)
+            for (let i = len - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1))
+                ;[indices[i], indices[j]] = [indices[j], indices[i]]
+            }
+            for (const i of indices) {
+                yield items[i]
             }
         })
     }
@@ -680,15 +717,16 @@ export class SeqFrom<E> extends Seq<E> {
 }
 
 export class SeqOperated<From, To> extends Seq<To> {
+    override [Symbol.iterator]!: () => Iterator<To>
+
     constructor(
         private _base: Seq<From>,
         private _operator: (this: Seq<From>, from: Seq<From>) => Iterable<To>
     ) {
         super()
+        this[Symbol.iterator] = () => this._operator.call(this._base, this._base)[Symbol.iterator]()
     }
-    *[Symbol.iterator](): Iterator<To> {
-        yield* this._operator.call(this._base, this._base)
-    }
+
     get _innerArray() {
         return undefined
     }

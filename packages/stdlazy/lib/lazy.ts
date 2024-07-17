@@ -49,8 +49,9 @@ export class Lazy<T>
         const inner = this.pull()
         if (isIterable(inner)) {
             yield* inner
+        } else {
+            yield inner
         }
-        yield inner
     }
 
     async *[Symbol.asyncIterator](): AsyncIterator<any> {
@@ -58,8 +59,11 @@ export class Lazy<T>
         const inner = await this.pull()
         if (isAsyncIterable(inner)) {
             yield* inner
+        } else if (isIterable(inner)) {
+            yield* inner
+        } else {
+            yield inner
         }
-        yield inner
     }
 
     private constructor(initializer: (...args: any[]) => any) {

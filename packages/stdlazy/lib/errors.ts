@@ -1,4 +1,4 @@
-export class LazyError extends Error {
+export class LazyErr extends Error {
     constructor(
         readonly code: string,
         message: string
@@ -9,7 +9,7 @@ export class LazyError extends Error {
 }
 
 export function cannotRecurseSync(): Error {
-    return new LazyError(
+    return new LazyErr(
         "lazies/recursed",
         "Cannot call `pull` in a synchronous context when the initializer is running."
     )

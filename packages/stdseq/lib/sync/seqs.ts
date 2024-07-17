@@ -8,32 +8,34 @@ export namespace seqs {
     export function of<Es extends unknown[]>(...elements: Es): Seq<Es[number]> {
         return new SeqFrom(elements)
     }
-
-    export namespace inf {
-        export const nat = seq(function* () {
-            let i = 0
-            while (true) {
-                yield i++
+    export function randomFloats(range: [start: number, end: number], count: number) {
+        return seq(function* () {
+            for (let i = 0; i < count; i++) {
+                yield Math.random() * (range[1] - range[0]) + range[0]
             }
         })
+    }
 
-        export function value<E>(value: E): Seq<E> {
-            return seq(function* () {
-                while (true) {
-                    yield value
-                }
-            })
-        }
+    export function randomInts(range: [start: number, end: number], count: number) {
+        return seqs.randomFloats(range, count).map(Math.floor)
     }
 
     export function range(start: number, end: number): Seq<number> {
         const len = Math.abs(end - start)
         const sign = Math.sign(end - start)
-        return inf.nat.map(x => x * sign + start).take(len)
+        return seq(function* () {
+            for (let i = 0; i < len; i++) {
+                yield i * sign + start
+            }
+        })
     }
 
     export function repeat<E>(element: E, times: number): Seq<E> {
-        return inf.value(element).take(times)
+        return seq(function* () {
+            for (let i = 0; i < times; i++) {
+                yield element
+            }
+        })
     }
 
     export function cycle<E>(elements: E[], times: number): Seq<E> {

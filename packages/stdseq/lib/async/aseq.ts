@@ -1,5 +1,6 @@
 import { Lazy, LazyAsync, isPullable, isThenable } from "stdlazy"
-import { ASeq, ASeqFrom } from "./async-wrapper"
+import { ASeq } from "./async-wrapper"
+import { ASeqFrom } from "./aseq-from"
 import { AnySeqLike, type AnyPromisedSeqLike } from "./types"
 function normalizeItem(item: any): any {
     if (isThenable(item)) {

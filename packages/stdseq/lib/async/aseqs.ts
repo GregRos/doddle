@@ -24,6 +24,14 @@ export namespace aseqs {
                 }
             })
         }
+
+        export function random(lower: number, upper: number) {
+            return aseq(function* () {
+                while (true) {
+                    yield Math.random() * (upper - lower) + lower
+                }
+            })
+        }
     }
 
     export function range(start: number, end: number): ASeq<number> {
