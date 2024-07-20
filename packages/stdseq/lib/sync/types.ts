@@ -10,4 +10,4 @@ export type TypePredicate<E, T extends E, I = Seq<E>> = (
     index: number
 ) => element is T
 export type Reducer<E, O> = (this: Seq<E>, acc: O, element: E, index: number) => O
-export type SeqLike<E> = Seq<E> | Iterable<E> | (() => Iterable<E> | Iterator<E>)
+export type SeqLikeInput<E> = Seq<E> | Iterable<E> | (() => Iterable<E> | Iterator<E>)

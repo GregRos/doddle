@@ -3,7 +3,7 @@ import { GetTypeForSelector, Selector, isIterable } from "stdlazy/utils"
 import { aseq } from "../async/aseq"
 import { ASeq } from "../async/async-wrapper"
 import type { Chunk } from "./chunk"
-import { Iteratee, Predicate, Reducer, type SeqLike, type TypePredicate } from "./types"
+import { Iteratee, Predicate, Reducer, type SeqLikeInput, type TypePredicate } from "./types"
 import { seq } from "."
 
 const unset = {}
@@ -227,7 +227,9 @@ export abstract class Seq<E> {
         return a
     }
 
-    every(fn: Predicate<E>): Lazy<boolean> {}
+    every(fn: Predicate<E>): Lazy<boolean> {
+        return this.some((x, i) => !fn.call(this, x, i)).map(x => !x)
+    }
 
     includes(item: E): Lazy<boolean> {
         if (this._innerArray) {
@@ -326,7 +328,7 @@ export abstract class Seq<E> {
         return this.toArray().pull()
     }
 
-    private _setEquals(other: SeqLike<E>): boolean {
+    private _setEquals(other: SeqLikeInput<E>): boolean {
         const thisSet = this.toSet().pull()
         let otherLength = 0
         for (const item of seq(other)) {
@@ -340,7 +342,7 @@ export abstract class Seq<E> {
         return otherLength === thisSet.size
     }
 
-    private _seqEquals(other: SeqLike<E>): boolean {
+    private _seqEquals(other: SeqLikeInput<E>): boolean {
         const a = this[Symbol.iterator]()
         const b = seq(other)[Symbol.iterator]()
         for (;;) {
@@ -355,8 +357,8 @@ export abstract class Seq<E> {
         }
     }
 
-    equals<E2 extends E>(other: SeqLike<E2>, equality?: "seq" | "set"): Lazy<boolean>
-    equals<S2 extends SeqLike<any>>(
+    equals<E2 extends E>(other: SeqLikeInput<E2>, equality?: "seq" | "set"): Lazy<boolean>
+    equals<S2 extends SeqLikeInput<any>>(
         this: Seq<E> extends S2 ? Seq<E> : never,
         other: S2,
         equality?: "seq" | "set"
@@ -683,7 +685,7 @@ export abstract class Seq<E> {
 }
 
 export class SeqFrom<E> extends Seq<E> {
-    constructor(private _internal: SeqLike<E>) {
+    constructor(private _internal: SeqLikeInput<E>) {
         super()
     }
     *[Symbol.iterator](): Iterator<E, any, undefined> {

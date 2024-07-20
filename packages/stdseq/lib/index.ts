@@ -1,2 +1,2 @@
 export { ASeq, aseq, ASeqLike } from "./async"
-export { Seq, seq, SeqLike } from "./sync"
+export { Seq, seq, SeqLikeInput } from "./sync"

@@ -7,11 +7,11 @@ import type {
     replaceIteratedElement
 } from "../../async/types"
 import { syncFrom, asyncFrom, SeqFrom, ASeqFrom } from "../from"
-import type { SeqLike } from "../../sync"
+import type { SeqLikeInput } from "../../sync"
 import type { Iteratee, Iteratee2 } from "../../sync/types"
 
 export default {
-    sync<In, Out>(this: Iterable<In>, projection: Iteratee2<In, SeqLike<Out>>) {
+    sync<In, Out>(this: Iterable<In>, projection: Iteratee2<In, SeqLikeInput<Out>>) {
         const self = this
         return new SeqFrom(function* concatMap() {
             let i = 0

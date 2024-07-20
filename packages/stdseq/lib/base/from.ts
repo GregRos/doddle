@@ -1,7 +1,7 @@
 import { isAsyncIterable, isIterable, isNextable } from "stdlazy/lib/utils"
 import { ASeq } from "./wrapper.async"
 import type { AnyPromisedSeqLike, AnySeqLike } from "../async/types"
-import type { SeqLike } from "../sync"
+import type { SeqLikeInput } from "../sync"
 import { Seq } from "./wrapper.sync"
 
 export class ASeqFrom<E> extends ASeq<E> {
@@ -9,52 +9,13 @@ export class ASeqFrom<E> extends ASeq<E> {
         super()
     }
 
-    async *[Symbol.asyncIterator](): AsyncIterator<E, any, undefined> {
-        const items = await this._internal
-        if (isAsyncIterable(items)) {
-            yield* items
-        } else if (isIterable(items)) {
-            yield* items
-        } else if (typeof items === "function") {
-            const result = items()
-            if (isAsyncIterable(result)) {
-                yield* result
-            } else if (isIterable(result)) {
-                yield* result
-            } else if (isNextable(result)) {
-                for (let item = await result.next(); !item.done; item = await result.next()) {
-                    yield item.value
-                }
-            } else {
-                throw new Error(`Got unexpected result from iterator constructor: ${result}`)
-            }
-        }
-    }
+    async *[Symbol.asyncIterator](): AsyncIterator<E, any, undefined> {}
 }
 
-export async function* asyncFrom<E>(items: AnyPromisedSeqLike<E>): AsyncIterable<E> {
-    if (isAsyncIterable(items)) {
-        yield* items
-    } else if (isIterable(items)) {
-        yield* items
-    } else if (typeof items === "function") {
-        const result = items()
-        if (isAsyncIterable(result)) {
-            yield* result
-        } else if (isIterable(result)) {
-            yield* result
-        } else if (isNextable(result)) {
-            for (let item = await result.next(); !item.done; item = await result.next()) {
-                yield item.value
-            }
-        } else {
-            throw new Error(`Got unexpected result from iterator constructor: ${result}`)
-        }
-    }
-}
+export async function* asyncFrom<E>(items: AnyPromisedSeqLike<E>): AsyncIterable<E> {}
 
 export class SeqFrom<E> extends Seq<E> {
-    constructor(private readonly _internal: SeqLike<E>) {
+    constructor(private readonly _internal: SeqLikeInput<E>) {
         super()
     }
 
@@ -78,6 +39,6 @@ export class SeqFrom<E> extends Seq<E> {
         }
     }
 }
-export function syncFrom<E>(items: SeqLike<E>) {
+export function syncFrom<E>(items: SeqLikeInput<E>) {
     return new SeqFrom(items)
 }

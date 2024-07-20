@@ -66,7 +66,7 @@ export class Lazy<T>
         }
     }
 
-    private constructor(initializer: (...args: any[]) => any) {
+    protected constructor(initializer: (...args: any[]) => any) {
         this._info = {
             stage: "untouched",
             syncness: "untouched",

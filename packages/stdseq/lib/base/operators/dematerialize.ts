@@ -7,7 +7,7 @@ import type {
     replaceIteratedElement
 } from "../../async/types"
 import { syncFrom, asyncFrom, SeqFrom, ASeqFrom } from "../from"
-import type { SeqLike } from "../../sync"
+import type { SeqLikeInput } from "../../sync"
 import type { Iteratee, Iteratee2 } from "../../sync/types"
 
 export default {

@@ -1,9 +1,12 @@
 import type { AnyPromisedSeqLike, AnySeqLike } from "../../async/types"
 import { asyncFrom, syncFrom } from "../from"
-import type { SeqLike } from "../../sync"
+import type { SeqLikeInput } from "../../sync"
 
 export default {
-    sync<In, Subject extends Iterable<In>, Ts extends SeqLike<any>[]>(this: Subject, inputs: Ts) {
+    sync<In, Subject extends Iterable<In>, Ts extends SeqLikeInput<any>[]>(
+        this: Subject,
+        inputs: Ts
+    ) {
         const self = this
         return syncFrom(function* concat() {
             yield* self

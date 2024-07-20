@@ -3,7 +3,6 @@ import { GetTypeForSelector, Selector } from "stdlazy/utils"
 import { Iteratee } from "../sync/types"
 import { aseq } from "./aseq"
 import { AsyncIteratee, AsyncPredicate, AsyncReducer } from "./types"
-import { ASeqFrom } from "./aseq-from"
 import { ASeqOperated } from "./aseq-operated"
 const unset = {}
 
