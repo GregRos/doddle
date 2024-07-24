@@ -28,6 +28,4 @@ export type getTuple<T, L extends number> = L extends 0
                               ? [T, T, T, T, T, T, T, T, T, T, T, T, T]
                               : L extends 14
                                 ? [T, T, T, T, T, T, T, T, T, T, T, T, T, T]
-                                : L extends 15
-                                  ? [T, T, T, T, T, T, T, T, T, T, T, T, T, T, T]
-                                  : [T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, ...T[]]
+                                : [T, T, T, T, T, T, T, T, T, T, T, T, T, T, ...T[]]

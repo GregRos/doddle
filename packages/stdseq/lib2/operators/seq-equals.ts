@@ -1,40 +1,31 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
+import { Iteratee, AsyncIteratee, type Eq, type SeqLikeInput } from "../f-types/index"
+import { mustBeAsyncIterable, mustBeFunction } from "../errors/error"
+import { fromAsyncInput, fromSyncInput } from "../from/input"
 
-const _seqEquals = {
-    name: "seqEquals",
-    sync<T>(
-        this: Iterable<T>,
-        other: Iterable<T>,
-        eq: (a: T, b: T) => boolean = (a, b) => a === b
-    ) {
-        return lazyFromOperator(_seqEquals, this, input => {
-            const otherIterator = other[Symbol.iterator]()
-            for (const element of input) {
-                const otherElement = otherIterator.next()
-                if (otherElement.done || !eq(element, otherElement.value)) {
-                    return false
-                }
+export function sync<T>(this: Iterable<T>, _other: SeqLikeInput<T>) {
+    const other = fromSyncInput(_other)
+    return lazyFromOperator("seqEquals", this, input => {
+        const otherIterator = other[Symbol.iterator]()
+        for (const element of input) {
+            const otherElement = otherIterator.next()
+            if (otherElement.done || element !== otherElement.value) {
+                return false
             }
-            return otherIterator.next().done
-        })
-    },
-    async<T>(
-        this: AsyncIterable<T>,
-        other: AsyncIterable<T>,
-        eq: (a: T, b: T) => boolean = (a, b) => a === b
-    ) {
-        return lazyFromOperator(_seqEquals, this, async input => {
-            const otherIterator = other[Symbol.asyncIterator]()
-            for await (const element of input) {
-                const otherElement = await otherIterator.next()
-                if (otherElement.done || !eq(element, otherElement.value)) {
-                    return false
-                }
-            }
-            return (await otherIterator.next()).done
-        })
-    }
+        }
+        return otherIterator.next().done
+    })
 }
-
-export default _seqEquals
+export function async<T>(this: AsyncIterable<T>, _other: AsyncIterable<T>) {
+    const other = fromAsyncInput(_other)
+    return lazyFromOperator("seqEquals", this, async input => {
+        const otherIterator = other[Symbol.asyncIterator]()
+        for await (const element of input) {
+            const otherElement = await otherIterator.next()
+            if (otherElement.done || element !== otherElement.value) {
+                return false
+            }
+        }
+        return (await otherIterator.next()).done
+    })
+}

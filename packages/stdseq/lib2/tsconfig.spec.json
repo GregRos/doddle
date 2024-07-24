@@ -1,0 +1,15 @@
+{
+  "references": [
+    {
+      "path": "../../stdlazy/tsconfig.json"
+    }
+  ],
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../dist",
+    "rootDir": ".",
+    "noEmit": false
+  },
+  "include": ["**/*.spec.ts"],
+  "exclude": ["**/dist/*/.ts", "**/node_modules"]
+}

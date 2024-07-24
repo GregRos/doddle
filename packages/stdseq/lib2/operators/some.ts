@@ -1,21 +1,20 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { aseq, seq } from "../ctors"
+import { Iteratee, AsyncIteratee, type AsyncPredicate, type Predicate } from "../f-types/index"
+import { seq } from "../seq"
+import { aseq } from "../aseq"
+import { mustBeFunction } from "../errors/error"
 
-const _some = {
-    name: "some",
-    sync<T>(this: Iterable<T>, predicate: Iteratee<T, boolean>) {
-        return lazyFromOperator(_some, this, input => {
-            const unset = {} as any
-            return seq(input).find(predicate, unset) !== unset
-        })
-    },
-    async<T>(this: AsyncIterable<T>, predicate: AsyncIteratee<T, boolean>) {
-        return lazyFromOperator(_some, this, async input => {
-            const unset = {} as any
-            return (await aseq(input).find(predicate, unset).pull()) !== unset
-        })
-    }
+export function sync<T>(this: Iterable<T>, predicate: Predicate<T>) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("some", this, input => {
+        const unset = {} as any
+        return seq(input).find(predicate, unset) !== unset
+    })
 }
-
-export default _some
+export function async<T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("some", this, async input => {
+        const unset = {} as any
+        return (await aseq(input).find(predicate, unset).pull()) !== unset
+    })
+}

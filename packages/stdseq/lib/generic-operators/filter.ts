@@ -29,18 +29,3 @@ export function skipWhile<T>(this: Seq<T>, predicate: Iteratee2<T, boolean>) {
         return skipping ? [] : [value]
     })
 }
-
-export function find<T, Alt>(this: Seq<T>, predicate: Iteratee2<T, boolean>, alt: Alt) {
-    return this.mapJoin(predicate)
-        .dematerialize()
-        .concatMap(item => {
-            const { done, value } = item
-            if (done) {
-                return [{ done: false, value: alt }]
-            }
-            if (value[1]) {
-                return [{ done: false, value: value[0] }]
-            }
-            return []
-        }).
-}

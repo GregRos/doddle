@@ -1,20 +1,15 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
 import { Iteratee, AsyncIteratee } from "../f-types/index"
-import _uniqBy from "./uniq-by"
-import { aseq, seq } from "../ctors"
+import { seq } from "../seq"
+import { aseq } from "../aseq"
 
-const _uniq = {
-    name: "uniq",
-    sync<T>(this: Iterable<T>) {
-        return syncFromOperator(_uniq, this, function* (input) {
-            yield* seq(input).uniqBy(x => x)
-        })
-    },
-    async<T>(this: AsyncIterable<T>) {
-        return asyncFromOperator(_uniq, this, async function* (input) {
-            yield* aseq(input).uniqBy(x => x)
-        })
-    }
+export function sync<T>(this: Iterable<T>) {
+    return syncFromOperator("uniq", this, function* (input) {
+        yield* seq(input).uniqBy(x => x)
+    })
 }
-
-export default _uniq
+export function async<T>(this: AsyncIterable<T>) {
+    return asyncFromOperator("uniq", this, async function* (input) {
+        yield* aseq(input).uniqBy(x => x)
+    })
+}

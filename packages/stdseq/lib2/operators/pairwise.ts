@@ -1,18 +1,23 @@
-import { seq, aseq } from "../ctors"
+import { seq, type Seq } from "../seq"
+import { aseq, type ASeq } from "../aseq"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { getOptionalTuple } from "../type-functions/get-optional-tuple"
 
-const _pairwise = {
-    name: "pairwise",
-    sync<T>(this: Iterable<T>): Iterable<[T, T]> {
-        return syncFromOperator(_pairwise, this, function* (input) {
-            yield* seq(input).windowed(2)
-        })
-    },
-    async<T>(this: AsyncIterable<T>): AsyncIterable<[T, T]> {
-        return asyncFromOperator(_pairwise, this, async function* (input) {
-            yield* aseq(input).windowed(2)
-        })
-    }
+export function sync<T, S, AllowSmaller extends boolean = false>(
+    this: Iterable<T>,
+    projection: (...args: AllowSmaller extends false ? [T, T] : [T?, T?]) => S,
+    allowSmaller?: AllowSmaller
+): Seq<S> {
+    return syncFromOperator("pairwise", this, function* (input) {
+        yield* seq(input).window(2, projection, allowSmaller)
+    })
 }
-
-export default _pairwise
+export function async<T, S, AllowSmaller extends boolean = false>(
+    this: AsyncIterable<T>,
+    projection: (...args: AllowSmaller extends false ? [T, T] : [T?, T?]) => S,
+    allowSmaller?: AllowSmaller
+): ASeq<S> {
+    return asyncFromOperator("pairwise", this, async function* (input) {
+        yield* aseq(input).window(2, projection, allowSmaller)
+    })
+}

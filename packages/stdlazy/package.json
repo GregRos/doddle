@@ -50,7 +50,6 @@
     "watch": "tsc -b . --watch",
     "build:clean": "run-s clean build"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.7",

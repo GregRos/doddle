@@ -1,19 +1,24 @@
-import { aseq, seq } from "../ctors"
+import { seq } from "../seq"
 import { lazyFromOperator } from "../from/operator"
-import _find from "./find"
+import { mustBeInteger, mustBeNatural } from "../errors/error"
+import { aseq } from "../aseq"
 
-const _at = {
-    name: "at",
-    sync<T>(this: Iterable<any>, index: number) {
-        return seq(this).find((_, i) => i === index)
-    },
-    async<T>(this: AsyncIterable<any>, index: number) {
-        return lazyFromOperator(_at, this, async input => {
-            return await aseq(input)
-                .find((_, i) => i === index)
-                .pull()
-        })
-    }
+export function sync<T>(this: Iterable<T>, index: number) {
+    mustBeInteger("index", index)
+
+    return lazyFromOperator("at", this, input => {
+        if (index < 0) {
+            return seq(input).take(index).first().pull()
+        }
+        return seq(input).skip(index).first().pull()
+    })
 }
-
-export default _at
+export function async<T>(this: AsyncIterable<T>, index: number) {
+    mustBeInteger("index", index)
+    return lazyFromOperator("at", this, async input => {
+        if (index < 0) {
+            return await aseq(input).take(index).first().pull()
+        }
+        return await aseq(input).skip(index).first().pull()
+    })
+}

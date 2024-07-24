@@ -1,24 +1,20 @@
 import { lazyFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import _some from "./some"
-import { aseq } from "../ctors"
+import { Iteratee, AsyncIteratee, type AsyncPredicate, type Predicate } from "../f-types/index"
+import { aseq } from "../aseq"
+import { seq } from "../seq"
+import { mustBeFunction } from "../errors/error"
 
-const _every = {
-    name: "every",
-    sync<T>(this: Iterable<T>, predicate: Iteratee<T, boolean>) {
-        return lazyFromOperator(_every, this, async input => {
-            return !(_some.sync<T>)
-                .call(this, (element, index) => !predicate(element, index))
-                .pull()
-        })
-    },
-    async<T>(this: AsyncIterable<T>, predicate: AsyncIteratee<T, boolean>) {
-        return lazyFromOperator(_every, this, async input => {
-            return !(await aseq(input)
-                .some(async (element, index) => !(await predicate(element, index)))
-                .pull())
-        })
-    }
+export function sync<T>(this: Iterable<T>, predicate: Predicate<T>) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("every", this, async input => {
+        return !seq(input).some((element, index) => !predicate(element, index))
+    })
 }
-
-export default _every
+export function async<T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("every", this, async input => {
+        return !(await aseq(input)
+            .some(async (element, index) => !(await predicate(element, index)))
+            .pull())
+    })
+}

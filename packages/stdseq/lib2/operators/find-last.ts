@@ -1,32 +1,18 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
+import { Iteratee, AsyncIteratee, type AsyncPredicate, type Predicate } from "../f-types/index"
+import { seq } from "../seq"
+import { aseq } from "../aseq"
+import { mustBeFunction } from "../errors/error"
 
-const _findLast = {
-    name: "findLast",
-    sync<T, Alt = undefined>(this: Iterable<T>, predicate: Iteratee<T, boolean>, alt?: Alt) {
-        return lazyFromOperator(_findLast, this, input => {
-            let index = 0
-            let last: T | Alt = alt as any
-            for (const element of input) {
-                if (predicate(element, index++)) {
-                    last = element
-                }
-            }
-            return last
-        })
-    },
-    async<T, Alt = T>(this: AsyncIterable<T>, predicate: AsyncIteratee<T, boolean>, alt?: Alt) {
-        return lazyFromOperator(_findLast, this, async input => {
-            let index = 0
-            let last: T | Alt = alt as any
-            for await (const element of input) {
-                if (await predicate(element, index++)) {
-                    last = element
-                }
-            }
-            return last
-        })
-    }
+export function sync<T, Alt = undefined>(this: Iterable<T>, predicate: Predicate<T>, alt?: Alt) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("findLast", this, input => {
+        return seq(input).filter(predicate).last(alt).pull()
+    })
 }
-
-export default _findLast
+export function async<T, Alt = T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>, alt?: Alt) {
+    mustBeFunction("predicate", predicate)
+    return lazyFromOperator("findLast", this, async input => {
+        return await aseq(input).filter(predicate).last(alt).pull()
+    })
+}

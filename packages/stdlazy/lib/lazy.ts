@@ -100,6 +100,16 @@ export class Lazy<T>
         return this._desc
     }
 
+    equals<Other>(other: Promise<Other> | LazyAsync<Other>): LazyAsync<boolean>
+    equals<Other>(other: Other | Lazy<Other>): Lazy<boolean>
+    equals(other: any): any {
+        return this.zip(lazy(() => other) as any).map(([a, b]) => a === b)
+    }
+
+    not(): LazyAsync<any> extends this ? LazyAsync<boolean> : Lazy<boolean> {
+        return this.map(x => !x) as any
+    }
+
     /**
      * Evaluates this {@link Lazy} instance, flattening any nested {@link Lazy} or {@link Promise}
      * types.
@@ -220,7 +230,6 @@ export class Lazy<T>
     map<X>(projection: (value: PulledAwaited<T>) => Promise<X>): LazyAsync<X>
     map<R>(projection: (value: PulledAwaited<T>) => Lazy<R>): Lazy<R>
     map<R>(projection: (value: PulledAwaited<T>) => R): Lazy<R>
-
     map(this: Lazy<any>, projection: (a: any) => any): any {
         return lazy(() => {
             const pulled = this.pull()
@@ -228,6 +237,12 @@ export class Lazy<T>
                 return pulled.then(projection)
             }
             return projection(pulled)
+        })
+    }
+
+    then<R>(onFulfilled: (value: Pulled<T>) => R): Promise<R> {
+        return Promise.resolve().then(() => {
+            return onFulfilled(this.pull())
         })
     }
 

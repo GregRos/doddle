@@ -1963,6 +1963,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"declare-it@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "declare-it@npm:1.0.1"
+  dependencies:
+    what-the-test: "npm:^0.1.2"
+  checksum: 10c0/bf3f3c75070b2e0a20f324cb567947315e83bd0ee31db390f1536eaed0e1d322d90eeeb09c1c0572096d8afbf9ce7e0d3f239c73712557456189d2b44424cf2d
+  languageName: node
+  linkType: hard
+
 "decode-named-character-reference@npm:^1.0.0":
   version: 1.0.2
   resolution: "decode-named-character-reference@npm:1.0.2"
@@ -5266,6 +5275,7 @@ __metadata:
     "@types/prettier": "npm:^3.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^7.6.0"
     "@typescript-eslint/parser": "npm:^7.6.0"
+    declare-it: "npm:^1.0.1"
     eslint: "npm:^8"
     husky: "npm:^8.0.3"
     jest: "npm:^29.7.0"
@@ -5319,6 +5329,15 @@ __metadata:
   version: 2.1.2
   resolution: "safer-buffer@npm:2.1.2"
   checksum: 10c0/7e3c8b2e88a1841c9671094bbaeebd94448111dd90a81a1f606f3f67708a6ec57763b3b47f06da09fc6054193e0e6709e77325415dc8422b04497a8070fa02d4
+  languageName: node
+  linkType: hard
+
+"semver-try-require@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "semver-try-require@npm:7.0.0"
+  dependencies:
+    semver: "npm:^7.6.0"
+  checksum: 10c0/b379d02ab4b8e331cf603221908129e2963af0e31210e9d6fcb2d6f168d0ccfba86cffd67a2f9bfff586a69981b61d20c19adf9af83413cd78920259fcc0a5d2
   languageName: node
   linkType: hard
 
@@ -6088,7 +6107,7 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A^5.5.2#optional!builtin<compat/typescript>":
   version: 5.5.2
-  resolution: "typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>::version=5.5.2&hash=5adc0c"
+  resolution: "typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>::version=5.5.2&hash=b45daf"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
@@ -6199,6 +6218,15 @@ __metadata:
   dependencies:
     makeerror: "npm:1.0.12"
   checksum: 10c0/a17e037bccd3ca8a25a80cb850903facdfed0de4864bd8728f1782370715d679fa72e0a0f5da7c1c1379365159901e5935f35be531229da53bbfc0efdabdb48e
+  languageName: node
+  linkType: hard
+
+"what-the-test@npm:^0.1.2":
+  version: 0.1.4
+  resolution: "what-the-test@npm:0.1.4"
+  dependencies:
+    semver-try-require: "npm:^7.0.0"
+  checksum: 10c0/8ae563c81873a6a8e6eaa186a7b4900a460e09ea3593ab7878ced89bc090d70627a3c04bf86ae8adc28cc62c191b936270687aafd8a8b5a1c09f5a25d8ffe251
   languageName: node
   linkType: hard
 

@@ -1,9 +1,10 @@
 import { isAsyncIterable, isIterable, isNextable } from "stdlazy/utils"
-import type { AnyPromisedSeqLike, SeqLikeInput } from "../f-types"
-import { ASeq, Seq } from "../wrappers"
+import type { ASeqLikeInput, SeqLikeInput } from "../f-types"
+import { Seq } from "../seq"
+import { ASeq, aseq } from "../aseq"
 
 class FromAsyncInput<T> extends ASeq<T> {
-    constructor(private readonly _input: AnyPromisedSeqLike<T>) {
+    constructor(private readonly _input: ASeqLikeInput<T>) {
         super()
     }
 
@@ -61,7 +62,7 @@ export function fromSyncInput<In>(input: SeqLikeInput<In>): Seq<In> {
     }
     return new FromSyncInput(input)
 }
-export function fromAsyncInput<In>(input: AnyPromisedSeqLike<In>): ASeq<In> {
+export function fromAsyncInput<In>(input: ASeqLikeInput<In>): ASeq<In> {
     if (input instanceof ASeq) {
         return input
     }
