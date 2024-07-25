@@ -9,8 +9,8 @@ import {
 } from "../f-types/index"
 import { mustBeAsyncIterable, mustBeIterable } from "../errors/error"
 import { fromAsyncInput, fromSyncInput } from "../from/input"
-import type { Seq } from "../seq"
-import type { ASeq } from "../aseq"
+import type { Seq } from "../wrappers/seq.class"
+import type { ASeq } from "../wrappers/aseq.class"
 
 export function sync<T, Xs extends any[]>(
     this: Iterable<T>,

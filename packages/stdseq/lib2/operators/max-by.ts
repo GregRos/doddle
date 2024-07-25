@@ -1,9 +1,9 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
 import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { Seq } from "../seq"
+import { Seq } from "../wrappers/seq.class"
 import { fromSyncInput } from "../from/input"
-import { seq } from "../seq"
-import { aseq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../wrappers/aseq.ctor"
 import { mustReturnComparable, mustBeFunction } from "../errors/error"
 
 export function sync<T, R>(this: Iterable<T>, iteratee: Iteratee<T, R>) {

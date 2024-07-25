@@ -9,6 +9,7 @@ export type StageAsyncIteratee<E, O> = (
 
 export type AsyncPredicate<E> = AsyncIteratee<E, boolean>
 export type AsyncReducer<E, O> = (acc: O, element: E, index: number) => O | Promise<O>
+export type getASeqLikeElementType<T> = T extends ASeqLikeInput<infer E> ? E : never
 
 export type ASeqLike<E> = AsyncIterable<E> | (() => AsyncIterable<E> | AsyncIterator<E>)
 

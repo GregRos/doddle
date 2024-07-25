@@ -1,7 +1,7 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
 import { Iteratee, AsyncIteratee, type AsyncPredicate, type Predicate } from "../f-types/index"
-import { seq } from "../seq"
-import { aseq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../wrappers/aseq.ctor"
 import { mustBeFunction } from "../errors/error"
 
 export function sync<T>(this: Iterable<T>, predicate: Predicate<T>) {

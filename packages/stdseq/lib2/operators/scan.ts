@@ -1,7 +1,7 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
 import { Iteratee, AsyncIteratee, type Reducer, type AsyncReducer } from "../f-types/index"
-import type { Seq } from "../seq"
-import type { ASeq } from "../aseq"
+import type { Seq } from "../wrappers/seq.class"
+import type { ASeq } from "../wrappers/aseq.class"
 import { mustBeFunction } from "../errors/error"
 
 export function sync<Item>(this: Iterable<Item>, reducer: Reducer<Item, Item>): Seq<Item>

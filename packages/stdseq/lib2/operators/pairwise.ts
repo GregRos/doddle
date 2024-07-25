@@ -1,7 +1,9 @@
-import { seq, type Seq } from "../seq"
-import { aseq, type ASeq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { type Seq } from "../wrappers/seq.class"
+import { aseq } from "../wrappers/aseq.ctor"
+import { type ASeq } from "../wrappers/aseq.class"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import type { getOptionalTuple } from "../type-functions/get-optional-tuple"
+import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
 
 export function sync<T, S, AllowSmaller extends boolean = false>(
     this: Iterable<T>,

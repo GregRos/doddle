@@ -7,8 +7,8 @@ import {
     type TypePredicate
 } from "../f-types/index"
 import { mustBeFunction } from "../errors/error"
-import type { Seq } from "../seq"
-import type { ASeq } from "../aseq"
+import type { Seq } from "../wrappers/seq.class"
+import type { ASeq } from "../wrappers/aseq.class"
 
 export function sync<T, S extends T>(this: Iterable<T>, predicate: TypePredicate<T, S>): Seq<S>
 export function sync<T>(this: Iterable<T>, predicate: Predicate<T>): Seq<T>

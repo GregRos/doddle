@@ -1,7 +1,7 @@
 import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
 import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../seq"
-import { aseq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../wrappers/aseq.ctor"
 import { mustBeInteger, mustBeNatural } from "../errors/error"
 
 export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis?: Ellipsis) {

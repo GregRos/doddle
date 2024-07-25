@@ -1963,14 +1963,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"declare-it@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "declare-it@npm:1.0.1"
+"declare-it@portal:/C:/codegr/declare-it::locator=root-workspace-0b6124%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "declare-it@portal:/C:/codegr/declare-it::locator=root-workspace-0b6124%40workspace%3A."
   dependencies:
     what-the-test: "npm:^0.1.2"
-  checksum: 10c0/bf3f3c75070b2e0a20f324cb567947315e83bd0ee31db390f1536eaed0e1d322d90eeeb09c1c0572096d8afbf9ce7e0d3f239c73712557456189d2b44424cf2d
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "decode-named-character-reference@npm:^1.0.0":
   version: 1.0.2
@@ -5275,7 +5274,7 @@ __metadata:
     "@types/prettier": "npm:^3.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^7.6.0"
     "@typescript-eslint/parser": "npm:^7.6.0"
-    declare-it: "npm:^1.0.1"
+    declare-it: "npm:^1.1.0"
     eslint: "npm:^8"
     husky: "npm:^8.0.3"
     jest: "npm:^29.7.0"
@@ -5659,6 +5658,7 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.12.7"
+    declare-it: "npm:^1.1.0"
     jest: "npm:^29.7.0"
     npm-run-all: "npm:^4.1.5"
     ts-jest: "npm:^29.1.2"
@@ -5673,6 +5673,7 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.12.7"
+    declare-it: "npm:^1.1.0"
     jest: "npm:^29.7.0"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"

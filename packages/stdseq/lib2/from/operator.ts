@@ -1,7 +1,8 @@
 import { isAsyncIterable, isIterable } from "stdlazy/utils"
 import { Lazy, type Pulled } from "stdlazy/lib"
-import { Seq } from "../seq"
-import { ASeq, aseq } from "../aseq"
+import { Seq } from "../wrappers/seq.class"
+import { aseq } from "../wrappers/aseq.ctor"
+import { ASeq } from "../wrappers/aseq.class"
 
 class AsyncFromOperator<In, Out> extends ASeq<Out> {
     [Symbol.asyncIterator]!: () => AsyncIterator<Out, any, undefined>

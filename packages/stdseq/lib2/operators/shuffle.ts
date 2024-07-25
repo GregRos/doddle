@@ -1,6 +1,6 @@
-import { aseq } from "../aseq"
+import { aseq } from "../wrappers/aseq.ctor"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import { seq } from "../seq"
+import { seq } from "../wrappers/seq.ctor"
 
 export function sync<T>(this: Iterable<T>) {
     return syncFromOperator("shuffle", this, function* (input) {
@@ -17,7 +17,7 @@ export function sync<T>(this: Iterable<T>) {
 
 export function async<T>(this: AsyncIterable<T>) {
     return asyncFromOperator("shuffle", this, async function* (input) {
-        const array = await aseq(input).toArray()
+        const array = await aseq(input).toArray().pull()
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1))
             const temp = array[i]

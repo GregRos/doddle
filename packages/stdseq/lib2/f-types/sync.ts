@@ -8,5 +8,5 @@ export type TypePredicate<E, T extends E> = (element: E, index: number) => eleme
 export type Reducer<E, O> = (acc: O, element: E, index: number) => O
 
 export type SeqLikeInput<E> = Iterable<E> | (() => Iterable<E> | Iterator<E>)
-
+export type getSeqLikeElementType<T> = T extends SeqLikeInput<infer E> ? E : never
 export type Eq<E> = (a: E, b: E) => boolean

@@ -1,39 +1,91 @@
-import { aseq } from "../aseq"
-import { Seq, seq } from "../seq"
+import { seq } from "../wrappers/seq.ctor"
+import { type Seq } from "../wrappers/seq.class"
+import { aseq } from "../wrappers/aseq.ctor"
 import { declare, type, type_of } from "declare-it"
+import type { ASeq } from "../wrappers/aseq.class"
 
 describe("sync", () => {
+    const f = seq
+    type SType<T> = Seq<T>
     describe("0 arguments", () => {
         declare.test("type stays never", expect => {
-            const s = seq().append()
-            expect(type_of(s)).to_equal(type<Seq<never>>)
+            const sNever = f().append()
+            expect(type_of(sNever)).to_equal(type<SType<never>>)
+            const sNumber = f<number>().append()
+            expect(type_of(sNumber)).to_equal(type<SType<number>>)
         })
         it("stays empty", () => {
-            const s = seq().append()
+            const s = f().append()
             expect(s._qr).toEqual([])
         })
         it("stays with same elements", () => {
-            const s = seq([1, 2, 3]).append()
+            const s = f([1, 2, 3]).append()
             expect(s._qr).toEqual([1, 2, 3])
         })
     })
     describe("1 argument", () => {
         declare.test("disjunction with input type", expect => {
-            const s = seq(["a", "b"]).append(1)
-            expect(type_of(s)).to_equal(type<Seq<string | number>>)
+            const s = f(["a", "b"]).append(1)
+            expect(type_of(s)).to_equal(type<SType<string | number>>)
+        })
+        declare.test("2 input types create disjunction", expect => {
+            const s = f(["a", "b"]).append(1, true)
+            expect(type_of(s)).to_equal(type<SType<string | number | boolean>>)
         })
         it("appends one element", () => {
-            const s = seq([1, 2, 3]).append(4)
+            const s = f([1, 2, 3]).append(4)
             expect(s._qr).toEqual([1, 2, 3, 4])
         })
         it("appends one element to empty", () => {
-            const s = seq().append(4)
+            const s = f().append(4)
             expect(s._qr).toEqual([4])
+        })
+        it("appends to infinite passes", () => {
+            const s = f.repeat(1, Infinity).append(2)
+            expect(s.take(3)._qr).toEqual([1, 1, 1])
         })
     })
 })
 
-it("tests", () => {
-    const s = seq()
-    const a = s.append()
+describe("async", () => {
+    const f = aseq
+    type SType<T> = ASeq<T>
+    describe("0 arguments", () => {
+        declare.test("type stays never", expect => {
+            const sNever = f().append()
+            expect(type_of(sNever)).to_equal(type<SType<never>>)
+            const sNumber = f<number>().append()
+            expect(type_of(sNumber)).to_equal(type<SType<number>>)
+        })
+        it("stays empty", async () => {
+            const s = f().append()
+            expect(await s._qr).toEqual([])
+        })
+        it("stays with same elements", async () => {
+            const s = f([1, 2, 3]).append()
+            expect(await s._qr).toEqual([1, 2, 3])
+        })
+    })
+    describe("1 argument", () => {
+        declare.test("disjunction with input type", expect => {
+            const s = f(["a", "b"]).append(1)
+            expect(type_of(s)).to_equal(type<SType<string | number>>)
+        })
+        declare.test("2 input types create disjunction", expect => {
+            const s = f(["a", "b"]).append(1, true)
+            expect(type_of(s)).to_equal(type<SType<string | number | boolean>>)
+        })
+        it("appends one element", () => {
+            const s = f([1, 2, 3]).append(4)
+            expect(s._qr).toEqual([1, 2, 3, 4])
+        })
+        it("appends one element to empty", () => {
+            const s = f().append(4)
+            expect(s._qr).toEqual([4])
+        })
+        it("appends to infinite passes", () => {
+            const s = f.repeat(1, Infinity).append(2)
+            expect(s.take(3)._qr).toEqual([1, 1, 1])
+        })
+    })
 })

@@ -1,7 +1,7 @@
-import { seq } from "../seq"
+import { seq } from "../wrappers/seq.ctor"
 import { lazyFromOperator } from "../from/operator"
 import { mustBeInteger, mustBeNatural } from "../errors/error"
-import { aseq } from "../aseq"
+import { aseq } from "../wrappers/aseq.ctor"
 
 export function sync<T>(this: Iterable<T>, index: number) {
     mustBeInteger("index", index)

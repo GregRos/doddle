@@ -1,6 +1,8 @@
-import { aseq, type ASeq } from "../aseq"
+import { aseq } from "../wrappers/aseq.ctor"
+import { type ASeq } from "../wrappers/aseq.class"
 import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
-import { seq, type Seq } from "../seq"
+import { seq } from "../wrappers/seq.ctor"
+import { type Seq } from "../wrappers/seq.class"
 import { UNSET } from "../special/tokens"
 
 export function sync<T>(this: Iterable<T>): Seq<NonNullable<T>> {

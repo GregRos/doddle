@@ -2,8 +2,8 @@ import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/o
 import { Iteratee, AsyncIteratee, type Reducer, type AsyncReducer } from "../f-types/index"
 
 import { lazy, type Lazy, type LazyAsync } from "stdlazy/lib"
-import { seq } from "../seq"
-import { aseq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../wrappers/aseq.ctor"
 import { mustBeFunction } from "../errors/error"
 
 export function sync<Item>(this: Iterable<Item>, reducer: Reducer<Item, Item>): Lazy<Item>

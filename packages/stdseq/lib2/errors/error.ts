@@ -50,6 +50,11 @@ export const mustBeNatural = argNotExpected(
     (value: unknown) => typeof value === "number" && value >= 0 && Number.isInteger(value)
 )
 
+export const mustBePositiveInt = argNotExpected(
+    "a positive number",
+    (value: unknown) => typeof value === "number" && value > 0 && Number.isInteger(value)
+)
+
 export const mustBeInteger = argNotExpected(
     "an integer",
     (value: unknown) => typeof value === "number" && Number.isInteger(value)

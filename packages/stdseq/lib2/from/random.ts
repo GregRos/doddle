@@ -1,4 +1,4 @@
-import type { Seq } from "../seq"
+import type { Seq } from "../wrappers/seq.class"
 import { fromSyncInput } from "./input"
 export interface Ints {
     type: "int"

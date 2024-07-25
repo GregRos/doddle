@@ -1,9 +1,9 @@
-import { seq } from "../seq"
-import { aseq } from "../aseq"
+import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../wrappers/aseq.ctor"
 import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
-import type { getOptionalTuple } from "../type-functions/get-optional-tuple"
-import type { Seq } from "../seq"
-import type { ASeq } from "../aseq"
+import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
+import type { Seq } from "../wrappers/seq.class"
+import type { ASeq } from "../wrappers/aseq.class"
 import type { getTuple } from "../type-functions/get-tuple"
 import { mustBeNatural, notEnoughElements } from "../errors/error"
 
@@ -11,7 +11,7 @@ export function sync<T, S, L extends number, AllowSmaller extends boolean = fals
     this: Iterable<T>,
     size: L,
     projection: (
-        ...window: AllowSmaller extends false ? getTuple<T, L> : getOptionalTuple<T, L>
+        ...window: AllowSmaller extends false ? getTuple<T, L> : getMostlyOptionalTuple<T, L>
     ) => S,
     allowSmaller?: AllowSmaller
 ): Seq<S> {
@@ -40,7 +40,7 @@ export function async<T, S, L extends number, AllowSmaller extends boolean = fal
     this: AsyncIterable<T>,
     size: L,
     projection: (
-        ...window: AllowSmaller extends false ? getTuple<T, L> : getOptionalTuple<T, L>
+        ...window: AllowSmaller extends false ? getTuple<T, L> : getMostlyOptionalTuple<T, L>
     ) => S,
     allowSmaller?: AllowSmaller
 ): ASeq<S> {

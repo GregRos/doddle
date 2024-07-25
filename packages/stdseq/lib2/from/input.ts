@@ -1,7 +1,8 @@
 import { isAsyncIterable, isIterable, isNextable } from "stdlazy/utils"
 import type { ASeqLikeInput, SeqLikeInput } from "../f-types"
-import { Seq } from "../seq"
-import { ASeq, aseq } from "../aseq"
+import { Seq } from "../wrappers/seq.class"
+import { aseq } from "../wrappers/aseq.ctor"
+import { ASeq } from "../wrappers/aseq.class"
 
 class FromAsyncInput<T> extends ASeq<T> {
     constructor(private readonly _input: ASeqLikeInput<T>) {
