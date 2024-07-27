@@ -1,11 +1,17 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { mustBeInteger, mustBeNatural } from "../errors/error"
+import { mustBeInteger } from "../errors/error"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
+import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
 const END_MARKER = Symbol("DUMMY")
-export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis?: Ellipsis) {
+export function sync<T, const Ellipsis = undefined>(
+    this: Iterable<T>,
+    count: number,
+    ellipsis?: Ellipsis
+): Seq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", count)
     return syncFromOperator("take", this, function* (input) {
         if (count < 0) {
@@ -13,18 +19,14 @@ export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis
             let anySkipped = false
             const results = seq(input)
                 .append(END_MARKER)
-                .window(
-                    count + 1,
-                    (...window) => {
-                        if (window[window.length - 1] === END_MARKER) {
-                            window.pop()
-                            return window as T[]
-                        }
-                        anySkipped = true
-                        return undefined
-                    },
-                    true
-                )
+                .window(count + 1, (...window) => {
+                    if (window[window.length - 1] === END_MARKER) {
+                        window.pop()
+                        return window as T[]
+                    }
+                    anySkipped = true
+                    return undefined
+                })
                 .filter(x => x !== undefined)
                 .first()
                 .pull() as T[]
@@ -34,9 +36,13 @@ export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis
         } else {
             yield* seq(input).takeWhile((_, index) => index < count, ellipsis)
         }
-    })
+    }) as any
 }
-export function async<T, Ellipsis = T>(this: AsyncIterable<T>, count: number, ellipsis?: Ellipsis) {
+export function async<T, const Ellipsis = undefined>(
+    this: AsyncIterable<T>,
+    count: number,
+    ellipsis?: Ellipsis
+): ASeq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", count)
     const hasEllipsis = ellipsis !== undefined
     return asyncFromOperator("take", this, async function* (input) {
@@ -45,18 +51,14 @@ export function async<T, Ellipsis = T>(this: AsyncIterable<T>, count: number, el
             let anySkipped = false
             const results = (await aseq(input)
                 .append(END_MARKER)
-                .window(
-                    count + 1,
-                    (...window) => {
-                        if (window[window.length - 1] === END_MARKER) {
-                            window.pop()
-                            return window as T[]
-                        }
-                        anySkipped = true
-                        return undefined
-                    },
-                    true
-                )
+                .window(count + 1, (...window) => {
+                    if (window[window.length - 1] === END_MARKER) {
+                        window.pop()
+                        return window as T[]
+                    }
+                    anySkipped = true
+                    return undefined
+                })
                 .filter(x => x !== undefined)
                 .first()
                 .pull()) as T[]
@@ -67,5 +69,5 @@ export function async<T, Ellipsis = T>(this: AsyncIterable<T>, count: number, el
         } else {
             yield* aseq(input).takeWhile((_, index) => index < count, ellipsis)
         }
-    })
+    }) as any
 }

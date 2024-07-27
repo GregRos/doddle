@@ -1,5 +1,4 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
+import { lazyFromOperator } from "../from/operator"
 
 export function sync<T>(this: Iterable<T>) {
     return lazyFromOperator("toSet", this, input => {

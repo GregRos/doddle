@@ -1,10 +1,16 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { mustBeInteger, mustBeNatural } from "../errors/error"
+import { mustBeInteger } from "../errors/error"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
+import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
-export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis?: Ellipsis) {
+export function sync<T, const Ellipsis = undefined>(
+    this: Iterable<T>,
+    count: number,
+    ellipsis?: Ellipsis
+): Seq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", count)
     const hasEllipsis = ellipsis !== undefined
     return syncFromOperator("skip", this, function* (input) {
@@ -19,9 +25,13 @@ export function sync<T, Ellipsis = T>(this: Iterable<T>, count: number, ellipsis
         } else {
             yield* seq(input).skipWhile((_, index) => index < count, ellipsis)
         }
-    })
+    }) as any
 }
-export function async<T, Ellipsis = T>(this: AsyncIterable<T>, count: number, ellipsis?: Ellipsis) {
+export function async<T, const Ellipsis = undefined>(
+    this: AsyncIterable<T>,
+    count: number,
+    ellipsis?: Ellipsis
+): ASeq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", count)
     const hasEllipsis = ellipsis !== undefined
     return asyncFromOperator("skip", this, async function* (input) {
@@ -36,5 +46,5 @@ export function async<T, Ellipsis = T>(this: AsyncIterable<T>, count: number, el
         } else {
             yield* aseq(input).skipWhile((_, index) => index < count, ellipsis)
         }
-    })
+    }) as any
 }

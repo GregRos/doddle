@@ -1,9 +1,9 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee, type SeqLikeInput, type ASeqLikeInput } from "../f-types/index"
-import { fromAsyncInput, fromSyncInput } from "../from/input"
 import { mustBeFunction } from "../errors/error"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
+import { AsyncIteratee, Iteratee, type ASeqLikeInput, type SeqLikeInput } from "../f-types/index"
+import { fromAsyncInput, fromSyncInput } from "../from/input"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 type getConcatElementType<T, S> = T extends never ? never : S
 export function sync<T, S>(
     this: Iterable<T>,

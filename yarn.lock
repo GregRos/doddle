@@ -5034,6 +5034,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-plugin-organize-imports@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "prettier-plugin-organize-imports@npm:4.0.0"
+  peerDependencies:
+    "@vue/language-plugin-pug": ^2.0.24
+    prettier: ">=2.0"
+    typescript: ">=2.9"
+    vue-tsc: ^2.0.24
+  peerDependenciesMeta:
+    "@vue/language-plugin-pug":
+      optional: true
+    vue-tsc:
+      optional: true
+  checksum: 10c0/6c3c2a0680540c2c27d8e0e47c7cb69d374e47534c467877a99031defa087d52a4fc972156321dadbadc10b2eb90d67398110a0be65f5b3c9db93b85a546d8f7
+  languageName: node
+  linkType: hard
+
 "prettier-plugin-packagejson@npm:^2.5.0":
   version: 2.5.0
   resolution: "prettier-plugin-packagejson@npm:2.5.0"
@@ -5675,6 +5692,7 @@ __metadata:
     "@types/node": "npm:^20.12.7"
     declare-it: "npm:^1.1.0"
     jest: "npm:^29.7.0"
+    prettier-plugin-organize-imports: "npm:^4.0.0"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.2"
@@ -6108,7 +6126,7 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A^5.5.2#optional!builtin<compat/typescript>":
   version: 5.5.2
-  resolution: "typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>::version=5.5.2&hash=b45daf"
+  resolution: "typescript@patch:typescript@npm%3A5.5.2#optional!builtin<compat/typescript>::version=5.5.2&hash=5adc0c"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver

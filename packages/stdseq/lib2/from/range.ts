@@ -1,6 +1,5 @@
 import { mustBeNatural } from "../errors/error"
-import { seq } from "../wrappers/seq.ctor"
-import { fromSyncInput } from "./input"
+import { seq } from "../seq/seq.ctor"
 
 export function sync(start: number, end: number, stepSize = 1) {
     mustBeNatural("stepSize", start)

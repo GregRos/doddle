@@ -1,7 +1,6 @@
 import { lazy } from "./ctor"
 
 export { lazy, memoize } from "./ctor"
-
 export {
     isLazy,
     isPullable,
@@ -15,6 +14,7 @@ export {
     Pulled,
     PulledAwaited
 } from "./types"
+export { isAsyncIterable, isIterable, isNextable } from "./utils"
 
 export { Lazy } from "./lazy"
 

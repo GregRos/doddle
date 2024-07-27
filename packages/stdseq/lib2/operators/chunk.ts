@@ -1,21 +1,13 @@
-import type { ASeq } from "../wrappers/aseq.class"
-import { mustBeNatural, mustBePositiveInt, notEnoughElements } from "../errors/error"
+import { mustBePositiveInt, notEnoughElements } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import type { Seq } from "../wrappers/seq.class"
 import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
 import type { getTuple } from "../type-functions/get-tuple"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
-type getChunkType<T, L extends number, AllowSmaller extends boolean> = boolean extends AllowSmaller
-    ? getMostlyOptionalTuple<T, L>
-    : AllowSmaller extends false
-      ? getTuple<T, L>
-      : getMostlyOptionalTuple<T, L>
+type getChunkType<T, L extends number> = getMostlyOptionalTuple<T, L>
 
-export function sync<T, L extends number, AllowSmaller extends boolean = false>(
-    this: Iterable<T>,
-    size: L,
-    allowSmaller?: AllowSmaller
-): Seq<getChunkType<T, L, AllowSmaller>> {
+export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getChunkType<T, L>> {
     mustBePositiveInt("size", size)
     return syncFromOperator("chunk", this, function* (input) {
         let group: T[] = []
@@ -27,20 +19,15 @@ export function sync<T, L extends number, AllowSmaller extends boolean = false>(
             }
         }
         if (group.length) {
-            if (allowSmaller) {
-                yield group as getMostlyOptionalTuple<T, L>
-            } else {
-                notEnoughElements("target", group.length, size)
-            }
+            yield group as getMostlyOptionalTuple<T, L>
         }
     }) as any
 }
 
-export function async<T, L extends number, AllowSmaller extends boolean = false>(
+export function async<T, L extends number>(
     this: AsyncIterable<T>,
-    size: L,
-    allowSmaller?: AllowSmaller
-): ASeq<getChunkType<T, L, AllowSmaller>> {
+    size: L
+): ASeq<getChunkType<T, L>> {
     return asyncFromOperator("chunk", this, async function* (input) {
         let group: T[] = []
         for await (const item of input) {
@@ -51,11 +38,7 @@ export function async<T, L extends number, AllowSmaller extends boolean = false>
             }
         }
         if (group.length) {
-            if (allowSmaller) {
-                yield group as getMostlyOptionalTuple<T, L>
-            } else {
-                notEnoughElements("target", group.length, size)
-            }
+            yield group as getMostlyOptionalTuple<T, L>
         }
     }) as any
 }

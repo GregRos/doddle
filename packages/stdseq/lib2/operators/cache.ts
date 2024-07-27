@@ -1,6 +1,4 @@
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
 
 export function sync<T>(this: Iterable<any>) {
     const self = this

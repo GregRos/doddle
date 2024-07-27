@@ -1,5 +1,5 @@
-import type { ASeq } from "../wrappers/aseq.class"
-import type { Seq } from "../wrappers/seq.class"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 import { fromAsyncInput, fromSyncInput } from "./input"
 
 export function sync<T>(value: T, times: number): Seq<T> {

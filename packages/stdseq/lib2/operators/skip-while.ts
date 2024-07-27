@@ -1,12 +1,15 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee, type Predicate, type AsyncPredicate } from "../f-types/index"
 import { mustBeFunction } from "../errors/error"
+import { type AsyncPredicate, type Predicate } from "../f-types/index"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
+import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
-export function sync<T, Ellipsis>(
+export function sync<T, const Ellipsis = undefined>(
     this: Iterable<T>,
     predicate: Predicate<T>,
     ellipsisItem?: Ellipsis
-) {
+): Seq<maybeDisjunction<T, Ellipsis>> {
     const hasEllipsis = ellipsisItem !== undefined
     mustBeFunction("predicate", predicate)
     return syncFromOperator("skipWhile", this, function* (input) {
@@ -25,13 +28,13 @@ export function sync<T, Ellipsis>(
                 yield element
             }
         }
-    })
+    }) as any
 }
-export function async<T, Ellipsis = T>(
+export function async<T, const Ellipsis = undefined>(
     this: AsyncIterable<T>,
     predicate: AsyncPredicate<T>,
     ellipsisItem?: Ellipsis
-) {
+): ASeq<maybeDisjunction<T, Ellipsis>> {
     const hasEllipsis = ellipsisItem !== undefined
     mustBeFunction("predicate", predicate)
     return asyncFromOperator("skipWhile", this, async function* (input) {
@@ -50,5 +53,5 @@ export function async<T, Ellipsis = T>(
                 yield element
             }
         }
-    })
+    }) as any
 }

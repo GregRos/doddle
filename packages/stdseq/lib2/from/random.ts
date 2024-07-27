@@ -1,5 +1,3 @@
-import type { Seq } from "../wrappers/seq.class"
-import { fromSyncInput } from "./input"
 export interface Ints {
     type: "int"
     min: number

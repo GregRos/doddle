@@ -1,8 +1,8 @@
-import { seq } from "../wrappers/seq.ctor"
-import { type Seq } from "../wrappers/seq.class"
-import { aseq } from "../wrappers/aseq.ctor"
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../wrappers/aseq.class"
+import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import { type Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {
     const f = seq
@@ -45,6 +45,12 @@ describe("sync", () => {
             expect(s.take(3)._qr).toEqual([1, 1, 1])
         })
     })
+
+    it("can iterate twice", () => {
+        const s = f([1, 2, 3]).append(4)
+        expect(s._qr).toEqual([1, 2, 3, 4])
+        expect(s._qr).toEqual([1, 2, 3, 4])
+    })
 })
 
 describe("async", () => {
@@ -75,17 +81,23 @@ describe("async", () => {
             const s = f(["a", "b"]).append(1, true)
             expect(type_of(s)).to_equal(type<SType<string | number | boolean>>)
         })
-        it("appends one element", () => {
+        it("appends one element", async () => {
             const s = f([1, 2, 3]).append(4)
-            expect(s._qr).toEqual([1, 2, 3, 4])
+            await expect(s._qr).resolves.toEqual([1, 2, 3, 4])
         })
-        it("appends one element to empty", () => {
+        it("appends one element to empty", async () => {
             const s = f().append(4)
-            expect(s._qr).toEqual([4])
+            await expect(s._qr).resolves.toEqual([4])
         })
-        it("appends to infinite passes", () => {
+        it("appends to infinite passes", async () => {
             const s = f.repeat(1, Infinity).append(2)
-            expect(s.take(3)._qr).toEqual([1, 1, 1])
+            await expect(s.take(3)._qr).resolves.toEqual([1, 1, 1])
         })
+    })
+
+    it("can iterate twice", async () => {
+        const s = f([1, 2, 3]).append(4)
+        await expect(s._qr).resolves.toEqual([1, 2, 3, 4])
+        await expect(s._qr).resolves.toEqual([1, 2, 3, 4])
     })
 })

@@ -1,9 +1,8 @@
-import { seq } from "../wrappers/seq.ctor"
-import { type Seq } from "../wrappers/seq.class"
-import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
-import { mustBeInteger, mustBeNatural } from "../errors/error"
-import { aseq } from "../wrappers/aseq.ctor"
-import { type ASeq } from "../wrappers/aseq.class"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { type ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import { type Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T, Items extends any[]>(
     this: Iterable<T>,

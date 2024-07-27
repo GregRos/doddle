@@ -1,9 +1,8 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { lazy } from "stdlazy/lib"
 import { mustBeBoolean, mustBeFunction, mustReturnComparable } from "../errors/error"
+import { AsyncIteratee } from "../f-types/index"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T, S>(this: Iterable<T>, projection: (element: T) => S, reverse = false) {
     mustBeFunction("projection", projection)

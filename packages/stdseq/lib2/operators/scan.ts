@@ -1,16 +1,23 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee, type Reducer, type AsyncReducer } from "../f-types/index"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
 import { mustBeFunction } from "../errors/error"
+import { type AsyncReducer, type Reducer } from "../f-types/index"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
-export function sync<Item>(this: Iterable<Item>, reducer: Reducer<Item, Item>): Seq<Item>
+export function sync<Item>(
+    this: Iterable<Item>,
+    reducer: Reducer<NoInfer<Item>, NoInfer<Item>>
+): Seq<Item>
 export function sync<Item, Acc>(
     this: Iterable<Item>,
-    reducer: Reducer<Item, Acc>,
+    reducer: Reducer<NoInfer<Item>, Acc>,
     initial: Acc
 ): Seq<Acc>
-export function sync<Item, Acc>(this: Iterable<Item>, reducer: Reducer<Item, Acc>, initial?: Acc) {
+export function sync<Item, Acc>(
+    this: Iterable<Item>,
+    reducer: Reducer<NoInfer<Item>, Acc>,
+    initial?: Acc
+) {
     const hasInitial = initial != undefined
     mustBeFunction("reducer", reducer)
 

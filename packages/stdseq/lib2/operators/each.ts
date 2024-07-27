@@ -1,11 +1,6 @@
-import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
-import {
-    Iteratee,
-    AsyncIteratee,
-    type StageIteratee,
-    type StageAsyncIteratee
-} from "../f-types/index"
 import { mustBeFunction, mustBeOneOf } from "../errors/error"
+import { type StageAsyncIteratee, type StageIteratee } from "../f-types/index"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
 export type EachCallStage = "before" | "after" | "both" | undefined
 const mustBeStage = mustBeOneOf("before", "after", "both", undefined)
 export function sync<T>(

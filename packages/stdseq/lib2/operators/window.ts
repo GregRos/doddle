@@ -1,19 +1,14 @@
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { asyncFromOperator, lazyFromOperator, syncFromOperator } from "../from/operator"
+import { mustBeNatural } from "../errors/error"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
 import type { getTuple } from "../type-functions/get-tuple"
-import { mustBeNatural, notEnoughElements } from "../errors/error"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
-export function sync<T, S, L extends number, AllowSmaller extends boolean = false>(
+export function sync<T, S, L extends number>(
     this: Iterable<T>,
     size: L,
-    projection: (
-        ...window: AllowSmaller extends false ? getTuple<T, L> : getMostlyOptionalTuple<T, L>
-    ) => S,
-    allowSmaller?: AllowSmaller
+    projection: (...window: getMostlyOptionalTuple<T, L>) => S
 ): Seq<S> {
     mustBeNatural("windowSize", size)
     return syncFromOperator("window", this, function* (input) {
@@ -29,20 +24,15 @@ export function sync<T, S, L extends number, AllowSmaller extends boolean = fals
                 )
             }
         }
-
-        if (i < size && allowSmaller) {
+        if (i < size) {
             yield (projection as any).call(null, ...buffer.slice(0, i))
-            return
         }
     })
 }
 export function async<T, S, L extends number, AllowSmaller extends boolean = false>(
     this: AsyncIterable<T>,
     size: L,
-    projection: (
-        ...window: AllowSmaller extends false ? getTuple<T, L> : getMostlyOptionalTuple<T, L>
-    ) => S,
-    allowSmaller?: AllowSmaller
+    projection: (...window: getMostlyOptionalTuple<T, L>) => S
 ): ASeq<S> {
     mustBeNatural("windowSize", size)
     return asyncFromOperator("window", this, async function* (input) {
@@ -59,9 +49,8 @@ export function async<T, S, L extends number, AllowSmaller extends boolean = fal
             }
         }
 
-        if (i < size && allowSmaller) {
+        if (i < size) {
             yield (projection as any).call(null, ...buffer.slice(0, i))
-            return
         }
     })
 }

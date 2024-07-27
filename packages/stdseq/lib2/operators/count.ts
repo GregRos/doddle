@@ -1,25 +1,24 @@
-import { lazyFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee, type AsyncPredicate, type Predicate } from "../f-types/index"
-import { lazy } from "stdlazy/lib"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
+import type { Lazy, LazyAsync } from "stdlazy"
 import { mustBeFunction } from "../errors/error"
+import { type AsyncPredicate, type Predicate } from "../f-types/index"
+import { lazyFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
-export function sync<T>(this: Iterable<T>, predicate: Predicate<T>) {
-    mustBeFunction("predicate", predicate)
-    return lazyFromOperator("count", this, input => {
-        return seq(input)
-            .filter(predicate)
+function generic<T>(input: Seq<T>, predicate?: Predicate<T>): Lazy<number> {
+    predicate && mustBeFunction("predicate", predicate)
+    return lazyFromOperator("count", input, input => {
+        return input
+            .filter(predicate ?? (() => true))
             .reduce(acc => acc + 1, 0)
             .pull()
     })
 }
-export function async<T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>) {
-    mustBeFunction("predicate", predicate)
-    return lazyFromOperator("count", this, async input => {
-        return await aseq(input)
-            .filter(predicate)
-            .reduce(acc => acc + 1, 0)
-            .pull()
-    })
+
+export function sync<T>(this: Iterable<T>, predicate?: Predicate<T>): Lazy<number> {
+    return generic(seq(this), predicate)
+}
+export function async<T>(this: AsyncIterable<T>, predicate?: AsyncPredicate<T>): LazyAsync<number> {
+    return generic(aseq(this) as any, predicate as any) as any
 }

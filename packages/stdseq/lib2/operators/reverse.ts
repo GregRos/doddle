@@ -1,19 +1,19 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
+import { lazyFromOperator, syncFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>) {
-    return lazyFromOperator("reverse", this, input => {
-        return seq(input)
+    return syncFromOperator("reverse", this, function* (input) {
+        yield* seq(input)
             .toArray()
             .map(x => x.reverse())
             .pull()
     })
 }
 export function async<T>(this: AsyncIterable<T>) {
-    return lazyFromOperator("reverse", this, async input => {
-        return aseq(input)
+    return lazyFromOperator("reverse", this, async function* (input) {
+        yield* await aseq(input)
             .toArray()
             .map(x => x.reverse())
             .pull()

@@ -1,9 +1,9 @@
-import type { Lazy, LazyAsync } from "stdlazy/lib"
-import { aseq } from "../wrappers/aseq.ctor"
-import { seq } from "../wrappers/seq.ctor"
-import { Seq } from "../wrappers/seq.class"
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../wrappers/aseq.class"
+import type { Lazy, LazyAsync } from "stdlazy"
+import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {
     const f = seq
@@ -61,24 +61,24 @@ describe("sync", () => {
         expect(s.pull()).resolves.toEqual(1)
     })
 
-    it("gets last element", () => {
+    it("gets last element", async () => {
         const s = f([1, 2, 3]).at(2)
-        expect(s.pull()).resolves.toEqual(3)
+        await expect(s.pull()).resolves.toEqual(3)
     })
 
-    it("gets undefined for out of bounds", () => {
+    it("gets undefined for out of bounds", async () => {
         const s = f([1, 2, 3]).at(3)
-        expect(s.pull()).resolves.toEqual(undefined)
+        await expect(s.pull()).resolves.toEqual(undefined)
     })
 
-    it("gets last item for negative index", () => {
+    it("gets last item for negative index", async () => {
         const s = f([1, 2, 3]).at(-1)
-        expect(s.pull()).resolves.toEqual(3)
+        await expect(s.pull()).resolves.toEqual(3)
     })
 
-    it("gets first item for negative index", () => {
+    it("gets first item for negative index", async () => {
         const s = f([1, 2, 3]).at(-3)
-        expect(s.pull()).resolves.toEqual(1)
+        await expect(s.pull()).resolves.toEqual(1)
     })
 
     it("has no side-effects before pull", async () => {

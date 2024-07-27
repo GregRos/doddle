@@ -1,3 +1,5 @@
+import { isThenable } from "./types"
+
 export function isIterable<T>(value: any): value is Iterable<T> {
     return (
         typeof value === "object" && value != null && typeof value[Symbol.iterator] === "function"

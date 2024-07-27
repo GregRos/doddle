@@ -1,16 +1,8 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import {
-    Iteratee,
-    AsyncIteratee,
-    type Reducer,
-    type AsyncReducer,
-    type ASeqLikeInput,
-    type SeqLikeInput
-} from "../f-types/index"
-import { mustBeAsyncIterable, mustBeIterable } from "../errors/error"
+import { type ASeqLikeInput, type SeqLikeInput } from "../f-types/index"
 import { fromAsyncInput, fromSyncInput } from "../from/input"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
 export function sync<T, Xs extends any[]>(
     this: Iterable<T>,

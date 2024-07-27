@@ -1,7 +1,9 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
+import type { Lazy, LazyAsync } from "stdlazy"
+import { lazyFromOperator } from "../from/operator"
 
-export function sync<T, Alt = undefined>(this: Iterable<T>, alt?: Alt) {
+export function sync<T>(this: Iterable<T>): Lazy<T | undefined>
+export function sync<T, const Alt>(this: Iterable<T>, alt: Alt): Lazy<T | Alt>
+export function sync<T, const Alt = undefined>(this: Iterable<T>, alt?: Alt): Lazy<any> {
     return lazyFromOperator("first", this, input => {
         for (const element of input) {
             return element
@@ -9,7 +11,10 @@ export function sync<T, Alt = undefined>(this: Iterable<T>, alt?: Alt) {
         return alt
     })
 }
-export function async<T, Alt = undefined>(this: AsyncIterable<T>, alt?: Alt) {
+
+export function async<T>(this: AsyncIterable<T>): LazyAsync<T | undefined>
+export function async<T, const Alt>(this: AsyncIterable<T>, alt: Alt): LazyAsync<T | Alt>
+export function async<T, const Alt = undefined>(this: AsyncIterable<T>, alt?: Alt) {
     return lazyFromOperator("first", this, async input => {
         for await (const element of input) {
             return element

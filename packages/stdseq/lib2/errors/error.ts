@@ -1,4 +1,4 @@
-import { isAsyncIterable, isIterable } from "stdlazy/lib/utils"
+import { isAsyncIterable, isIterable } from "stdlazy"
 
 export class DawdleError extends Error {
     constructor(code: string, message: string) {
@@ -51,7 +51,7 @@ export const mustBeNatural = argNotExpected(
 )
 
 export const mustBePositiveInt = argNotExpected(
-    "a positive number",
+    "positive",
     (value: unknown) => typeof value === "number" && value > 0 && Number.isInteger(value)
 )
 

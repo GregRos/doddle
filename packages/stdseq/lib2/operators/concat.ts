@@ -1,16 +1,13 @@
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import {
-    Iteratee,
-    AsyncIteratee,
-    type SeqLikeInput,
     type ASeqLikeInput,
+    type getASeqLikeElementType,
     type getSeqLikeElementType,
-    type getASeqLikeElementType
+    type SeqLikeInput
 } from "../f-types/index"
-import { mustBeAsyncIterable, mustBeIterable } from "../errors/error"
 import { fromAsyncInput, fromSyncInput } from "../from/input"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
 export function sync<T, Seqs extends SeqLikeInput<any>[]>(
     this: Iterable<T>,

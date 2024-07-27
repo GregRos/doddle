@@ -1,32 +1,26 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
-import { mustBeBoolean, mustBeFunction, mustReturnTuple } from "../errors/error"
+import { mustBeFunction, mustReturnTuple } from "../errors/error"
+import { AsyncIteratee, Iteratee } from "../f-types/index"
+import { lazyFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 const mustReturnPair = mustReturnTuple(2)
-export function sync<T, K, V>(this: Iterable<T>, projection: Iteratee<T, [K, V]>) {
-    mustBeFunction("selector", projection)
-    return lazyFromOperator("toMap", this, input => {
-        const result = seq(input)
+export function generic<T, K, V>(input: Seq<T>, projection: Iteratee<T, [K, V]>) {
+    mustBeFunction("projection", projection)
+    return lazyFromOperator("toMap", input, input => {
+        return input
             .map(projection)
             .each(x => {
                 mustReturnPair("projection", x)
             })
             .toArray()
+            .map(x => new Map(x))
             .pull()
-        return new Map(result)
     })
 }
+export function sync<T, K, V>(this: Iterable<T>, projection: Iteratee<T, [K, V]>) {
+    return generic(seq(this), projection)
+}
 export function async<T, K, V>(this: AsyncIterable<T>, projection: AsyncIteratee<T, [K, V]>) {
-    mustBeFunction("projection", projection)
-    return lazyFromOperator("toMap", this, async input => {
-        const result = await aseq(input)
-            .map(projection)
-            .each(x => {
-                mustReturnPair("projection", x)
-            })
-            .toArray()
-            .pull()
-        return new Map(result)
-    })
+    return generic(aseq(this) as any, projection as any) as any
 }

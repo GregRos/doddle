@@ -1,28 +1,26 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import type { Lazy, LazyAsync } from "stdlazy/lib"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
+import type { LazyAsync } from "stdlazy"
 import { mustBeFunction } from "../errors/error"
+import { AsyncIteratee, Iteratee } from "../f-types/index"
+import { lazyFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq.ctor"
+import type { Seq } from "../seq/seq.class"
 
-export function sync<T>(this: Iterable<T>, projection: Iteratee<T, number>) {
+export function generic<T>(input: Seq<T>, projection: Iteratee<T, number>) {
     mustBeFunction("projection", projection)
-    return lazyFromOperator("sumBy", this, input => {
-        return seq(input)
+    return lazyFromOperator("sumBy", input, input => {
+        return input
             .map(projection)
             .reduce((acc, element) => acc + element, 0)
             .pull()
     })
 }
+export function sync<T>(this: Iterable<T>, projection: Iteratee<T, number>) {
+    return generic(seq(this), projection)
+}
 export function async<T>(
     this: AsyncIterable<T>,
     projection: AsyncIteratee<T, number>
 ): LazyAsync<number> {
-    mustBeFunction("projection", projection)
-    return lazyFromOperator("sumBy", this, async input => {
-        return await aseq(input)
-            .map(projection)
-            .reduce((acc, element) => acc + element, 0)
-            .pull()
-    })
+    return generic(aseq(this) as any, projection as any) as any
 }

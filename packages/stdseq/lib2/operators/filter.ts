@@ -1,26 +1,19 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import {
-    Iteratee,
-    AsyncIteratee,
-    type Predicate,
-    type AsyncPredicate,
-    type TypePredicate
-} from "../f-types/index"
 import { mustBeFunction } from "../errors/error"
-import type { Seq } from "../wrappers/seq.class"
-import type { ASeq } from "../wrappers/aseq.class"
+import { type AsyncPredicate, type Predicate, type TypePredicate } from "../f-types/index"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T, S extends T>(this: Iterable<T>, predicate: TypePredicate<T, S>): Seq<S>
 export function sync<T>(this: Iterable<T>, predicate: Predicate<T>): Seq<T>
 export function sync<T>(this: Iterable<T>, predicate: Predicate<T>) {
     mustBeFunction("predicate", predicate)
     return syncFromOperator("filter", this, function* (input) {
-        let index = 0
-        for (const element of input) {
-            if (predicate(element, index++)) {
-                yield element
-            }
-        }
+        yield* seq(input).concatMap((element, index) =>
+            predicate(element, index) ? [element] : []
+        )
     })
 }
 
@@ -32,11 +25,8 @@ export function async<T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>): 
 export function async<T>(this: AsyncIterable<T>, predicate: AsyncPredicate<T>) {
     mustBeFunction("predicate", predicate)
     return asyncFromOperator("filter", this, async function* (input) {
-        let index = 0
-        for await (const element of input) {
-            if (await predicate(element, index++)) {
-                yield element
-            }
-        }
+        yield* aseq(input).concatMap((element, index) =>
+            predicate(element, index) ? [element] : []
+        )
     })
 }

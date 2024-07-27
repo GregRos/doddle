@@ -1,7 +1,6 @@
-import { lazyFromOperator, asyncFromOperator, syncFromOperator } from "../from/operator"
-import { Iteratee, AsyncIteratee } from "../f-types/index"
-import { seq } from "../wrappers/seq.ctor"
-import { aseq } from "../wrappers/aseq.ctor"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>) {
     return syncFromOperator("uniq", this, function* (input) {

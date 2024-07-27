@@ -1,8 +1,8 @@
-import { aseq } from "../wrappers/aseq.ctor"
-import { type ASeq } from "../wrappers/aseq.class"
-import { seq } from "../wrappers/seq.ctor"
-import { Seq } from "../wrappers/seq.class"
 import { declare, type, type_of } from "declare-it"
+import { type ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
+import { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {
     const _seq = seq
@@ -11,31 +11,31 @@ describe("sync", () => {
         const Seq_never = type<_Seq<never>>
         const empty = _seq([])
         const s123 = _seq([1, 2, 3])
-        declare.it("typed as never when input is empty", expect => {
+        declare.it("is typed as never when input is empty", expect => {
             expect(type_of(empty.concatMap(() => null! as []))).to_equal(Seq_never)
         })
 
-        declare.it("typed as never when projected to empty", expect => {
+        declare.it("is typed as never when projected to empty", expect => {
             expect(type_of(s123.concatMap(() => []))).to_equal(Seq_never)
         })
 
-        declare.it("typed correctly when projected to single element", expect => {
+        declare.it("is typed correctly when projected to single element", expect => {
             expect(type_of(s123.concatMap(x => [`${x}`]))).to_equal(type<_Seq<string>>)
         })
 
-        declare.it("typed correctly when projected to different types", expect => {
+        declare.it("is typed correctly when projected to different types", expect => {
             expect(type_of(s123.concatMap(x => [x, `${x}`]))).to_equal(type<_Seq<string | number>>)
             expect(type_of(s123.concatMap(x => [x > 1 ? 1 : "b"]))).to_equal(
                 type<_Seq<string | number>>
             )
         })
 
-        declare.it("typed correctly when mapped to another seq", expect => {
+        declare.it("is typed correctly when mapped to another seq", expect => {
             const s = _seq([1, 2, 3]).concatMap(x => _seq([x, `${x}`]))
             expect(type_of(s)).to_equal(type<_Seq<string | number>>)
         })
 
-        declare.it("correct element type when mapped to different seq inputs", expect => {
+        declare.it("is correct element type when mapped to different seq inputs", expect => {
             const expected = type<_Seq<string>>
             const input = seq([1, 2, 3])
             expect(type_of(input.concatMap(x => null! as Iterable<string>))).to_equal(expected)
@@ -60,6 +60,11 @@ describe("sync", () => {
         expect(s._qr).toEqual([])
     })
 
+    it("receives index", () => {
+        const s = _seq([1, 2, 3]).concatMap((x, i) => [x, i])
+        expect(s._qr).toEqual([1, 0, 2, 1, 3, 2])
+    })
+
     it("projects correctly when mapped to different inputs", () => {
         const s = _seq([1, 2, 3])
         expect(
@@ -69,7 +74,9 @@ describe("sync", () => {
         ).toEqual([1, 1, 1])
 
         expect(s.concatMap(x => _seq.of(1, 2))._qr).toEqual([1, 2, 1, 2, 1, 2])
-        expect(s.concatMap(x => _seq.of(1, 2)[Symbol.iterator])).toEqual([1, 2, 1, 2, 1, 2])
+        expect(s.concatMap(x => () => _seq.of(1, 2)[Symbol.iterator]())._qr).toEqual([
+            1, 2, 3, 1, 2
+        ])
     })
 
     it("is not eager", () => {
@@ -78,6 +85,26 @@ describe("sync", () => {
         for (const _ of projected) {
             break
         }
+    })
+
+    it("doesn't pull more than necessary", () => {
+        const iter = jest.fn(function* () {
+            yield 1
+            yield 2
+            fail("should not pull next element")
+        })
+        const s = _seq(iter)
+        const projected = s.concatMap(x => _seq([x]))
+        expect(iter).not.toHaveBeenCalled()
+        for (const _ of projected) {
+            break
+        }
+    })
+
+    it("can iterate twice", () => {
+        const s = _seq([1, 2, 3]).concatMap(x => [x, `${x}`])
+        expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
+        expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
     })
 })
 
@@ -124,20 +151,20 @@ describe("async", () => {
         })
     })
 
-    it("projects correctly", () => {
+    it("projects correctly", async () => {
         const s = _seq([1, 2, 3]).concatMap(x => [x, `${x}`])
-        expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
+        await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
     })
 
-    it("projects to empty", () => {
+    it("projects to empty", async () => {
         const s = _seq([1, 2, 3]).concatMap(() => [])
-        expect(s._qr).resolves.toEqual([])
+        await expect(s._qr).resolves.toEqual([])
     })
 
-    it("projects when empty to non empty, function not called", () => {
+    it("projects when empty to non empty, function not called", async () => {
         const fn = jest.fn(() => [1])
         const s = _seq([]).concatMap(fn)
-        expect(s._qr).resolves.toEqual([])
+        await expect(s._qr).resolves.toEqual([])
         expect(fn).not.toHaveBeenCalled()
     })
 
@@ -147,5 +174,25 @@ describe("async", () => {
         for await (const _ of projected) {
             break
         }
+    })
+
+    it("doesn't pull more than necessary", async () => {
+        const iter = jest.fn(async function* () {
+            yield 1
+            yield 2
+            fail("should not pull next element")
+        })
+        const s = _seq(iter)
+        const projected = s.concatMap(x => _seq([x]))
+        expect(iter).not.toHaveBeenCalled()
+        for await (const _ of projected) {
+            break
+        }
+    })
+
+    it("can iterate twice", async () => {
+        const s = _seq([1, 2, 3]).concatMap(x => [x, `${x}`])
+        await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
+        await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
     })
 })

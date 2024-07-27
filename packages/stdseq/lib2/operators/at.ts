@@ -1,24 +1,24 @@
-import { seq } from "../wrappers/seq.ctor"
+import type { Lazy, LazyAsync } from "stdlazy"
+import { mustBeInteger } from "../errors/error"
 import { lazyFromOperator } from "../from/operator"
-import { mustBeInteger, mustBeNatural } from "../errors/error"
-import { aseq } from "../wrappers/aseq.ctor"
+import { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
-export function sync<T>(this: Iterable<T>, index: number) {
+export function generic<T>(input: Seq<T>, index: number): Lazy<T | undefined> {
     mustBeInteger("index", index)
 
-    return lazyFromOperator("at", this, input => {
+    return lazyFromOperator("at", input, input => {
         if (index < 0) {
-            return seq(input).take(index).first().pull()
+            return input.take(index).first().pull()
         }
-        return seq(input).skip(index).first().pull()
+        return input.skip(index).first().pull()
     })
 }
-export function async<T>(this: AsyncIterable<T>, index: number) {
-    mustBeInteger("index", index)
-    return lazyFromOperator("at", this, async input => {
-        if (index < 0) {
-            return await aseq(input).take(index).first().pull()
-        }
-        return await aseq(input).skip(index).first().pull()
-    })
+
+export function sync<T>(this: Iterable<T>, index: number): Lazy<T | undefined> {
+    return generic(seq(this), index) as any
+}
+export function async<T>(this: AsyncIterable<T>, index: number): LazyAsync<T | undefined> {
+    return generic(aseq(this) as any, index) as any
 }

@@ -1,6 +1,6 @@
-import { aseq } from "../wrappers/aseq.ctor"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import { seq } from "../wrappers/seq.ctor"
+import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>, length: number) {
     return syncFromOperator("sample", this, function* (input) {
