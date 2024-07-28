@@ -7,7 +7,7 @@ const config = {
         "^.+\\.tsx?$": [
             "ts-jest",
             {
-                tsconfig: "<rootDir>/lib2/tsconfig.spec.json",
+                tsconfig: "<rootDir>/lib2/tsconfig.json",
                 transpileOnly: true
             }
         ]

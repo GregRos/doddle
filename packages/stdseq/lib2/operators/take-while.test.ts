@@ -68,6 +68,8 @@ describe("sync", () => {
     it("calls predicate as many times as needed", () => {
         const f = jest.fn(x => x < 2)
         const s = _seq([1, 2, 3, 4, 5]).takeWhile(f)
+        for (const _ of s) {
+        }
         expect(f).toHaveBeenCalledTimes(2)
     })
 
@@ -87,8 +89,6 @@ describe("sync", () => {
     })
 
     it("no ellipsis if it's nullish", () => {
-        const s = _seq([1, 2, 3]).takeWhile(() => false, null)
-        expect(s._qr).toEqual([])
         const s2 = _seq([1, 2, 3]).takeWhile(() => false, undefined)
         expect(s2._qr).toEqual([])
     })
@@ -151,7 +151,7 @@ describe("async", () => {
         const s = _seq([1, 2, 3, 4, 5]).takeWhile(f)
         for await (const _ of s) {
         }
-        await expect(f).resolves.toHaveBeenCalledTimes(2)
+        await expect(f).toHaveBeenCalledTimes(2)
     })
 
     it("doesn't insert ellipsis if no items are skipped", async () => {

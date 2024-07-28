@@ -7,7 +7,7 @@ import { seq } from "../seq/seq.ctor"
 describe("sync", () => {
     const _seq = seq
     type _Seq<T> = Seq<T>
-    declare.describe("type tests", () => {
+    describe("type tests", () => {
         const Seq_never = type<_Seq<never>>
         const empty = _seq([])
         const s123 = _seq([1, 2, 3])
@@ -75,7 +75,7 @@ describe("sync", () => {
 
         expect(s.concatMap(x => _seq.of(1, 2))._qr).toEqual([1, 2, 1, 2, 1, 2])
         expect(s.concatMap(x => () => _seq.of(1, 2)[Symbol.iterator]())._qr).toEqual([
-            1, 2, 3, 1, 2
+            1, 2, 1, 2, 1, 2
         ])
     })
 
@@ -111,7 +111,7 @@ describe("sync", () => {
 describe("async", () => {
     const _seq = aseq
     type _Seq<T> = ASeq<T>
-    declare.describe("type tests", () => {
+    describe("type tests", () => {
         const Seq_never = type<_Seq<never>>
         const empty = _seq([])
         const s123 = _seq([1, 2, 3])
@@ -193,6 +193,11 @@ describe("async", () => {
     it("can iterate twice", async () => {
         const s = _seq([1, 2, 3]).concatMap(x => [x, `${x}`])
         await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
+        await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
+    })
+
+    it("works for async projections", async () => {
+        const s = _seq([1, 2, 3]).concatMap(async x => [x, `${x}`])
         await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
     })
 })

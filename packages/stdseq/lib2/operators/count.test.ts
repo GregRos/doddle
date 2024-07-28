@@ -88,4 +88,9 @@ describe("async", () => {
         await lazy.pull()
         expect(fn).toHaveBeenCalledTimes(1)
     })
+
+    it("works with async predicate", async () => {
+        const s = f([1, 2, 3]).count(async x => x > 1)
+        await expect(s.pull()).resolves.toEqual(2)
+    })
 })

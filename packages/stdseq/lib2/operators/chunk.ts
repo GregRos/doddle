@@ -1,9 +1,9 @@
-import { mustBePositiveInt, notEnoughElements } from "../errors/error"
+import { mustBePositiveInt } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
-import type { getTuple } from "../type-functions/get-tuple"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
+import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
+import type { getTuple } from "../type-functions/get-tuple"
 
 type getChunkType<T, L extends number> = getMostlyOptionalTuple<T, L>
 
@@ -28,6 +28,8 @@ export function async<T, L extends number>(
     this: AsyncIterable<T>,
     size: L
 ): ASeq<getChunkType<T, L>> {
+    mustBePositiveInt("size", size)
+
     return asyncFromOperator("chunk", this, async function* (input) {
         let group: T[] = []
         for await (const item of input) {

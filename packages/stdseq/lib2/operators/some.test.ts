@@ -49,6 +49,15 @@ describe("async", () => {
         expect(await s.pull()).toEqual(false)
     })
 
+    it("works for async predicates (true)", async () => {
+        const s = f([1, 2, 3]).some(async x => x === 2)
+        expect(await s.pull()).toEqual(true)
+    })
+
+    it("works for async predicates (false)", async () => {
+        const s = f([1, 2, 3]).some(async x => x === 4)
+        expect(await s.pull()).toEqual(false)
+    })
     it("returns false for no matches", async () => {
         const s = f([1, 2, 3]).some(() => false)
         expect(await s.pull()).toEqual(false)
@@ -84,5 +93,15 @@ describe("async", () => {
         const s = f([1, 2, 3]).some(fn)
         await s.pull()
         expect(fn).toHaveBeenCalledTimes(2)
+    })
+
+    it("works with async predicate (true)", async () => {
+        const s = f([1, 2, 3]).some(async x => true)
+        expect(await s.pull()).toEqual(true)
+    })
+
+    it("works with async predicate (false)", async () => {
+        const s = f([1, 2, 3]).some(async x => false)
+        expect(await s.pull()).toEqual(false)
     })
 })

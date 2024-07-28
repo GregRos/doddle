@@ -5693,6 +5693,7 @@ __metadata:
     declare-it: "npm:^1.1.0"
     jest: "npm:^29.7.0"
     prettier-plugin-organize-imports: "npm:^4.0.0"
+    shx: "npm:^0.3.4"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.5.2"

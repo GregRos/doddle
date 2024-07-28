@@ -7,7 +7,7 @@ import { seq } from "../seq/seq.ctor"
 describe("sync", () => {
     const _seq = seq
     type _Seq<T> = Seq<T>
-    declare.describe("type tests", () => {
+    describe("type tests", () => {
         const Seq_never = type<_Seq<never>>
         const s123 = _seq([1, 2, 3])
         declare.it("gives same type with no arguments", expect => {
@@ -121,7 +121,7 @@ describe("sync", () => {
 describe("async", () => {
     const _seq = aseq
     type _Seq<T> = ASeq<T>
-    declare.describe("type tests", () => {
+    describe("type tests", () => {
         const Seq_never = type<_Seq<never>>
         const s123 = _seq([1, 2, 3])
         declare.it("gives same type with no arguments", expect => {

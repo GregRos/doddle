@@ -15,18 +15,22 @@ export function sync<T, const Ellipsis = undefined>(
     return syncFromOperator("skipWhile", this, function* (input) {
         let skipping = true
         let index = 0
+        let needEllipsis = false
         for (const element of input) {
-            if (skipping && predicate(element, index++)) {
-                if (!predicate(element, index++)) {
-                    if (index > 1 && hasEllipsis) {
-                        yield ellipsisItem as Ellipsis
-                    }
-                    skipping = false
-                    yield element
+            skipping = skipping && predicate(element, index++)
+            if (skipping && hasEllipsis) {
+                needEllipsis = true
+            }
+            if (!skipping) {
+                if (needEllipsis) {
+                    needEllipsis = false
+                    yield ellipsisItem as Ellipsis
                 }
-            } else {
                 yield element
             }
+        }
+        if (needEllipsis) {
+            yield ellipsisItem as Ellipsis
         }
     }) as any
 }
@@ -40,18 +44,22 @@ export function async<T, const Ellipsis = undefined>(
     return asyncFromOperator("skipWhile", this, async function* (input) {
         let skipping = true
         let index = 0
+        let needEllipsis = false
         for await (const element of input) {
-            if (skipping) {
-                if (!(await predicate(element, index++))) {
-                    if (index > 1 && hasEllipsis) {
-                        yield ellipsisItem as Ellipsis
-                    }
-                    skipping = false
-                    yield element
+            skipping = skipping && (await predicate(element, index++))
+            if (skipping && hasEllipsis) {
+                needEllipsis = true
+            }
+            if (!skipping) {
+                if (needEllipsis) {
+                    needEllipsis = false
+                    yield ellipsisItem as Ellipsis
                 }
-            } else {
                 yield element
             }
+        }
+        if (needEllipsis) {
+            yield ellipsisItem as Ellipsis
         }
     }) as any
 }

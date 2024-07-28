@@ -2,13 +2,9 @@
   "references": [
     {
       "path": "./lib2/tsconfig.json"
-    },
-    {
-      "path": "./lib2/tsconfig.spec.json"
     }
   ],
   "compilerOptions": {
-    "module": "commonjs",
     "sourceMap": true
   },
   "files": []

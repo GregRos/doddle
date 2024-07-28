@@ -149,4 +149,14 @@ describe("async", () => {
         await s.pull()
         expect(fn).toHaveBeenCalledTimes(5)
     })
+
+    it("works for async predicates (true)", async () => {
+        const s = f([1, 2, 3]).findLast(async x => x === 2)
+        expect(await s.pull()).toEqual(2)
+    })
+
+    it("works for async predicates (false)", async () => {
+        const s = f([1, 2, 3]).findLast(async x => x === 4)
+        expect(await s.pull()).toEqual(undefined)
+    })
 })

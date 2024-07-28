@@ -5,14 +5,14 @@ import { lazyFromOperator } from "../from/operator"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
+import { UNSET } from "../special/tokens"
 
 function generic<T>(input: Seq<T>, predicate: Predicate<T>): Lazy<boolean> {
     mustBeFunction("predicate", predicate)
     return lazyFromOperator("some", input, input => {
-        const unset = {} as any
         return input
-            .find(predicate, unset)
-            .map(x => x !== unset)
+            .find(predicate, UNSET)
+            .map(x => x !== UNSET)
             .pull()
     })
 }

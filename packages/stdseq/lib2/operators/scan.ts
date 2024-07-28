@@ -18,17 +18,24 @@ export function sync<Item, Acc>(
     reducer: Reducer<NoInfer<Item>, Acc>,
     initial?: Acc
 ) {
-    const hasInitial = initial != undefined
     mustBeFunction("reducer", reducer)
 
     return syncFromOperator("scan", this, function* (input) {
+        let hasAcc = initial !== undefined
+
         let acc: Acc = initial as any
         let index = 0
+        if (hasAcc) {
+            yield acc
+        }
         for (const element of input) {
-            if (!hasInitial && index === 0) {
+            if (!hasAcc) {
                 acc = element as any
+                hasAcc = true
+            } else {
+                acc = reducer(acc, element, index++)
             }
-            acc = reducer(acc, element, index++)
+
             yield acc
         }
     })
@@ -50,13 +57,19 @@ export function async<Item, Acc>(
 ) {
     mustBeFunction("reducer", reducer)
     return asyncFromOperator("scan", this, async function* (input) {
-        let acc = initial
+        let hasAcc = initial !== undefined
+
+        let acc: Acc = initial as any
         let index = 0
+        if (hasAcc) {
+            yield acc
+        }
         for await (const element of input) {
-            if (acc == undefined && index === 0) {
+            if (!hasAcc) {
                 acc = element as any
+                hasAcc = true
             } else {
-                acc = await reducer(acc!, element, index++)
+                acc = await reducer(acc, element, index++)
             }
 
             yield acc

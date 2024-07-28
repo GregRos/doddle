@@ -41,18 +41,20 @@ describe("sync", () => {
             expect(true).toBe(false)
         }).map(fn)
         expect(fn).not.toHaveBeenCalled()
-        for (const _ of s) {
-            break
+        for (const x of s) {
+            if (x === 3) {
+                break
+            }
         }
         expect(fn).toHaveBeenCalledTimes(2)
     })
 
-    it("calls predicate as many times as needed", () => {
+    it("calls projection as many times as needed", () => {
         const fn = jest.fn(x => x + 1)
         const s = _seq([1, 2, 3]).map(fn)
         expect(fn).not.toHaveBeenCalled()
         for (const x of s) {
-            if (x === 2) {
+            if (x === 3) {
                 break
             }
         }
@@ -102,7 +104,11 @@ describe("async", () => {
             expect(true).toBe(false) // This will not be reached unless all elements are processed
         }).map(fn)
         expect(fn).not.toHaveBeenCalled()
-        await s._qr // This triggers the execution
+        for await (const x of s) {
+            if (x === 3) {
+                break
+            }
+        }
         expect(fn).toHaveBeenCalledTimes(2)
     })
 
@@ -122,6 +128,11 @@ describe("async", () => {
     it("can iterate twice", async () => {
         const s = _aseq([1, 2, 3]).map(x => x + 1)
         expect(await s._qr).toEqual([2, 3, 4])
+        expect(await s._qr).toEqual([2, 3, 4])
+    })
+
+    it("works for async projections", async () => {
+        const s = _aseq([1, 2, 3]).map(async x => x + 1)
         expect(await s._qr).toEqual([2, 3, 4])
     })
 })

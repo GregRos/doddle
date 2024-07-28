@@ -115,19 +115,29 @@ describe("async", () => {
         const s = _seq([1, 2, 3]).filter(fn)
         expect(fn).not.toHaveBeenCalled()
         await s._qr
-        expect(fn).toHaveBeenCalledTimes(2)
+        expect(fn).toHaveBeenCalledTimes(3)
     })
 
     it("calls predicate as many times as needed", async () => {
         const fn = jest.fn(x => x > 1)
         const s = _seq([1, 2, 3]).filter(fn)
         await s._qr
-        expect(fn).toHaveBeenCalledTimes(2)
+        expect(fn).toHaveBeenCalledTimes(3)
     })
 
     it("can iterate twice", async () => {
         const s = _seq([1, 2, 3]).filter(x => x > 1)
         expect(await s._qr).toEqual([2, 3])
         expect(await s._qr).toEqual([2, 3])
+    })
+
+    it("works for async predicates (true)", async () => {
+        const s = _seq([1, 2, 3]).filter(async x => x === 2)
+        expect(await s._qr).toEqual([2])
+    })
+
+    it("works for async predicates (false)", async () => {
+        const s = _seq([1, 2, 3]).filter(async x => x === 4)
+        expect(await s._qr).toEqual([])
     })
 })

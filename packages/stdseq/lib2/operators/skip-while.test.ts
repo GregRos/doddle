@@ -96,12 +96,10 @@ describe("sync", () => {
 
     it("inserts ellipsis if some items are skipped", () => {
         const s = _seq([1, 2, 3]).skipWhile(x => x < 3, "...")
-        expect(s._qr).toEqual([3, "..."])
+        expect(s._qr).toEqual(["...", 3])
     })
 
-    it("doesn't insert ellipsis if it's nullish", () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => true, null)
-        expect(s._qr).toEqual([])
+    it("doesn't insert ellipsis if it's undefined", () => {
         const s2 = _seq([1, 2, 3]).skipWhile(() => true, undefined)
         expect(s2._qr).toEqual([])
     })
@@ -117,7 +115,7 @@ describe("async", () => {
     })
     it("returns empty for constant true", async () => {
         const s = _seq([1, 2, 3]).skipWhile(() => true)
-        expect(await s._qr).resolves.toEqual([])
+        expect(s._qr).resolves.toEqual([])
     })
 
     it("returns all for constant false", async () => {
@@ -179,12 +177,10 @@ describe("async", () => {
 
     it("inserts ellipsis if some items are skipped", async () => {
         const s = _seq([1, 2, 3]).skipWhile(x => x < 3, "...")
-        expect(await s._qr).toEqual([3, "..."])
+        expect(await s._qr).toEqual(["...", 3])
     })
 
-    it("doesn't insert ellipsis if it's nullish", async () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => true, null)
-        expect(await s._qr).toEqual([])
+    it("doesn't insert ellipsis if it's undefined", async () => {
         const s2 = _seq([1, 2, 3]).skipWhile(() => true, undefined)
         expect(await s2._qr).toEqual([])
     })

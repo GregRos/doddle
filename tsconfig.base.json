@@ -14,5 +14,5 @@
     "noEmit": true,
     "strict": true
   },
-  "include": []
+  "files": []
 }
