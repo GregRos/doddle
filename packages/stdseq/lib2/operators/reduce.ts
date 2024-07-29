@@ -6,7 +6,7 @@ import { mustBeFunction } from "../errors/error"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
-import { UNSET } from "../special/tokens"
+const NO_INITIAL = Symbol("NO_INTIAL")
 
 export function generic<Item, Acc>(
     input: Seq<Item>,
@@ -17,9 +17,9 @@ export function generic<Item, Acc>(
     return lazyFromOperator("reduce", input, input => {
         return input
             .scan(reducer, initial!)
-            .last(UNSET)
+            .last(NO_INITIAL)
             .map(x => {
-                if (x === UNSET) {
+                if (x === NO_INITIAL) {
                     throw new Error("Cannot reduce empty sequence with no initial value")
                 }
                 return x

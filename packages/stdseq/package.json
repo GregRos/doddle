@@ -36,14 +36,17 @@
   },
   "scripts": {
     "build": "tsc -b .",
+    "build:clean": "yarn clean && yarn build",
     "clean": "shx rm -rf dist",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "watch": "tsc -b . --watch",
-    "build:clean": "yarn clean && yarn build"
+    "watch": "tsc -b . --watch"
   },
   "resolutions": {
     "stdlazy": "portal:../stdlazy"
+  },
+  "dependencies": {
+    "type-plus": "^7.6.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

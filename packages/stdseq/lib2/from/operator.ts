@@ -1,7 +1,6 @@
 import { Lazy, type Pulled } from "stdlazy"
 import { ASeq } from "../seq/aseq.class"
 import { Seq } from "../seq/seq.class"
-import type { ASeqLikeInput, SeqLikeInput } from "../f-types"
 import { seq } from "../seq/seq.ctor"
 
 export function syncFromOperator<In extends Iterable<any>, Out>(

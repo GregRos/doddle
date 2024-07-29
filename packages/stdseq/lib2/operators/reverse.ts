@@ -1,6 +1,5 @@
 import { lazyFromOperator, syncFromOperator } from "../from/operator"
 import { aseq } from "../seq/aseq.ctor"
-import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>) {

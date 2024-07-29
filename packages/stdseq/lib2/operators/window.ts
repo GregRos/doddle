@@ -1,16 +1,22 @@
-import { mustBeNatural } from "../errors/error"
+import { mustBePositiveInt } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
-import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
-import type { getTuple } from "../type-functions/get-tuple"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
+import type { getTupleUpTo } from "../type-functions/get-tuple-min-max"
 
-export function sync<T, S, L extends number>(
+export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection: (...window: getMostlyOptionalTuple<T, L>) => S
-): Seq<S> {
-    mustBeNatural("windowSize", size)
+    projection: (...window: getTupleUpTo<T, L>) => S
+): Seq<S>
+export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getTupleUpTo<T, L>>
+export function sync<T, L extends number, S>(
+    this: Iterable<T>,
+    size: L,
+    projection?: (...window: getTupleUpTo<T, L>) => S
+): Seq<any> {
+    mustBePositiveInt("windowSize", size)
+    projection ??= (...window: any) => window as any
     return syncFromOperator("window", this, function* (input) {
         const buffer = Array<T>(size)
         let i = 0
@@ -24,17 +30,27 @@ export function sync<T, S, L extends number>(
                 )
             }
         }
-        if (i < size) {
+        if (i > 0 && i < size) {
             yield (projection as any).call(null, ...buffer.slice(0, i))
         }
     })
 }
-export function async<T, S, L extends number, AllowSmaller extends boolean = false>(
+export function async<T, S, L extends number>(
     this: AsyncIterable<T>,
     size: L,
-    projection: (...window: getMostlyOptionalTuple<T, L>) => S
-): ASeq<S> {
-    mustBeNatural("windowSize", size)
+    projection: (...window: getTupleUpTo<T, L>) => S
+): ASeq<S>
+export function async<T, L extends number>(
+    this: AsyncIterable<T>,
+    size: L
+): ASeq<getTupleUpTo<T, L>>
+export function async<T, L extends number, S>(
+    this: AsyncIterable<T>,
+    size: L,
+    projection?: (...window: getTupleUpTo<T, L>) => S
+): ASeq<any> {
+    mustBePositiveInt("windowSize", size)
+    projection ??= (...window: any) => window as any
     return asyncFromOperator("window", this, async function* (input) {
         const buffer = Array<T>(size)
         let i = 0
@@ -49,7 +65,7 @@ export function async<T, S, L extends number, AllowSmaller extends boolean = fal
             }
         }
 
-        if (i < size) {
+        if (i > 0 && i < size) {
             yield (projection as any).call(null, ...buffer.slice(0, i))
         }
     })

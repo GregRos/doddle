@@ -8,17 +8,23 @@ import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
 export function sync<T, const Ellipsis = undefined>(
     this: Iterable<T>,
-    count: number,
+    countArg: number,
     ellipsis?: Ellipsis
 ): Seq<maybeDisjunction<T, Ellipsis>> {
-    mustBeInteger("count", count)
+    mustBeInteger("count", countArg)
     const hasEllipsis = ellipsis !== undefined
     return syncFromOperator("skip", this, function* (input) {
+        let count = countArg
         if (count < 0) {
             count = -count
-            yield* seq(input).window(count + 1, (...window) => {
-                return window[0]
-            })
+            yield* seq(input)
+                .window(count + 1, (...window) => {
+                    if (window.length === count + 1) {
+                        return window[0]
+                    }
+                    return undefined
+                })
+                .nonNullish()
             if (hasEllipsis) {
                 yield ellipsis as Ellipsis
             }
@@ -29,17 +35,23 @@ export function sync<T, const Ellipsis = undefined>(
 }
 export function async<T, const Ellipsis = undefined>(
     this: AsyncIterable<T>,
-    count: number,
+    countArg: number,
     ellipsis?: Ellipsis
 ): ASeq<maybeDisjunction<T, Ellipsis>> {
-    mustBeInteger("count", count)
+    mustBeInteger("count", countArg)
     const hasEllipsis = ellipsis !== undefined
     return asyncFromOperator("skip", this, async function* (input) {
+        let count = countArg
         if (count < 0) {
             count = -count
-            yield* aseq(input).window(count + 1, (...window) => {
-                return window[0]
-            })
+            yield* aseq(input)
+                .window(count + 1, (...window) => {
+                    if (window.length === count + 1) {
+                        return window[0]
+                    }
+                    return undefined
+                })
+                .nonNullish()
             if (hasEllipsis) {
                 yield ellipsis as Ellipsis
             }

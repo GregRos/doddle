@@ -116,7 +116,7 @@ describe("sync", () => {
 
     it("ellipsis is inserted if some items are taken", () => {
         const s = _seq([1, 2, 3]).take(-2, "...")
-        expect(s._qr).toEqual([2, 3, "..."])
+        expect(s._qr).toEqual(["...", 2, 3])
     })
 
     it("no ellipsis if it's nullish", () => {
@@ -188,7 +188,7 @@ describe("async", () => {
 
     it("ellipsis is inserted if some items are taken", async () => {
         const s = _aseq([1, 2, 3]).take(-2, "...")
-        expect(await s._qr).toEqual([2, 3, "..."])
+        expect(await s._qr).toEqual(["...", 2, 3])
     })
 
     it("can iterate twice", async () => {

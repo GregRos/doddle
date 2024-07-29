@@ -9,11 +9,12 @@ import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 const END_MARKER = Symbol("DUMMY")
 export function sync<T, const Ellipsis = undefined>(
     this: Iterable<T>,
-    count: number,
+    countArg: number,
     ellipsis?: Ellipsis
 ): Seq<maybeDisjunction<T, Ellipsis>> {
-    mustBeInteger("count", count)
+    mustBeInteger("count", countArg)
     return syncFromOperator("take", this, function* (input) {
+        let count = countArg
         if (count < 0) {
             count = -count
             let anySkipped = false
@@ -33,6 +34,7 @@ export function sync<T, const Ellipsis = undefined>(
             if (anySkipped && ellipsis !== undefined) {
                 yield ellipsis
             }
+            yield* results
         } else {
             yield* seq(input).takeWhile((_, index) => index < count, ellipsis)
         }
@@ -40,12 +42,13 @@ export function sync<T, const Ellipsis = undefined>(
 }
 export function async<T, const Ellipsis = undefined>(
     this: AsyncIterable<T>,
-    count: number,
+    countArg: number,
     ellipsis?: Ellipsis
 ): ASeq<maybeDisjunction<T, Ellipsis>> {
-    mustBeInteger("count", count)
+    mustBeInteger("count", countArg)
     const hasEllipsis = ellipsis !== undefined
     return asyncFromOperator("take", this, async function* (input) {
+        let count = countArg
         if (count < 0) {
             count = -count
             let anySkipped = false

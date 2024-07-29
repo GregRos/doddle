@@ -1301,6 +1301,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"acorn@npm:^8.8.2":
+  version: 8.12.1
+  resolution: "acorn@npm:8.12.1"
+  bin:
+    acorn: bin/acorn
+  checksum: 10c0/51fb26cd678f914e13287e886da2d7021f8c2bc0ccc95e03d3e0447ee278dd3b40b9c57dc222acd5881adcf26f3edc40901a4953403232129e3876793cd17386
+  languageName: node
+  linkType: hard
+
 "agent-base@npm:^7.0.2, agent-base@npm:^7.1.0, agent-base@npm:^7.1.1":
   version: 7.1.1
   resolution: "agent-base@npm:7.1.1"
@@ -3131,6 +3140,13 @@ __metadata:
     call-bind: "npm:^1.0.2"
     has-tostringtag: "npm:^1.0.0"
   checksum: 10c0/6090587f8a8a8534c0f816da868bc94f32810f08807aa72fa7e79f7e11c466d281486ffe7a788178809c2aa71fe3e700b167fe80dd96dad68026bfff8ebf39f7
+  languageName: node
+  linkType: hard
+
+"is-buffer@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "is-buffer@npm:2.0.5"
+  checksum: 10c0/e603f6fced83cf94c53399cff3bda1a9f08e391b872b64a73793b0928be3e5f047f2bcece230edb7632eaea2acdbfcb56c23b33d8a20c820023b230f1485679a
   languageName: node
   linkType: hard
 
@@ -5696,6 +5712,7 @@ __metadata:
     shx: "npm:^0.3.4"
     ts-jest: "npm:^29.1.2"
     ts-node: "npm:^10.9.2"
+    type-plus: "npm:^7.6.2"
     typescript: "npm:^5.5.2"
   peerDependencies:
     stdlazy: ^2.0.0
@@ -5898,6 +5915,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tersify@npm:^3.11.1":
+  version: 3.12.1
+  resolution: "tersify@npm:3.12.1"
+  dependencies:
+    acorn: "npm:^8.8.2"
+    is-buffer: "npm:^2.0.5"
+    unpartial: "npm:^1.0.4"
+  checksum: 10c0/b2701bacb9c8f1e063ca2c1c1d1559cfac491230b95d1b33a273343aa9ad8c62130a9f54a64f381a221d56869df74f938c3a284187e769697db49bc8cc7e7e4a
+  languageName: node
+  linkType: hard
+
 "test-exclude@npm:^6.0.0":
   version: 6.0.0
   resolution: "test-exclude@npm:6.0.0"
@@ -6063,6 +6091,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-plus@npm:^7.6.2":
+  version: 7.6.2
+  resolution: "type-plus@npm:7.6.2"
+  dependencies:
+    tersify: "npm:^3.11.1"
+    unpartial: "npm:^1.0.4"
+  checksum: 10c0/79c75bc3ad5b8e72021b2424c3d21dfae1177cf7afd64b894dd821b6f580dcf792a9951e8e8effdad682019cd143008da1163e4df4371963ec2ad899b3171163
+  languageName: node
+  linkType: hard
+
 "typed-array-buffer@npm:^1.0.2":
   version: 1.0.2
   resolution: "typed-array-buffer@npm:1.0.2"
@@ -6178,6 +6216,13 @@ __metadata:
   dependencies:
     "@types/unist": "npm:^3.0.0"
   checksum: 10c0/dfe1dbe79ba31f589108cb35e523f14029b6675d741a79dea7e5f3d098785045d556d5650ec6a8338af11e9e78d2a30df12b1ee86529cded1098da3f17ee999e
+  languageName: node
+  linkType: hard
+
+"unpartial@npm:^1.0.4":
+  version: 1.0.5
+  resolution: "unpartial@npm:1.0.5"
+  checksum: 10c0/bdfe89d0712679e22eee654a645493a2aad2428bf9cc0d27d5b56e986001e40c1c70b41407708f33d5ccffe1ced71ee3245e99bb62559fef3d6960feac625a07
   languageName: node
   linkType: hard
 

@@ -14,7 +14,7 @@ export function generic<T, K>(input: Seq<T>, iteratee: Iteratee<T, K>) {
                 return returnKvp(input, iteratee(element, index), element)
             })
             .reduce((min: any, value) => {
-                return min.key < value.key ? min : value
+                return min.key <= value.key ? min : value
             })
             .pull()
     })

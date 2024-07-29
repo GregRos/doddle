@@ -68,21 +68,24 @@ describe("sync", () => {
         expect(s._qr).toEqual(["...", 2, 3])
     })
 
-    it("no ellipsis if it's nullish", () => {
-        const s = _seq([1, 2, 3]).skip(3, null)
-        expect(s._qr).toEqual([])
+    it("no ellipsis if it's undefined", () => {
         const s2 = _seq([1, 2, 3]).skip(3, undefined)
         expect(s2._qr).toEqual([])
     })
 
     it("ellipsis inserted if all items are skipped from the end", () => {
         const s = _seq([1, 2, 3]).skip(-3, "...")
-        expect(s._qr).toEqual(["...", 1, 2])
+        expect(s._qr).toEqual(["..."])
+    })
+
+    it("ellipsis inserted if extra items are skipped", () => {
+        const s = _seq([1, 2, 3]).skip(-5, "...")
+        expect(s._qr).toEqual(["..."])
     })
 
     it("ellipsis inserted if items are skipped from the end", () => {
         const s = _seq([1, 2, 3]).skip(-1, "...")
-        expect(s._qr).toEqual([1, "..."])
+        expect(s._qr).toEqual([1, 2, "..."])
     })
 
     it("can iterate twice", () => {
@@ -160,7 +163,7 @@ describe("async", () => {
 
     it("ellipsis is inserted if some items are taken", async () => {
         const s = _aseq([1, 2, 3]).take(-2, "...")
-        expect(await s._qr).toEqual([2, 3, "..."])
+        expect(await s._qr).toEqual(["...", 2, 3])
     })
 
     it("can iterate twice", async () => {

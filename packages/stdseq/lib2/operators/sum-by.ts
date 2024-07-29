@@ -3,8 +3,8 @@ import { mustBeFunction } from "../errors/error"
 import { AsyncIteratee, Iteratee } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"
 import { aseq } from "../seq/aseq.ctor"
-import { seq } from "../seq/seq.ctor"
 import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 export function generic<T>(input: Seq<T>, projection: Iteratee<T, number>) {
     mustBeFunction("projection", projection)

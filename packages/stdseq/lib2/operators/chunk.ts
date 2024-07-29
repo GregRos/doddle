@@ -2,10 +2,10 @@ import { mustBePositiveInt } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
-import type { getMostlyOptionalTuple } from "../type-functions/get-optional-tuple"
 import type { getTuple } from "../type-functions/get-tuple"
+import type { getTupleUpTo } from "../type-functions/get-tuple-min-max"
 
-type getChunkType<T, L extends number> = getMostlyOptionalTuple<T, L>
+type getChunkType<T, L extends number> = getTupleUpTo<T, L>
 
 export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getChunkType<T, L>> {
     mustBePositiveInt("size", size)
@@ -19,7 +19,7 @@ export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getCh
             }
         }
         if (group.length) {
-            yield group as getMostlyOptionalTuple<T, L>
+            yield group as getChunkType<T, L>
         }
     }) as any
 }
@@ -40,7 +40,7 @@ export function async<T, L extends number>(
             }
         }
         if (group.length) {
-            yield group as getMostlyOptionalTuple<T, L>
+            yield group as getChunkType<T, L>
         }
     }) as any
 }

@@ -39,6 +39,7 @@ import { async as uniqAsync } from "../operators/uniq"
 import { async as uniqByAsync } from "../operators/uniq-by"
 import { async as windowAsync } from "../operators/window"
 import { async as zipAsync } from "../operators/zip"
+import { aseq } from "./aseq.ctor"
 
 export abstract class ASeq<T> implements AsyncIterable<T> {
     __T!: T;
@@ -90,3 +91,5 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     window = windowAsync
     zip = zipAsync
 }
+
+aseq.prototype = ASeq.prototype

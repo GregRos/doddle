@@ -5,7 +5,7 @@ import { async as asyncOf } from "../from/of"
 import { async as asyncRange } from "../from/range"
 import { async as asyncRepeat } from "../from/repeat"
 
-import { ASeq } from "./aseq.class"
+import type { ASeq } from "./aseq.class"
 function _aseq<E = never>(): ASeq<E>
 function _aseq<E>(input: readonly E[]): ASeq<E>
 function _aseq<E>(input: AnySeqLike<PromiseLike<LazyAsync<E>>>): ASeq<E>
@@ -20,7 +20,6 @@ function _aseq<E>(input?: ASeqLikeInput<E>): any {
     }
     return fromAsyncInput(input)
 }
-_aseq.prototype = ASeq.prototype
 export type aseq<T> = ASeq<T>
 export const aseq = Object.assign(_aseq, {
     of: asyncOf,
