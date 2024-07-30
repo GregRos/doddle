@@ -1,9 +1,10 @@
 import { type SeqLikeInput } from "../f-types/index"
-import { fromAsyncInput, fromSyncInput } from "../from/input"
 import { lazyFromOperator } from "../from/operator"
+import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>, _other: SeqLikeInput<T>) {
-    const other = fromSyncInput(_other)
+    const other = seq(_other)
     return lazyFromOperator("setEquals", this, input => {
         const set = new Set(other)
         for (const element of input) {
@@ -15,7 +16,7 @@ export function sync<T>(this: Iterable<T>, _other: SeqLikeInput<T>) {
     })
 }
 export function async<T>(this: AsyncIterable<T>, _other: AsyncIterable<T>) {
-    const other = fromAsyncInput(_other)
+    const other = aseq(_other)
     return lazyFromOperator("setEquals", this, async input => {
         const set = new Set<T>()
         for await (const element of other) {

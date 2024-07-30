@@ -1,9 +1,10 @@
 import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
-import { fromAsyncInput, fromSyncInput } from "./input"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(value: T, times: number): Seq<T> {
-    return fromSyncInput(function* () {
+    return seq(function* () {
         for (let i = 0; i < times; i++) {
             yield value
         }
@@ -11,5 +12,5 @@ export function sync<T>(value: T, times: number): Seq<T> {
 }
 
 export function async<T>(value: T, times: number): ASeq<T> {
-    return fromAsyncInput(sync(value, times))
+    return aseq(sync(value, times))
 }

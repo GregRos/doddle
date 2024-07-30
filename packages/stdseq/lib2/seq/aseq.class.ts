@@ -4,9 +4,10 @@ import { async as cacheAsync } from "../operators/cache"
 import { async as concatAsync } from "../operators/concat"
 import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
-import { async as nonNullishAsync } from "../operators/non-nullish"
 import { async as sampleAsync } from "../operators/sample"
 
+import { isAsyncIterable, isIterable, isNextable } from "stdlazy"
+import type { ASeqLikeInput } from "../f-types"
 import { async as chunkAsync } from "../operators/chunk"
 import { async as concatMapAsync } from "../operators/concat-map"
 import { async as everyAsync } from "../operators/every"
@@ -39,7 +40,6 @@ import { async as uniqAsync } from "../operators/uniq"
 import { async as uniqByAsync } from "../operators/uniq-by"
 import { async as windowAsync } from "../operators/window"
 import { async as zipAsync } from "../operators/zip"
-import { aseq } from "./aseq.ctor"
 
 export abstract class ASeq<T> implements AsyncIterable<T> {
     __T!: T;
@@ -65,7 +65,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     includes = includesAsync
     last = lastAsync
     map = mapAsync
-    nonNullish = nonNullishAsync
     maxBy = maxByAsync
     minBy = minByAsync
     orderBy = orderByAsync
@@ -92,4 +91,42 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     zip = zipAsync
 }
 
-aseq.prototype = ASeq.prototype
+export class FromAsyncInput<T> extends ASeq<T> {
+    constructor(private readonly _input: ASeqLikeInput<T>) {
+        super()
+    }
+
+    async *[Symbol.asyncIterator](): AsyncIterator<T, any, undefined> {
+        const items = await this._input
+        if (isAsyncIterable(items)) {
+            yield* items
+        } else if (isIterable(items)) {
+            yield* items
+        } else if (typeof items === "function") {
+            const result = items()
+            if (isAsyncIterable(result)) {
+                yield* result
+            } else if (isIterable(result)) {
+                yield* result
+            } else if (isNextable(result)) {
+                for (let item = await result.next(); !item.done; item = await result.next()) {
+                    yield item.value
+                }
+            } else {
+                throw new Error(`Got unexpected result from iterator constructor: ${result}`)
+            }
+        }
+    }
+}
+
+export class AsyncFromOperator<In, Out> extends ASeq<Out> {
+    [Symbol.asyncIterator]!: () => AsyncIterator<Out, any, undefined>
+    constructor(
+        readonly operator: string,
+        private readonly _operand: AsyncIterable<In>,
+        private readonly _func: (input: AsyncIterable<In>) => AsyncIterable<Out>
+    ) {
+        super()
+        this[Symbol.asyncIterator] = () => this._func(this._operand)[Symbol.asyncIterator]()
+    }
+}

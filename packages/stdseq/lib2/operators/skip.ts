@@ -6,6 +6,7 @@ import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
 import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
+const SKIP = Symbol("SKIP")
 export function sync<T, const Ellipsis = undefined>(
     this: Iterable<T>,
     countArg: number,
@@ -22,9 +23,9 @@ export function sync<T, const Ellipsis = undefined>(
                     if (window.length === count + 1) {
                         return window[0]
                     }
-                    return undefined
+                    return SKIP
                 })
-                .nonNullish()
+                .filter(x => x !== SKIP)
             if (hasEllipsis) {
                 yield ellipsis as Ellipsis
             }
@@ -49,9 +50,9 @@ export function async<T, const Ellipsis = undefined>(
                     if (window.length === count + 1) {
                         return window[0]
                     }
-                    return undefined
+                    return SKIP
                 })
-                .nonNullish()
+                .filter(x => x !== SKIP)
             if (hasEllipsis) {
                 yield ellipsis as Ellipsis
             }

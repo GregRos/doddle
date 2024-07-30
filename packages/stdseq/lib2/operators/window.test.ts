@@ -11,25 +11,25 @@ describe("sync", () => {
         expect(type_of(_seq([1, 2, 3]).window(3))).to_equal(
             type<SType<[number] | [number, number] | [number, number, number]>>
         )
-        expect(type_of(_seq([1, 2, 3]).chunk(1))).to_equal(type<SType<[number]>>)
+        expect(type_of(_seq([1, 2, 3]).window(1))).to_equal(type<SType<[number]>>)
     })
 
-    declare.it("typed as length 1-∞ tuple when non-literal chunk length", expect => {
+    declare.it("typed as length 1-∞ tuple when non-literal window length", expect => {
         const s = _seq([1, 2, 3]).window(3 as number)
         expect(type_of(s)).to_equal(type<SType<[number, ...number[]]>>)
     })
 
-    it("chunks empty as empty", () => {
+    it("windows empty as empty", () => {
         const s = _seq([]).window(1)
         expect(s._qr).toEqual([])
     })
 
-    it("chunks singletons correctly", () => {
+    it("windows singletons correctly", () => {
         const s = _seq([1, 2, 3]).window(1)
         expect(s._qr).toEqual([[1], [2], [3]])
     })
 
-    it("chunks pairs", () => {
+    it("windows pairs", () => {
         const s = _seq([1, 2, 3, 4, 5]).window(2)
         expect(s._qr).toEqual([
             [1, 2],
@@ -45,8 +45,8 @@ describe("sync", () => {
 
     it("is not eager", () => {
         const s = seq.repeat(1, Infinity)
-        const chunked = s.window(3)
-        for (const _ of chunked) {
+        const windowed = s.window(3)
+        for (const _ of windowed) {
             break
         }
     })
@@ -58,9 +58,9 @@ describe("sync", () => {
             fail("should not pull next element")
         })
         const s = _seq(iter)
-        const chunked = s.window(2)
+        const windowed = s.window(2)
         expect(iter).not.toHaveBeenCalled()
-        for (const _ of chunked) {
+        for (const _ of windowed) {
             break
         }
     })
@@ -88,22 +88,22 @@ describe("async", () => {
         expect(type_of(_seq([1, 2, 3]).window(1))).to_equal(type<SType<[number]>>)
     })
 
-    declare.it("typed as length 1-∞ tuple when non-literal chunk length", expect => {
+    declare.it("typed as length 1-∞ tuple when non-literal window length", expect => {
         const s = _seq([1, 2, 3]).window(3 as number)
         expect(type_of(s)).to_equal(type<SType<[number, ...number[]]>>)
     })
 
-    it("chunks empty as empty", async () => {
+    it("windows empty as empty", async () => {
         const s = _seq([]).window(1)
         await expect(s._qr).resolves.toEqual([])
     })
 
-    it("chunks singletons correctly", async () => {
+    it("windows singletons correctly", async () => {
         const s = _seq([1, 2, 3]).window(1)
         await expect(s._qr).resolves.toEqual([[1], [2], [3]])
     })
 
-    it("chunks pairs", async () => {
+    it("windows pairs", async () => {
         const s = _seq([1, 2, 3, 4, 5]).window(2)
         await expect(s._qr).resolves.toEqual([
             [1, 2],
@@ -113,14 +113,14 @@ describe("async", () => {
         ])
     })
 
-    it("errors on chunk length of 0 immediately", async () => {
+    it("errors on window length of 0 immediately", async () => {
         expect(() => _seq([1, 2, 3]).window(0)).toThrow("must be positive")
     })
 
     it("is not eager", async () => {
         const s = aseq.repeat(1, Infinity)
-        const chunked = s.window(3)
-        for await (const _ of chunked) {
+        const windowed = s.window(3)
+        for await (const _ of windowed) {
             break
         }
     })
@@ -132,9 +132,9 @@ describe("async", () => {
             fail("should not pull next element")
         })
         const s = _seq(iter)
-        const chunked = s.window(2)
+        const windowed = s.window(2)
         expect(iter).not.toHaveBeenCalled()
-        for await (const _ of chunked) {
+        for await (const _ of windowed) {
             break
         }
     })

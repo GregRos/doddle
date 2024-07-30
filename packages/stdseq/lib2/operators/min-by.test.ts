@@ -4,51 +4,52 @@ import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
-
-// test maxBy function
+// test sync `minBy` function
 describe("sync", () => {
     const _seq = seq
     type SType<T> = Seq<T>
+
     declare.test("should type as Lazy<T | undefined>", expect => {
-        expect(type_of(_seq([1, 2, 3]).maxBy(() => true))).to_equal(type<Lazy<number | undefined>>)
+        expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(type<Lazy<number | undefined>>)
     })
     declare.test("should type as Lazy<T | string> with alt", expect => {
-        expect(type_of(_seq([1, 2, 3]).maxBy(() => true, "alt" as string))).to_equal(
+        expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt" as string))).to_equal(
             type<Lazy<number | string>>
         )
     })
     declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
-        expect(type_of(_seq([1, 2, 3]).maxBy(() => true, "alt"))).to_equal(
+        expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt"))).to_equal(
             type<Lazy<number | "alt">>
         )
     })
+
     it("returns undefined for empty", () => {
-        const s = _seq([]).maxBy(() => true)
+        const s = _seq([]).minBy(() => true)
         expect(s.pull()).toEqual(undefined)
     })
 
     it("sorted input", () => {
-        const s = _seq([1, 2, 3]).maxBy(x => x)
-        expect(s.pull()).toEqual(3)
+        const s = _seq([1, 2, 3]).minBy(x => x)
+        expect(s.pull()).toEqual(1)
     })
 
     it("unsorted input", () => {
-        const s = _seq([3, 1, 2]).maxBy(x => x)
-        expect(s.pull()).toEqual(3)
+        const s = _seq([3, 1, 2]).minBy(x => x)
+        expect(s.pull()).toEqual(1)
     })
 
     it("returns first value for same input", () => {
-        const s = _seq([1, 2, 3]).maxBy(() => true)
+        const s = _seq([1, 2, 3]).minBy(() => true)
         expect(s.pull()).toEqual(1)
     })
 
     it("returns alt for empty sequence", () => {
-        const s = _seq([]).maxBy(() => false, "alt")
+        const s = _seq([]).minBy(() => false, "alt")
         expect(s.pull()).toEqual("alt")
     })
 
     it("returns undefined if no alt", () => {
-        const s = _seq([]).maxBy(() => false)
+        const s = _seq([]).minBy(() => false)
         expect(s.pull()).toEqual(undefined)
     })
 
@@ -57,7 +58,7 @@ describe("sync", () => {
             yield 1
         })
         const s = _seq(fn)
-        const lazy = s.maxBy(() => true)
+        const lazy = s.minBy(() => true)
         expect(fn).not.toHaveBeenCalled()
         lazy.pull()
         expect(fn).toHaveBeenCalledTimes(1)
@@ -65,7 +66,7 @@ describe("sync", () => {
 
     it("calls iteratee as many times as needed", () => {
         const fn = jest.fn(x => x)
-        const s = _seq([1, 2, 3]).maxBy(fn)
+        const s = _seq([1, 2, 3]).minBy(fn)
         expect(fn).not.toHaveBeenCalled()
         s.pull()
         expect(fn).toHaveBeenCalledTimes(3)
@@ -73,84 +74,84 @@ describe("sync", () => {
 
     it("no calls for empty sequence", () => {
         const fn = jest.fn(x => x)
-        const s = _seq([]).maxBy(fn)
+        const s = _seq([]).minBy(fn)
         expect(fn).not.toHaveBeenCalled()
         s.pull()
         expect(fn).not.toHaveBeenCalled()
     })
 
-    it("returns first max value", () => {
-        const s = _seq([1, 2, 3, 2]).maxBy(x => x)
-        expect(s.pull()).toEqual(3)
+    it("returns first min value", () => {
+        const s = _seq([3, 1, 3, 1]).minBy(x => x)
+        expect(s.pull()).toEqual(1)
     })
 
     it("doesn't error for non-comparable keys", () => {
         const s = expect(() =>
             _seq([1, 2, 3])
-                .maxBy(x => {})
+                .minBy(x => {})
                 .pull()
         ).not.toThrow()
     })
 
     it("iteratee receives index", () => {
-        const s = _seq([1, 2, 3]).maxBy((x, i) => {
+        const s = _seq([1, 2, 3]).minBy((x, i) => {
             expect(i).toBe(x - 1)
             return x
         })
-        expect(s.pull()).toEqual(3)
+        expect(s.pull()).toEqual(1)
     })
 })
 
-// test async `maxBy` function
+// test async `minBy` function
 describe("async", () => {
     const _aseq = aseq
     type _ASeq<T> = ASeq<T>
 
     declare.test("should type as LazyAsync<T | undefined>", expect => {
-        expect(type_of(_aseq([1, 2, 3]).maxBy(() => true))).to_equal(
+        expect(type_of(_aseq([1, 2, 3]).minBy(() => true))).to_equal(
             type<LazyAsync<number | undefined>>
         )
     })
 
     declare.test("should type as LazyAsync<T | string> with alt", expect => {
-        expect(type_of(_aseq([1, 2, 3]).maxBy(() => true, "alt" as string))).to_equal(
+        expect(type_of(_aseq([1, 2, 3]).minBy(() => true, "alt" as string))).to_equal(
             type<LazyAsync<number | string>>
         )
     })
 
     declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
-        expect(type_of(_aseq([1, 2, 3]).maxBy(() => true, "alt"))).to_equal(
+        expect(type_of(_aseq([1, 2, 3]).minBy(() => true, "alt"))).to_equal(
             type<LazyAsync<number | "alt">>
         )
     })
 
     it("returns undefined for empty", async () => {
-        const s = _aseq([]).maxBy(() => true)
+        const s = _aseq([]).minBy(() => true)
         expect(await s.pull()).toEqual(undefined)
     })
 
     it("sorted input", async () => {
-        const s = _aseq([1, 2, 3]).maxBy(x => x)
-        expect(await s.pull()).toEqual(3)
+        const s = _aseq([1, 2, 3]).minBy(x => x)
+        expect(await s.pull()).toEqual(1)
     })
 
     it("unsorted input", async () => {
-        const s = _aseq([3, 1, 2]).maxBy(x => x)
-        expect(await s.pull()).toEqual(3)
+        const s = _aseq([3, 1, 2]).minBy(x => x)
+        expect(await s.pull()).toEqual(1)
     })
 
     it("returns first value for same input", async () => {
-        const s = _aseq([1, 2, 3]).maxBy(() => true)
+        const s = _aseq([1, 2, 3]).minBy(() => true)
         expect(await s.pull()).toEqual(1)
     })
 
     it("returns alt for empty sequence", async () => {
-        const s = _aseq([]).maxBy(() => false, "alt")
+        const s = _aseq([]).minBy(() => false, "alt")
         expect(await s.pull()).toEqual("alt")
     })
 
     it("returns undefined if no alt", async () => {
-        const s = _aseq([]).maxBy(() => false)
+        const s = _aseq([]).minBy(() => false)
         expect(await s.pull()).toEqual(undefined)
     })
 
@@ -159,7 +160,7 @@ describe("async", () => {
             yield 1
         })
         const s = _aseq(fn)
-        const lazy = s.maxBy(() => true)
+        const lazy = s.minBy(() => true)
         expect(fn).not.toHaveBeenCalled()
         await lazy.pull()
         expect(fn).toHaveBeenCalledTimes(1)
@@ -167,7 +168,7 @@ describe("async", () => {
 
     it("calls iteratee as many times as needed", async () => {
         const fn = jest.fn(x => x)
-        const s = _aseq([1, 2, 3]).maxBy(fn)
+        const s = _aseq([1, 2, 3]).minBy(fn)
         expect(fn).not.toHaveBeenCalled()
         await s.pull()
         expect(fn).toHaveBeenCalledTimes(3)
@@ -175,19 +176,19 @@ describe("async", () => {
 
     it("no calls for empty sequence", async () => {
         const fn = jest.fn(x => x)
-        const s = _aseq([]).maxBy(fn)
+        const s = _aseq([]).minBy(fn)
         expect(fn).not.toHaveBeenCalled()
         await s.pull()
         expect(fn).not.toHaveBeenCalled()
     })
 
-    it("returns first max value", async () => {
-        const s = _aseq([1, 2, 3, 2]).maxBy(x => x)
-        expect(await s.pull()).toEqual(3)
+    it("returns first min value", async () => {
+        const s = _aseq([3, 1, 3, 1]).minBy(x => x)
+        expect(await s.pull()).toEqual(1)
     })
 
     it("doesn't error for non-comparable keys", async () => {
-        const s = _aseq([1, 2, 3]).maxBy(x => ({}))
+        const s = _aseq([1, 2, 3]).minBy(x => ({}))
         await expect(s.pull()).resolves.not.toThrow()
     })
 
@@ -196,7 +197,7 @@ describe("async", () => {
             expect(i).toBe(x - 1)
             return x
         })
-        const s = _aseq([1, 2, 3]).maxBy(fn)
-        expect(await s.pull()).toEqual(3)
+        const s = _aseq([1, 2, 3]).minBy(fn)
+        expect(await s.pull()).toEqual(1)
     })
 })

@@ -1,3 +1,5 @@
+import { isIterable } from "stdlazy"
+import type { SeqLikeInput } from "../f-types"
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"
@@ -17,7 +19,6 @@ import { sync as lastSync } from "../operators/last"
 import { sync as mapSync } from "../operators/map"
 import { sync as maxBySync } from "../operators/max-by"
 import { sync as minBySync } from "../operators/min-by"
-import { sync as nonNullishSync } from "../operators/non-nullish"
 import { sync as orderBySync } from "../operators/order-by"
 import { sync as pairwiseSync } from "../operators/pairwise"
 import { sync as reduceSync } from "../operators/reduce"
@@ -39,7 +40,6 @@ import { sync as uniqSync } from "../operators/uniq"
 import { sync as uniqBySync } from "../operators/uniq-by"
 import { sync as windowSync } from "../operators/window"
 import { sync as zipSync } from "../operators/zip"
-import { seq } from "./seq.ctor"
 
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
@@ -65,7 +65,6 @@ export abstract class Seq<T> implements Iterable<T> {
     includes = includesSync
     last = lastSync
     map = mapSync
-    nonNullish = nonNullishSync
 
     maxBy = maxBySync
     minBy = minBySync
@@ -92,4 +91,40 @@ export abstract class Seq<T> implements Iterable<T> {
     zip = zipSync
 }
 
-seq.prototype = Seq.prototype
+export class SyncFromOperator<In, Out> extends Seq<Out> {
+    [Symbol.iterator]!: () => Iterator<Out, any, undefined>
+    constructor(
+        readonly operator: string,
+        private readonly _operand: In,
+        private readonly _func: (input: In) => Iterable<Out>
+    ) {
+        super()
+        this[Symbol.iterator] = () => this._func(this._operand)[Symbol.iterator]()
+    }
+}
+
+export class FromSyncInput<T> extends Seq<T> {
+    constructor(private readonly _input: SeqLikeInput<T>) {
+        super()
+    }
+
+    *[Symbol.iterator](): Iterator<T, any, undefined> {
+        const input = this._input
+        if (typeof input === "function") {
+            const result = input()
+            if (isIterable(result)) {
+                yield* result
+            } else {
+                for (;;) {
+                    const { done, value } = result.next()
+                    if (done) {
+                        return
+                    }
+                    yield value
+                }
+            }
+        } else {
+            yield* input
+        }
+    }
+}

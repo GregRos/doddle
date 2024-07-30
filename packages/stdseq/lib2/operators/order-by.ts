@@ -14,9 +14,10 @@ export function sync<T, S>(this: Iterable<T>, projection: (element: T) => S, rev
                 xs.sort((a, b) => {
                     const aKey = mustReturnComparable("projection", projection(a))
                     const bKey = mustReturnComparable("projection", projection(b))
-                    return aKey < bKey ? -1 : aKey > bKey ? 1 : 0
+                    const comp = aKey < bKey ? -1 : aKey > bKey ? 1 : 0
+                    return reverse ? -comp : comp
                 })
-                return reverse ? xs.reverse() : xs
+                return xs
             })
             .pull()
     })
@@ -32,16 +33,17 @@ export function async<T, S>(
         return aseq(input)
             .map(async (element, index) => {
                 return {
-                    key: mustReturnComparable("projection", await projection(element, index)),
+                    key: await projection(element, index),
                     value: element
                 }
             })
             .toArray()
             .map(async xs => {
                 xs.sort((a, b) => {
-                    return a.key < b.key ? -1 : a.key > b.key ? 1 : 0
+                    const comp = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
+                    return reverse ? -comp : comp
                 })
-                return reverse ? xs.reverse() : xs
+                return xs.map(x => x.value)
             })
     })
 }

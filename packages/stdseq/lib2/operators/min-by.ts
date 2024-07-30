@@ -1,3 +1,4 @@
+import type { Lazy, LazyAsync } from "stdlazy"
 import { mustBeFunction } from "../errors/error"
 import { AsyncIteratee, Iteratee } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"
@@ -20,9 +21,25 @@ export function generic<T, K>(input: Seq<T>, iteratee: Iteratee<T, K>) {
     })
 }
 
+export function sync<T, K, Alt>(this: Iterable<T>, iteratee: Iteratee<T, K>): Lazy<T | undefined>
+export function sync<T, K, const Alt>(
+    this: Iterable<T>,
+    iteratee: Iteratee<T, K>,
+    alt: Alt
+): Lazy<T | Alt>
 export function sync<T, K>(this: Iterable<T>, iteratee: Iteratee<T, K>) {
     return generic(seq(this), iteratee)
 }
+
+export function async<T, K>(
+    this: AsyncIterable<T>,
+    iteratee: AsyncIteratee<T, K>
+): LazyAsync<T | undefined>
+export function async<T, K, const Alt>(
+    this: AsyncIterable<T>,
+    iteratee: AsyncIteratee<T, K>,
+    alt?: Alt
+): LazyAsync<T | Alt>
 export function async<T, K>(this: AsyncIterable<T>, iteratee: AsyncIteratee<T, K>) {
     return generic(aseq(this) as any, iteratee as any)
 }

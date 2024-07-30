@@ -1,8 +1,9 @@
 import { type ASeqLikeInput, type SeqLikeInput } from "../f-types/index"
-import { fromAsyncInput, fromSyncInput } from "../from/input"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
+import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+import { seq } from "../seq/seq.ctor"
 
 export function sync<T, Xs extends any[]>(
     this: Iterable<T>,
@@ -10,7 +11,7 @@ export function sync<T, Xs extends any[]>(
         [K in keyof Xs]: SeqLikeInput<Xs[K]>
     }
 ): Seq<[T, ...Xs]> {
-    const others = _others.map(fromSyncInput)
+    const others = _others.map(seq)
     return syncFromOperator("zip", this, function* (input) {
         const iterators = [input, ...others].map(i => i[Symbol.iterator]())
         while (true) {
@@ -28,7 +29,7 @@ export function async<T, Xs extends any[]>(
         [K in keyof Xs]: ASeqLikeInput<Xs[K]>
     }
 ): ASeq<[T, ...Xs]> {
-    const others = _others.map(fromAsyncInput)
+    const others = _others.map(aseq)
     return asyncFromOperator("zip", this, async function* (input) {
         const iterators = [input, ...others].map(i => i[Symbol.asyncIterator]())
         while (true) {
