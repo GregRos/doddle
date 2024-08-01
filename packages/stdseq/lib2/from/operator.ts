@@ -1,4 +1,4 @@
-import { Lazy, type Pulled } from "stdlazy"
+import { Lazy, type Pulled } from "../lazy"
 import { AsyncFromOperator, type ASeq } from "../seq/aseq.class"
 import { SyncFromOperator, type Seq } from "../seq/seq.class"
 

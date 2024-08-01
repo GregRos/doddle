@@ -117,7 +117,6 @@ export class Lazy<T>
     pull(): Pulled<T> {
         const info = this._info
         if (info.stage === "threw") {
-            // Correct way to return the error
             throw this._cached
         }
         if (info.stage === "executing") {

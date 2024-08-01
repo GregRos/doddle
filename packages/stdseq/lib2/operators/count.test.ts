@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, LazyAsync } from "stdlazy"
+import type { Lazy, LazyAsync } from "../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"

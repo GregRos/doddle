@@ -1,6 +1,6 @@
-import type { Lazy, LazyAsync } from "stdlazy"
 import { type AsyncPredicate, type Predicate } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"
+import type { Lazy, LazyAsync } from "../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import { seq } from "../seq/seq.ctor"
 

@@ -1,7 +1,8 @@
 import { type AsyncReducer, type Reducer } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"
 
-import { type Lazy, type LazyAsync } from "stdlazy"
+import type { Lazy, LazyAsync } from "../lazy"
+
 import { mustBeFunction } from "../errors/error"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"

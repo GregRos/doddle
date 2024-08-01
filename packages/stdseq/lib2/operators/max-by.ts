@@ -1,4 +1,5 @@
-import { type Lazy, type LazyAsync } from "stdlazy"
+import type { Lazy, LazyAsync } from "../lazy"
+
 import { mustBeFunction } from "../errors/error"
 import { AsyncIteratee, Iteratee } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"

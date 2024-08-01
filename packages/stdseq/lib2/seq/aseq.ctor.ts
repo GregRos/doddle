@@ -1,8 +1,8 @@
-import type { Lazy, LazyAsync } from "stdlazy"
 import type { AnySeqLike, ASeqLikeInput } from "../f-types"
 import { async as asyncOf } from "../from/of"
 import { async as asyncRange } from "../from/range"
 import { async as asyncRepeat } from "../from/repeat"
+import type { Lazy, LazyAsync } from "../lazy"
 
 import { FromAsyncInput, type ASeq } from "./aseq.class"
 function _aseq<E = never>(): ASeq<E>

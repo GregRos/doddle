@@ -1,7 +1,7 @@
-import type { LazyAsync } from "stdlazy"
 import { mustBeFunction, mustReturnTuple } from "../errors/error"
 import { AsyncIteratee, Iteratee } from "../f-types/index"
 import { lazyFromOperator } from "../from/operator"
+import type { LazyAsync } from "../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"

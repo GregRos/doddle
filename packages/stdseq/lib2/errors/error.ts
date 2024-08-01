@@ -1,4 +1,4 @@
-import { getClassName, isAsyncIterable, isIterable } from "stdlazy"
+import { getClassName, isAsyncIterable, isIterable } from "../lazy"
 
 export class DawdleError extends Error {
     constructor(code: string, message: string) {
@@ -79,7 +79,7 @@ export const mustBeIterable = argNotExpected("an iterable", isIterable)
 
 export const mustBeAsyncIterable = argNotExpected("an async iterable", isAsyncIterable)
 
-export const mustBeOneOf = <T>(...options: T[]) => {
+export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }

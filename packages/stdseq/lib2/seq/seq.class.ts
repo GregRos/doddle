@@ -1,6 +1,6 @@
-import { isAsyncIterable, isIterable, isThenable } from "stdlazy"
 import { gotAsyncInSyncContext, gotNonIterable } from "../errors/error"
 import type { SeqLikeInput } from "../f-types"
+import { isAsyncIterable, isIterable, isThenable } from "../lazy"
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"

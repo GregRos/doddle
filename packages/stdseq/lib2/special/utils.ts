@@ -1,4 +1,4 @@
-import { isAsyncIterable, isThenable } from "stdlazy"
+import { isAsyncIterable, isThenable } from "../lazy"
 
 export function returnKvp(input: any, key: any, value: any) {
     if (isAsyncIterable(input) && isThenable(key)) {

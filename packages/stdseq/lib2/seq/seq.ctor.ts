@@ -1,8 +1,8 @@
-import type { Lazy } from "stdlazy"
 import type { SeqLikeInput } from "../f-types"
 import { sync as syncOf } from "../from/of"
 import { sync as syncRange } from "../from/range"
 import { sync as syncRepeat } from "../from/repeat"
+import type { Lazy } from "../lazy"
 import { FromSyncInput, type Seq } from "./seq.class"
 export function _seq<E = never>(): Seq<E>
 export function _seq<E>(input: Lazy<SeqLikeInput<E>>): Seq<E>

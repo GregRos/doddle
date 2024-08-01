@@ -1,6 +1,6 @@
-import type { Lazy, LazyAsync } from "stdlazy"
 import { mustBeInteger } from "../errors/error"
 import { lazyFromOperator } from "../from/operator"
+import type { Lazy, LazyAsync } from "../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"

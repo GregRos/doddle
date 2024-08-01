@@ -5,9 +5,9 @@ import { async as concatAsync } from "../operators/concat"
 import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
 
-import { isAsyncIterable, isIterable, isNextable } from "stdlazy"
 import { gotNonIterable } from "../errors/error"
 import type { ASeqLikeInput } from "../f-types"
+import { isAsyncIterable, isIterable, isNextable } from "../lazy"
 import { async as catchAsync } from "../operators/catch"
 import { async as chunkAsync } from "../operators/chunk"
 
