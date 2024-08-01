@@ -1,7 +1,9 @@
 import { lazy } from "./ctor"
 
 export { lazy, memoize } from "./ctor"
+export { Lazy } from "./lazy"
 export {
+    getClassName,
     isLazy,
     isPullable,
     isThenable,
@@ -15,7 +17,5 @@ export {
     PulledAwaited
 } from "./types"
 export { isAsyncIterable, isIterable, isNextable } from "./utils"
-export { getClassName } from "./types"
-export { Lazy } from "./lazy"
 
 const a = lazy(async () => lazy(() => 1))

@@ -79,7 +79,7 @@ export const mustBeIterable = argNotExpected("an iterable", isIterable)
 
 export const mustBeAsyncIterable = argNotExpected("an async iterable", isAsyncIterable)
 
-export const mustBeOneOf = <T,>(...options: T[]) => {
+export const mustBeOneOf = <T>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }

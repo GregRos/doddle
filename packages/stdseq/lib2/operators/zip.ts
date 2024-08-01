@@ -5,39 +5,99 @@ import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
 
-export function sync<T, Xs extends any[]>(
+type neverToUndefined<T> = T extends never ? undefined : T
+export type getZipValuesType<Xs extends [any, ...any[]]> = {
+    [K in keyof Xs]: neverToUndefined<Xs[K]> | undefined
+}
+
+export function sync<T, Xs extends [any, ...any[]]>(
     this: Iterable<T>,
-    ..._others: {
+    others: {
         [K in keyof Xs]: SeqLikeInput<Xs[K]>
     }
+): Seq<getZipValuesType<[T, ...Xs]>>
+export function sync<T, Xs extends [any, ...any[]], R>(
+    this: Iterable<T>,
+    others: {
+        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+    },
+    projection: (...args: getZipValuesType<[T, ...Xs]>) => R
+): Seq<R>
+export function sync<T, Xs extends [any, ...any[]], R>(
+    this: Iterable<T>,
+    _others: {
+        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+    },
+    projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
 ): Seq<[T, ...Xs]> {
     const others = _others.map(seq)
+    projection ??= (...args: any[]) => args as any
     return syncFromOperator("zip", this, function* (input) {
-        const iterators = [input, ...others].map(i => i[Symbol.iterator]())
+        const iterators = [input, ...others].map(
+            i => i[Symbol.iterator]() as Iterator<any> | undefined
+        )
         while (true) {
-            const results = iterators.map(i => i.next())
-            if (results.some(r => r.done)) {
+            const results = iterators.map((iter, i) => {
+                if (!iter) {
+                    return undefined
+                }
+                const result = iter.next()
+                if (result.done) {
+                    iterators[i] = undefined
+                    return undefined
+                }
+                return result
+            })
+            if (results.every(r => !r)) {
                 break
             }
-            yield results.map(r => r.value) as any
+            yield projection.apply(undefined, results.map(r => r?.value) as any)
         }
-    })
+    }) as any
 }
-export function async<T, Xs extends any[]>(
+export function async<T, Xs extends [any, ...any[]]>(
     this: AsyncIterable<T>,
-    ..._others: {
-        [K in keyof Xs]: ASeqLikeInput<Xs[K]>
+    others: {
+        [K in keyof Xs]: SeqLikeInput<Xs[K]>
     }
+): ASeq<getZipValuesType<getZipValuesType<[T, ...Xs]>>>
+export function async<T, Xs extends [any, ...any[]], R>(
+    this: AsyncIterable<T>,
+    _others: {
+        [K in keyof Xs]: ASeqLikeInput<Xs[K]>
+    },
+    projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
+): ASeq<R>
+export function async<T, Xs extends [any, ...any[]], R>(
+    this: AsyncIterable<T>,
+    _others: {
+        [K in keyof Xs]: ASeqLikeInput<Xs[K]>
+    },
+    projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
 ): ASeq<[T, ...Xs]> {
     const others = _others.map(aseq)
+    projection ??= (...args: any[]) => args as any
     return asyncFromOperator("zip", this, async function* (input) {
-        const iterators = [input, ...others].map(i => i[Symbol.asyncIterator]())
+        const iterators = [input, ...others].map(
+            i => i[Symbol.asyncIterator]() as AsyncIterator<any> | undefined
+        )
         while (true) {
-            const results = await Promise.all(iterators.map(async i => i.next()))
-            if (results.some(r => r.done)) {
+            const pResults = iterators.map(async (iter, i) => {
+                if (!iter) {
+                    return undefined
+                }
+                const result = await iter.next()
+                if (result.done) {
+                    iterators[i] = undefined
+                    return undefined
+                }
+                return result
+            })
+            const results = await Promise.all(pResults)
+            if (results.every(r => !r)) {
                 break
             }
-            yield results.map(r => r.value) as any
+            yield projection.apply(undefined, results.map(r => r?.value) as any)
         }
-    })
+    }) as any
 }
