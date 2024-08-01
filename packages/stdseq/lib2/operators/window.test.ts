@@ -19,6 +19,22 @@ describe("sync", () => {
         expect(type_of(s)).to_equal(type<SType<[number, ...number[]]>>)
     })
 
+    declare.it("projection parameters typed as [T, T? ...]", expect => {
+        _seq([1, 2, 3]).window(2, (...args) => {
+            expect(type_of(args)).to_equal(type<[number, number?]>)
+        })
+        _seq([1, 2, 3]).window(3, (...args) => {
+            expect(type_of(args)).to_equal(type<[number, number?, number?]>)
+        })
+    })
+
+    declare.it("accepts projection with N parameters", expect => {
+        const s = _seq([1, 2, 3]).window(2, (a, b) => {
+            expect(type_of(a)).to_equal(type<number>)
+            expect(type_of(b)).to_equal(type<number | undefined>)
+        })
+    })
+
     it("windows empty as empty", () => {
         const s = _seq([]).window(1)
         expect(s._qr).toEqual([])
@@ -37,6 +53,23 @@ describe("sync", () => {
             [3, 4],
             [4, 5]
         ])
+    })
+
+    it("windows empty as empty with projection", () => {
+        const s = _seq([]).window(1, x => 1)
+        expect(s._qr).toEqual([])
+    })
+    it("windows empty as empty with projection", () => {
+        const s = _seq([]).window(1, x => 1)
+        expect(s._qr).toEqual([])
+    })
+    it("projects singleton windows correctly", () => {
+        const s = _seq([1, 2, 3]).window(1, x => x + 1)
+        expect(s._qr).toEqual([2, 3, 4])
+    })
+    it("projects pairs", () => {
+        const s = _seq([1, 2, 3, 4, 5]).window(2, (a, b) => a + b!)
+        expect(s._qr).toEqual([3, 5, 7, 9])
     })
 
     it("errors on length of 0", () => {
@@ -92,6 +125,21 @@ describe("async", () => {
         const s = _seq([1, 2, 3]).window(3 as number)
         expect(type_of(s)).to_equal(type<SType<[number, ...number[]]>>)
     })
+    declare.it("projection parameters typed as [T, T? ...]", expect => {
+        _seq([1, 2, 3]).window(2, (...args) => {
+            expect(type_of(args)).to_equal(type<[number, number?]>)
+        })
+        _seq([1, 2, 3]).window(3, (...args) => {
+            expect(type_of(args)).to_equal(type<[number, number?, number?]>)
+        })
+    })
+
+    declare.it("accepts projection with N parameters", expect => {
+        const s = _seq([1, 2, 3]).window(2, (a, b) => {
+            expect(type_of(a)).to_equal(type<number>)
+            expect(type_of(b)).to_equal(type<number | undefined>)
+        })
+    })
 
     it("windows empty as empty", async () => {
         const s = _seq([]).window(1)
@@ -111,6 +159,27 @@ describe("async", () => {
             [3, 4],
             [4, 5]
         ])
+    })
+
+    it("windows empty as empty with projection", async () => {
+        const s = _seq([]).window(1, x => 1)
+        await expect(s._qr).resolves.toEqual([])
+    })
+
+    it("projects singleton windows correctly", async () => {
+        const s = _seq([1, 2, 3]).window(1, x => x + 1)
+        await expect(s._qr).resolves.toEqual([2, 3, 4])
+    })
+    it("projects pairs", async () => {
+        const s = _seq([1, 2, 3, 4, 5]).window(2, (a, b) => a + b!)
+        await expect(s._qr).resolves.toEqual([3, 5, 7, 9])
+    })
+
+    it("accepts async projection", async () => {
+        const s = _seq([1, 2, 3])
+            .window(2)
+            .map(async ([a, b]) => a + b!)
+        await expect(s._qr).resolves.toEqual([3, 5])
     })
 
     it("errors on window length of 0 immediately", async () => {
@@ -149,5 +218,34 @@ describe("async", () => {
             [1, 2],
             [2, 3]
         ])
+    })
+
+    it("calls iteratee as many times as needed", async () => {
+        const sq = jest.fn(async function* () {
+            yield 1
+            yield 2
+            yield 3
+        })
+        const map = jest.fn(x => x)
+        const tkw = _seq(sq).window(2, map)
+        expect(sq).not.toHaveBeenCalled()
+        expect(map).not.toHaveBeenCalled()
+        for await (const _ of tkw) {
+        }
+        expect(map).toHaveBeenCalledTimes(2)
+        expect(sq).toHaveBeenCalledTimes(1)
+    })
+
+    it("calls iteratee with incomplete windows", async () => {
+        const sq = jest.fn(async function* () {
+            yield 1
+            yield 2
+            yield 3
+        })
+        const map = jest.fn((...args) => args)
+        const tkw = _seq(sq).window(4, map)
+        for await (const _ of tkw) {
+        }
+        expect(map).toHaveBeenCalledWith(1, 2, 3)
     })
 })

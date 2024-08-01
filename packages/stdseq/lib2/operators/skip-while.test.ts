@@ -12,29 +12,6 @@ describe("sync", () => {
         declare.it("keeps same type as input when no ellipsis is given", expect => {
             expect(type_of(_seq([1]).skipWhile(() => true))).to_equal(type<_Seq<number>>)
         })
-        declare.it("disjunction with ellipsis if specified", expect => {
-            expect(type_of(_seq([1]).skipWhile(() => true, "..." as string))).to_equal(
-                type<_Seq<number | string>>
-            )
-        })
-        declare.it("same input if ellipsis is nullish", expect => {
-            expect(type_of(_seq([1]).skipWhile(() => true, null))).to_equal(type<_Seq<number>>)
-        })
-        declare.it("ellipsis is const", expect => {
-            expect(type_of(_seq([1]).skipWhile(() => true, "..."))).to_equal(
-                type<_Seq<number | "...">>
-            )
-        })
-        declare.it("no disjunction if ellipsis is nullish", expect => {
-            expect(type_of(_seq([1]).skipWhile(() => true, null as null | undefined))).to_equal(
-                type<_Seq<number>>
-            )
-        })
-        declare.it("excludes nullishness out of ellipsis if it's nullable", expect => {
-            expect(type_of(_seq([1]).skipWhile(() => true, null as null | string))).to_equal(
-                type<_Seq<number | string>>
-            )
-        })
     })
 
     it("immediate false gives same", () => {
@@ -82,26 +59,6 @@ describe("sync", () => {
             break
         }
         expect(f).toHaveBeenCalledTimes(2)
-    })
-
-    it("inserts no ellipsis if items are not skipped", () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => false, "...")
-        expect(s._qr).toEqual([1, 2, 3])
-    })
-
-    it("inserts ellipsis if all items are skipped", () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => true, "...")
-        expect(s._qr).toEqual(["..."])
-    })
-
-    it("inserts ellipsis if some items are skipped", () => {
-        const s = _seq([1, 2, 3]).skipWhile(x => x < 3, "...")
-        expect(s._qr).toEqual(["...", 3])
-    })
-
-    it("doesn't insert ellipsis if it's undefined", () => {
-        const s2 = _seq([1, 2, 3]).skipWhile(() => true, undefined)
-        expect(s2._qr).toEqual([])
     })
 })
 
@@ -165,23 +122,8 @@ describe("async", () => {
         expect(f).toHaveBeenCalledTimes(2)
     })
 
-    it("inserts no ellipsis if items are not skipped", async () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => false, "...")
-        expect(await s._qr).toEqual([1, 2, 3])
-    })
-
-    it("inserts ellipsis if all items are skipped", async () => {
-        const s = _seq([1, 2, 3]).skipWhile(() => true, "...")
-        expect(await s._qr).toEqual(["..."])
-    })
-
-    it("inserts ellipsis if some items are skipped", async () => {
-        const s = _seq([1, 2, 3]).skipWhile(x => x < 3, "...")
-        expect(await s._qr).toEqual(["...", 3])
-    })
-
-    it("doesn't insert ellipsis if it's undefined", async () => {
-        const s2 = _seq([1, 2, 3]).skipWhile(() => true, undefined)
-        expect(await s2._qr).toEqual([])
+    it("works with async predicate", async () => {
+        const s = _seq([1, 2, 3]).skipWhile(async x => x < 2)
+        expect(await s._qr).toEqual([2, 3])
     })
 })

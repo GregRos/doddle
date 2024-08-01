@@ -1,53 +1,84 @@
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 
-export function sync<T>(this: Iterable<any>) {
+class ThrownErrorMarker {
+    constructor(public error: any) {}
+}
+export function sync<T>(this: Iterable<T>): Seq<T> {
     const self = this
-    const cache: T[] = []
+    const cache: (T | ThrownErrorMarker)[] = []
     let alreadyDone = false
+    let iterator: Iterator<T>
 
     return syncFromOperator("cache", this, function* cache_() {
         let i = 0
-        let iterator: Iterator<T>
         for (;;) {
             if (i < cache.length) {
-                yield cache[i++]
+                const cur = cache[i]
+                if (cur instanceof ThrownErrorMarker) {
+                    throw cur.error
+                }
+                yield cur
+                i++
             } else if (!alreadyDone) {
                 iterator ??= self[Symbol.iterator]()
-                const { done, value } = iterator.next()
-                if (done) {
-                    alreadyDone = true
-                    return
+                try {
+                    const { done, value } = iterator.next()
+                    if (done) {
+                        alreadyDone = true
+                        return
+                    }
+                    cache.push(value)
+                    yield value
+                    i++
+                } catch (err) {
+                    cache.push(new ThrownErrorMarker(err as any))
+                    throw err
                 }
-                cache.push(value)
-                yield value
-                i++
             } else {
                 return
             }
         }
     })
 }
-export function async<T>(this: AsyncIterable<any>, index: number) {
+export function async<T>(this: AsyncIterable<T>): ASeq<T> {
     const self = this
-    const cache: T[] = []
+    const cache: (T | ThrownErrorMarker)[] = []
     let alreadyDone = false
-
+    let iterator: AsyncIterator<T>
+    let pending: Promise<void> | undefined
     return asyncFromOperator("cache", this, async function* cache_() {
         let i = 0
-        let iterator: AsyncIterator<T>
         for (;;) {
             if (i < cache.length) {
-                yield cache[i++]
+                const cur = cache[i]
+                if (cur instanceof ThrownErrorMarker) {
+                    throw cur.error
+                }
+                yield cur
+                i++
             } else if (!alreadyDone) {
                 iterator ??= self[Symbol.asyncIterator]()
-                const { done, value } = await iterator.next()
-                if (done) {
-                    alreadyDone = true
-                    return
+                if (!pending) {
+                    pending = (async () => {
+                        try {
+                            const { done, value } = await iterator.next()
+                            if (done) {
+                                alreadyDone = true
+                                return
+                            }
+                            cache.push(value)
+                            pending = undefined
+                            return
+                        } catch (err) {
+                            cache.push(new ThrownErrorMarker(err as any))
+                            pending = undefined
+                            return
+                        }
+                    })()
                 }
-                cache.push(value)
-                yield value
-                i++
+                await pending
             } else {
                 return
             }

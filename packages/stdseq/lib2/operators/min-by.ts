@@ -6,17 +6,19 @@ import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
 import { returnKvp } from "../special/utils"
+const EMPTY = Symbol("EMPTY_SEQ")
 
-export function generic<T, K>(input: Seq<T>, iteratee: Iteratee<T, K>) {
+export function generic<T, K, Alt>(input: Seq<T>, iteratee: Iteratee<T, K>, alt: Alt) {
     mustBeFunction("iteratee", iteratee)
     return lazyFromOperator("minBy", input, input => {
         return input
             .map((element, index) => {
                 return returnKvp(input, iteratee(element, index), element)
             })
-            .reduce((min: any, value) => {
+            .reduce((min: any, value: any) => {
                 return min.key <= value.key ? min : value
-            })
+            }, EMPTY as any)
+            .map(x => (x === EMPTY ? alt : x.value))
             .pull()
     })
 }
@@ -27,8 +29,8 @@ export function sync<T, K, const Alt>(
     iteratee: Iteratee<T, K>,
     alt: Alt
 ): Lazy<T | Alt>
-export function sync<T, K>(this: Iterable<T>, iteratee: Iteratee<T, K>) {
-    return generic(seq(this), iteratee)
+export function sync<T, K>(this: Iterable<T>, iteratee: Iteratee<T, K>, alt?: any) {
+    return generic(seq(this), iteratee, alt)
 }
 
 export function async<T, K>(
@@ -40,6 +42,6 @@ export function async<T, K, const Alt>(
     iteratee: AsyncIteratee<T, K>,
     alt?: Alt
 ): LazyAsync<T | Alt>
-export function async<T, K>(this: AsyncIterable<T>, iteratee: AsyncIteratee<T, K>) {
-    return generic(aseq(this) as any, iteratee as any)
+export function async<T, K>(this: AsyncIterable<T>, iteratee: AsyncIteratee<T, K>, alt?: any) {
+    return generic(aseq(this) as any, iteratee as any, alt)
 }

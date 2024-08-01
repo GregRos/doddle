@@ -1,9 +1,11 @@
-import { isIterable } from "stdlazy"
+import { isAsyncIterable, isIterable, isThenable } from "stdlazy"
+import { gotAsyncInSyncContext, gotNonIterable } from "../errors/error"
 import type { SeqLikeInput } from "../f-types"
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"
 import { sync as cacheSync } from "../operators/cache"
+import { sync as catchSync } from "../operators/catch"
 import { sync as chunkSync } from "../operators/chunk"
 import { sync as concatSync } from "../operators/concat"
 import { sync as concatMapSync } from "../operators/concat-map"
@@ -20,9 +22,8 @@ import { sync as mapSync } from "../operators/map"
 import { sync as maxBySync } from "../operators/max-by"
 import { sync as minBySync } from "../operators/min-by"
 import { sync as orderBySync } from "../operators/order-by"
-import { sync as pairwiseSync } from "../operators/pairwise"
 import { sync as reduceSync } from "../operators/reduce"
-import { sync as sampleSync } from "../operators/sample"
+import { sync as reverseSync } from "../operators/reverse"
 import { sync as scanSync } from "../operators/scan"
 import { sync as seqEqualsSync } from "../operators/seq-equals"
 import { sync as setEqualsSync } from "../operators/set-equals"
@@ -51,6 +52,7 @@ export abstract class Seq<T> implements Iterable<T> {
     aseq = aseqSync
     at = atSync
     cache = cacheSync
+    catch = catchSync
     concat = concatSync
     chunk = chunkSync
     concatMap = concatMapSync
@@ -69,10 +71,9 @@ export abstract class Seq<T> implements Iterable<T> {
     maxBy = maxBySync
     minBy = minBySync
     orderBy = orderBySync
-    pairwise = pairwiseSync
     reduce = reduceSync
+    reverse = reverseSync
     scan = scanSync
-    sample = sampleSync
     seqEquals = seqEqualsSync
     setEquals = setEqualsSync
     shuffle = shuffleSync
@@ -116,15 +117,24 @@ export class FromSyncInput<T> extends Seq<T> {
                 yield* result
             } else {
                 for (;;) {
-                    const { done, value } = result.next()
+                    const obj = result.next()
+                    if (isThenable(obj)) {
+                        throw gotAsyncInSyncContext(result, "next function returned thenable")
+                    }
+                    const { done, value } = obj
+
                     if (done) {
                         return
                     }
                     yield value
                 }
             }
-        } else {
+        } else if (isIterable(input)) {
             yield* input
+        } else if (isAsyncIterable(input)) {
+            throw gotAsyncInSyncContext(input, "input only has Symbol.asyncIterator")
+        } else {
+            throw gotNonIterable(input, "sync", "not a function or sync iterable")
         }
     }
 }

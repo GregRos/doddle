@@ -12,28 +12,6 @@ describe("sync", () => {
         expect(type_of(_seq([1, 2, 3]).take(1))).to_equal(type<_Seq<number>>)
     })
 
-    declare.it("element type changes with ellipsis", expect => {
-        expect(type_of(_seq([1, 2, 3]).take(1, "..." as string))).to_equal(
-            type<_Seq<number | string>>
-        )
-    })
-
-    declare.it("ellipsis is const", expect => {
-        expect(type_of(_seq([1, 2, 3]).take(1, "..."))).to_equal(type<_Seq<number | "...">>)
-    })
-
-    declare.it("no disjunction if ellipsis is nullish", expect => {
-        expect(type_of(_seq([1, 2, 3]).take(1, null as null | undefined))).to_equal(
-            type<_Seq<number>>
-        )
-    })
-
-    declare.it("excludes nullishness out of ellipsis if it's nullable", expect => {
-        expect(type_of(_seq([1]).take(1, null as null | string))).to_equal(
-            type<_Seq<number | string>>
-        )
-    })
-
     it("takes no elements gives empty", () => {
         const s = _seq([1, 2, 3]).take(0)
         expect(s._qr).toEqual([])
@@ -104,24 +82,16 @@ describe("sync", () => {
         expect(s._qr).toEqual([2, 3])
     })
 
-    it("ellipsis is not inserted if all items are taken", () => {
-        const s = _seq([1, 2, 3]).take(-3, "...")
-        expect(s._qr).toEqual([1, 2, 3])
-    })
-
-    it("ellipsis is not inserted if max+ items are taken from end", () => {
-        const s = _seq([1, 2, 3]).take(-5, "...")
-        expect(s._qr).toEqual([1, 2, 3])
-    })
-
-    it("ellipsis is inserted if some items are taken", () => {
-        const s = _seq([1, 2, 3]).take(-2, "...")
-        expect(s._qr).toEqual(["...", 2, 3])
-    })
-
-    it("no ellipsis if it's nullish", () => {
-        const s = _seq([1, 2, 3]).take(-5, null)
-        expect(s._qr).toEqual([1, 2, 3])
+    it("pulls as many as needed", () => {
+        const iter = jest.fn(function* () {
+            yield 1
+            yield 2
+            expect(false).toBe(true) // This should not be reached
+        })
+        const s = _seq(iter)
+        const tkw = s.take(2)
+        expect(iter).not.toHaveBeenCalled()
+        expect(tkw._qr).toEqual([1, 2])
     })
 })
 
@@ -132,28 +102,6 @@ describe("async", () => {
 
     declare.it("element type stays the same without ellipsis", expect => {
         expect(type_of(_aseq([1, 2, 3]).take(1))).to_equal(type<_ASeq<number>>)
-    })
-
-    declare.it("element type changes with ellipsis", expect => {
-        expect(type_of(_aseq([1, 2, 3]).take(1, "..." as string))).to_equal(
-            type<_ASeq<number | string>>
-        )
-    })
-
-    declare.it("ellipsis is const", expect => {
-        expect(type_of(_aseq([1, 2, 3]).take(1, "..."))).to_equal(type<_ASeq<number | "...">>)
-    })
-
-    declare.it("no disjunction if ellipsis is nullish", expect => {
-        expect(type_of(_aseq([1, 2, 3]).take(1, null as null | undefined))).to_equal(
-            type<_ASeq<number>>
-        )
-    })
-
-    declare.it("excludes nullishness out of ellipsis if it's nullable", expect => {
-        expect(type_of(_aseq([1]).take(1, null as null | string))).to_equal(
-            type<_ASeq<number | string>>
-        )
     })
 
     it("takes no elements gives empty", async () => {
@@ -186,11 +134,6 @@ describe("async", () => {
         expect(await s._qr).toEqual([2, 3])
     })
 
-    it("ellipsis is inserted if some items are taken", async () => {
-        const s = _aseq([1, 2, 3]).take(-2, "...")
-        expect(await s._qr).toEqual(["...", 2, 3])
-    })
-
     it("can iterate twice", async () => {
         const s = _aseq([1, 2, 3]).take(2)
         expect(await s._qr).toEqual([1, 2])
@@ -201,5 +144,17 @@ describe("async", () => {
         const s = _aseq([1, 2, 3]).take(-2)
         expect(await s._qr).toEqual([2, 3])
         expect(await s._qr).toEqual([2, 3])
+    })
+
+    it("pulls as many as needed", async () => {
+        const iter = jest.fn(function* () {
+            yield 1
+            yield 2
+            expect(false).toBe(true) // This should not be reached
+        })
+        const s = _aseq(iter)
+        const tkw = s.take(2)
+        expect(iter).not.toHaveBeenCalled()
+        await expect(tkw._qr).resolves.toEqual([1, 2])
     })
 })

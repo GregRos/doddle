@@ -3,14 +3,15 @@ import { type AsyncPredicate, type Predicate } from "../f-types/index"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
-import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
-export function sync<T, const Ellipsis = undefined>(
+export interface TakeWhileSpecifier {
+    takeFinal?: boolean
+}
+export function sync<T>(
     this: Iterable<T>,
     predicate: Predicate<T>,
-    ellipsis?: Ellipsis
-): Seq<maybeDisjunction<T, Ellipsis>> {
-    const hasEllipsis = arguments.length === 2
+    specifier?: TakeWhileSpecifier
+): Seq<T> {
     mustBeFunction("predicate", predicate)
     return syncFromOperator("takeWhile", this, function* (input) {
         let index = 0
@@ -18,20 +19,19 @@ export function sync<T, const Ellipsis = undefined>(
             if (predicate(element, index++)) {
                 yield element
             } else {
-                if (hasEllipsis) {
-                    yield ellipsis as Ellipsis
+                if (specifier?.takeFinal) {
+                    yield element
                 }
                 return
             }
         }
     }) as any
 }
-export function async<T, const Ellipsis = undefined>(
+export function async<T>(
     this: AsyncIterable<T>,
     predicate: AsyncPredicate<T>,
-    ellipsis?: Ellipsis
-): ASeq<maybeDisjunction<T, Ellipsis>> {
-    const hasEllipsis = arguments.length === 2
+    specifier?: TakeWhileSpecifier
+): ASeq<T> {
     mustBeFunction("predicate", predicate)
     return asyncFromOperator("takeWhile", this, async function* (input) {
         let index = 0
@@ -40,8 +40,8 @@ export function async<T, const Ellipsis = undefined>(
             if (await predicate(element, index++)) {
                 yield element
             } else {
-                if (hasEllipsis) {
-                    yield ellipsis as Ellipsis
+                if (specifier?.takeFinal) {
+                    yield element
                 }
                 return
             }

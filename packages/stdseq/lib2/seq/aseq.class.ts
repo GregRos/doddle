@@ -4,11 +4,13 @@ import { async as cacheAsync } from "../operators/cache"
 import { async as concatAsync } from "../operators/concat"
 import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
-import { async as sampleAsync } from "../operators/sample"
 
 import { isAsyncIterable, isIterable, isNextable } from "stdlazy"
+import { gotNonIterable } from "../errors/error"
 import type { ASeqLikeInput } from "../f-types"
+import { async as catchAsync } from "../operators/catch"
 import { async as chunkAsync } from "../operators/chunk"
+
 import { async as concatMapAsync } from "../operators/concat-map"
 import { async as everyAsync } from "../operators/every"
 import { async as filterAsync } from "../operators/filter"
@@ -21,8 +23,8 @@ import { async as mapAsync } from "../operators/map"
 import { async as maxByAsync } from "../operators/max-by"
 import { async as minByAsync } from "../operators/min-by"
 import { async as orderByAsync } from "../operators/order-by"
-import { async as pairwiseAsync } from "../operators/pairwise"
 import { async as reduceAsync } from "../operators/reduce"
+import { async as reverseAsync } from "../operators/reverse"
 import { async as scanAsync } from "../operators/scan"
 import { async as seqEqualsAsync } from "../operators/seq-equals"
 import { async as setEqualsAsync } from "../operators/set-equals"
@@ -50,6 +52,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     append = appendAsync
     at = atAsync
+    catch = catchAsync
     concat = concatAsync
     concatMap = concatMapAsync
     chunk = chunkAsync
@@ -68,9 +71,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     maxBy = maxByAsync
     minBy = minByAsync
     orderBy = orderByAsync
-    pairwise = pairwiseAsync
     reduce = reduceAsync
-    sample = sampleAsync
+    reverse = reverseAsync
     scan = scanAsync
     seqEquals = seqEqualsAsync
     setEquals = setEqualsAsync
@@ -89,6 +91,27 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     uniq = uniqAsync
     window = windowAsync
     zip = zipAsync
+}
+
+async function fromFunction<T>(func: () => any) {
+    return async function* () {
+        const result = func()
+        if (isAsyncIterable(result)) {
+            yield* result
+        } else if (isIterable(result)) {
+            yield* result
+        } else if (isNextable(result)) {
+            for (let item = await result.next(); !item.done; item = await result.next()) {
+                yield item.value
+            }
+        } else {
+            throw gotNonIterable(
+                result,
+                "async",
+                "it was a function that did not return an iterable or iterator"
+            )
+        }
+    }
 }
 
 export class FromAsyncInput<T> extends ASeq<T> {
@@ -113,8 +136,13 @@ export class FromAsyncInput<T> extends ASeq<T> {
                     yield item.value
                 }
             } else {
-                throw new Error(`Got unexpected result from iterator constructor: ${result}`)
+                throw gotNonIterable(
+                    items,
+                    "async",
+                    "it was a function that did not return an iterable or iterator"
+                )
             }
+        } else {
         }
     }
 }

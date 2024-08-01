@@ -200,4 +200,9 @@ describe("async", () => {
         const s = _aseq([1, 2, 3]).minBy(fn)
         expect(await s.pull()).toEqual(1)
     })
+
+    it("works with async iteratee", async () => {
+        const s = _aseq([3, 1, 2]).minBy(async x => x)
+        expect(await s.pull()).toEqual(1)
+    })
 })

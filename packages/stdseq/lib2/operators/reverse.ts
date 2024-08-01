@@ -1,4 +1,4 @@
-import { lazyFromOperator, syncFromOperator } from "../from/operator"
+import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import { aseq } from "../seq/aseq.ctor"
 import { seq } from "../seq/seq.ctor"
 
@@ -11,7 +11,7 @@ export function sync<T>(this: Iterable<T>) {
     })
 }
 export function async<T>(this: AsyncIterable<T>) {
-    return lazyFromOperator("reverse", this, async function* (input) {
+    return asyncFromOperator("reverse", this, async function* (input) {
         yield* await aseq(input)
             .toArray()
             .map(x => x.reverse())

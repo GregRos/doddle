@@ -9,13 +9,15 @@ import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 const SKIP = Symbol("SKIP")
 export function sync<T, const Ellipsis = undefined>(
     this: Iterable<T>,
-    countArg: number,
-    ellipsis?: Ellipsis
+    countArg: number
 ): Seq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", countArg)
-    const hasEllipsis = ellipsis !== undefined
     return syncFromOperator("skip", this, function* (input) {
         let count = countArg
+        if (count === 0) {
+            yield* seq(input)
+            return
+        }
         if (count < 0) {
             count = -count
             yield* seq(input)
@@ -26,23 +28,19 @@ export function sync<T, const Ellipsis = undefined>(
                     return SKIP
                 })
                 .filter(x => x !== SKIP)
-            if (hasEllipsis) {
-                yield ellipsis as Ellipsis
-            }
         } else {
-            yield* seq(input).skipWhile((_, index) => index < count, ellipsis)
+            yield* seq(input).skipWhile((_, index) => index < count, {})
         }
     }) as any
 }
-export function async<T, const Ellipsis = undefined>(
-    this: AsyncIterable<T>,
-    countArg: number,
-    ellipsis?: Ellipsis
-): ASeq<maybeDisjunction<T, Ellipsis>> {
+export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    const hasEllipsis = ellipsis !== undefined
     return asyncFromOperator("skip", this, async function* (input) {
         let count = countArg
+        if (count === 0) {
+            yield* aseq(input)
+            return
+        }
         if (count < 0) {
             count = -count
             yield* aseq(input)
@@ -53,11 +51,8 @@ export function async<T, const Ellipsis = undefined>(
                     return SKIP
                 })
                 .filter(x => x !== SKIP)
-            if (hasEllipsis) {
-                yield ellipsis as Ellipsis
-            }
         } else {
-            yield* aseq(input).skipWhile((_, index) => index < count, ellipsis)
+            yield* aseq(input).skipWhile((_, index) => index < count, {})
         }
     }) as any
 }

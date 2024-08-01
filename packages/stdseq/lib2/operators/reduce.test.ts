@@ -157,4 +157,9 @@ describe("async", () => {
         await s.pull()
         expect(fn).toHaveBeenCalledTimes(3)
     })
+
+    it("works for async reducers", async () => {
+        const s = _seq([1, 2, 3]).reduce(async (acc, x) => acc + x, 1)
+        expect(await s.pull()).toEqual(7)
+    })
 })

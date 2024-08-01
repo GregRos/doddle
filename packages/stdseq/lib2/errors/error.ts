@@ -1,4 +1,4 @@
-import { isAsyncIterable, isIterable } from "stdlazy"
+import { getClassName, isAsyncIterable, isIterable } from "stdlazy"
 
 export class DawdleError extends Error {
     constructor(code: string, message: string) {
@@ -79,7 +79,7 @@ export const mustBeIterable = argNotExpected("an iterable", isIterable)
 
 export const mustBeAsyncIterable = argNotExpected("an async iterable", isAsyncIterable)
 
-export const mustBeOneOf = <T>(...options: T[]) => {
+export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }
@@ -92,6 +92,22 @@ export const mustReturnComparable = argExpectedReturn(
 )
 export const mustReturnArray = argExpectedReturn("an array", Array.isArray)
 
+export function mustBeOptionalOptions(name: string, value: unknown) {
+    if (value !== undefined && typeof value !== "object" && value !== null) {
+        throw new DawdleError(
+            BAD_ARGUMENT,
+            `Argument '${name}' must either be an object or undefined, but got ${value}`
+        )
+    }
+}
+
+export interface MustHaveKeyOptions {
+    parameterName: string
+    key: string
+    isOptional: boolean
+    expectedType: string
+}
+
 export function mustReturnTuple(length: number) {
     return function (name: string, value: unknown) {
         if (!Array.isArray(value) || value.length !== length) {
@@ -102,4 +118,25 @@ export function mustReturnTuple(length: number) {
         }
         return true
     }
+}
+
+export function asyncInSyncOperator(operator: string, object: object) {
+    return new DawdleError(
+        "operator/async-in-sync",
+        `Operator '${operator}' received an async iterable of type '${getClassName(object)}' in a sync context.`
+    )
+}
+
+export function gotAsyncInSyncContext(object: object, property: string) {
+    return new DawdleError(
+        "operator/non-iterable",
+        `Tries to convert input of type ${getClassName(object)} to sync iterable, but got an async iterable because ${property}.`
+    )
+}
+
+export function gotNonIterable(object: object, syncness: "sync" | "async", description: string) {
+    return new DawdleError(
+        "operator/non-iterable",
+        `Tried to convert input of type ${getClassName(object)} to ${syncness} iterable, but ${description}.`
+    )
 }

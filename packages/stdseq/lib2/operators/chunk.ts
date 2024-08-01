@@ -2,45 +2,69 @@ import { mustBePositiveInt } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
-import type { getTuple } from "../type-functions/get-tuple"
-import type { getTupleUpTo } from "../type-functions/get-tuple-min-max"
+import type {
+    getReturnedWindowType,
+    getWindowProjectionArgsType
+} from "../type-functions/get-window-type"
 
-type getChunkType<T, L extends number> = getTupleUpTo<T, L>
-
-export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getChunkType<T, L>> {
+export function sync<T, L extends number, S>(
+    this: Iterable<T>,
+    size: L,
+    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+): Seq<S>
+export function sync<T, L extends number>(
+    this: Iterable<T>,
+    size: L
+): Seq<getReturnedWindowType<T, L>>
+export function sync<T, L extends number>(
+    this: Iterable<T>,
+    size: L,
+    projection?: (...window: getWindowProjectionArgsType<T, L>) => any
+): Seq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
+    projection ??= (...chunk: any) => chunk as any
     return syncFromOperator("chunk", this, function* (input) {
-        let group: T[] = []
+        let chunk: T[] = []
         for (const item of input) {
-            group.push(item)
-            if (group.length === size) {
-                yield group as getTuple<T, L>
-                group = []
+            chunk.push(item)
+            if (chunk.length === size) {
+                yield projection(...(chunk as any))
+                chunk = []
             }
         }
-        if (group.length) {
-            yield group as getChunkType<T, L>
+        if (chunk.length) {
+            yield projection(...(chunk as any))
         }
     }) as any
 }
 
+export function async<T, L extends number, S>(
+    this: AsyncIterable<T>,
+    size: L,
+    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+): ASeq<S>
 export function async<T, L extends number>(
     this: AsyncIterable<T>,
     size: L
-): ASeq<getChunkType<T, L>> {
+): ASeq<getReturnedWindowType<T, L>>
+export function async<T, L extends number, S>(
+    this: AsyncIterable<T>,
+    size: L,
+    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
+): ASeq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
-
+    projection ??= (...chunk: any) => chunk as any
     return asyncFromOperator("chunk", this, async function* (input) {
-        let group: T[] = []
+        let chunk: T[] = []
         for await (const item of input) {
-            group.push(item)
-            if (group.length === size) {
-                yield group as getTuple<T, L>
-                group = []
+            chunk.push(item)
+            if (chunk.length === size) {
+                yield projection(...(chunk as any))
+                chunk = []
             }
         }
-        if (group.length) {
-            yield group as getChunkType<T, L>
+        if (chunk.length) {
+            yield projection(...(chunk as any))
         }
     }) as any
 }

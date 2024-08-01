@@ -3,63 +3,60 @@ import { type AsyncPredicate, type Predicate } from "../f-types/index"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
-import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
-export function sync<T, const Ellipsis = undefined>(
+export interface SkipWhileOptions {
+    skipFinal?: boolean
+}
+enum SkippingMode {
+    None = 0,
+    Skipping = 1,
+    NotSkipping = 2
+}
+export function sync<T>(
     this: Iterable<T>,
     predicate: Predicate<T>,
-    ellipsisItem?: Ellipsis
-): Seq<maybeDisjunction<T, Ellipsis>> {
-    const hasEllipsis = ellipsisItem !== undefined
+    options?: SkipWhileOptions
+): Seq<T> {
     mustBeFunction("predicate", predicate)
     return syncFromOperator("skipWhile", this, function* (input) {
-        let skipping = true
+        let prevMode = SkippingMode.None as SkippingMode
         let index = 0
-        let needEllipsis = false
         for (const element of input) {
-            skipping = skipping && predicate(element, index++)
-            if (skipping && hasEllipsis) {
-                needEllipsis = true
-            }
-            if (!skipping) {
-                if (needEllipsis) {
-                    needEllipsis = false
-                    yield ellipsisItem as Ellipsis
-                }
+            if (prevMode === SkippingMode.NotSkipping) {
                 yield element
+                continue
             }
-        }
-        if (needEllipsis) {
-            yield ellipsisItem as Ellipsis
+            const newSkipping: boolean = predicate(element, index++)
+            if (!newSkipping) {
+                if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
+                    yield element
+                }
+            }
+            prevMode = newSkipping ? SkippingMode.Skipping : SkippingMode.NotSkipping
         }
     }) as any
 }
-export function async<T, const Ellipsis = undefined>(
+export function async<T>(
     this: AsyncIterable<T>,
     predicate: AsyncPredicate<T>,
-    ellipsisItem?: Ellipsis
-): ASeq<maybeDisjunction<T, Ellipsis>> {
-    const hasEllipsis = ellipsisItem !== undefined
+    options?: SkipWhileOptions
+): ASeq<T> {
     mustBeFunction("predicate", predicate)
     return asyncFromOperator("skipWhile", this, async function* (input) {
-        let skipping = true
+        let prevMode = SkippingMode.None as SkippingMode
         let index = 0
-        let needEllipsis = false
         for await (const element of input) {
-            skipping = skipping && (await predicate(element, index++))
-            if (skipping && hasEllipsis) {
-                needEllipsis = true
-            }
-            if (!skipping) {
-                if (needEllipsis) {
-                    needEllipsis = false
-                    yield ellipsisItem as Ellipsis
-                }
+            if (prevMode === SkippingMode.NotSkipping) {
                 yield element
+                continue
             }
-        }
-        if (needEllipsis) {
-            yield ellipsisItem as Ellipsis
+            const newSkipping: boolean = await predicate(element, index++)
+            if (!newSkipping) {
+                if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
+                    yield element
+                }
+            }
+            prevMode = newSkipping ? SkippingMode.Skipping : SkippingMode.NotSkipping
         }
     }) as any
 }

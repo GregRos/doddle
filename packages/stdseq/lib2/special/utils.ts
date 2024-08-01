@@ -5,7 +5,7 @@ export function returnKvp(input: any, key: any, value: any) {
         return key.then(key => ({
             key: key,
             value: value
-        }))
+        })) as Promise<any>
     }
     return {
         key: key,

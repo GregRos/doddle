@@ -199,4 +199,9 @@ describe("async", () => {
         const s = _aseq([1, 2, 3]).maxBy(fn)
         expect(await s.pull()).toEqual(3)
     })
+
+    it("works with async iteratee", async () => {
+        const s = _aseq([1, 3, 2]).maxBy(async x => x)
+        expect(await s.pull()).toEqual(3)
+    })
 })

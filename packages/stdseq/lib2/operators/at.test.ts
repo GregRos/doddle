@@ -56,9 +56,9 @@ describe("sync", () => {
         expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
     })
 
-    it("gets first element", () => {
+    it("gets first element", async () => {
         const s = f([1, 2, 3]).at(0)
-        expect(s.pull()).resolves.toEqual(1)
+        await expect(s.pull()).resolves.toEqual(1)
     })
 
     it("gets last element", async () => {

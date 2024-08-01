@@ -2,18 +2,24 @@ import { mustBePositiveInt } from "../errors/error"
 import { asyncFromOperator, syncFromOperator } from "../from/operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
-import type { getTupleUpTo } from "../type-functions/get-tuple-min-max"
+import type {
+    getReturnedWindowType,
+    getWindowProjectionArgsType
+} from "../type-functions/get-window-type"
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection: (...window: getTupleUpTo<T, L>) => S
+    projection: (...window: getWindowProjectionArgsType<T, L>) => S
 ): Seq<S>
-export function sync<T, L extends number>(this: Iterable<T>, size: L): Seq<getTupleUpTo<T, L>>
+export function sync<T, L extends number>(
+    this: Iterable<T>,
+    size: L
+): Seq<getReturnedWindowType<T, L>>
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection?: (...window: getTupleUpTo<T, L>) => S
+    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
 ): Seq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
@@ -35,19 +41,19 @@ export function sync<T, L extends number, S>(
         }
     })
 }
-export function async<T, S, L extends number>(
+export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection: (...window: getTupleUpTo<T, L>) => S
+    projection: (...window: getWindowProjectionArgsType<T, L>) => S
 ): ASeq<S>
 export function async<T, L extends number>(
     this: AsyncIterable<T>,
     size: L
-): ASeq<getTupleUpTo<T, L>>
+): ASeq<getReturnedWindowType<T, L>>
 export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection?: (...window: getTupleUpTo<T, L>) => S
+    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
 ): ASeq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any

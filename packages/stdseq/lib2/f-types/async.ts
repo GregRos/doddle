@@ -6,6 +6,7 @@ export type StageAsyncIteratee<E, O> = (
     index: number,
     stage: "before" | "after"
 ) => O | Promise<O>
+export type AsyncNoIndexIteratee<E, O> = (element: E) => O | Promise<O>
 
 export type AsyncPredicate<E> = AsyncIteratee<E, boolean>
 export type AsyncReducer<E, O> = (acc: O, element: E, index: number) => O | Promise<O>

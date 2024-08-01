@@ -15,12 +15,13 @@ export function sync<T>(
         let index = 0
         for (const element of input) {
             if (stage === "before" || stage === "both") {
-                action(element, index++, "before")
+                action(element, index, "before")
             }
             yield element
             if (stage === "after" || stage === "both") {
-                action(element, index++, "after")
+                action(element, index, "after")
             }
+            index++
         }
     })
 }

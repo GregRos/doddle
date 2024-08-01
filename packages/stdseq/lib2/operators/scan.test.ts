@@ -237,4 +237,20 @@ describe("async", () => {
         }
         expect(fn).toHaveBeenCalledTimes(1)
     })
+
+    it("calls reducer as many times as needed", async () => {
+        const fn = jest.fn((acc, x) => acc + x)
+        const s = _seq([1, 2, 3]).scan(fn)
+        for await (const x of s) {
+            if (x > 1) {
+                break
+            }
+        }
+        expect(fn).toHaveBeenCalledTimes(1) // Checks the calls up to the break point
+    })
+
+    it("works for async reducers", async () => {
+        const s = _seq([1, 2, 3]).scan(async (acc, x) => acc + x, 0)
+        expect(await s._qr).toEqual([0, 1, 3, 6])
+    })
 })

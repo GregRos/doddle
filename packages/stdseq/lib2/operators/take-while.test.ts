@@ -12,24 +12,7 @@ describe("sync", () => {
             expect(type_of(_seq([1]).takeWhile(() => true))).to_equal(type<_Seq<number>>)
         })
         declare.it("disjunction with ellipsis if specified", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, "..." as string))).to_equal(
-                type<_Seq<number | string>>
-            )
-        })
-        declare.it("ellipsis is const", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, "..."))).to_equal(
-                type<_Seq<number | "...">>
-            )
-        })
-        declare.it("no disjunction if ellipsis is nullish", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, null as null | undefined))).to_equal(
-                type<_Seq<number>>
-            )
-        })
-        declare.it("excludes nullishness out of ellipsis if it's nullable", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, null as null | string))).to_equal(
-                type<_Seq<number | string>>
-            )
+            expect(type_of(_seq([1]).takeWhile(() => true))).to_equal(type<_Seq<number>>)
         })
     })
 
@@ -72,26 +55,6 @@ describe("sync", () => {
         }
         expect(f).toHaveBeenCalledTimes(2)
     })
-
-    it("doesn't insert ellipsis if no items are skipped", () => {
-        const s = _seq([1, 2, 3]).takeWhile(() => true, "...")
-        expect(s._qr).toEqual([1, 2, 3])
-    })
-
-    it("inserts ellipsis if all items are taken", () => {
-        const s = _seq([1, 2, 3]).takeWhile(() => false, "...")
-        expect(s._qr).toEqual(["..."])
-    })
-
-    it("inserts ellipsis if some items are taken", () => {
-        const s = _seq([1, 2, 3]).takeWhile(x => x < 3, "...")
-        expect(s._qr).toEqual([1, 2, "..."])
-    })
-
-    it("no ellipsis if it's nullish", () => {
-        const s2 = _seq([1, 2, 3]).takeWhile(() => false, undefined)
-        expect(s2._qr).toEqual([])
-    })
 })
 
 describe("async", () => {
@@ -100,16 +63,6 @@ describe("async", () => {
     describe("type tests", () => {
         declare.it("keeps same type as input when no ellipsis is given", expect => {
             expect(type_of(_seq([1]).takeWhile(() => true))).to_equal(type<_Seq<number>>)
-        })
-        declare.it("disjunction with ellipsis if specified", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, "..." as string))).to_equal(
-                type<_Seq<number | string>>
-            )
-        })
-        declare.it("ellipsis is const", expect => {
-            expect(type_of(_seq([1]).takeWhile(() => true, "..."))).to_equal(
-                type<_Seq<number | "...">>
-            )
         })
     })
 
@@ -154,18 +107,8 @@ describe("async", () => {
         await expect(f).toHaveBeenCalledTimes(2)
     })
 
-    it("doesn't insert ellipsis if no items are skipped", async () => {
-        const s = _seq([1, 2, 3]).takeWhile(() => true, "...")
+    it("works with async predicate", async () => {
+        const s = _seq([1, 2, 3]).takeWhile(async () => true)
         await expect(s._qr).resolves.toEqual([1, 2, 3])
-    })
-
-    it("inserts ellipsis if all items are taken", async () => {
-        const s = _seq([1, 2, 3]).takeWhile(() => false, "...")
-        await expect(s._qr).resolves.toEqual(["..."])
-    })
-
-    it("inserts ellipsis if some items are taken", async () => {
-        const s = _seq([1, 2, 3]).takeWhile(x => x < 3, "...")
-        await expect(s._qr).resolves.toEqual([1, 2, "..."])
     })
 })
