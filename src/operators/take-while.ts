@@ -1,7 +1,8 @@
 import { mustBeFunction } from "../errors/error"
-import { type AsyncPredicate, type Predicate } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
+import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 export interface TakeWhileSpecifier {
@@ -9,11 +10,11 @@ export interface TakeWhileSpecifier {
 }
 export function sync<T>(
     this: Iterable<T>,
-    predicate: Predicate<T>,
+    predicate: Seq.Predicate<T>,
     specifier?: TakeWhileSpecifier
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return syncFromOperator("takeWhile", this, function* (input) {
+    return new syncOperator("takeWhile", this, function* (input) {
         let index = 0
         for (const element of input) {
             if (predicate(element, index++)) {
@@ -29,11 +30,11 @@ export function sync<T>(
 }
 export function async<T>(
     this: AsyncIterable<T>,
-    predicate: AsyncPredicate<T>,
+    predicate: ASeq.Predicate<T>,
     specifier?: TakeWhileSpecifier
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return asyncFromOperator("takeWhile", this, async function* (input) {
+    return new asyncOperator("takeWhile", this, async function* (input) {
         let index = 0
 
         for await (const element of input) {

@@ -2,6 +2,7 @@ import { declare, type, type_of } from "declare-it"
 import type { Lazy, LazyAsync } from "../lazy"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
+
 import { seq } from "../seq/seq.ctor"
 
 // test sync `some` function

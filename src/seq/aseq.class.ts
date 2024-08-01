@@ -6,8 +6,7 @@ import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
 
 import { gotNonIterable } from "../errors/error"
-import type { ASeqLikeInput } from "../f-types"
-import { isAsyncIterable, isIterable, isNextable } from "../lazy"
+import { isAsyncIterable, isIterable, isNextable, type Pulled } from "../lazy"
 import { async as catchAsync } from "../operators/catch"
 import { async as chunkAsync } from "../operators/chunk"
 
@@ -42,10 +41,9 @@ import { async as uniqAsync } from "../operators/uniq"
 import { async as uniqByAsync } from "../operators/uniq-by"
 import { async as windowAsync } from "../operators/window"
 import { async as zipAsync } from "../operators/zip"
+import type { aseq } from "./aseq.ctor"
 
 export abstract class ASeq<T> implements AsyncIterable<T> {
-    __T!: T;
-
     abstract [Symbol.asyncIterator](): AsyncIterator<T>
     get _qr() {
         return this.toArray().pull()
@@ -92,69 +90,63 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     window = windowAsync
     zip = zipAsync
 }
+let namedInvokerStubs: Record<string, () => Iterable<any>> = {}
 
-async function fromFunction<T>(func: () => any) {
-    return async function* () {
-        const result = func()
-        if (isAsyncIterable(result)) {
-            yield* result
-        } else if (isIterable(result)) {
-            yield* result
-        } else if (isNextable(result)) {
-            for (let item = await result.next(); !item.done; item = await result.next()) {
-                yield item.value
+function getInvokerStub(name: string) {
+    if (!namedInvokerStubs[name]) {
+        Object.assign(namedInvokerStubs, {
+            [name]: async function* (this: ASyncOperator<any, any>) {
+                yield* this._impl(this._operand)
             }
-        } else {
-            throw gotNonIterable(
-                result,
-                "async",
-                "it was a function that did not return an iterable or iterator"
-            )
-        }
+        })
     }
+    return namedInvokerStubs[name]
 }
 
-export class FromAsyncInput<T> extends ASeq<T> {
-    constructor(private readonly _input: ASeqLikeInput<T>) {
-        super()
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<T, any, undefined> {
-        const items = await this._input
-        if (isAsyncIterable(items)) {
-            yield* items
-        } else if (isIterable(items)) {
-            yield* items
-        } else if (typeof items === "function") {
-            const result = items()
-            if (isAsyncIterable(result)) {
-                yield* result
-            } else if (isIterable(result)) {
-                yield* result
-            } else if (isNextable(result)) {
-                for (let item = await result.next(); !item.done; item = await result.next()) {
-                    yield item.value
-                }
-            } else {
-                throw gotNonIterable(
-                    items,
-                    "async",
-                    "it was a function that did not return an iterable or iterator"
-                )
-            }
-        } else {
-        }
-    }
+interface ASyncOperator<In, Out> extends AsyncIterable<Out> {
+    _operator: string
+    _operand: In
+    _impl: (input: In) => AsyncIterable<Out>
 }
 
-export class AsyncFromOperator<In, Out> extends ASeq<Out> {
-    [Symbol.asyncIterator]!: () => AsyncIterator<Out, any, undefined>
-    constructor(
-        readonly operator: string,
-        private readonly _operand: AsyncIterable<In>,
-        private readonly _func: (input: AsyncIterable<In>) => AsyncIterable<Out>
-    ) {
-        super()
-        this[Symbol.asyncIterator] = () => this._func(this._operand)[Symbol.asyncIterator]()
-    }
+export const asyncOperator = function asyncOperator<In, Out>(
+    this: ASyncOperator<In, Out>,
+    operator: string,
+    operand: In,
+    impl: (input: In) => AsyncIterable<Out>
+) {
+    this._operator = operator
+    this._operand = operand
+    this._impl = impl
+
+    this[Symbol.asyncIterator] = getInvokerStub(operator) as any
+} as any as {
+    new <In, Out>(operator: string, operand: In, impl: (input: In) => AsyncIterable<Out>): ASeq<Out>
+}
+asyncOperator.prototype = new (ASeq as any)()
+
+export namespace ASeq {
+    type MaybePromise<T> = T | PromiseLike<T>
+
+    export type Iteratee<E, O> = (element: E, index: number) => MaybePromise<O>
+    export type NoIndexIteratee<E, O> = (element: E) => MaybePromise<O>
+
+    export type StageIteratee<E, O> = (
+        element: E,
+        index: number,
+        stage: "before" | "after"
+    ) => MaybePromise<O>
+    export type Predicate<E> = Iteratee<E, boolean>
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybePromise<O>
+    export type ElementOfInput<T> = T extends Input<infer E> ? E : never
+    export type IterableOrIterator<E> =
+        | AsyncIterable<E>
+        | AsyncIterator<E>
+        | Iterable<E>
+        | Iterator<E>
+    export type FunctionInput<E> = () => MaybePromise<IterableOrIterator<E>>
+    export type DesyncedInput<E> = Iterable<MaybePromise<E>>
+    export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E>
+    export type SimpleInput<E> = IterableInput<E> | FunctionInput<E>
+    export type Input<E> = SimpleInput<MaybePromise<E>>
 }

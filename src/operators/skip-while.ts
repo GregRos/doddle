@@ -1,7 +1,8 @@
 import { mustBeFunction } from "../errors/error"
-import { type AsyncPredicate, type Predicate } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
+import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 export interface SkipWhileOptions {
@@ -14,11 +15,11 @@ enum SkippingMode {
 }
 export function sync<T>(
     this: Iterable<T>,
-    predicate: Predicate<T>,
+    predicate: Seq.Predicate<T>,
     options?: SkipWhileOptions
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return syncFromOperator("skipWhile", this, function* (input) {
+    return new syncOperator("skipWhile", this, function* (input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for (const element of input) {
@@ -38,11 +39,11 @@ export function sync<T>(
 }
 export function async<T>(
     this: AsyncIterable<T>,
-    predicate: AsyncPredicate<T>,
+    predicate: ASeq.Predicate<T>,
     options?: SkipWhileOptions
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return asyncFromOperator("skipWhile", this, async function* (input) {
+    return new asyncOperator("skipWhile", this, async function* (input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for await (const element of input) {

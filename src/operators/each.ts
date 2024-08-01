@@ -1,17 +1,19 @@
 import { mustBeFunction, mustBeOneOf } from "../errors/error"
-import { type StageAsyncIteratee, type StageIteratee } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator, type ASeq } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
+import type { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
 export type EachCallStage = "before" | "after" | "both" | undefined
 const mustBeStage = mustBeOneOf("before", "after", "both", undefined)
 export function sync<T>(
     this: Iterable<T>,
-    action: StageIteratee<T, void>,
+    action: Seq.StageIteratee<T, void>,
     stage: EachCallStage = "before"
 ) {
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return syncFromOperator("each", this, function* (input) {
+    return new syncOperator("each", this, function* (input) {
         let index = 0
         for (const element of input) {
             if (stage === "before" || stage === "both") {
@@ -27,13 +29,13 @@ export function sync<T>(
 }
 export function async<T>(
     this: AsyncIterable<T>,
-    action: StageAsyncIteratee<T, void>,
+    action: ASeq.StageIteratee<T, void>,
     stage: EachCallStage = "before"
 ) {
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return asyncFromOperator("each", this, async function* (input) {
+    return new asyncOperator("each", this, async function* (input) {
         let index = 0
         for await (const element of input) {
             if (stage === "before" || stage === "both") {

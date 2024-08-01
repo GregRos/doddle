@@ -1,8 +1,9 @@
-import { type ASeqLikeInput, type SeqLikeInput } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
 
 type neverToUndefined<T> = T extends never ? undefined : T
@@ -13,26 +14,26 @@ export type getZipValuesType<Xs extends [any, ...any[]]> = {
 export function sync<T, Xs extends [any, ...any[]]>(
     this: Iterable<T>,
     others: {
-        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+        [K in keyof Xs]: Seq.Input<Xs[K]>
     }
 ): Seq<getZipValuesType<[T, ...Xs]>>
 export function sync<T, Xs extends [any, ...any[]], R>(
     this: Iterable<T>,
     others: {
-        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+        [K in keyof Xs]: Seq.Input<Xs[K]>
     },
     projection: (...args: getZipValuesType<[T, ...Xs]>) => R
 ): Seq<R>
 export function sync<T, Xs extends [any, ...any[]], R>(
     this: Iterable<T>,
     _others: {
-        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+        [K in keyof Xs]: Seq.Input<Xs[K]>
     },
     projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
 ): Seq<[T, ...Xs]> {
     const others = _others.map(seq)
     projection ??= (...args: any[]) => args as any
-    return syncFromOperator("zip", this, function* (input) {
+    return new syncOperator("zip", this, function* (input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.iterator]() as Iterator<any> | undefined
         )
@@ -58,26 +59,26 @@ export function sync<T, Xs extends [any, ...any[]], R>(
 export function async<T, Xs extends [any, ...any[]]>(
     this: AsyncIterable<T>,
     others: {
-        [K in keyof Xs]: SeqLikeInput<Xs[K]>
+        [K in keyof Xs]: Seq.Input<Xs[K]>
     }
 ): ASeq<getZipValuesType<getZipValuesType<[T, ...Xs]>>>
 export function async<T, Xs extends [any, ...any[]], R>(
     this: AsyncIterable<T>,
     _others: {
-        [K in keyof Xs]: ASeqLikeInput<Xs[K]>
+        [K in keyof Xs]: ASeq.SimpleInput<Xs[K]>
     },
     projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
 ): ASeq<R>
 export function async<T, Xs extends [any, ...any[]], R>(
     this: AsyncIterable<T>,
     _others: {
-        [K in keyof Xs]: ASeqLikeInput<Xs[K]>
+        [K in keyof Xs]: ASeq.SimpleInput<Xs[K]>
     },
     projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
 ): ASeq<[T, ...Xs]> {
     const others = _others.map(aseq)
     projection ??= (...args: any[]) => args as any
-    return asyncFromOperator("zip", this, async function* (input) {
+    return new asyncOperator("zip", this, async function* (input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.asyncIterator]() as AsyncIterator<any> | undefined
         )

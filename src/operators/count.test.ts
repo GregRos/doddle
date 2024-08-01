@@ -2,7 +2,9 @@ import { declare, type, type_of } from "declare-it"
 import type { Lazy, LazyAsync } from "../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
+import type { ASeq } from "../seq/aseq.class"
 
 describe("sync", () => {
     const f = seq
@@ -48,7 +50,7 @@ describe("sync", () => {
 })
 describe("async", () => {
     const f = aseq
-    type SType<T> = aseq<T>
+    type SType<T> = ASeq<T>
     declare.test("should type as Lazy<number>", expect => {
         expect(type_of(f([1, 2, 3]).count(() => true))).to_equal(type<LazyAsync<number>>)
         expect(type_of(f([1, 2, 3]).count())).to_equal(type<LazyAsync<number>>)

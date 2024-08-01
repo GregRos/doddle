@@ -1,12 +1,11 @@
 import { mustBeFunction } from "../errors/error"
-import { type AsyncNoIndexIteratee } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator, type ASeq } from "../seq/aseq.class"
+import { syncOperator, type Seq } from "../seq/seq.class"
 import type { aseq } from "../seq/aseq.ctor"
-import type { seq } from "../seq/seq.ctor"
 
-export function sync<T>(this: Iterable<T>, projection: AsyncNoIndexIteratee<T, any>): seq<T> {
+export function sync<T>(this: Iterable<T>, projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
     mustBeFunction("projection", projection)
-    return syncFromOperator("uniqBy", this, function* (input) {
+    return new syncOperator("uniqBy", this, function* (input) {
         const seen = new Set()
         for (const element of input) {
             const key = projection(element)
@@ -19,10 +18,10 @@ export function sync<T>(this: Iterable<T>, projection: AsyncNoIndexIteratee<T, a
 }
 export function async<T>(
     this: AsyncIterable<T>,
-    projection: AsyncNoIndexIteratee<T, any>
-): aseq<T> {
+    projection: ASeq.NoIndexIteratee<T, any>
+): ASeq<T> {
     mustBeFunction("projection", projection)
-    return asyncFromOperator("uniqBy", this, async function* (input) {
+    return new asyncOperator("uniqBy", this, async function* (input) {
         const seen = new Set()
         for await (const element of input) {
             const key = await projection(element)

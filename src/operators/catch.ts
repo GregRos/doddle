@@ -1,8 +1,9 @@
-import type { ASeqLikeInput, AsyncIteratee, Iteratee, SeqLikeInput } from "../f-types"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
 
 class ThrewNonError<T> extends Error {
@@ -11,13 +12,16 @@ class ThrewNonError<T> extends Error {
     }
 }
 
-export function sync<T, S>(this: Iterable<T>, handler: Iteratee<Error, SeqLikeInput<S>>): Seq<T | S>
-export function sync<T>(this: Iterable<T>, handler: Iteratee<Error, void>): Seq<T>
 export function sync<T, S>(
     this: Iterable<T>,
-    handler: Iteratee<Error, void | SeqLikeInput<S>>
+    handler: Seq.Iteratee<Error, Seq.Input<S>>
+): Seq<T | S>
+export function sync<T>(this: Iterable<T>, handler: Seq.Iteratee<Error, void>): Seq<T>
+export function sync<T, S>(
+    this: Iterable<T>,
+    handler: Seq.Iteratee<Error, void | Seq.Input<S>>
 ): Seq<unknown> {
-    return syncFromOperator("catch", this, function* (input) {
+    return new syncOperator("catch", this, function* (input) {
         let i = 0
         const iterator = input[Symbol.iterator]()
         for (;;) {
@@ -47,14 +51,14 @@ export function sync<T, S>(
 
 export function async<T, S>(
     this: AsyncIterable<T>,
-    handler: AsyncIteratee<Error, ASeqLikeInput<S>>
+    handler: ASeq.Iteratee<Error, ASeq.SimpleInput<S>>
 ): ASeq<T | S>
-export function async<T>(this: AsyncIterable<T>, handler: AsyncIteratee<Error, void>): ASeq<T>
+export function async<T>(this: AsyncIterable<T>, handler: ASeq.Iteratee<Error, void>): ASeq<T>
 export function async<T, S>(
     this: AsyncIterable<T>,
-    handler: AsyncIteratee<Error, void | ASeqLikeInput<S>>
+    handler: ASeq.Iteratee<Error, void | ASeq.SimpleInput<S>>
 ): ASeq<any> {
-    return asyncFromOperator("catch", this, async function* (input) {
+    return new asyncOperator("catch", this, async function* (input) {
         let i = 0
         const iterator = input[Symbol.asyncIterator]()
         for (;;) {

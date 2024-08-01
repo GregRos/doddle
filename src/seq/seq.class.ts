@@ -1,6 +1,5 @@
 import { gotAsyncInSyncContext, gotNonIterable } from "../errors/error"
-import type { SeqLikeInput } from "../f-types"
-import { isAsyncIterable, isIterable, isThenable } from "../lazy"
+import { isAsyncIterable, isIterable, isThenable, type Pulled } from "../lazy"
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"
@@ -92,49 +91,53 @@ export abstract class Seq<T> implements Iterable<T> {
     zip = zipSync
 }
 
-export class SyncFromOperator<In, Out> extends Seq<Out> {
-    [Symbol.iterator]!: () => Iterator<Out, any, undefined>
-    constructor(
-        readonly operator: string,
-        private readonly _operand: In,
-        private readonly _func: (input: In) => Iterable<Out>
-    ) {
-        super()
-        this[Symbol.iterator] = () => this._func(this._operand)[Symbol.iterator]()
-    }
+interface SyncOperator<In, Out> extends Iterable<Out> {
+    _operator: string
+    _operand: In
+    _impl: (input: In) => Iterable<Out>
 }
 
-export class FromSyncInput<T> extends Seq<T> {
-    constructor(private readonly _input: SeqLikeInput<T>) {
-        super()
-    }
+let namedInvokerStubs: Record<string, () => Iterable<any>> = {}
 
-    *[Symbol.iterator](): Iterator<T, any, undefined> {
-        const input = this._input
-        if (typeof input === "function") {
-            const result = input()
-            if (isIterable(result)) {
-                yield* result
-            } else {
-                for (;;) {
-                    const obj = result.next()
-                    if (isThenable(obj)) {
-                        throw gotAsyncInSyncContext(result, "next function returned thenable")
-                    }
-                    const { done, value } = obj
-
-                    if (done) {
-                        return
-                    }
-                    yield value
-                }
+function getInvokerStub(name: string) {
+    if (!namedInvokerStubs[name]) {
+        Object.assign(namedInvokerStubs, {
+            [name]: function* (this: SyncOperator<any, any>) {
+                yield* this._impl(this._operand)
             }
-        } else if (isIterable(input)) {
-            yield* input
-        } else if (isAsyncIterable(input)) {
-            throw gotAsyncInSyncContext(input, "input only has Symbol.asyncIterator")
-        } else {
-            throw gotNonIterable(input, "sync", "not a function or sync iterable")
-        }
+        })
     }
+    return namedInvokerStubs[name]
+}
+
+export const syncOperator = function syncOperator<In, Out>(
+    this: SyncOperator<In, Out>,
+    operator: string,
+    operand: In,
+    impl: (input: In) => Iterable<Out>
+) {
+    this._operator = operator
+    this._operand = operand
+    this._impl = impl
+
+    this[Symbol.iterator] = getInvokerStub(operator) as any
+} as any as {
+    new <In, Out>(operator: string, operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
+}
+syncOperator.prototype = new (Seq as any)()
+export namespace Seq {
+    export type Iteratee<E, O> = (element: E, index: number) => O
+    export type NoIndexIteratee<E, O> = (element: E) => O
+
+    export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
+    export type Predicate<E> = Seq.Iteratee<E, boolean>
+    export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
+
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => O
+    export type IterableOrIterator<E> = Iterable<E> | Iterator<E>
+    export type FunctionInput<E> = () => IterableOrIterator<E>
+
+    export type IterableInput<E> = Iterable<E>
+    export type Input<E> = IterableInput<E> | FunctionInput<E>
+    export type ElementOfInput<T> = T extends Input<infer E> ? E : never
 }

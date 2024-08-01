@@ -1,18 +1,18 @@
-import type { SeqLikeInput } from "../f-types"
 import { sync as syncOf } from "../from/of"
 import { sync as syncRange } from "../from/range"
 import { sync as syncRepeat } from "../from/repeat"
+import { sync as syncFrom } from "../from/input"
 import type { Lazy } from "../lazy"
-import { FromSyncInput, type Seq } from "./seq.class"
+import { type Seq } from "./seq.class"
 export function _seq<E = never>(): Seq<E>
-export function _seq<E>(input: Lazy<SeqLikeInput<E>>): Seq<E>
+export function _seq<E>(input: Lazy<Seq.Input<E>>): Seq<E>
 export function _seq<E>(input: E[]): Seq<E>
-export function _seq<E>(input: SeqLikeInput<E>): Seq<E>
-export function _seq<E>(input?: SeqLikeInput<E> | Lazy<SeqLikeInput<E>>) {
+export function _seq<E>(input: Seq.Input<E>): Seq<E>
+export function _seq<E>(input?: Seq.Input<E> | Lazy<Seq.Input<E>>) {
     if (!input) {
-        return new FromSyncInput([])
+        return syncFrom([])
     }
-    return new FromSyncInput(input)
+    return syncFrom(input)
 }
 
 export const seq = Object.assign(_seq, {
@@ -23,4 +23,3 @@ export const seq = Object.assign(_seq, {
         return input instanceof seq
     }
 })
-export type seq<T> = Seq<T>

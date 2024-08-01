@@ -3,6 +3,7 @@ import type { Lazy, LazyAsync } from "../lazy"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {
@@ -81,9 +82,9 @@ describe("async", () => {
     it("has no side-effects before pull", async () => {
         const fn = jest.fn(function* () {})
         const s = _aseq(fn)
-        const lazy = s.toArray().pull()
+        const lazy = s.toArray()
         expect(fn).not.toHaveBeenCalled()
-        await lazy
+        await lazy.pull()
         expect(fn).toHaveBeenCalledTimes(1)
     })
 

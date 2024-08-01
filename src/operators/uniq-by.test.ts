@@ -1,5 +1,6 @@
 import { declare, type, type_of } from "declare-it"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {

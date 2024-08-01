@@ -1,7 +1,9 @@
-import type { AsyncIteratee, Iteratee } from "../f-types"
 import { lazyFromOperator } from "../from/operator"
+import type { ASeq } from "../seq/aseq.class"
+import type { aseq } from "../seq/aseq.ctor"
+import type { Seq } from "../seq/seq.class"
 
-export function sync<T, K>(this: Iterable<T>, keyProjection: Iteratee<T, K>) {
+export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.Iteratee<T, K>) {
     return lazyFromOperator("groupBy", this, input => {
         const map = new Map<K, T[]>()
         let index = 0
@@ -17,7 +19,7 @@ export function sync<T, K>(this: Iterable<T>, keyProjection: Iteratee<T, K>) {
     })
 }
 
-export function async<T, K>(this: AsyncIterable<T>, keyProjection: AsyncIteratee<T, K>) {
+export function async<T, K>(this: AsyncIterable<T>, keyProjection: ASeq.Iteratee<T, K>) {
     return lazyFromOperator("groupBy", this, async input => {
         const map = new Map<K, T[]>()
         let index = 0

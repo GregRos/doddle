@@ -1,8 +1,10 @@
 import { mustBeInteger } from "../errors/error"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+
 import { seq } from "../seq/seq.ctor"
 import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
 
@@ -12,7 +14,7 @@ export function sync<T, const Ellipsis = undefined>(
     countArg: number
 ): Seq<maybeDisjunction<T, Ellipsis>> {
     mustBeInteger("count", countArg)
-    return syncFromOperator("skip", this, function* (input) {
+    return new syncOperator("skip", this, function* (input) {
         let count = countArg
         if (count === 0) {
             yield* seq(input)
@@ -35,7 +37,7 @@ export function sync<T, const Ellipsis = undefined>(
 }
 export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    return asyncFromOperator("skip", this, async function* (input) {
+    return new asyncOperator("skip", this, async function* (input) {
         let count = countArg
         if (count === 0) {
             yield* aseq(input)

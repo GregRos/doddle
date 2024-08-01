@@ -1,26 +1,27 @@
 import { mustBeFunction } from "../errors/error"
-import { type AsyncReducer, type Reducer } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
+import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 export function sync<Item>(
     this: Iterable<Item>,
-    reducer: Reducer<NoInfer<Item>, NoInfer<Item>>
+    reducer: Seq.Reducer<NoInfer<Item>, NoInfer<Item>>
 ): Seq<Item>
 export function sync<Item, Acc>(
     this: Iterable<Item>,
-    reducer: Reducer<NoInfer<Item>, Acc>,
+    reducer: Seq.Reducer<NoInfer<Item>, Acc>,
     initial: Acc
 ): Seq<Acc>
 export function sync<Item, Acc>(
     this: Iterable<Item>,
-    reducer: Reducer<NoInfer<Item>, Acc>,
+    reducer: Seq.Reducer<NoInfer<Item>, Acc>,
     initial?: Acc
 ) {
     mustBeFunction("reducer", reducer)
 
-    return syncFromOperator("scan", this, function* (input) {
+    return new syncOperator("scan", this, function* (input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any
@@ -43,20 +44,20 @@ export function sync<Item, Acc>(
 
 export function async<Item>(
     this: AsyncIterable<Item>,
-    reducer: AsyncReducer<Item, Item>
+    reducer: ASeq.Reducer<Item, Item>
 ): ASeq<Item>
 export function async<Item, Acc>(
     this: AsyncIterable<Item>,
-    reducer: AsyncReducer<Item, Acc>,
+    reducer: ASeq.Reducer<Item, Acc>,
     initial: Acc
 ): ASeq<Acc>
 export function async<Item, Acc>(
     this: AsyncIterable<Item>,
-    reducer: AsyncReducer<Item, Acc>,
+    reducer: ASeq.Reducer<Item, Acc>,
     initial?: Acc
 ) {
     mustBeFunction("reducer", reducer)
-    return asyncFromOperator("scan", this, async function* (input) {
+    return new asyncOperator("scan", this, async function* (input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any

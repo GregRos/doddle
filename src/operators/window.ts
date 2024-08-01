@@ -1,5 +1,6 @@
 import { mustBePositiveInt } from "../errors/error"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 import type {
@@ -23,7 +24,7 @@ export function sync<T, L extends number, S>(
 ): Seq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return syncFromOperator("window", this, function* (input) {
+    return new syncOperator("window", this, function* (input) {
         const buffer = Array<T>(size)
         let i = 0
         for (const item of input) {
@@ -57,7 +58,7 @@ export function async<T, L extends number, S>(
 ): ASeq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return asyncFromOperator("window", this, async function* (input) {
+    return new asyncOperator("window", this, async function* (input) {
         const buffer = Array<T>(size)
         let i = 0
         for await (const item of input) {

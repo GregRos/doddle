@@ -1,18 +1,19 @@
 import { mustBeBoolean, mustBeFunction } from "../errors/error"
-import { type AsyncNoIndexIteratee, type NoIndexIteratee } from "../f-types/index"
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator, type ASeq } from "../seq/aseq.class"
+import { syncOperator, type Seq } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
+
 import { seq } from "../seq/seq.ctor"
 import { returnKvp } from "../special/utils"
 
 export function sync<T>(
     this: Iterable<T>,
-    projection: NoIndexIteratee<T, any>,
+    projection: Seq.NoIndexIteratee<T, any>,
     reverse = false
-): seq<T> {
+): Seq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return syncFromOperator("orderBy", this, function* (input) {
+    return new syncOperator("orderBy", this, function* (input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()
@@ -28,12 +29,12 @@ export function sync<T>(
 }
 export function async<T, S>(
     this: AsyncIterable<T>,
-    projection: AsyncNoIndexIteratee<T, S>,
+    projection: ASeq.NoIndexIteratee<T, S>,
     reverse = false
-): aseq<T> {
+): ASeq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return asyncFromOperator("orderBy", this, async function* (input) {
+    return new asyncOperator("orderBy", this, async function* (input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()

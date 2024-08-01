@@ -1,5 +1,7 @@
-import { asyncFromOperator, syncFromOperator } from "../from/operator"
+import { asyncOperator } from "../seq/aseq.class"
+import { syncOperator } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
+
 import { seq } from "../seq/seq.ctor"
 
 function shuffle<T>(array: T[]) {
@@ -12,7 +14,7 @@ function shuffle<T>(array: T[]) {
     return array
 }
 export function sync<T>(this: Iterable<T>) {
-    return syncFromOperator("shuffle", this, function* (input) {
+    return new syncOperator("shuffle", this, function* (input) {
         const array = seq(input).toArray().pull()
         shuffle(array)
         yield* array
@@ -20,7 +22,7 @@ export function sync<T>(this: Iterable<T>) {
 }
 
 export function async<T>(this: AsyncIterable<T>) {
-    return asyncFromOperator("shuffle", this, async function* (input) {
+    return new asyncOperator("shuffle", this, async function* (input) {
         const array = await aseq(input).toArray().pull()
         shuffle(array)
         yield* array
