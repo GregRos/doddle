@@ -1,9 +1,6 @@
 {
   "references": [
     {
-      "path": "./packages/stdlazy/tsconfig.json"
-    },
-    {
       "path": "./packages/stdseq/tsconfig.json"
     }
   ],
