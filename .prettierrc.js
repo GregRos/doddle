@@ -2,7 +2,7 @@
 module.exports = {
     tabWidth: 4,
     filepath:
-        "packages/**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,ctsx,mtsx,html,htm,yaml,yml,json,scss,css}",
+        "src/**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,ctsx,mtsx,html,htm,yaml,yml,json,scss,css}",
     arrowParens: "avoid",
     trailingComma: "none",
     printWidth: 100,

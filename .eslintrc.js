@@ -7,7 +7,7 @@ const projects =
             extends: ["@gregros/eslint-config"],
             parserOptions: {
                 project: [
-                    "./packages/stdseq/lib2/tsconfig.json"
+                    "./tsconfig.json"
                 ]
             },
             rules: {

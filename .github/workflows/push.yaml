@@ -3,10 +3,6 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "packages/stdlazy/**"
-      - ".github/workflows/stdlazy.push.yaml"
-      - "yarn.lock"
   workflow_dispatch:
 
 permissions:
@@ -43,11 +39,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
       - name: build
-        run: yarn workspace stdlazy run build
+        run: yarn run build
       - name: lint:check
-        run: yarn workspace stdlazy run lint:check
+        run: yarn run lint:check
       - name: test
-        run: yarn workspace stdlazy run test:coverage
+        run: yarn run test:coverage
       - name: code coverage
         uses: coverallsapp/github-action@v2
         with:
@@ -55,8 +51,7 @@ jobs:
           base-path: packages/stdlazy
       - name: Setup token
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
-      - name: publish seqs
-        working-directory: packages/stdlazy
+      - name: publish dawdle
         run: yarn npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
