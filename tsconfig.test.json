@@ -1,0 +1,14 @@
+{
+  "references": [
+    {
+      "path": "./tsconfig.json"
+    }
+  ],
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "noEmit": true
+  },
+  "include": ["src/**/*.test.ts"],
+  "exclude": ["**/dist", "**/node_modules"]
+}
