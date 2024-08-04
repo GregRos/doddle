@@ -4,7 +4,8 @@ import { syncOperator, type Seq } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
 
 import { seq } from "../seq/seq.ctor"
-import { returnKvp } from "../../special/utils"
+
+import { returnKvp } from "../../utils";
 
 export function sync<T>(
     this: Iterable<T>,

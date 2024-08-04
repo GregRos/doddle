@@ -6,7 +6,8 @@ import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
-import type { maybeDisjunction } from "../type-functions/maybe-disjunction"
+
+import { maybeDisjunction } from "../type-functions/get-window-type";
 
 const END_MARKER = Symbol("DUMMY")
 export function sync<T, const Ellipsis = undefined>(

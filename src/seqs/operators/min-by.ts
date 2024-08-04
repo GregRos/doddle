@@ -6,7 +6,8 @@ import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
-import { returnKvp } from "../../special/utils"
+
+import { returnKvp } from "../../utils";
 const EMPTY = Symbol("EMPTY_SEQ")
 
 export function generic<T, K, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, K>, alt: Alt) {
