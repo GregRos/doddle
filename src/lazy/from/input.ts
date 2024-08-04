@@ -1,5 +1,5 @@
-import { Lazy } from "./lazy"
-import { LazyAsync } from "./types"
+import { Lazy } from "../lazy"
+import { LazyAsync } from "../types"
 
 /**
  * Creates a lazy primitive around the given function, making sure it's only executed once. Works

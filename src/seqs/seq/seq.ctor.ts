@@ -8,7 +8,7 @@ export function _seq<E = never>(): Seq<E>
 export function _seq<E>(input: Lazy<Seq.Input<E>>): Seq<E>
 export function _seq<E>(input: E[]): Seq<E>
 export function _seq<E>(input: Seq.Input<E>): Seq<E>
-export function _seq<E>(input?: Seq.Input<E> | Lazy<Seq.Input<E>>) {
+export function _seq<E>(input?: Seq.Input<E>) {
     if (!input) {
         return syncFrom([])
     }

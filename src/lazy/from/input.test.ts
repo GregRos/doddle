@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from "../"
+import { lazy, Lazy, LazyAsync, Pulled, PulledAwaited } from ".."
 
 it("lazy<1> for lazy 1", () => {
     const lz = lazy(() => 1) satisfies Lazy<number>

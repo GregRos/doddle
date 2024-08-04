@@ -1,6 +1,6 @@
-import { lazy } from "./ctor"
-import { type Lazy, ownerInstance } from "./lazy"
-import type { Pulled } from "./types"
+import { lazy } from "./input"
+import { type Lazy, ownerInstance } from "../lazy"
+import type { Pulled } from "../types"
 
 /**
  * Memoizes the given function, caching its result and making sure it's only executed once. Uses

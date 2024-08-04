@@ -1,4 +1,4 @@
-import { lazy } from "../ctor"
+import { lazy } from "../from/input"
 import type { Lazy } from "../lazy"
 import type { LazyAsync, PulledAwaited } from "../types"
 

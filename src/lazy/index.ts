@@ -1,7 +1,7 @@
-import { lazy } from "./ctor"
+import { lazy } from "./from/input"
 
-export { lazy } from "./ctor"
-export { memoize } from "./memoize"
+export { lazy } from "./from/input"
+export { memoize } from "./from/memoize"
 export { Lazy } from "./lazy"
 export {
     getClassName,

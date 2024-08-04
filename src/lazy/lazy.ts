@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/await-thenable */
 import * as config from "./config"
-import { lazy } from "./ctor"
+import { lazy } from "./from/input"
 import { cannotRecurseSync } from "./errors"
 import assemble from "./operators/assemble"
 import each from "./operators/each"
 import equals from "./operators/equals"
 import map from "./operators/map"
 import zip from "./operators/zip"
+import { sync as syncIterate, async as asyncIterate } from "./operators/iterate"
 import {
     LazyAsync,
     LazyInfo,
@@ -45,34 +46,11 @@ export class Lazy<T>
      */
     private _init: null | ((...args: any[]) => T)
 
-    /** Has the initializer finished executing? */
-    get isReady() {
-        return this._info.stage === "done"
-    }
-
-    *[Symbol.iterator](): Iterator<any> {
-        const inner = this.pull()
-        if (isIterable(inner)) {
-            yield* inner
-        } else {
-            yield inner
-        }
-    }
-
-    async *[Symbol.asyncIterator](): AsyncIterator<any> {
-        // eslint-disable @typescript-eslint/await-thenable
-        const inner = await this.pull()
-        if (isAsyncIterable(inner)) {
-            yield* inner
-        } else if (isIterable(inner)) {
-            yield* inner
-        } else {
-            yield inner
-        }
-    }
-
     protected constructor(initializer: (...args: any[]) => any) {
         this._info = {
+            get isReady() {
+                return this.stage === "done" || this.stage === "threw"
+            },
             stage: "untouched",
             syncness: "untouched",
             name: getInitializerName(initializer)
@@ -104,8 +82,9 @@ export class Lazy<T>
     each = each
     zip = zip
     assemble = assemble
-    equals = equals
-
+    equals = equals;
+    [Symbol.iterator] = syncIterate;
+    [Symbol.asyncIterator] = asyncIterate
     /** Returns a short description of the Lazy value and its state. */
     toString() {
         return this._desc

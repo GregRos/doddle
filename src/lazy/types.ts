@@ -80,6 +80,7 @@ export type CompleteLazyInitializer<F extends (...args: any[]) => any> = {
 } & (Parameters<F> extends [] ? {} : { args: Parameters<F> })
 export type LazyAsyncLike<T> = Pullable<PromiseLike<T>>
 export interface LazyInfo {
+    isReady: boolean
     stage: LazyStage
     syncness: LazySyncness
     name: string | null

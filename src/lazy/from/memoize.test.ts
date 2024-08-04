@@ -1,4 +1,4 @@
-import { lazy, memoize, Pulled, PulledAwaited } from "../"
+import { lazy, memoize, Pulled, PulledAwaited } from ".."
 
 it("memoizes sync", () => {
     let count = 0
