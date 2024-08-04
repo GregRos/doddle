@@ -65,7 +65,7 @@ describe("sync", () => {
     })
 
     it("works on infinite sequence", () => {
-        const s = _seq.repeat(1, Infinity).scan((acc, x) => acc + x, 0)
+        const s = _seq.repeat(Infinity, 1).scan((acc, x) => acc + x, 0)
         for (const x of s) {
             break
         }
@@ -183,7 +183,7 @@ describe("async", () => {
     })
 
     it("works on infinite sequence", async () => {
-        const s = _seq.repeat(1, Infinity).scan((acc, x) => acc + x, 0)
+        const s = _seq.repeat(Infinity, 1).scan((acc, x) => acc + x, 0)
         let count = 0
         for await (const x of s) {
             if (++count > 3) break // To avoid infinite loop in test

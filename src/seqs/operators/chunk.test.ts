@@ -55,7 +55,7 @@ describe("sync", () => {
     })
 
     it("is not eager", () => {
-        const s = seq.repeat(1, Infinity)
+        const s = seq.repeat(Infinity, 1)
         const chunked = s.chunk(3)
         for (const _ of chunked) {
             break
@@ -149,7 +149,7 @@ describe("async", () => {
     })
 
     it("is not eager", async () => {
-        const s = aseq.repeat(1, Infinity)
+        const s = aseq.repeat(Infinity, 1)
         const chunked = s.chunk(3)
         for await (const _ of chunked) {
             break

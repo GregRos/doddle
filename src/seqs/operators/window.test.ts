@@ -78,7 +78,7 @@ describe("sync", () => {
     })
 
     it("is not eager", () => {
-        const s = seq.repeat(1, Infinity)
+        const s = seq.repeat(Infinity, 1)
         const windowed = s.window(3)
         for (const _ of windowed) {
             break
@@ -188,7 +188,7 @@ describe("async", () => {
     })
 
     it("is not eager", async () => {
-        const s = aseq.repeat(1, Infinity)
+        const s = aseq.repeat(Infinity, 1)
         const windowed = s.window(3)
         for await (const _ of windowed) {
             break

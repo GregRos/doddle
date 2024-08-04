@@ -81,8 +81,8 @@ describe("sync", () => {
     })
 
     it("is not eager", () => {
-        const s = _seq.repeat(1, Infinity)
-        const projected = s.concatMap(x => _seq.repeat("a", Infinity))
+        const s = _seq.repeat(Infinity, 1)
+        const projected = s.concatMap(x => _seq.repeat(Infinity, "a"))
         for (const _ of projected) {
             break
         }
@@ -170,8 +170,8 @@ describe("async", () => {
     })
 
     it("is not eager", async () => {
-        const s = _seq.repeat(1, Infinity)
-        const projected = s.concatMap(x => _seq.repeat("a", Infinity))
+        const s = _seq.repeat(Infinity, 1)
+        const projected = s.concatMap(x => _seq.repeat(Infinity, "a"))
         for await (const _ of projected) {
             break
         }

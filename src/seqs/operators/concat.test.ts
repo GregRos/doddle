@@ -96,7 +96,7 @@ describe("sync", () => {
     })
 
     it("concats to infinite", () => {
-        const s = _seq.repeat(1, Infinity).concat([2, 3])
+        const s = _seq.repeat(Infinity, 1).concat([2, 3])
         expect(s.take(3)._qr).toEqual([1, 1, 1])
     })
 
@@ -215,7 +215,7 @@ describe("async", () => {
     })
 
     it("concats to infinite", async () => {
-        const s = _seq.repeat(1, Infinity).concat([2, 3])
+        const s = _seq.repeat(Infinity, 1).concat([2, 3])
         await expect(s.take(3)._qr).resolves.toEqual([1, 1, 1])
     })
 

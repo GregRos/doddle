@@ -42,7 +42,7 @@ describe("sync", () => {
             expect(s._qr).toEqual([4])
         })
         it("appends to infinite passes", () => {
-            const s = f.repeat(1, Infinity).append(2)
+            const s = f.repeat(Infinity, 1).append(2)
             expect(s.take(3)._qr).toEqual([1, 1, 1])
         })
     })
@@ -91,7 +91,7 @@ describe("async", () => {
             await expect(s._qr).resolves.toEqual([4])
         })
         it("appends to infinite passes", async () => {
-            const s = f.repeat(1, Infinity).append(2)
+            const s = f.repeat(Infinity, 1).append(2)
             await expect(s.take(3)._qr).resolves.toEqual([1, 1, 1])
         })
     })
