@@ -1,4 +1,4 @@
-import { getClassName, isAsyncIterable, isIterable } from "../lazy"
+import { getClassName, isAsyncIterable, isIterable } from "../utils"
 
 export class DawdleError extends Error {
     constructor(code: string, message: string) {

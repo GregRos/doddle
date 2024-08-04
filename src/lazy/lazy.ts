@@ -14,13 +14,9 @@ import {
     Pullable,
     Pulled,
     PulledAwaited,
-    getClassName,
-    getInitializerName,
-    isPullable,
-    isThenable,
     type _IterationType
 } from "./types"
-import { isAsyncIterable, isIterable } from "./utils"
+import { getClassName, getInitializerName, isAsyncIterable, isIterable, isPullable, isThenable } from "../utils";
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 

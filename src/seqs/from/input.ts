@@ -1,5 +1,5 @@
 import { gotNonIterable } from "../../errors/error"
-import { isIterable, isAsyncIterable, isLazy, isNextable, isThenable } from "../../lazy"
+import { isIterable, isAsyncIterable, isLazy, isNextable, isThenable } from "../../utils"
 import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { asyncOperator, type ASeq } from "../seq/aseq.class"

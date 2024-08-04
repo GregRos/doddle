@@ -1,4 +1,4 @@
-import { Lazy } from "./lazy"
+import { Lazy } from "./lazy";
 
 export type Pulled<T> =
     T extends PromiseLike<infer X>
@@ -17,46 +17,6 @@ export type ReplaceValue<Lz, T> =
           ? Promise<ReplaceValue<R, T>>
           : T
 export type LazyAsync<T> = Lazy<Promise<T>>
-export function getClassName(something: any) {
-    if (typeof something !== "object") {
-        return typeof something
-    }
-    if (something === null) {
-        return "null"
-    }
-    const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object"
-    return ctorName
-}
-
-export function getInitializerName(initializer: (...args: any[]) => any) {
-    return initializer.name || null
-}
-/**
- * Checks if the given value is a LazyLike, i.e. that it has a `pull` method.
- *
- * @param what The value to check.
- */
-export function isPullable<T = unknown>(what: unknown): what is Pullable<T> {
-    return (
-        typeof what === "object" &&
-        what != null &&
-        "pull" in what &&
-        typeof what?.pull === "function"
-    )
-}
-
-/**
- * Checks if the given value is a thenable.
- *
- * @param what The value to check.
- */
-export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
-    return typeof what === "object" && !!what && "then" in what && typeof what.then === "function"
-}
-
-export function isLazy(value: any): value is Lazy<any> {
-    return typeof value === "object" && value != null && value instanceof Lazy
-}
 
 /** The stage of a lazily initialized value. */
 export type LazyStage = "untouched" | "executing" | "done" | "threw"

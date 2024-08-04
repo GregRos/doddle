@@ -1,6 +1,7 @@
 import { lazy } from "../from/input"
 import type { Lazy } from "../lazy"
-import { type LazyAsync, type PulledAwaited, isThenable } from "../types"
+import { type LazyAsync, type PulledAwaited } from "../types"
+import { isThenable } from "../../utils";
 
 /**
  * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and return its result,

@@ -1,6 +1,6 @@
 import type { Lazy } from "../lazy"
 import type { _IterationType } from "../types"
-import { isAsyncIterable, isIterable } from "../utils"
+import { isAsyncIterable, isIterable } from "../../utils";
 
 export function* sync<T>(this: Lazy<T>): Iterator<_IterationType<T>> {
     const inner = this.pull()

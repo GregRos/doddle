@@ -1,12 +1,12 @@
 import { lazy } from "../from/input"
 import type { Lazy } from "../lazy"
 import {
-    isThenable,
     type LazyAsync,
     type Pullable,
     type Pulled,
     type PulledAwaited
 } from "../types"
+import { isThenable } from "../../utils";
 
 /**
  * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when

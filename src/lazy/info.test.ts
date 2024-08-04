@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback */
 
-import { lazy } from "../"
+import { lazy } from "."
 
 it("no name normalizes to null", () => {
     const lz = lazy(() => 1)
@@ -18,6 +18,7 @@ it("name is recovered", () => {
 it("starts out untouched", () => {
     const lz = lazy(() => 1)
     expect(lz.info).toEqual({
+        isReady: false,
         name: null,
         stage: "untouched",
         syncness: "untouched"

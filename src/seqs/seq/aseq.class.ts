@@ -6,7 +6,7 @@ import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
 
 import { gotNonIterable } from "../../errors/error"
-import { isAsyncIterable, isIterable, isNextable, type Pulled } from "../../lazy"
+import { isAsyncIterable, isIterable, isNextable } from "../../utils"
 import { async as catchAsync } from "../operators/catch"
 import { async as chunkAsync } from "../operators/chunk"
 

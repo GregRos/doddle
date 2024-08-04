@@ -1,5 +1,6 @@
 import { gotAsyncInSyncContext, gotNonIterable } from "../../errors/error"
-import { isAsyncIterable, isIterable, isThenable, type Pulled } from "../../lazy"
+import { isAsyncIterable, isIterable, isThenable } from "../../utils"
+
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"
