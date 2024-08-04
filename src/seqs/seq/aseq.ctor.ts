@@ -2,6 +2,8 @@ import { async as asyncOf } from "../from/of"
 import { async as asyncRange } from "../from/range"
 import { async as asyncRepeat } from "../from/repeat"
 import { async as asyncFrom } from "../from/input"
+import { async as asyncIterate } from "../from/iterate"
+
 import type { Lazy, LazyAsync } from "../../lazy"
 
 import { type ASeq } from "./aseq.class"
@@ -25,5 +27,6 @@ export const aseq = Object.assign(_aseq, {
     range: asyncRange,
     is(input: any): input is ASeq<any> {
         return input instanceof aseq
-    }
+    },
+    iterate: asyncIterate
 })

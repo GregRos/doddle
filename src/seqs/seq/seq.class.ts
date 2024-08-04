@@ -127,6 +127,8 @@ export const syncOperator = function syncOperator<In, Out>(
 }
 syncOperator.prototype = new (Seq as any)()
 export namespace Seq {
+    export type IndexIteratee<O> = (index: number) => O
+
     export type Iteratee<E, O> = (element: E, index: number) => O
     export type NoIndexIteratee<E, O> = (element: E) => O
 

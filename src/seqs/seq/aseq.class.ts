@@ -127,7 +127,7 @@ asyncOperator.prototype = new (ASeq as any)()
 
 export namespace ASeq {
     type MaybePromise<T> = T | PromiseLike<T>
-
+    export type IndexIteratee<O> = (index: number) => MaybePromise<O>
     export type Iteratee<E, O> = (element: E, index: number) => MaybePromise<O>
     export type NoIndexIteratee<E, O> = (element: E) => MaybePromise<O>
 

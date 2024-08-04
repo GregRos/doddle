@@ -1,5 +1,5 @@
 import { mustBeInteger } from "../../errors/error"
-import { lazyFromOperator } from "../from/operator"
+import { lazyFromOperator } from "../../lazy/lazy-operator"
 import type { Lazy, LazyAsync } from "../../lazy"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"

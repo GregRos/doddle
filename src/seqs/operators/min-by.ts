@@ -1,5 +1,5 @@
 import { mustBeFunction } from "../../errors/error"
-import { lazyFromOperator } from "../from/operator"
+import { lazyFromOperator } from "../../lazy/lazy-operator"
 import type { Lazy, LazyAsync } from "../../lazy"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
@@ -7,7 +7,7 @@ import type { Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
 
-import { returnKvp } from "../../utils";
+import { returnKvp } from "../../utils"
 const EMPTY = Symbol("EMPTY_SEQ")
 
 export function generic<T, K, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, K>, alt: Alt) {
