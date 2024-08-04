@@ -9,7 +9,7 @@ describe("sync", () => {
     const _seq = seq
     type _Seq<T> = Seq<T>
 
-    declare.it("element type stays the same without ellipsis", expect => {
+    declare.it("element type stays the same", expect => {
         expect(type_of(_seq([1, 2, 3]).skip(1))).to_equal(type<_Seq<number>>)
     })
 
@@ -55,7 +55,7 @@ describe("async", () => {
     const _aseq = aseq
     type _ASeq<T> = ASeq<T>
 
-    declare.it("element type stays the same without ellipsis", expect => {
+    declare.it("element type stays the same", expect => {
         expect(type_of(_aseq([1, 2, 3]).take(1))).to_equal(type<_ASeq<number>>)
     })
 

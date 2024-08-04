@@ -7,13 +7,8 @@ import type { Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
 
-import { maybeDisjunction } from "../type-functions/get-window-type";
-
 const END_MARKER = Symbol("DUMMY")
-export function sync<T, const Ellipsis = undefined>(
-    this: Iterable<T>,
-    countArg: number
-): Seq<maybeDisjunction<T, Ellipsis>> {
+export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
     return new syncOperator("take", this, function* (input) {
         let count = countArg
@@ -46,10 +41,7 @@ export function sync<T, const Ellipsis = undefined>(
         }
     }) as any
 }
-export function async<T, const Ellipsis = undefined>(
-    this: AsyncIterable<T>,
-    countArg: number
-): ASeq<maybeDisjunction<T, Ellipsis>> {
+export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
     return new asyncOperator("take", this, async function* (input) {
         let count = countArg
