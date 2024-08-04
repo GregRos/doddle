@@ -1,4 +1,4 @@
-import { lazy, Lazy, LazyAsync } from "../"
+import { lazy, Lazy, LazyAsync } from ".."
 
 const lz = lazy(() => 1) satisfies Lazy<number>
 const lza = lazy(async () => 1) satisfies LazyAsync<number>
@@ -7,7 +7,7 @@ it("lazy do doThing", () => {
     let i = ""
     expect(
         lazy(() => (i += "a"))
-            .do(x => {
+            .each(x => {
                 expect(x).toBe("a")
                 i += "b"
             })
@@ -20,7 +20,7 @@ it("lazy async do doThing", async () => {
     let i = ""
     await expect(
         lazy(async () => (i += "a"))
-            .do(x => {
+            .each(x => {
                 expect(i).toBe("a")
                 i += "b"
                 return lazy(() => (i += "c"))
@@ -34,7 +34,7 @@ it("lazy do doThing", async () => {
     let i = ""
     await expect(
         lazy(() => (i += "a"))
-            .do(async x => {
+            .each(async x => {
                 expect(x).toBe("a")
                 i += "b"
                 return lazy(() => (i += "c"))
@@ -47,7 +47,7 @@ it("lazy do doThing", async () => {
 it("lazy async do doThing", async () => {
     let i = ""
     await lazy(async () => (i += "a"))
-        .do(async x => {
+        .each(async x => {
             expect(x).toBe("a")
             i += "b"
             return lazy(() => (i += "c"))
@@ -59,7 +59,7 @@ it("lazy async do doThing", async () => {
 it("lazy do doThing", () => {
     let i = ""
     lazy(() => (i += "a"))
-        .do(x => {
+        .each(x => {
             expect(x).toBe("a")
             i += "b"
             return lazy(() => (i += "c"))

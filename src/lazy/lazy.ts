@@ -2,6 +2,11 @@
 import * as config from "./config"
 import { lazy } from "./ctor"
 import { cannotRecurseSync } from "./errors"
+import assemble from "./operators/assemble"
+import each from "./operators/each"
+import equals from "./operators/equals"
+import map from "./operators/map"
+import zip from "./operators/zip"
 import {
     LazyAsync,
     LazyInfo,
@@ -95,15 +100,15 @@ export class Lazy<T>
         return [name, ...asyncPart, stagePart].join(" ")
     }
 
+    map = map
+    each = each
+    zip = zip
+    assemble = assemble
+    equals = equals
+
     /** Returns a short description of the Lazy value and its state. */
     toString() {
         return this._desc
-    }
-
-    equals<Other>(other: Promise<Other> | LazyAsync<Other>): LazyAsync<boolean>
-    equals<Other>(other: Other | Lazy<Other>): Lazy<boolean>
-    equals(other: any): any {
-        return this.zip(lazy(() => other) as any).map(([a, b]) => a === b)
     }
 
     /**
@@ -167,215 +172,5 @@ export class Lazy<T>
 
     get [Symbol.toStringTag]() {
         return this.toString()
-    }
-
-    /**
-     * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and return its
-     * result, projected using the given function. If the Lazy primitive is async, the projection
-     * will receive the awaited value.
-     *
-     * @example
-     *     // sync projectionL
-     *     const sync = lazy(() => "hello").map(x => `${x} world`) satisfies Lazy<string>
-     *     expect(sync.pull()).toBe("hello world")
-     *
-     *     // sync projection on async lazy:
-     *     const async = lazy(async () => [1]).map(x => [...x, 2]) satisfies LazyAsync<number[]>
-     *     await expect(async.pull()).resolves.toBe(2)
-     *
-     *     // async projection on sync lazy:
-     *     const nested = lazy(() => 1).map(async x => x + 1) satisfies LazyAsync<number>
-     *     await expect(nested.pull()).resolves.toBe(2)
-     *
-     *     // async projection on async lazy:
-     *     const asyncToAsync = lazy(async () => 1).map(
-     *         async x => x + 1
-     *     ) satisfies LazyAsync<number>
-     *     await expect(asyncToAsync.pull()).resolves.toBe(2)
-     *
-     * @param projection The function to apply to the value of the Lazy primitive. It will flatten
-     *   any nested {@link Lazy} and {@link Promise} instances.
-     * @summary
-     * Projects the result of this {@link Lazy} primitive using the given function.
-     * @see {@link Array.map} for a similar method on arrays.
-     * @see {@link Promise.then} for a similar method on promises.
-     * @see {@link Lazy.do} for a similar method that doesn't change the result.
-     */
-    map<S, R>(
-        this: LazyAsync<S>,
-        projection: (value: PulledAwaited<S>) => Promise<LazyAsync<R>>
-    ): LazyAsync<R>
-    map<S, Y>(
-        this: LazyAsync<S>,
-        projection: (value: PulledAwaited<S>) => Promise<LazyAsync<Y>>
-    ): LazyAsync<Y>
-    map<S, X>(
-        this: LazyAsync<S>,
-        projection: (value: PulledAwaited<S>) => Promise<Lazy<X>>
-    ): LazyAsync<X>
-    map<S, X>(this: LazyAsync<S>, projection: (value: PulledAwaited<S>) => Promise<X>): LazyAsync<X>
-    map<S, X>(
-        this: LazyAsync<S>,
-        projection: (value: PulledAwaited<S>) => LazyAsync<X>
-    ): LazyAsync<X>
-    map<S, R>(this: LazyAsync<S>, f: (value: PulledAwaited<S>) => Lazy<R>): LazyAsync<R>
-    map<S, R>(this: LazyAsync<S>, f: (value: PulledAwaited<S>) => R): LazyAsync<R>
-    map<Y>(projection: (value: PulledAwaited<T>) => Promise<LazyAsync<Y>>): LazyAsync<Y>
-    map<X>(projection: (value: PulledAwaited<T>) => Promise<Lazy<X>>): LazyAsync<X>
-    map<X>(projection: (value: PulledAwaited<T>) => Promise<X>): LazyAsync<X>
-    map<R>(projection: (value: PulledAwaited<T>) => Lazy<R>): Lazy<R>
-    map<R>(projection: (value: PulledAwaited<T>) => R): Lazy<R>
-    map(this: Lazy<any>, projection: (a: any) => any): any {
-        return lazy(() => {
-            const pulled = this.pull()
-            if (isThenable(pulled)) {
-                return pulled.then(projection)
-            }
-            return projection(pulled)
-        })
-    }
-
-    /**
-     * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and apply the given
-     * callback to the result. The new {@link Lazy} will still return the same value as **this**,
-     * only waiting for the handler to finish first.
-     *
-     * @example
-     *     const lazy = lazy(() => 1).do(x => console.log(x)) satisfies Lazy<number>
-     *     expect(lazy.pull()).toBe(1) // Logs "1" to the console as a side effect.
-     *     const wait30 = lazy(() => 1).do(
-     *         async x => new Promise(r => setTimeout(r, 30))
-     *     ) satisfies Lazy<number>
-     *     await expect(wait30.pull()).resolves.toBe(1) // Waits 30ms before returning 1.
-     *
-     * @param callback The callback
-     * @summary Applies the given callback to the result of this {@link Lazy} primitive.
-     */
-    do<S>(
-        this: LazyAsync<S>,
-        callback: (
-            value: S
-        ) => any | Lazy<any> | Promise<any> | Promise<LazyAsync<any>> | LazyAsync<any>
-    ): LazyAsync<S>
-    do<T>(
-        this: Lazy<T>,
-        callback: (value: PulledAwaited<T>) => Promise<any> | LazyAsync<any>
-    ): LazyAsync<T>
-    do<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => Lazy<any>): Lazy<T>
-    do<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => any): Lazy<T>
-    do<T>(this: LazyAsync<T>, callback: (value: any) => any): any {
-        return this.map(x => {
-            const result = callback(x)
-            return lazy(() => {
-                return result
-            }).map(() => x)
-        })
-    }
-
-    /**
-     * Zips **this** {@link Lazy} primitive with one or more others, returning a new {@link Lazy}
-     * that, when pulled, will pull all of them and return an array with the results. If any
-     * primitive involved is async, the new {@link Lazy} will also be async.
-     *
-     * @example
-     *     const a = lazy(() => 1).zip(lazy(() => 2)) satisfies Lazy<[number, number]>
-     *     expect(a.pull()).toEqual([1, 2])
-     *
-     *     const b = lazy(async () => 1).zip(lazy(() => 2)) satisfies LazyAsync<[number, number]>
-     *     await expect(b.pull()).resolves.toEqual([1, 2])
-     *
-     * @param others One or more {@link Lazy} primitives to zip with **this**.
-     * @summary Turns multiple lazy values into a single lazy value producing an array.
-     */
-    zip<Others extends readonly [Pullable<unknown>, ...Pullable<unknown>[]]>(
-        ...others: Others
-    ): LazyAsync<any> extends [this, ...Others][number]
-        ? LazyAsync<
-              [
-                  PulledAwaited<T>,
-                  ...{
-                      [K in keyof Others]: PulledAwaited<Others[K]>
-                  }
-              ]
-          >
-        : Lazy<
-              [
-                  Pulled<T>,
-                  ...{
-                      [K in keyof Others]: Pulled<Others[K]>
-                  }
-              ]
-          >
-
-    zip(...others: Pullable<any>[]): Lazy<any> {
-        // eslint-disable-next-line @typescript-eslint/promise-function-async
-        return lazy(() => {
-            const values = [this, ...others].map(x => x.pull())
-            if (values.some(isThenable)) {
-                return Promise.all(values)
-            }
-            return values
-        })
-    }
-
-    /**
-     * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when
-     * pulled, will pull all of them and return an object with the same keys, but with the values
-     * replaced by the pulled results. If any of the values are async, the new {@link Lazy} will also
-     * be async.
-     *
-     * The value of **this** {@link Lazy} will be available under the key `"this"`.
-     *
-     * @example
-     *     const self = lazy(() => 1).assemble({
-     *         a: lazy(() => 2),
-     *         b: lazy(() => 3)
-     *     })
-     *     expect(self.pull()).toEqual({ this: 1, a: 2, b: 3 })
-     *
-     *     const asyncSelf = lazy(async () => 1).assemble({
-     *         a: lazy(() => 2),
-     *         b: lazy(() => 3)
-     *     })
-     *     await expect(asyncSelf.pull()).resolves.toEqual({ this: 1, a: 2, b: 3 })
-     *
-     * @param assembly An object with {@link Lazy} values.
-     * @returns A new {@link Lazy} primitive that will return an object with the same keys as the
-     *   input object, plus the key `"this"`, with the pulled results.
-     * @summary Converts an object of {@link Lazy} values into a {@link Lazy} value producing an object.
-     */
-    assemble<X extends Record<keyof X, Pullable<unknown>>>(
-        assembly: X
-    ): LazyAsync<any> extends X[keyof X] | this
-        ? LazyAsync<
-              {
-                  [K in keyof X]: PulledAwaited<X[K]>
-              } & {
-                  this: PulledAwaited<T>
-              }
-          >
-        : Lazy<
-              {
-                  [K in keyof X]: Pulled<X[K]>
-              } & {
-                  this: Pulled<T>
-              }
-          > {
-        return lazy(() => {
-            const keys = ["this", ...Object.keys(assembly)]
-            const values = [this, ...Object.values(assembly)].map((x: any) => x.pull())
-            if (values.some(isThenable)) {
-                return Promise.all(values).then(values =>
-                    keys.reduce((acc, key, i) => {
-                        acc[key] = values[i]
-                        return acc
-                    }, {} as any)
-                )
-            }
-            return values.reduce((acc, value, i) => {
-                acc[keys[i]] = value
-                return acc
-            }, {} as any)
-        }) as any
     }
 }
