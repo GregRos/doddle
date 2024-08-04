@@ -1,6 +1,7 @@
 import { lazy } from "./ctor"
 
-export { lazy, memoize } from "./ctor"
+export { lazy } from "./ctor"
+export { memoize } from "./memoize"
 export { Lazy } from "./lazy"
 export {
     getClassName,

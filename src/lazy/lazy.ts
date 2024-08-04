@@ -81,7 +81,7 @@ export class Lazy<T>
         this._init = initializer
 
         const anyMe = this as any
-        for (const key of ["pull", "map", "do", "zip", "assemble"]) {
+        for (const key of ["pull", "map", "each", "zip", "assemble"]) {
             anyMe[key] = anyMe[key].bind(this)
             anyMe[key][ownerInstance] = this
             anyMe[key][methodName] = key
