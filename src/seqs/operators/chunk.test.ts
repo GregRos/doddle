@@ -98,6 +98,31 @@ describe("sync", () => {
         const s = _seq([1, 2, 3, 4]).chunk(2, (a, b) => a + b!)
         expect(s._qr).toEqual([3, 7])
     })
+
+    describe("invalid inputs", () => {
+        describe("throws on invocation", () => {
+            it("negative chunk length", () => {
+                expect(() => _seq([1, 2, 3]).chunk(-1)).toThrow()
+            })
+
+            it("non-number chunk length", () => {
+                // @ts-expect-error
+                expect(() => _seq([1, 2, 3]).chunk("1")).toThrow()
+            })
+
+            it("non-integer chunk length", () => {
+                expect(() => _seq([1, 2, 3]).chunk(0.5)).toThrow()
+                expect(() => _seq([1, 2, 3]).chunk(NaN)).toThrow()
+                expect(() => _seq([1, 2, 3]).chunk(Infinity)).toThrow()
+                expect(() => _seq([1, 2, 3]).chunk(-Infinity)).toThrow()
+            })
+
+            it("bigint chunk length", () => {
+                // @ts-expect-error
+                expect(() => _seq([1, 2, 3]).chunk(1n)).toThrow()
+            })
+        })
+    })
 })
 
 describe("async", () => {

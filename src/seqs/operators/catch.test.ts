@@ -112,23 +112,6 @@ describe("sync", () => {
         expect(handler).toHaveBeenCalledWith(expect.any(Error), 2)
     })
 
-    it("throws conversion TypeError if handler returns random value", () => {
-        const throwing = _seq.throws("error")
-        // @ts-expect-error
-        expect(() => [...throwing.catch(() => 1)]).toThrow(TypeError)
-        expect(() => [
-            // @ts-expect-error
-            ...throwing.catch(() => {
-                return {}
-            })
-        ]).toThrow(TypeError)
-    })
-    it("does throw if catch returns a Promise", () => {
-        const throwing = _seq.throws("error")
-        // @ts-expect-error
-        expect(() => [...throwing.catch(() => Promise.resolve(1))]).toThrow()
-    })
-
     describe("invalid inputs", () => {
         describe("throws on invocation", () => {
             it("non-function handler", () => {
@@ -142,7 +125,24 @@ describe("sync", () => {
             })
         })
 
-        describe("throws on iteration", () => {})
+        describe("throws on iteration", () => {
+            it("throws conversion TypeError if handler returns random value", () => {
+                const throwing = _seq.throws("error")
+                // @ts-expect-error
+                expect(() => [...throwing.catch(() => 1)]).toThrow(TypeError)
+                expect(() => [
+                    // @ts-expect-error
+                    ...throwing.catch(() => {
+                        return {}
+                    })
+                ]).toThrow(TypeError)
+            })
+            it("throws if catch returns a Promise", () => {
+                const throwing = _seq.throws("error")
+                // @ts-expect-error
+                expect(() => [...throwing.catch(() => Promise.resolve(1))]).toThrow()
+            })
+        })
     })
 })
 
