@@ -3,25 +3,22 @@ import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
-import type {
-    getReturnedWindowType,
-    getWindowProjectionArgsType
-} from "../type-functions/get-window-type"
+import type { getWindowOutputType, getWindowArgsType } from "./window.types"
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection: (...window: getWindowArgsType<T, L>) => S
 ): Seq<S>
 export function sync<T, L extends number>(
     this: Iterable<T>,
     size: L
-): Seq<getReturnedWindowType<T, L>>
+): Seq<getWindowOutputType<T, L>>
 export function sync<T, L extends number>(
     this: Iterable<T>,
     size: L,
-    projection?: (...window: getWindowProjectionArgsType<T, L>) => any
-): Seq<getReturnedWindowType<T, L>> {
+    projection?: (...window: getWindowArgsType<T, L>) => any
+): Seq<getWindowOutputType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
     return new SeqOperator(this, function* chunk(input) {
@@ -42,17 +39,17 @@ export function sync<T, L extends number>(
 export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection: (...window: getWindowArgsType<T, L>) => S
 ): ASeq<S>
 export function async<T, L extends number>(
     this: AsyncIterable<T>,
     size: L
-): ASeq<getReturnedWindowType<T, L>>
+): ASeq<getWindowOutputType<T, L>>
 export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
-): ASeq<getReturnedWindowType<T, L>> {
+    projection?: (...window: getWindowArgsType<T, L>) => S
+): ASeq<getWindowOutputType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
     return new ASeqOperator(this, async function* chunk(input) {

@@ -3,24 +3,21 @@ import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
-import type {
-    getReturnedWindowType,
-    getWindowProjectionArgsType
-} from "../type-functions/get-window-type"
+import type { getWindowOutputType, getWindowArgsType } from "./window.types"
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection: (...window: getWindowArgsType<T, L>) => S
 ): Seq<S>
 export function sync<T, L extends number>(
     this: Iterable<T>,
     size: L
-): Seq<getReturnedWindowType<T, L>>
+): Seq<getWindowOutputType<T, L>>
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
     size: L,
-    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection?: (...window: getWindowArgsType<T, L>) => S
 ): Seq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
@@ -45,16 +42,16 @@ export function sync<T, L extends number, S>(
 export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection: (...window: getWindowArgsType<T, L>) => S
 ): ASeq<S>
 export function async<T, L extends number>(
     this: AsyncIterable<T>,
     size: L
-): ASeq<getReturnedWindowType<T, L>>
+): ASeq<getWindowOutputType<T, L>>
 export function async<T, L extends number, S>(
     this: AsyncIterable<T>,
     size: L,
-    projection?: (...window: getWindowProjectionArgsType<T, L>) => S
+    projection?: (...window: getWindowArgsType<T, L>) => S
 ): ASeq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
