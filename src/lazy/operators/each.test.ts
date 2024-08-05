@@ -1,4 +1,4 @@
-import { lazy, Lazy, LazyAsync } from ".."
+import { lazy, Lazy, LazyAsync } from "../.."
 
 const lz = lazy(() => 1) satisfies Lazy<number>
 const lza = lazy(async () => 1) satisfies LazyAsync<number>
