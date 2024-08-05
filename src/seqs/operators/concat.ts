@@ -11,7 +11,7 @@ export function sync<T, Seqs extends Seq.Input<any>[]>(
     ..._iterables: Seqs
 ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
     const iterables = _iterables.map(seq)
-    return new SeqOperator("concat", this, function* (input) {
+    return new SeqOperator(this, function* concat(input) {
         yield* input
         for (const iterable of iterables) {
             yield* iterable
@@ -23,7 +23,7 @@ export function async<T, ASeqs extends ASeq.SimpleInput<any>[]>(
     ..._otherInputs: ASeqs
 ): ASeq<T | ASeq.ElementOfInput<ASeqs[number]>> {
     const inputs = _otherInputs.map(aseq)
-    return new ASeqOperator("concat", this, async function* (input) {
+    return new ASeqOperator(this, async function* concat(input) {
         for await (const element of input) {
             yield element
         }

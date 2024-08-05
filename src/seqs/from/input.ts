@@ -7,17 +7,17 @@ import { SeqOperator } from "../seq/seq.class"
 
 export function async<T>(input: ASeq.Input<T>) {
     if (isIterable(input)) {
-        return new ASeqOperator("aseq", input, async function* (input) {
+        return new ASeqOperator(input, async function* aseq(input) {
             yield* input
         })
     }
     if (isAsyncIterable(input)) {
-        return new ASeqOperator("aseq", input, async function* (input) {
+        return new ASeqOperator(input, async function* aseq(input) {
             yield* input
         })
     }
     if (typeof input === "function") {
-        return new ASeqOperator("aseq", input, async function* (input) {
+        return new ASeqOperator(input, async function* aseq(input) {
             const result = input()
             if (isLazy(result)) {
                 yield result.pull()
@@ -41,12 +41,12 @@ export function async<T>(input: ASeq.Input<T>) {
 
 export function sync<T>(input: Seq.Input<T>) {
     if (isIterable(input)) {
-        return new SeqOperator("seq", input, function* (input) {
+        return new SeqOperator(input, function* seq(input) {
             yield* input
         })
     }
     if (typeof input === "function") {
-        return new SeqOperator("seq", input, function* (input) {
+        return new SeqOperator(input, function* seq(input) {
             const result = input()
             if (isIterable(result)) {
                 yield* result

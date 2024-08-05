@@ -10,7 +10,7 @@ import { seq } from "../seq/seq.ctor"
 const END_MARKER = Symbol("DUMMY")
 export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
-    return new SeqOperator("take", this, function* (input) {
+    return new SeqOperator(this, function* take(input) {
         let count = countArg
         if (count === 0) {
             yield* []
@@ -43,7 +43,7 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
 }
 export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    return new ASeqOperator("take", this, async function* (input) {
+    return new ASeqOperator(this, async function* take(input) {
         let count = countArg
         if (count === 0) {
             yield* []

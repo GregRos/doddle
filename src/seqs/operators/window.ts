@@ -24,7 +24,7 @@ export function sync<T, L extends number, S>(
 ): Seq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return new SeqOperator("window", this, function* (input) {
+    return new SeqOperator(this, function* window(input) {
         const buffer = Array<T>(size)
         let i = 0
         for (const item of input) {
@@ -58,7 +58,7 @@ export function async<T, L extends number, S>(
 ): ASeq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return new ASeqOperator("window", this, async function* (input) {
+    return new ASeqOperator(this, async function* window(input) {
         const buffer = Array<T>(size)
         let i = 0
         for await (const item of input) {

@@ -4,7 +4,7 @@ import { aseq } from "../seq/aseq.ctor"
 
 import { seq } from "../seq/seq.ctor"
 
-function shuffle<T>(array: T[]) {
+function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
         const temp = array[i]
@@ -14,17 +14,17 @@ function shuffle<T>(array: T[]) {
     return array
 }
 export function sync<T>(this: Iterable<T>) {
-    return new SeqOperator("shuffle", this, function* (input) {
+    return new SeqOperator(this, function* shuffle(input) {
         const array = seq(input).toArray().pull()
-        shuffle(array)
+        shuffleArray(array)
         yield* array
     })
 }
 
 export function async<T>(this: AsyncIterable<T>) {
-    return new ASeqOperator("shuffle", this, async function* (input) {
+    return new ASeqOperator(this, async function* shuffle(input) {
         const array = await aseq(input).toArray().pull()
-        shuffle(array)
+        shuffleArray(array)
         yield* array
     })
 }

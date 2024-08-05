@@ -19,7 +19,7 @@ export function sync<T>(
     options?: SkipWhileOptions
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return new SeqOperator("skipWhile", this, function* (input) {
+    return new SeqOperator(this, function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for (const element of input) {
@@ -43,7 +43,7 @@ export function async<T>(
     options?: SkipWhileOptions
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return new ASeqOperator("skipWhile", this, async function* (input) {
+    return new ASeqOperator(this, async function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for await (const element of input) {

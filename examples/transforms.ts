@@ -1,5 +1,5 @@
 import { seq } from "../src"
-
+Error.stackTraceLimit = Infinity
 const s = seq
     .of(1, 2, 3)
     .concat(seq.range(0, 100))

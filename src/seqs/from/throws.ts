@@ -9,7 +9,7 @@ function getThrownError(thrown: unknown) {
 
 export function sync<T = never>(thrown: unknown): Seq<T> {
     mustNotBeNullish("thrown", thrown)
-    return new SeqOperator("fromError", thrown, function* (input) {
+    return new SeqOperator(thrown, function* throws(input) {
         if (typeof input === "function") {
             const result = input()
             mustNotReturnNullish("thrown", result)
@@ -23,7 +23,7 @@ export function async<T>(
     thrown: string | Error | (() => string | Error | Promise<string> | Promise<Error>)
 ): ASeq<T> {
     mustNotBeNullish("thrown", thrown)
-    return new ASeqOperator("fromError", thrown, async function* (input) {
+    return new ASeqOperator(thrown, async function* throws(input) {
         if (typeof input === "function") {
             const result = input()
             mustNotReturnNullish("thrown", result)

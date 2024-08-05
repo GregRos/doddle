@@ -14,7 +14,7 @@ export function sync<T>(
 ): Seq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new SeqOperator("orderBy", this, function* (input) {
+    return new SeqOperator(this, function* orderBy(input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()
@@ -35,7 +35,7 @@ export function async<T, S>(
 ): ASeq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new ASeqOperator("orderBy", this, async function* (input) {
+    return new ASeqOperator(this, async function* orderBy(input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()

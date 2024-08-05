@@ -8,15 +8,15 @@ class ThrownErrorMarker {
 }
 export function sync<T>(this: Iterable<T>): Seq<T> {
     const self = this
-    const cache: (T | ThrownErrorMarker)[] = []
+    const _cache: (T | ThrownErrorMarker)[] = []
     let alreadyDone = false
     let iterator: Iterator<T>
 
-    return new SeqOperator("cache", this, function* cache_() {
+    return new SeqOperator(this, function* cache() {
         let i = 0
         for (;;) {
-            if (i < cache.length) {
-                const cur = cache[i]
+            if (i < _cache.length) {
+                const cur = _cache[i]
                 if (cur instanceof ThrownErrorMarker) {
                     throw cur.error
                 }
@@ -30,11 +30,11 @@ export function sync<T>(this: Iterable<T>): Seq<T> {
                         alreadyDone = true
                         return
                     }
-                    cache.push(value)
+                    _cache.push(value)
                     yield value
                     i++
                 } catch (err) {
-                    cache.push(new ThrownErrorMarker(err as any))
+                    _cache.push(new ThrownErrorMarker(err as any))
                     throw err
                 }
             } else {
@@ -45,15 +45,15 @@ export function sync<T>(this: Iterable<T>): Seq<T> {
 }
 export function async<T>(this: AsyncIterable<T>): ASeq<T> {
     const self = this
-    const cache: (T | ThrownErrorMarker)[] = []
+    const _cache: (T | ThrownErrorMarker)[] = []
     let alreadyDone = false
     let iterator: AsyncIterator<T>
     let pending: Promise<void> | undefined
-    return new ASeqOperator("cache", this, async function* cache_() {
+    return new ASeqOperator(this, async function* cache() {
         let i = 0
         for (;;) {
-            if (i < cache.length) {
-                const cur = cache[i]
+            if (i < _cache.length) {
+                const cur = _cache[i]
                 if (cur instanceof ThrownErrorMarker) {
                     throw cur.error
                 }
@@ -69,11 +69,11 @@ export function async<T>(this: AsyncIterable<T>): ASeq<T> {
                                 alreadyDone = true
                                 return
                             }
-                            cache.push(value)
+                            _cache.push(value)
                             pending = undefined
                             return
                         } catch (err) {
-                            cache.push(new ThrownErrorMarker(err as any))
+                            _cache.push(new ThrownErrorMarker(err as any))
                             pending = undefined
                             return
                         }

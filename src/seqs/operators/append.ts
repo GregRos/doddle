@@ -10,7 +10,7 @@ export function sync<T, Items extends any[]>(
     this: Iterable<T>,
     ...items: Items
 ): Seq<T | Items[number]> {
-    return new SeqOperator("append", this, function* (input) {
+    return new SeqOperator(this, function* append(input) {
         yield* seq(input).concat(items)
     })
 }
@@ -18,7 +18,7 @@ export function async<T, Items extends any[]>(
     this: AsyncIterable<T>,
     ...items: Items
 ): ASeq<T | Items[number]> {
-    return new ASeqOperator("append", this, async function* (input) {
+    return new ASeqOperator(this, async function* append(input) {
         yield* aseq(input).concat(items)
     })
 }

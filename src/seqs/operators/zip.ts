@@ -33,7 +33,7 @@ export function sync<T, Xs extends [any, ...any[]], R>(
 ): Seq<[T, ...Xs]> {
     const others = _others.map(seq)
     projection ??= (...args: any[]) => args as any
-    return new SeqOperator("zip", this, function* (input) {
+    return new SeqOperator(this, function* zip(input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.iterator]() as Iterator<any> | undefined
         )
@@ -78,7 +78,7 @@ export function async<T, Xs extends [any, ...any[]], R>(
 ): ASeq<[T, ...Xs]> {
     const others = _others.map(aseq)
     projection ??= (...args: any[]) => args as any
-    return new ASeqOperator("zip", this, async function* (input) {
+    return new ASeqOperator(this, async function* zip(input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.asyncIterator]() as AsyncIterator<any> | undefined
         )

@@ -5,12 +5,12 @@ import { aseq } from "../seq/aseq.ctor"
 import { seq } from "../seq/seq.ctor"
 
 export function sync<T>(this: Iterable<T>) {
-    return new SeqOperator("uniq", this, function* (input) {
+    return new SeqOperator(this, function* uniq(input) {
         yield* seq(input).uniqBy(x => x)
     })
 }
 export function async<T>(this: AsyncIterable<T>) {
-    return new ASeqOperator("uniq", this, async function* (input) {
+    return new ASeqOperator(this, async function* uniq(input) {
         yield* aseq(input).uniqBy(x => x)
     })
 }

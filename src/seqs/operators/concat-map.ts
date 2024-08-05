@@ -12,7 +12,7 @@ export function sync<T, S>(
     projection: Seq.Iteratee<T, Seq.Input<S>>
 ): Seq<getConcatElementType<T, S>> {
     mustBeFunction("projection", projection)
-    return new SeqOperator("concatMap", this, function* (input) {
+    return new SeqOperator(this, function* concatMap(input) {
         let index = 0
         for (const element of input) {
             for (const projected of seq(projection(element, index++))) {
@@ -26,7 +26,7 @@ export function async<T, S>(
     projection: ASeq.Iteratee<T, ASeq.SimpleInput<S>>
 ): ASeq<getConcatElementType<T, S>> {
     mustBeFunction("projection", projection)
-    return new ASeqOperator("concatMap", this, async function* (input) {
+    return new ASeqOperator(this, async function* concatMap(input) {
         let index = 0
         for await (const element of input) {
             for await (const projected of aseq(await projection(element, index++))) {

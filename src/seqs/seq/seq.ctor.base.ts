@@ -7,15 +7,15 @@ import { sync as syncThrows } from "../from/throws"
 import type { Lazy } from "../../lazy"
 import { type Seq } from "./seq.class"
 import { seqSymbol } from "./symbol"
-import { seq as seqBase } from "./seq.ctor.base"
-
-export const seq = Object.assign(seqBase, {
-    of: syncOf,
-    repeat: syncRepeat,
-    range: syncRange,
-    is<T = unknown>(input: any): input is Seq<T> {
-        return seqSymbol in input && input[seqSymbol] === true
-    },
-    iterate: syncIterate,
-    throws: syncThrows
-})
+import { throws } from "assert"
+export function seq<E = never>(): Seq<E>
+export function seq(input: never[]): Seq<never>
+export function seq<E>(input: Seq.IterableInput<Lazy<E>>): Seq<E>
+export function seq<E>(input: E[]): Seq<E>
+export function seq<E>(input: Seq.Input<E>): Seq<E>
+export function seq<E>(input?: Seq.Input<E>) {
+    if (!input) {
+        return syncFrom([])
+    }
+    return syncFrom(input)
+}

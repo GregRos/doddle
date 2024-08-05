@@ -21,7 +21,7 @@ export function sync<Item, Acc>(
 ) {
     mustBeFunction("reducer", reducer)
 
-    return new SeqOperator("scan", this, function* (input) {
+    return new SeqOperator(this, function* scan(input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any
@@ -57,7 +57,7 @@ export function async<Item, Acc>(
     initial?: Acc
 ) {
     mustBeFunction("reducer", reducer)
-    return new ASeqOperator("scan", this, async function* (input) {
+    return new ASeqOperator(this, async function* scan(input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any

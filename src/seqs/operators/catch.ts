@@ -24,7 +24,7 @@ export function sync<T, S>(
     handler: Seq.Iteratee<Error, void | Seq.Input<S>>
 ): Seq<unknown> {
     mustBeFunction("handler", handler)
-    return new SeqOperator("catch", this, function* (input) {
+    return new SeqOperator(this, function* catch_(input) {
         let i = 0
         const iterator = input[Symbol.iterator]()
         for (;;) {
@@ -65,7 +65,7 @@ export function async<T, S>(
     this: AsyncIterable<T>,
     handler: ASeq.Iteratee<Error, void | ASeq.SimpleInput<S>>
 ): ASeq<any> {
-    return new ASeqOperator("catch", this, async function* (input) {
+    return new ASeqOperator(this, async function* catch_(input) {
         let i = 0
         const iterator = input[Symbol.asyncIterator]()
         for (;;) {

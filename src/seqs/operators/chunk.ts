@@ -24,7 +24,7 @@ export function sync<T, L extends number>(
 ): Seq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new SeqOperator("chunk", this, function* (input) {
+    return new SeqOperator(this, function* chunk(input) {
         let chunk: T[] = []
         for (const item of input) {
             chunk.push(item)
@@ -55,7 +55,7 @@ export function async<T, L extends number, S>(
 ): ASeq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new ASeqOperator("chunk", this, async function* (input) {
+    return new ASeqOperator(this, async function* chunk(input) {
         let chunk: T[] = []
         for await (const item of input) {
             chunk.push(item)

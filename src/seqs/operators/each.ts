@@ -13,7 +13,7 @@ export function sync<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new SeqOperator("each", this, function* (input) {
+    return new SeqOperator(this, function* each(input) {
         let index = 0
         for (const element of input) {
             if (stage === "before" || stage === "both") {
@@ -35,7 +35,7 @@ export function async<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new ASeqOperator("each", this, async function* (input) {
+    return new ASeqOperator(this, async function* each(input) {
         let index = 0
         for await (const element of input) {
             if (stage === "before" || stage === "both") {

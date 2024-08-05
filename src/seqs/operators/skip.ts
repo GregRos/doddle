@@ -10,7 +10,7 @@ import { seq } from "../seq/seq.ctor"
 const SKIP = Symbol("SKIP")
 export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
-    return new SeqOperator("skip", this, function* (input) {
+    return new SeqOperator(this, function* skip(input) {
         let count = countArg
         if (count === 0) {
             yield* seq(input)
@@ -33,7 +33,7 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
 }
 export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    return new ASeqOperator("skip", this, async function* (input) {
+    return new ASeqOperator(this, async function* skip(input) {
         let count = countArg
         if (count === 0) {
             yield* aseq(input)

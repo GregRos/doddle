@@ -95,37 +95,20 @@ export abstract class Seq<T> implements Iterable<T> {
 interface SyncOperator<In, Out> extends Iterable<Out> {
     _operator: string
     _operand: In
-    _impl: (input: In) => Iterable<Out>
 }
 
-let namedInvokerStubs: Record<string, () => Iterable<any>> = {}
-
-function getInvokerStub(name: string) {
-    if (!namedInvokerStubs[name]) {
-        Object.assign(namedInvokerStubs, {
-            *[name](this: SyncOperator<any, any>) {
-                for (const x of this._impl(this._operand)) {
-                    yield x
-                }
-            }
-        })
-    }
-    return namedInvokerStubs[name]
-}
-
-export const SeqOperator = function SeqOperator<In, Out>(
+export const SeqOperator = function seq<In, Out>(
     this: SyncOperator<In, Out>,
-    operator: string,
     operand: In,
     impl: (input: In) => Iterable<Out>
 ) {
-    this._operator = operator
+    this._operator = impl.name
     this._operand = operand
-    this._impl = impl
-
-    this[Symbol.iterator] = getInvokerStub(operator) as any
+    this[Symbol.iterator] = function operator() {
+        return impl.call(this, this._operand)[Symbol.iterator]()
+    }
 } as any as {
-    new <In, Out>(operator: string, operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
+    new <In, Out>(operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
 }
 SeqOperator.prototype = new (Seq as any)()
 export namespace Seq {

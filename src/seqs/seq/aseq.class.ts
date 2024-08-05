@@ -94,27 +94,23 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     readonly zip = zipAsync
 }
 
-type ASyncOperator<Operator extends string, In, Out> = AsyncIterable<Out> & {
-    _operator: Operator
+type ASyncOperator<In, Out> = AsyncIterable<Out> & {
+    _operator: string
     _operand: In
-} & {}
+}
 
-export const ASeqOperator = function ASeqOperator<Operator extends string, In, Out>(
-    this: ASyncOperator<Operator, In, Out>,
-    operator: Operator,
+export const ASeqOperator = function aseq<In, Out>(
+    this: ASyncOperator<In, Out>,
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ) {
-    this._operator = operator
+    this._operator = impl.name
     this._operand = operand
-    const opName = `OP_${operator}` as const
-    ;(this as any)[opName] = impl
-
-    this[Symbol.asyncIterator] = async function* operator() {
-        yield* (this as any)[opName](operand)
+    this[Symbol.asyncIterator] = function operator() {
+        return impl.call(this, this._operand)[Symbol.asyncIterator]()
     }
 } as any as {
-    new <In, Out>(operator: string, operand: In, impl: (input: In) => AsyncIterable<Out>): ASeq<Out>
+    new <In, Out>(operand: In, impl: (input: In) => AsyncIterable<Out>): ASeq<Out>
 }
 ASeqOperator.prototype = new (ASeq as any)()
 

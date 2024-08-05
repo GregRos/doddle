@@ -14,7 +14,7 @@ export function sync<T>(
     specifier?: TakeWhileSpecifier
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return new SeqOperator("takeWhile", this, function* (input) {
+    return new SeqOperator(this, function* takeWhile(input) {
         let index = 0
         for (const element of input) {
             if (predicate(element, index++)) {
@@ -34,7 +34,7 @@ export function async<T>(
     specifier?: TakeWhileSpecifier
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return new ASeqOperator("takeWhile", this, async function* (input) {
+    return new ASeqOperator(this, async function* takeWhile(input) {
         let index = 0
 
         for await (const element of input) {

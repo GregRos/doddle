@@ -5,7 +5,7 @@ import type { aseq } from "../seq/aseq.ctor"
 
 export function sync<T>(this: Iterable<T>, projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
     mustBeFunction("projection", projection)
-    return new SeqOperator("uniqBy", this, function* (input) {
+    return new SeqOperator(this, function* uniqBy(input) {
         const seen = new Set()
         for (const element of input) {
             const key = projection(element)
@@ -21,7 +21,7 @@ export function async<T>(
     projection: ASeq.NoIndexIteratee<T, any>
 ): ASeq<T> {
     mustBeFunction("projection", projection)
-    return new ASeqOperator("uniqBy", this, async function* (input) {
+    return new ASeqOperator(this, async function* uniqBy(input) {
         const seen = new Set()
         for await (const element of input) {
             const key = await projection(element)
