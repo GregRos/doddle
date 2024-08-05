@@ -1,6 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy } from "../.."
-import type { Seq } from "../.."
+import type { Lazy, Seq } from "../.."
 
 import { seq } from "../.."
 const f = seq

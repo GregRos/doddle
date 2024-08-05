@@ -1,6 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { type ASeq } from "../.."
-import { aseq } from "../.."
+import { aseq, type ASeq } from "../.."
 
 const _seq = aseq
 type _Seq<T> = ASeq<T>

@@ -1,7 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import { lazy, type Lazy } from "../.."
 import type { Seq } from "../.."
-import { seq } from "../.."
+import { lazy, seq, type Lazy } from "../.."
 import { Dummy } from "./input.utils"
 const _seq = seq
 type _Seq<T> = Seq<T>
