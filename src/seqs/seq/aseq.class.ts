@@ -5,8 +5,6 @@ import { async as concatAsync } from "../operators/concat"
 import { async as countAsync } from "../operators/count"
 import { async as eachAsync } from "../operators/each"
 
-import { gotNonIterable } from "../../errors/error"
-import { isAsyncIterable, isIterable, isNextable } from "../../utils"
 import { async as catchAsync } from "../operators/catch"
 import { async as chunkAsync } from "../operators/chunk"
 
@@ -42,7 +40,6 @@ import { async as uniqAsync } from "../operators/uniq"
 import { async as uniqByAsync } from "../operators/uniq-by"
 import { async as windowAsync } from "../operators/window"
 import { async as zipAsync } from "../operators/zip"
-import { aseq } from "./aseq.ctor"
 import { aseqSymbol } from "./symbol"
 
 export abstract class ASeq<T> implements AsyncIterable<T> {

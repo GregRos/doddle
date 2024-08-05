@@ -1,7 +1,7 @@
 import { mustBeBoolean, mustBeFunction } from "../../errors/error"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import { SeqOperator, type Seq } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
+import { SeqOperator, type Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
 

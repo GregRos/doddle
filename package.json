@@ -54,6 +54,9 @@
   "resolutions": {
     "declare-it": "portal:/C:/codegr/declare-it"
   },
+  "dependencies": {
+    "type-plus": "^7.6.2"
+  },
   "devDependencies": {
     "@assertive-ts/core": "^2.1.0",
     "@gregros/eslint-config": "^0.6.0",
@@ -80,8 +83,5 @@
     "ts-jest": "^29.2.4",
     "typescript": "^5.5.4"
   },
-  "packageManager": "yarn@4.2.2",
-  "dependencies": {
-    "type-plus": "^7.6.2"
-  }
+  "packageManager": "yarn@4.2.2"
 }

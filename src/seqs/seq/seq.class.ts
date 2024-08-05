@@ -39,7 +39,6 @@ import { sync as uniqSync } from "../operators/uniq"
 import { sync as uniqBySync } from "../operators/uniq-by"
 import { sync as windowSync } from "../operators/window"
 import { sync as zipSync } from "../operators/zip"
-import { seq } from "./seq.ctor"
 import { seqSymbol } from "./symbol"
 
 export abstract class Seq<T> implements Iterable<T> {

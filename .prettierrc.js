@@ -1,8 +1,7 @@
 /** @type {import("prettier").Config} */
 module.exports = {
     tabWidth: 4,
-    filepath:
-        "src/**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,ctsx,mtsx,html,htm,yaml,yml,json,scss,css}",
+    filepath: "src/**/*.{js,jsx,cjs,mjs,ts,tsx,cts,mts,ctsx,mtsx,html,htm,yaml,yml,json,scss,css}",
     arrowParens: "avoid",
     trailingComma: "none",
     printWidth: 100,

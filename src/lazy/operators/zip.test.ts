@@ -1,4 +1,4 @@
-import { LazyAsync, lazy, type Pullable, type PullableAsync } from ".."
+import { lazy, type PullableAsync } from ".."
 it("zips only sync", () => {
     const [a, b, c] = [lazy(() => 1 as const), lazy(() => 2), lazy(() => 3)]
     const zipped = a.zip(b, c)

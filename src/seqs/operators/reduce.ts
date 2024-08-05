@@ -6,8 +6,8 @@ import { mustBeFunction } from "../../errors/error"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
 import type { ASeq } from "../seq/aseq.class"
+import { seq } from "../seq/seq.ctor"
 const NO_INITIAL = Symbol("NO_INTIAL")
 
 export function generic<Item, Acc>(

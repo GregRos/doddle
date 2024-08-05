@@ -1,6 +1,6 @@
 import { ASeqOperator } from "../seq/aseq.class"
-import { SeqOperator } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
+import { SeqOperator } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
 

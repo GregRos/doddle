@@ -1,9 +1,9 @@
 import { mustBeInteger } from "../../errors/error"
-import { ASeqOperator } from "../seq/aseq.class"
-import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
+import { ASeqOperator } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
+import { SeqOperator } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
 

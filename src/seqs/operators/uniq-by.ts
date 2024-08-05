@@ -1,7 +1,6 @@
 import { mustBeFunction } from "../../errors/error"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class"
 import { SeqOperator, type Seq } from "../seq/seq.class"
-import type { aseq } from "../seq/aseq.ctor"
 
 export function sync<T>(this: Iterable<T>, projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
     mustBeFunction("projection", projection)

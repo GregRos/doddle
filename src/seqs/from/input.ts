@@ -1,8 +1,7 @@
 import { gotNonIterable } from "../../errors/error"
-import { isIterable, isAsyncIterable, isLazy, isNextable, isThenable } from "../../utils"
-import type { aseq } from "../seq/aseq.ctor"
-import type { Seq } from "../seq/seq.class"
+import { isAsyncIterable, isIterable, isLazy, isNextable, isThenable } from "../../utils"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class"
+import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
 
 export function async<T>(input: ASeq.Input<T>) {

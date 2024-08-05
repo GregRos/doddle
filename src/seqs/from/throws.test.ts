@@ -1,8 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import { aseq } from "../seq/aseq.ctor"
-import { seq } from "../seq/seq.ctor"
 import type { Seq } from "../seq/seq.class"
-import exp from "constants"
+import { seq } from "../seq/seq.ctor"
 
 describe("sync", () => {
     declare.it("type defaults to Seq<never>", expect => {

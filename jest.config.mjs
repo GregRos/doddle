@@ -1,6 +1,5 @@
 /** @type {import("jest").Config} */
 export default {
-
     transform: {
         "^.+\\.ts$": [
             "ts-jest",
@@ -16,5 +15,3 @@ export default {
     coverageDirectory: "./coverage",
     collectCoverage: false
 }
-
-

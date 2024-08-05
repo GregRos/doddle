@@ -1,6 +1,6 @@
 import { declare, type } from "declare-it"
-import type { Lazy } from "./lazy"
 import { lazy } from "./from/input"
+import type { Lazy } from "./lazy"
 
 declare.it("If S ⊆ T then Lazy<S> ⊆ Lazy<T>", expect => {
     expect(type<Lazy<1>>).to_subtype(type<Lazy<number>>)

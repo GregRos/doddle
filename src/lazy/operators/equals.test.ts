@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { lazy, Lazy, LazyAsync, PulledAwaited } from ".."
+import { lazy, Lazy, LazyAsync } from ".."
 
 const sync = lazy(() => 1)
 const asy = lazy(async () => 1)

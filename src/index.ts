@@ -1,2 +1,2 @@
-export * from "./seqs"
 export * from "./lazy"
+export * from "./seqs"

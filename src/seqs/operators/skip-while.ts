@@ -1,9 +1,8 @@
 import { mustBeFunction } from "../../errors/error"
-import { ASeqOperator } from "../seq/aseq.class"
-import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
-import type { aseq } from "../seq/aseq.ctor"
+import { ASeqOperator } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
+import { SeqOperator } from "../seq/seq.class"
 
 export interface SkipWhileOptions {
     skipFinal?: boolean

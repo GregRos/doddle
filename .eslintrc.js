@@ -6,9 +6,7 @@ const projects =
             root: true,
             extends: ["@gregros/eslint-config"],
             parserOptions: {
-                project: [
-                    "./tsconfig.json"
-                ]
+                project: ["./tsconfig.json"]
             },
             rules: {
                 "no-invalid-this": "off",

@@ -1,4 +1,4 @@
-import { mustNotBeNullish, mustNotReturnNullish, type mustReturnTuple } from "../../errors/error"
+import { mustNotBeNullish, mustNotReturnNullish } from "../../errors/error"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class"
 import { SeqOperator, type Seq } from "../seq/seq.class"
 

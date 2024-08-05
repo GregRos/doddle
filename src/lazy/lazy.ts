@@ -1,12 +1,5 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import { lazy } from "./from/input"
 import { cannotRecurseSync } from "../errors/error"
-import assemble from "./operators/assemble"
-import each from "./operators/each"
-import equals from "./operators/equals"
-import map from "./operators/map"
-import zip from "./operators/zip"
-import { LazyAsync, LazyInfo, Pullable, Pulled, PulledAwaited, type _IterationType } from "./types"
 import {
     getClassName,
     getInitializerName,
@@ -15,6 +8,12 @@ import {
     isPullable,
     isThenable
 } from "../utils"
+import assemble from "./operators/assemble"
+import each from "./operators/each"
+import equals from "./operators/equals"
+import map from "./operators/map"
+import zip from "./operators/zip"
+import { LazyInfo, Pullable, Pulled, type _IterationType } from "./types"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 

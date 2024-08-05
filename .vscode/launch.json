@@ -1,4 +1,13 @@
 {
   "version": "0.2.0",
-  "configurations": []
+  "configurations": [
+    {
+      // launch dist/refactor.js
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Refactor",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/dist/cleanup.js"
+    }
+  ]
 }
