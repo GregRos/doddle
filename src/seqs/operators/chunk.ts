@@ -3,7 +3,7 @@ import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
-import type { getWindowOutputType, getWindowArgsType } from "./window.types"
+import type { getWindowArgsType, getWindowOutputType } from "./window.types"
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
