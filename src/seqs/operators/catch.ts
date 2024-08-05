@@ -1,10 +1,12 @@
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
 import { seq } from "../seq/seq.ctor"
+import { isThenable } from "../../utils"
+import { mustBeFunction } from "../../errors/error"
 
 class ThrewNonError<T> extends Error {
     constructor(public value: T) {
@@ -16,12 +18,13 @@ export function sync<T, S>(
     this: Iterable<T>,
     handler: Seq.Iteratee<Error, Seq.Input<S>>
 ): Seq<T | S>
-export function sync<T>(this: Iterable<T>, handler: Seq.Iteratee<Error, void>): Seq<T>
+export function sync<T>(this: Iterable<T>, handler: Seq.Iteratee<Error, void | undefined>): Seq<T>
 export function sync<T, S>(
     this: Iterable<T>,
     handler: Seq.Iteratee<Error, void | Seq.Input<S>>
 ): Seq<unknown> {
-    return new syncOperator("catch", this, function* (input) {
+    mustBeFunction("handler", handler)
+    return new SeqOperator("catch", this, function* (input) {
         let i = 0
         const iterator = input[Symbol.iterator]()
         for (;;) {
@@ -32,15 +35,19 @@ export function sync<T, S>(
                     return
                 }
                 yield value
-            } catch (error) {
+            } catch (error: any) {
                 if (typeof error !== "object" || !(error instanceof Error)) {
-                    throw new ThrewNonError(error)
+                    error = new ThrewNonError(error)
                 }
                 const result = handler(error, i)
                 if (result == undefined) {
                     return
                 }
-
+                if (isThenable(result)) {
+                    throw TypeError(
+                        "Unexpected promise or thenable returned from sync catch handler."
+                    )
+                }
                 yield* seq(result)
                 return
             }
@@ -58,7 +65,7 @@ export function async<T, S>(
     this: AsyncIterable<T>,
     handler: ASeq.Iteratee<Error, void | ASeq.SimpleInput<S>>
 ): ASeq<any> {
-    return new asyncOperator("catch", this, async function* (input) {
+    return new ASeqOperator("catch", this, async function* (input) {
         let i = 0
         const iterator = input[Symbol.asyncIterator]()
         for (;;) {
@@ -69,9 +76,9 @@ export function async<T, S>(
                     return
                 }
                 yield value
-            } catch (error) {
+            } catch (error: any) {
                 if (typeof error !== "object" || !(error instanceof Error)) {
-                    throw new ThrewNonError(error)
+                    error = new ThrewNonError(error)
                 }
                 const result = await handler(error, i)
                 if (result == undefined) {

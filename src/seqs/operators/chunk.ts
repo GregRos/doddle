@@ -1,6 +1,6 @@
 import { mustBePositiveInt } from "../../errors/error"
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 import type {
@@ -24,7 +24,7 @@ export function sync<T, L extends number>(
 ): Seq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new syncOperator("chunk", this, function* (input) {
+    return new SeqOperator("chunk", this, function* (input) {
         let chunk: T[] = []
         for (const item of input) {
             chunk.push(item)
@@ -55,7 +55,7 @@ export function async<T, L extends number, S>(
 ): ASeq<getReturnedWindowType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new asyncOperator("chunk", this, async function* (input) {
+    return new ASeqOperator("chunk", this, async function* (input) {
         let chunk: T[] = []
         for await (const item of input) {
             chunk.push(item)

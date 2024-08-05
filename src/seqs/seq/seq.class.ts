@@ -1,6 +1,3 @@
-import { gotAsyncInSyncContext, gotNonIterable } from "../../errors/error"
-import { isAsyncIterable, isIterable, isThenable } from "../../utils"
-
 import { sync as appendSync } from "../operators/append"
 import { sync as aseqSync } from "../operators/aseq"
 import { sync as atSync } from "../operators/at"
@@ -16,6 +13,7 @@ import { sync as filterSync } from "../operators/filter"
 import { sync as findSync } from "../operators/find"
 import { sync as findLastSync } from "../operators/find-last"
 import { sync as firstSync } from "../operators/first"
+import { sync as groupBySync } from "../operators/group-by"
 import { sync as includesSync } from "../operators/includes"
 import { sync as lastSync } from "../operators/last"
 import { sync as mapSync } from "../operators/map"
@@ -41,55 +39,57 @@ import { sync as uniqSync } from "../operators/uniq"
 import { sync as uniqBySync } from "../operators/uniq-by"
 import { sync as windowSync } from "../operators/window"
 import { sync as zipSync } from "../operators/zip"
+import { seq } from "./seq.ctor"
+import { seqSymbol } from "./symbol"
 
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
     get _qr() {
         return this.toArray().pull()
     }
-
-    append = appendSync
-    aseq = aseqSync
-    at = atSync
-    cache = cacheSync
-    catch = catchSync
-    concat = concatSync
-    chunk = chunkSync
-    concatMap = concatMapSync
-    count = countSync
-    each = eachSync
-    every = everySync
-    filter = filterSync
-    findLast = findLastSync
-    find = findSync
-    first = firstSync
-    flatMap = concatMapSync
-    includes = includesSync
-    last = lastSync
-    map = mapSync
-
-    maxBy = maxBySync
-    minBy = minBySync
-    orderBy = orderBySync
-    reduce = reduceSync
-    reverse = reverseSync
-    scan = scanSync
-    seqEquals = seqEqualsSync
-    setEquals = setEqualsSync
-    shuffle = shuffleSync
-    skipWhile = skipWhileSync
-    skip = skipSync
-    some = someSync
-    sumBy = sumBySync
-    takeWhile = takeWhileSync
-    take = takeSync
-    toArray = toArraySync
-    toSet = toSetSync
-    toMap = toMapSync
-    uniqBy = uniqBySync
-    uniq = uniqSync
-    window = windowSync
-    zip = zipSync
+    readonly [seqSymbol] = true
+    readonly append = appendSync
+    readonly aseq = aseqSync
+    readonly at = atSync
+    readonly cache = cacheSync
+    readonly catch = catchSync
+    readonly concat = concatSync
+    readonly chunk = chunkSync
+    readonly concatMap = concatMapSync
+    readonly count = countSync
+    readonly each = eachSync
+    readonly every = everySync
+    readonly filter = filterSync
+    readonly findLast = findLastSync
+    readonly find = findSync
+    readonly first = firstSync
+    readonly flatMap = concatMapSync
+    readonly groupBy = groupBySync
+    readonly includes = includesSync
+    readonly last = lastSync
+    readonly map = mapSync
+    readonly maxBy = maxBySync
+    readonly minBy = minBySync
+    readonly orderBy = orderBySync
+    readonly reduce = reduceSync
+    readonly reverse = reverseSync
+    readonly scan = scanSync
+    readonly seqEquals = seqEqualsSync
+    readonly setEquals = setEqualsSync
+    readonly shuffle = shuffleSync
+    readonly skipWhile = skipWhileSync
+    readonly skip = skipSync
+    readonly some = someSync
+    readonly sumBy = sumBySync
+    readonly takeWhile = takeWhileSync
+    readonly take = takeSync
+    readonly toArray = toArraySync
+    readonly toSet = toSetSync
+    readonly toMap = toMapSync
+    readonly uniqBy = uniqBySync
+    readonly uniq = uniqSync
+    readonly window = windowSync
+    readonly zip = zipSync
 }
 
 interface SyncOperator<In, Out> extends Iterable<Out> {
@@ -103,15 +103,17 @@ let namedInvokerStubs: Record<string, () => Iterable<any>> = {}
 function getInvokerStub(name: string) {
     if (!namedInvokerStubs[name]) {
         Object.assign(namedInvokerStubs, {
-            [name]: function* (this: SyncOperator<any, any>) {
-                yield* this._impl(this._operand)
+            *[name](this: SyncOperator<any, any>) {
+                for (const x of this._impl(this._operand)) {
+                    yield x
+                }
             }
         })
     }
     return namedInvokerStubs[name]
 }
 
-export const syncOperator = function syncOperator<In, Out>(
+export const SeqOperator = function SeqOperator<In, Out>(
     this: SyncOperator<In, Out>,
     operator: string,
     operand: In,
@@ -125,7 +127,7 @@ export const syncOperator = function syncOperator<In, Out>(
 } as any as {
     new <In, Out>(operator: string, operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
 }
-syncOperator.prototype = new (Seq as any)()
+SeqOperator.prototype = new (Seq as any)()
 export namespace Seq {
     export type IndexIteratee<O> = (index: number) => O
 

@@ -1,6 +1,6 @@
 import { mustBeInteger } from "../../errors/error"
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
@@ -10,7 +10,7 @@ import { seq } from "../seq/seq.ctor"
 const END_MARKER = Symbol("DUMMY")
 export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
-    return new syncOperator("take", this, function* (input) {
+    return new SeqOperator("take", this, function* (input) {
         let count = countArg
         if (count === 0) {
             yield* []
@@ -43,7 +43,7 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
 }
 export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    return new asyncOperator("take", this, async function* (input) {
+    return new ASeqOperator("take", this, async function* (input) {
         let count = countArg
         if (count === 0) {
             yield* []

@@ -15,6 +15,11 @@ it("name is recovered", () => {
     expect(lz.toString()).toEqual("lazy(foo) <untouched>")
 })
 
+it("toString() is equal to Symbol.toStringTag", () => {
+    const lz = lazy(() => 1)
+    expect(lz.toString()).toEqual(lz[Symbol.toStringTag])
+})
+
 it("starts out untouched", () => {
     const lz = lazy(() => 1)
     expect(lz.info).toEqual({

@@ -1,6 +1,6 @@
 import { mustBeFunction, mustBeOneOf } from "../../errors/error"
-import { asyncOperator, type ASeq } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 export type EachCallStage = "before" | "after" | "both" | undefined
@@ -13,7 +13,7 @@ export function sync<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new syncOperator("each", this, function* (input) {
+    return new SeqOperator("each", this, function* (input) {
         let index = 0
         for (const element of input) {
             if (stage === "before" || stage === "both") {
@@ -35,16 +35,17 @@ export function async<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new asyncOperator("each", this, async function* (input) {
+    return new ASeqOperator("each", this, async function* (input) {
         let index = 0
         for await (const element of input) {
             if (stage === "before" || stage === "both") {
-                await action(element, index++, "before")
+                await action(element, index, "before")
             }
             yield element
             if (stage === "after" || stage === "both") {
-                await action(element, index++, "after")
+                await action(element, index, "after")
             }
+            index++
         }
     })
 }

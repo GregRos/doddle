@@ -16,6 +16,7 @@ import { async as filterAsync } from "../operators/filter"
 import { async as findAsync } from "../operators/find"
 import { async as findLastAsync } from "../operators/find-last"
 import { async as firstAsync } from "../operators/first"
+import { async as groupByAsync } from "../operators/group-by"
 import { async as includesAsync } from "../operators/includes"
 import { async as lastAsync } from "../operators/last"
 import { async as mapAsync } from "../operators/map"
@@ -41,89 +42,81 @@ import { async as uniqAsync } from "../operators/uniq"
 import { async as uniqByAsync } from "../operators/uniq-by"
 import { async as windowAsync } from "../operators/window"
 import { async as zipAsync } from "../operators/zip"
-import type { aseq } from "./aseq.ctor"
+import { aseq } from "./aseq.ctor"
+import { aseqSymbol } from "./symbol"
 
 export abstract class ASeq<T> implements AsyncIterable<T> {
     abstract [Symbol.asyncIterator](): AsyncIterator<T>
     get _qr() {
         return this.toArray().pull()
     }
-    append = appendAsync
-    at = atAsync
-    catch = catchAsync
-    concat = concatAsync
-    concatMap = concatMapAsync
-    chunk = chunkAsync
-    cache = cacheAsync
-    count = countAsync
-    each = eachAsync
-    every = everyAsync
-    filter = filterAsync
-    findLast = findLastAsync
-    find = findAsync
-    first = firstAsync
-    flatMap = concatMapAsync
-    includes = includesAsync
-    last = lastAsync
-    map = mapAsync
-    maxBy = maxByAsync
-    minBy = minByAsync
-    orderBy = orderByAsync
-    reduce = reduceAsync
-    reverse = reverseAsync
-    scan = scanAsync
-    seqEquals = seqEqualsAsync
-    setEquals = setEqualsAsync
-    shuffle = shuffleAsync
-
-    skipWhile = skipWhileAsync
-    skip = skipAsync
-    some = someAsync
-    sumBy = sumByAsync
-    takeWhile = takeWhileAsync
-    take = takeAsync
-    toArray = toArrayAsync
-    toSet = toSetAsync
-    toMap = toMapAsync
-    uniqBy = uniqByAsync
-    uniq = uniqAsync
-    window = windowAsync
-    zip = zipAsync
-}
-let namedInvokerStubs: Record<string, () => Iterable<any>> = {}
-
-function getInvokerStub(name: string) {
-    if (!namedInvokerStubs[name]) {
-        Object.assign(namedInvokerStubs, {
-            [name]: async function* (this: ASyncOperator<any, any>) {
-                yield* this._impl(this._operand)
-            }
-        })
-    }
-    return namedInvokerStubs[name]
+    readonly [aseqSymbol] = true
+    readonly append = appendAsync
+    readonly at = atAsync
+    readonly catch = catchAsync
+    readonly concat = concatAsync
+    readonly concatMap = concatMapAsync
+    readonly chunk = chunkAsync
+    readonly cache = cacheAsync
+    readonly count = countAsync
+    readonly each = eachAsync
+    readonly every = everyAsync
+    readonly filter = filterAsync
+    readonly findLast = findLastAsync
+    readonly find = findAsync
+    readonly first = firstAsync
+    readonly flatMap = concatMapAsync
+    readonly groupBy = groupByAsync
+    readonly includes = includesAsync
+    readonly last = lastAsync
+    readonly map = mapAsync
+    readonly maxBy = maxByAsync
+    readonly minBy = minByAsync
+    readonly orderBy = orderByAsync
+    readonly reduce = reduceAsync
+    readonly reverse = reverseAsync
+    readonly scan = scanAsync
+    readonly seqEquals = seqEqualsAsync
+    readonly setEquals = setEqualsAsync
+    readonly shuffle = shuffleAsync
+    readonly skipWhile = skipWhileAsync
+    readonly skip = skipAsync
+    readonly some = someAsync
+    readonly sumBy = sumByAsync
+    readonly takeWhile = takeWhileAsync
+    readonly take = takeAsync
+    readonly toArray = toArrayAsync
+    readonly toSet = toSetAsync
+    readonly toMap = toMapAsync
+    readonly uniqBy = uniqByAsync
+    readonly uniq = uniqAsync
+    readonly window = windowAsync
+    readonly zip = zipAsync
 }
 
-interface ASyncOperator<In, Out> extends AsyncIterable<Out> {
-    _operator: string
+type ASyncOperator<Operator extends string, In, Out> = AsyncIterable<Out> & {
+    _operator: Operator
     _operand: In
-    _impl: (input: In) => AsyncIterable<Out>
-}
+} & {}
 
-export const asyncOperator = function asyncOperator<In, Out>(
-    this: ASyncOperator<In, Out>,
-    operator: string,
+export const ASeqOperator = function ASeqOperator<Operator extends string, In, Out>(
+    this: ASyncOperator<Operator, In, Out>,
+    operator: Operator,
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ) {
     this._operator = operator
     this._operand = operand
-    this._impl = impl
+    const opName = `OP_${operator}` as const
+    ;(this as any)[opName] = impl
 
-    this[Symbol.asyncIterator] = getInvokerStub(operator) as any
+    this[Symbol.asyncIterator] = async function* operator() {
+        yield* (this as any)[opName](operand)
+    }
 } as any as {
     new <In, Out>(operator: string, operand: In, impl: (input: In) => AsyncIterable<Out>): ASeq<Out>
 }
-asyncOperator.prototype = new (ASeq as any)()
+ASeqOperator.prototype = new (ASeq as any)()
 
 export namespace ASeq {
     type MaybePromise<T> = T | PromiseLike<T>

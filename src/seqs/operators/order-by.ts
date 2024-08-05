@@ -1,11 +1,11 @@
 import { mustBeBoolean, mustBeFunction } from "../../errors/error"
-import { asyncOperator, type ASeq } from "../seq/aseq.class"
-import { syncOperator, type Seq } from "../seq/seq.class"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class"
+import { SeqOperator, type Seq } from "../seq/seq.class"
 import { aseq } from "../seq/aseq.ctor"
 
 import { seq } from "../seq/seq.ctor"
 
-import { returnKvp } from "../../utils";
+import { returnKvp } from "../../utils"
 
 export function sync<T>(
     this: Iterable<T>,
@@ -14,7 +14,7 @@ export function sync<T>(
 ): Seq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new syncOperator("orderBy", this, function* (input) {
+    return new SeqOperator("orderBy", this, function* (input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()
@@ -35,7 +35,7 @@ export function async<T, S>(
 ): ASeq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new asyncOperator("orderBy", this, async function* (input) {
+    return new ASeqOperator("orderBy", this, async function* (input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()

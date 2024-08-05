@@ -9,22 +9,10 @@ export class DawdleError extends Error {
 
 const BAD_ARGUMENT = "call/bad-argument"
 const BAD_RETURN = "call/bad-return"
-const NOT_ENOUGH_ELEMENTS = "seq/not-enough-elements"
-
-export function notEnoughElements(where: string, found: number, expected: number) {
-    throw new DawdleError(
-        NOT_ENOUGH_ELEMENTS,
-        `Expected ${where} to have at least ${expected} elements, but found only ${found}`
-    )
-}
-
 function argNotExpected(expected: string, check: (value: unknown) => boolean) {
     return function (name: string, value: unknown) {
         if (!check(value)) {
-            throw new DawdleError(
-                BAD_ARGUMENT,
-                `Argument '${name}' must be ${expected}, but got ${value}`
-            )
+            throw new TypeError(`Argument '${name}' must be ${expected}, but got ${value}`)
         }
     }
 }
@@ -40,10 +28,6 @@ function argExpectedReturn<T = unknown>(expected: string, check: (value: any) =>
         return true
     }
 }
-export const mustBeNumber = argNotExpected(
-    "a number",
-    (value: unknown) => typeof value === "number"
-)
 
 export const mustBeNatural = argNotExpected(
     "a natural number",
@@ -75,37 +59,23 @@ export const mustBeFunction = argNotExpected(
     (value: unknown) => typeof value === "function"
 )
 
-export const mustBeIterable = argNotExpected("an iterable", isIterable)
-
-export const mustBeAsyncIterable = argNotExpected("an async iterable", isAsyncIterable)
-
 export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }
 
-export const mustReturnComparable = argExpectedReturn(
-    "a comparable value",
-    (value: any): value is string | number | boolean | bigint => {
-        return ["string", "number", "boolean", "bigint"].includes(typeof value)
-    }
+export const mustNotBeNullish = argNotExpected(
+    "not null or undefined",
+    (value: unknown) => value != null
 )
-export const mustReturnArray = argExpectedReturn("an array", Array.isArray)
 
-export function mustBeOptionalOptions(name: string, value: unknown) {
-    if (value !== undefined && typeof value !== "object" && value !== null) {
-        throw new DawdleError(
-            BAD_ARGUMENT,
-            `Argument '${name}' must either be an object or undefined, but got ${value}`
+export function mustNotReturnNullish<T = unknown>(name: string, value: T): T {
+    if (value == null) {
+        throw new TypeError(
+            `Function argument ${name} expected to return a non-nullish value, but got ${value}`
         )
     }
-}
-
-export interface MustHaveKeyOptions {
-    parameterName: string
-    key: string
-    isOptional: boolean
-    expectedType: string
+    return value
 }
 
 export function mustReturnTuple(length: number) {
@@ -120,24 +90,9 @@ export function mustReturnTuple(length: number) {
     }
 }
 
-export function asyncInSyncOperator(operator: string, object: object) {
-    return new DawdleError(
-        "operator/async-in-sync",
-        `Operator '${operator}' received an async iterable of type '${getClassName(object)}' in a sync context.`
-    )
-}
-
-export function gotAsyncInSyncContext(object: object, property: string) {
-    return new DawdleError(
-        "operator/non-iterable",
-        `Tries to convert input of type ${getClassName(object)} to sync iterable, but got an async iterable because ${property}.`
-    )
-}
-
 export function gotNonIterable(object: object, syncness: "sync" | "async", description: string) {
-    return new DawdleError(
-        "operator/non-iterable",
-        `Tried to convert input of type ${getClassName(object)} to ${syncness} iterable, but ${description}.`
+    return new TypeError(
+        `Tried to convert ${getClassName(object)} to an ${syncness === "sync" ? "" : "(async) "}iterable, but ${description}`
     )
 }
 export function cannotRecurseSync(): Error {

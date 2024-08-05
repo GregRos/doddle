@@ -101,17 +101,17 @@ describe("sync", () => {
         expect(iterable._qr).toEqual([1])
     })
     it("errors if given iterator directly", () => {
-        expect(() => seq(new Dummy._Iterator() as any)).toThrow()
+        expect(() => seq(new Dummy._Iterator() as any)).toThrow(TypeError)
     })
     it("errors if given something else", () => {
-        expect(() => seq(1 as any)).toThrow()
+        expect(() => seq(1 as any)).toThrow(TypeError)
     })
     it("errors if given an async iterable", () => {
-        expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow()
+        expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow(TypeError)
     })
     it("errors when iterated when given a function returning something else", () => {
         const iterable = seq(() => 1 as any)
-        expect(() => [...iterable]).toThrow()
+        expect(() => [...iterable]).toThrow(TypeError)
     })
     it("errors when iterated when given a function returning async iterable", () => {
         const iterable = seq(() => new Dummy._AsyncIterable() as any)
@@ -249,7 +249,9 @@ describe("async", () => {
     })
 
     it("errors if given iterator directly", async () => {
-        await expect(async () => await _seq(new Dummy._Iterator() as any)._qr).rejects.toThrow()
+        await expect(async () => await _seq(new Dummy._Iterator() as any)._qr).rejects.toThrow(
+            TypeError
+        )
     })
 
     it("errors on iteration when given a function returning something else", async () => {
@@ -257,7 +259,7 @@ describe("async", () => {
         await expect(async () => {
             for await (const _ of iterable) {
             }
-        }).rejects.toThrow()
+        }).rejects.toThrow(TypeError)
     })
 
     it("errors when iterated if source errors", async () => {

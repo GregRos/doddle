@@ -1,6 +1,6 @@
 import { mustBeFunction } from "../../errors/error"
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
@@ -21,7 +21,7 @@ export function sync<Item, Acc>(
 ) {
     mustBeFunction("reducer", reducer)
 
-    return new syncOperator("scan", this, function* (input) {
+    return new SeqOperator("scan", this, function* (input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any
@@ -57,7 +57,7 @@ export function async<Item, Acc>(
     initial?: Acc
 ) {
     mustBeFunction("reducer", reducer)
-    return new asyncOperator("scan", this, async function* (input) {
+    return new ASeqOperator("scan", this, async function* (input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any

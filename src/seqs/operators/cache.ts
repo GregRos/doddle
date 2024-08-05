@@ -1,5 +1,5 @@
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import type { Seq } from "../seq/seq.class"
 
@@ -12,7 +12,7 @@ export function sync<T>(this: Iterable<T>): Seq<T> {
     let alreadyDone = false
     let iterator: Iterator<T>
 
-    return new syncOperator("cache", this, function* cache_() {
+    return new SeqOperator("cache", this, function* cache_() {
         let i = 0
         for (;;) {
             if (i < cache.length) {
@@ -49,7 +49,7 @@ export function async<T>(this: AsyncIterable<T>): ASeq<T> {
     let alreadyDone = false
     let iterator: AsyncIterator<T>
     let pending: Promise<void> | undefined
-    return new asyncOperator("cache", this, async function* cache_() {
+    return new ASeqOperator("cache", this, async function* cache_() {
         let i = 0
         for (;;) {
             if (i < cache.length) {

@@ -96,51 +96,99 @@ describe("sync", () => {
         expect(s._qr).toEqual([1, 2, 1, 2, 3])
         expect(handler).toHaveBeenCalledTimes(2)
     })
+
+    it("catches non-error and turns it into error", () => {
+        const handler = jest.fn(() => {})
+        const s = _seq([1, 2, 3])
+            .each(x => {
+                if (x === 3) {
+                    throw "test"
+                }
+            })
+            .catch(handler)
+        for (const _ of s) {
+        }
+        expect(handler).toHaveBeenCalledTimes(1)
+        expect(handler).toHaveBeenCalledWith(expect.any(Error), 2)
+    })
+
+    it("throws conversion TypeError if handler returns random value", () => {
+        const throwing = _seq.throws("error")
+        // @ts-expect-error
+        expect(() => [...throwing.catch(() => 1)]).toThrow(TypeError)
+        expect(() => [
+            // @ts-expect-error
+            ...throwing.catch(() => {
+                return {}
+            })
+        ]).toThrow(TypeError)
+    })
+    it("does throw if catch returns a Promise", () => {
+        const throwing = _seq.throws("error")
+        // @ts-expect-error
+        expect(() => [...throwing.catch(() => Promise.resolve(1))]).toThrow()
+    })
+
+    describe("invalid inputs", () => {
+        describe("throws on invocation", () => {
+            it("non-function handler", () => {
+                // @ts-expect-error
+                expect(() => _seq([1, 2, 3]).catch(1)).toThrow()
+            })
+
+            it("no handler", () => {
+                // @ts-expect-error
+                expect(() => _seq([1, 2, 3]).catch()).toThrow()
+            })
+        })
+
+        describe("throws on iteration", () => {})
+    })
 })
 
 import type { ASeq } from "../seq/aseq.class"
 import { aseq } from "../seq/aseq.ctor"
 
 describe("async", () => {
-    const _aseq = aseq
+    const _seq = aseq
     type _ASeq<T> = ASeq<T>
 
     declare.it("should not be callable without handler", () => {
         // @ts-expect-error
-        _aseq([1, 2, 3]).catch()
+        _seq([1, 2, 3]).catch()
     })
 
     declare.it("callable with void handler gives aseq of same type", expect => {
-        expect(type_of(_aseq([1, 2, 3]).catch(() => {}))).to_equal(type<_ASeq<number>>)
+        expect(type_of(_seq([1, 2, 3]).catch(() => {}))).to_equal(type<_ASeq<number>>)
     })
 
     declare.it("callable with iterable handler of same type", expect => {
-        expect(type_of(_aseq([1, 2, 3]).catch(() => [1, 2, 3]))).to_equal(type<_ASeq<number>>)
+        expect(type_of(_seq([1, 2, 3]).catch(() => [1, 2, 3]))).to_equal(type<_ASeq<number>>)
     })
 
     declare.it("iterable handler of another type gives disjunction", expect => {
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
         expect(type_of(s.catch(() => ["a"]))).to_equal(type<_ASeq<number | string>>)
     })
 
     declare.it("handler explicitly returning undefined is also okay", expect => {
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
         expect(type_of(s.catch(() => undefined))).to_equal(type<_ASeq<number>>)
     })
 
     it("returns same for no errors", async () => {
-        const s = _aseq([1, 2, 3]).catch(() => {})
+        const s = _seq([1, 2, 3]).catch(() => {})
         expect(await s._qr).toEqual([1, 2, 3])
     })
 
     it("returns same for empty", async () => {
-        const s = _aseq([]).catch(() => {})
+        const s = _seq([]).catch(() => {})
         expect(await s._qr).toEqual([])
     })
 
     it("handler stops seq on void", async () => {
         const handler = jest.fn(() => {})
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -155,7 +203,7 @@ describe("async", () => {
 
     it("handler concats seq on iterable", async () => {
         const handler = jest.fn(() => [1, 2, 3])
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -167,7 +215,7 @@ describe("async", () => {
 
     it("can iterate twice, calls handler twice, same behavior", async () => {
         const handler = jest.fn(() => {})
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -183,7 +231,7 @@ describe("async", () => {
 
     it("can iterate twice with iterable handler", async () => {
         const handler = jest.fn(() => [1, 2, 3])
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -197,7 +245,7 @@ describe("async", () => {
 
     it("works for rejected promise", async () => {
         const handler = jest.fn(() => {})
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(async x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -212,19 +260,19 @@ describe("async", () => {
 
     declare.it("can't be called with async handler returning a non-iterable", () => {
         // @ts-expect-error
-        _aseq([1, 2, 3]).catch(async () => 1)
+        _seq([1, 2, 3]).catch(async () => 1)
     })
 
     declare.it(
         "can be called with async handler returning an iterable, or an async iterable",
         () => {
-            _aseq([1, 2, 3]).catch(async () => [1, 2, 3])
-            _aseq([1, 2, 3]).catch(async function* () {
+            _seq([1, 2, 3]).catch(async () => [1, 2, 3])
+            _seq([1, 2, 3]).catch(async function* () {
                 yield 1
                 yield 2
                 yield 3
             })
-            _aseq([1, 2, 3]).catch(async () => {
+            _seq([1, 2, 3]).catch(async () => {
                 return async function* () {
                     yield 1
                     yield 2
@@ -236,7 +284,7 @@ describe("async", () => {
 
     it("works for async handler returning void", async () => {
         const handler = jest.fn(async () => {})
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(async x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -251,7 +299,7 @@ describe("async", () => {
 
     it("works for async handler returning iterable", async () => {
         const handler = jest.fn(async () => [1, 2, 3])
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(async x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -267,7 +315,7 @@ describe("async", () => {
             yield 2
             yield 3
         })
-        const s = _aseq([1, 2, 3])
+        const s = _seq([1, 2, 3])
             .each(async x => {
                 if (x === 3) {
                     throw new Error("test")
@@ -275,5 +323,20 @@ describe("async", () => {
             })
             .catch(handler)
         expect(await s._qr).toEqual([1, 2, 1, 2, 3])
+    })
+
+    it("catches non-error and turns it into error", async () => {
+        const handler = jest.fn(() => {})
+        const s = _seq([1, 2, 3])
+            .each(x => {
+                if (x === 3) {
+                    throw "test"
+                }
+            })
+            .catch(handler)
+        for await (const _ of s) {
+        }
+        expect(handler).toHaveBeenCalledTimes(1)
+        expect(handler).toHaveBeenCalledWith(expect.any(Error), 2)
     })
 })

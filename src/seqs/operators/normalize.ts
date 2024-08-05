@@ -1,6 +1,6 @@
 import { result } from "lodash"
 import { gotNonIterable } from "../../errors/error"
 import type { aseq } from "../seq/aseq.ctor"
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { Seq } from "../seq/seq.class"

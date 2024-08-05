@@ -1,6 +1,6 @@
 import { mustBeFunction } from "../../errors/error"
-import { asyncOperator } from "../seq/aseq.class"
-import { syncOperator } from "../seq/seq.class"
+import { ASeqOperator } from "../seq/aseq.class"
+import { SeqOperator } from "../seq/seq.class"
 import type { ASeq } from "../seq/aseq.class"
 import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
@@ -19,7 +19,7 @@ export function sync<T>(
     options?: SkipWhileOptions
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return new syncOperator("skipWhile", this, function* (input) {
+    return new SeqOperator("skipWhile", this, function* (input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for (const element of input) {
@@ -43,7 +43,7 @@ export function async<T>(
     options?: SkipWhileOptions
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return new asyncOperator("skipWhile", this, async function* (input) {
+    return new ASeqOperator("skipWhile", this, async function* (input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for await (const element of input) {
