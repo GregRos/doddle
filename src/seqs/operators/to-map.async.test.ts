@@ -133,3 +133,24 @@ it("works for async projections", async () => {
         ])
     )
 })
+
+describe("invalid inputs", () => {
+    it("doesn't accept projection to single", async () => {
+        await expect(() =>
+            _aseq([1, 2, 3])
+                // @ts-expect-error
+
+                .toMap(() => [1])
+                .pull()
+        ).rejects.toThrow(TypeError)
+    })
+
+    it("doesn't accept projection to triple", async () => {
+        await expect(() =>
+            _aseq([1, 2, 3])
+                // @ts-expect-error
+                .toMap(x => [x, x, x])
+                .pull()
+        ).rejects.toThrow(TypeError)
+    })
+})

@@ -6,7 +6,7 @@ export namespace Dummy {
         _count = 0
         next(...args: any[]) {
             if (this._count === 3) {
-                return { done: true, value: null } as const
+                return { done: true, value: undefined } as const
             }
             return { done: false, value: this._count++ } as const
         }

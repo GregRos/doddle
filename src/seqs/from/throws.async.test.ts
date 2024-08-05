@@ -20,6 +20,22 @@ it("throws error when iterated", async () => {
     }).rejects.toThrow(err)
 })
 
+it("throws error based on function returning Error", async () => {
+    const s = aseq.throws(() => new Error("error"))
+    await expect(async () => {
+        for await (const item of s) {
+        }
+    }).rejects.toThrow("error")
+})
+
+it("throws error based on function returning string", async () => {
+    const s = aseq.throws(() => "error")
+    await expect(async () => {
+        for await (const item of s) {
+        }
+    }).rejects.toThrow("error")
+})
+
 it("works when appended to another aseq", async () => {
     const each = jest.fn()
     const s = aseq.of(1, 2, 3).concat(aseq.throws("error")).each(each)

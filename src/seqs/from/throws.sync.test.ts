@@ -15,6 +15,22 @@ it("throws error when iterated", () => {
     expect(() => [...s]).toThrow(err)
 })
 
+it("throws error based on function returning Error", () => {
+    const s = seq.throws(() => new Error("error"))
+    expect(() => {
+        for (const item of s) {
+        }
+    }).toThrow("error")
+})
+
+it("throws error based on function returning string", () => {
+    const s = seq.throws(() => "error")
+    expect(() => {
+        for (const item of s) {
+        }
+    }).toThrow("error")
+})
+
 it("works when appended to another seq", () => {
     const each = jest.fn()
     const s = seq.of(1, 2, 3).concat(seq.throws("error")).each(each)

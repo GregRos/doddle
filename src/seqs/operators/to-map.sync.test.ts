@@ -138,3 +138,23 @@ it("calls projection with index", () => {
     expect(fn).toHaveBeenCalledWith(2, 1)
     expect(fn).toHaveBeenCalledWith(3, 2)
 })
+
+describe("invalid inputs", () => {
+    it("doesn't accept projection to single", () => {
+        expect(() =>
+            _seq([1, 2, 3])
+                // @ts-expect-error
+                .toMap(() => [1])
+                .pull()
+        ).toThrow(TypeError)
+    })
+
+    it("doesn't accept projection to triple", () => {
+        expect(() =>
+            _seq([1, 2, 3])
+                // @ts-expect-error
+                .toMap(x => [x, x, x])
+                .pull()
+        ).toThrow(TypeError)
+    })
+})

@@ -17,18 +17,6 @@ function argNotExpected(expected: string, check: (value: unknown) => boolean) {
     }
 }
 
-function argExpectedReturn<T = unknown>(expected: string, check: (value: any) => value is T) {
-    return function (name: string, value: any): value is T {
-        if (!check(value)) {
-            throw new DawdleError(
-                BAD_RETURN,
-                `Function argument ${name} expected to return ${expected}, but got ${value}`
-            )
-        }
-        return true
-    }
-}
-
 export const mustBeNatural = argNotExpected(
     "a natural number",
     (value: unknown) => typeof value === "number" && value >= 0 && Number.isInteger(value)
@@ -44,11 +32,6 @@ export const mustBeInteger = argNotExpected(
     (value: unknown) => typeof value === "number" && Number.isInteger(value)
 )
 
-export const mustBeString = argNotExpected(
-    "a string",
-    (value: unknown) => typeof value === "string"
-)
-
 export const mustBeBoolean = argNotExpected(
     "a boolean",
     (value: unknown) => typeof value === "boolean"
@@ -59,7 +42,7 @@ export const mustBeFunction = argNotExpected(
     (value: unknown) => typeof value === "function"
 )
 
-export const mustBeOneOf = <T>(...options: T[]) => {
+export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }
@@ -81,8 +64,7 @@ export function mustNotReturnNullish<T = unknown>(name: string, value: T): T {
 export function mustReturnTuple(length: number) {
     return function (name: string, value: unknown) {
         if (!Array.isArray(value) || value.length !== length) {
-            throw new DawdleError(
-                BAD_RETURN,
+            throw new TypeError(
                 `Function argument ${name} expected to return a tuple of length ${length}, but got ${value}`
             )
         }
