@@ -1,5 +1,5 @@
-import { lazy } from "../lazy"
 import type { Lazy, LazyAsync } from "../lazy"
+import { lazy } from "../lazy"
 
 function equals<T extends Other, Other>(
     this: LazyAsync<T>,

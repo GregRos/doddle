@@ -1,6 +1,6 @@
 import { isThenable } from "../../utils"
-import { lazy } from "../lazy"
 import type { Lazy, LazyAsync } from "../lazy"
+import { lazy } from "../lazy"
 
 /**
  * Zips **this** {@link Lazy} primitive with one or more others, returning a new {@link Lazy} that,

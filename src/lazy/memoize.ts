@@ -1,5 +1,4 @@
-import { type Lazy, ownerInstance } from "./lazy"
-import { lazy } from "./lazy"
+import { type Lazy, lazy, ownerInstance } from "./lazy"
 
 /**
  * Memoizes the given function, caching its result and making sure it's only executed once. Uses

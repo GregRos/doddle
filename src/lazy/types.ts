@@ -1,1 +1,0 @@
-import { Lazy } from "./lazy"

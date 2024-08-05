@@ -1,6 +1,6 @@
 import { isThenable } from "../../utils"
-import { lazy } from "../lazy"
 import type { Lazy, LazyAsync } from "../lazy"
+import { lazy } from "../lazy"
 
 /**
  * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when
