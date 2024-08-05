@@ -31,6 +31,7 @@ export function async<T>(input: ASeq.Input<T>) {
             }
         })
     }
+    throw gotNonIterable(input, "sync", "it was not an iterable, async iterable, or function")
 }
 
 export function sync<T>(input: Seq.Input<T>) {
@@ -42,9 +43,7 @@ export function sync<T>(input: Seq.Input<T>) {
     if (typeof input === "function") {
         return new syncOperator("fromFunction", input, function* (input) {
             const result = input()
-            if (isLazy(result)) {
-                yield result.pull()
-            } else if (isIterable(result)) {
+            if (isIterable(result)) {
                 yield* result
             } else if (isNextable(result)) {
                 for (let item = result.next(); !item.done; item = result.next()) {
@@ -54,7 +53,11 @@ export function sync<T>(input: Seq.Input<T>) {
                     yield item.value
                 }
             } else if (isAsyncIterable(result)) {
-                throw Error("Cannot use sync fromFunction with an async iterable")
+                throw gotNonIterable(
+                    result,
+                    "sync",
+                    "it was an async iterable, which is not allowed in a sync context"
+                )
             } else {
                 throw gotNonIterable(
                     result,
@@ -64,4 +67,12 @@ export function sync<T>(input: Seq.Input<T>) {
             }
         })
     }
+    if (isAsyncIterable(input)) {
+        throw gotNonIterable(
+            input,
+            "sync",
+            "it was an async iterable, which is not allowed in a sync context"
+        )
+    }
+    throw gotNonIterable(input, "sync", "it was not an iterable or a function")
 }

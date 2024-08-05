@@ -1,4 +1,4 @@
-import { Lazy, type Pulled } from "."
+import { Lazy, type Pulled } from "../lazy"
 
 class LazyFromOperator<In, Out> extends Lazy<Out> {
     constructor(

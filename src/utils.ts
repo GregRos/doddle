@@ -1,9 +1,9 @@
-import { Lazy, Pullable } from "./lazy";
+import { Lazy, Pullable } from "./lazy"
 
 export function isIterable<T>(value: any): value is Iterable<T> {
     return (
         typeof value === "object" && value != null && typeof value[Symbol.iterator] === "function"
-    );
+    )
 }
 
 export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
@@ -11,27 +11,27 @@ export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
         typeof value === "object" &&
         value != null &&
         typeof value[Symbol.asyncIterator] === "function"
-    );
+    )
 }
 
 export function isNextable<T>(value: any): value is Iterator<T> | AsyncIterator<T> {
     // Checks if value is an iterator
-    return typeof value === "object" && value && "next" in value && typeof value.next === "function";
+    return typeof value === "object" && value && "next" in value && typeof value.next === "function"
 }
 
 export function getClassName(something: any) {
     if (typeof something !== "object") {
-        return typeof something;
+        return typeof something
     }
     if (something === null) {
-        return "null";
+        return "null"
     }
-    const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object";
-    return ctorName;
+    const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object"
+    return ctorName
 }
 
 export function getInitializerName(initializer: (...args: any[]) => any) {
-    return initializer.name || null;
+    return initializer.name || null
 }
 
 /**
@@ -45,7 +45,7 @@ export function isPullable<T = unknown>(what: unknown): what is Pullable<T> {
         what != null &&
         "pull" in what &&
         typeof what?.pull === "function"
-    );
+    )
 }
 
 /**
@@ -54,11 +54,11 @@ export function isPullable<T = unknown>(what: unknown): what is Pullable<T> {
  * @param what The value to check.
  */
 export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
-    return typeof what === "object" && !!what && "then" in what && typeof what.then === "function";
+    return typeof what === "object" && !!what && "then" in what && typeof what.then === "function"
 }
 
 export function isLazy(value: any): value is Lazy<any> {
-    return typeof value === "object" && value != null && value instanceof Lazy;
+    return typeof value === "object" && value != null && value instanceof Lazy
 }
 
 export function returnKvp(input: any, key: any, value: any) {
@@ -66,10 +66,10 @@ export function returnKvp(input: any, key: any, value: any) {
         return key.then(key => ({
             key: key,
             value: value
-        })) as Promise<any>;
+        })) as Promise<any>
     }
     return {
         key: key,
         value: value
-    };
+    }
 }

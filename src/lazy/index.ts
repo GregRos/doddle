@@ -5,7 +5,7 @@ export { memoize } from "./from/memoize"
 export { Lazy } from "./lazy"
 export {
     LazyAsync,
-    LazyAsyncLike,
+    PullableAsync,
     LazyInitializer,
     LazyStage,
     LazySyncness,
@@ -13,4 +13,3 @@ export {
     Pulled,
     PulledAwaited
 } from "./types"
-

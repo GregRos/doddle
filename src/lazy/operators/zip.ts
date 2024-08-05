@@ -1,12 +1,7 @@
 import { lazy } from "../from/input"
 import type { Lazy } from "../lazy"
-import {
-    type LazyAsync,
-    type Pullable,
-    type Pulled,
-    type PulledAwaited
-} from "../types"
-import { isThenable } from "../../utils";
+import { type LazyAsync, type Pullable, type Pulled, type PulledAwaited } from "../types"
+import { isThenable } from "../../utils"
 
 /**
  * Zips **this** {@link Lazy} primitive with one or more others, returning a new {@link Lazy} that,
@@ -23,7 +18,8 @@ import { isThenable } from "../../utils";
  * @param others One or more {@link Lazy} primitives to zip with **this**.
  * @summary Turns multiple lazy values into a single lazy value producing an array.
  */
-function zip<T, Others extends readonly [Pullable<unknown>, ...Pullable<unknown>[]]>(
+function zip<T, Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
+    this: Lazy<T>,
     ...others: Others
 ): LazyAsync<any> extends [Lazy<T>, ...Others][number]
     ? LazyAsync<

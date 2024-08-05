@@ -1,22 +1,20 @@
 /* eslint-disable @typescript-eslint/await-thenable */
-import * as config from "./config"
 import { lazy } from "./from/input"
-import { cannotRecurseSync } from "./errors"
+import { cannotRecurseSync } from "../errors/error"
 import assemble from "./operators/assemble"
 import each from "./operators/each"
 import equals from "./operators/equals"
 import map from "./operators/map"
 import zip from "./operators/zip"
-import { sync as syncIterate, async as asyncIterate } from "./operators/iterate"
+import { LazyAsync, LazyInfo, Pullable, Pulled, PulledAwaited, type _IterationType } from "./types"
 import {
-    LazyAsync,
-    LazyInfo,
-    Pullable,
-    Pulled,
-    PulledAwaited,
-    type _IterationType
-} from "./types"
-import { getClassName, getInitializerName, isAsyncIterable, isIterable, isPullable, isThenable } from "../utils";
+    getClassName,
+    getInitializerName,
+    isAsyncIterable,
+    isIterable,
+    isPullable,
+    isThenable
+} from "../utils"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
@@ -79,8 +77,23 @@ export class Lazy<T>
     zip = zip
     assemble = assemble
     equals = equals;
-    [Symbol.iterator] = syncIterate;
-    [Symbol.asyncIterator] = asyncIterate
+    *[Symbol.iterator]() {
+        const inner = this.pull()
+        if (isIterable(inner)) {
+            yield* inner as Iterable<_IterationType<T>>
+        } else {
+            yield inner as _IterationType<T>
+        }
+    }
+    async *[Symbol.asyncIterator]() {
+        // eslint-disable @typescript-eslint/await-thenable
+        const inner = await this.pull()
+        if (isAsyncIterable(inner) || isIterable(inner)) {
+            yield* inner as Iterable<_IterationType<T>>
+        } else {
+            yield inner as _IterationType<T>
+        }
+    }
     /** Returns a short description of the Lazy value and its state. */
     toString() {
         return this._desc
@@ -122,9 +135,8 @@ export class Lazy<T>
             throw e
         }
         // No need to keep holding a reference to the constructor.
-        if (!config.LAZY_NOCLEAR) {
-            this._init = null
-        }
+        this._init = null
+
         if (isThenable(resource)) {
             info.syncness = "async"
             resource = resource.then(value => {

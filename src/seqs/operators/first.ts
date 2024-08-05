@@ -1,4 +1,4 @@
-import { lazyFromOperator } from "../../lazy/lazy-operator"
+import { lazyFromOperator } from "../lazy-operator"
 import type { Lazy, LazyAsync } from "../../lazy"
 
 export function sync<T>(this: Iterable<T>): Lazy<T | undefined>

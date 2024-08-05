@@ -1,4 +1,4 @@
-import { lazy } from ".."
+import { lazy } from "."
 
 describe("sync", () => {
     test("iterates as singleton when value non-iterable", () => {

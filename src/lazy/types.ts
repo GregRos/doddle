@@ -1,4 +1,4 @@
-import { Lazy } from "./lazy";
+import { Lazy } from "./lazy"
 
 export type Pulled<T> =
     T extends PromiseLike<infer X>
@@ -38,7 +38,7 @@ export type CompleteLazyInitializer<F extends (...args: any[]) => any> = {
     function: F
     thisArg: ThisParameterType<F>
 } & (Parameters<F> extends [] ? {} : { args: Parameters<F> })
-export type LazyAsyncLike<T> = Pullable<PromiseLike<T>>
+export type PullableAsync<T> = Pullable<PromiseLike<T>>
 export interface LazyInfo {
     isReady: boolean
     stage: LazyStage

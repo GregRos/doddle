@@ -140,3 +140,9 @@ export function gotNonIterable(object: object, syncness: "sync" | "async", descr
         `Tried to convert input of type ${getClassName(object)} to ${syncness} iterable, but ${description}.`
     )
 }
+export function cannotRecurseSync(): Error {
+    return new DawdleError(
+        "lazies/recursed",
+        "Cannot call `pull` in a synchronous context when the initializer is running."
+    )
+}

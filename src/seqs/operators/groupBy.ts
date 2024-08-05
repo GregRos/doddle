@@ -1,4 +1,4 @@
-import { lazyFromOperator } from "../../lazy/lazy-operator"
+import { lazyFromOperator } from "../lazy-operator"
 import type { ASeq } from "../seq/aseq.class"
 import type { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"

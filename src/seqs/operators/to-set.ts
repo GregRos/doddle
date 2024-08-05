@@ -1,4 +1,4 @@
-import { lazyFromOperator } from "../../lazy/lazy-operator"
+import { lazyFromOperator } from "../lazy-operator"
 
 export function sync<T>(this: Iterable<T>) {
     return lazyFromOperator("toSet", this, input => {

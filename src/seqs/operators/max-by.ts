@@ -1,7 +1,7 @@
 import type { Lazy, LazyAsync } from "../../lazy"
 
 import { mustBeFunction } from "../../errors/error"
-import { lazyFromOperator } from "../../lazy/lazy-operator"
+import { lazyFromOperator } from "../lazy-operator"
 import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 

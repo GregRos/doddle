@@ -6,7 +6,8 @@ import { sync as syncIterate } from "../from/iterate"
 import type { Lazy } from "../../lazy"
 import { type Seq } from "./seq.class"
 export function _seq<E = never>(): Seq<E>
-export function _seq<E>(input: Lazy<Seq.Input<E>>): Seq<E>
+export function _seq(input: never[]): Seq<never>
+export function _seq<E>(input: Seq.IterableInput<Lazy<E>>): Seq<E>
 export function _seq<E>(input: E[]): Seq<E>
 export function _seq<E>(input: Seq.Input<E>): Seq<E>
 export function _seq<E>(input?: Seq.Input<E>) {
