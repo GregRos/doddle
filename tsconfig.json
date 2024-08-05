@@ -1,10 +1,13 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "../dist",
-    "rootDir": ".",
-    "noEmit": false
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["**/dist", "**/node_modules"]
+  "references": [
+    {
+      "path": "./src/tsconfig.json"
+    },
+    {
+      "path": "./examples/tsconfig.json"
+    }
+  ],
+
+  "compilerOptions": {},
+  "files": []
 }
