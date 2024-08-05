@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy } from "../../lazy"
-import type { Seq } from "../seq/seq.class"
+import type { Lazy } from "../.."
+import type { Seq } from "../.."
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../.."
 const _seq = seq
 type SType<T> = Seq<T>
 declare.test("should type as Lazy<T | undefined>", expect => {

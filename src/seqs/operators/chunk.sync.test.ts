@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
-import type { Seq } from "../seq/seq.class"
-import { seq } from "../seq/seq.ctor"
+import type { Seq } from "../.."
+import { seq } from "../.."
 const _seq = seq
 type SType<T> = Seq<T>
 declare.it("typed as 1-N length tuple", expect => {

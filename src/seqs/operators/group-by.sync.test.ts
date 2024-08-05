@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../seq/seq.class"
+import type { Seq } from "../.."
 
-import type { Lazy } from "../../lazy"
-import { seq } from "../seq/seq.ctor"
+import type { Lazy } from "../.."
+import { seq } from "../.."
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns Lazy<Map<K, [T, ...T[]]>>", expect => {

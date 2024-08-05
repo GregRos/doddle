@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../seq/seq.class"
-import { seq } from "../seq/seq.ctor"
+import type { Seq } from "../.."
+import { seq } from "../.."
 declare.it("type defaults to Seq<never>", expect => {
     expect(type_of(seq.throws("error"))).to_equal(type<Seq<never>>)
 })

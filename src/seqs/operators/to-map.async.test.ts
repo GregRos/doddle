@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { LazyAsync } from "../../lazy"
+import type { LazyAsync } from "../.."
 
-import type { ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
+import type { ASeq } from "../.."
+import { aseq } from "../.."
 
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>

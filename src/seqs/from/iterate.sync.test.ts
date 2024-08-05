@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../seq/seq.class"
-import { seq } from "../seq/seq.ctor"
+import type { Seq } from "../.."
+import { seq } from "../.."
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("can't be called with less than two arguments", () => {

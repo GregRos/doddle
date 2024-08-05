@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { LazyAsync } from "../../lazy"
-import { aseq } from "../seq/aseq.ctor"
+import type { LazyAsync } from "../.."
+import { aseq } from "../.."
 
-import type { ASeq } from "../seq/aseq.class"
+import type { ASeq } from "../.."
 const f = aseq
 type SType<T> = ASeq<T>
 declare.test("should type as Lazy<number>", expect => {

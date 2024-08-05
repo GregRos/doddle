@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../.."
 
-import type { Seq } from "../seq/seq.class"
+import type { Seq } from "../.."
 const _seq = seq
 type SType<T> = Seq<T>
 declare.it(

@@ -1,4 +1,4 @@
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../.."
 it("gives empty on empty argslist", () => {
     expect(seq.of()._qr).toEqual([])
 })

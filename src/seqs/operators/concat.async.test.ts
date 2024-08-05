@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
+import type { ASeq } from "../.."
+import { aseq } from "../.."
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../.."
 const _seq = aseq
 type _Seq<T> = ASeq<T>
 describe("type tests", () => {
