@@ -52,11 +52,10 @@ export class Lazy<T>
         this._desc = this._makeDescription()
         this._init = initializer
 
-        const anyMe = this as any
-        for (const key of ["pull", "map", "each", "zip", "assemble"]) {
-            anyMe[key] = anyMe[key].bind(this)
-            anyMe[key][ownerInstance] = this
-            anyMe[key][methodName] = key
+        for (const method of operators) {
+            const bound = method.bind(this)
+            Object.defineProperty(bound, ownerInstance, { value: this })
+            ;(this as any)[method.name] = bound
         }
     }
 
@@ -72,11 +71,11 @@ export class Lazy<T>
         return [name, ...asyncPart, stagePart].join(" ")
     }
 
-    map = map
-    each = each
-    zip = zip
-    assemble = assemble
-    equals = equals;
+    map!: typeof map
+    each!: typeof each
+    zip!: typeof zip
+    assemble!: typeof assemble
+    equals!: typeof equals;
     *[Symbol.iterator]() {
         const inner = this.pull()
         if (isIterable(inner)) {
@@ -161,3 +160,5 @@ export class Lazy<T>
         return this.toString()
     }
 }
+
+const operators = [map, each, zip, assemble, equals, Lazy.prototype.pull] as Function[]
