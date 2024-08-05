@@ -1,6 +1,5 @@
 import { lazy } from "../lazy"
-import type { Lazy } from "../lazy"
-import type { LazyAsync, PulledAwaited } from "../types"
+import type { Lazy, LazyAsync } from "../lazy"
 
 /**
  * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and apply the given
@@ -26,10 +25,10 @@ function each<S>(
 ): LazyAsync<S>
 function each<T>(
     this: Lazy<T>,
-    callback: (value: PulledAwaited<T>) => Promise<any> | LazyAsync<any>
+    callback: (value: Lazy.PulledAwaited<T>) => Promise<any> | LazyAsync<any>
 ): LazyAsync<T>
-function each<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => Lazy<any>): Lazy<T>
-function each<T>(this: Lazy<T>, callback: (value: PulledAwaited<T>) => any): Lazy<T>
+function each<T>(this: Lazy<T>, callback: (value: Lazy.PulledAwaited<T>) => Lazy<any>): Lazy<T>
+function each<T>(this: Lazy<T>, callback: (value: Lazy.PulledAwaited<T>) => any): Lazy<T>
 function each<T>(this: LazyAsync<T>, callback: (value: any) => any): any {
     return this.map(x => {
         const result = callback(x)

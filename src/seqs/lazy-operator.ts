@@ -1,4 +1,4 @@
-import { Lazy, type Pulled } from "../lazy"
+import { Lazy } from "../lazy"
 
 class LazyFromOperator<In, Out> extends Lazy<Out> {
     constructor(
@@ -13,7 +13,7 @@ class LazyFromOperator<In, Out> extends Lazy<Out> {
 export function lazyFromOperator<In, Out>(
     operator: string,
     operand: In,
-    func: (input: In) => Out | Pulled<Out>
+    func: (input: In) => Out | Lazy.Pulled<Out>
 ): Lazy<Out> {
     return new LazyFromOperator(operator, operand, func) as Lazy<Out>
 }

@@ -1,4 +1,4 @@
-import { Lazy, Pullable } from "./lazy"
+import { Lazy } from "./lazy"
 
 export function isIterable<T>(value: any): value is Iterable<T> {
     return (
@@ -32,20 +32,6 @@ export function getClassName(something: any) {
 
 export function getInitializerName(initializer: (...args: any[]) => any) {
     return initializer.name || null
-}
-
-/**
- * Checks if the given value is a LazyLike, i.e. that it has a `pull` method.
- *
- * @param what The value to check.
- */
-export function isPullable<T = unknown>(what: unknown): what is Pullable<T> {
-    return (
-        typeof what === "object" &&
-        what != null &&
-        "pull" in what &&
-        typeof what?.pull === "function"
-    )
 }
 
 /**

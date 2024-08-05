@@ -1,5 +1,4 @@
 import { type Lazy, ownerInstance } from "./lazy"
-import type { Pulled } from "./types"
 import { lazy } from "./lazy"
 
 /**
@@ -25,9 +24,9 @@ import { lazy } from "./lazy"
  */
 
 export function memoize<T>(definition: 0 extends 1 & T ? any : never): () => any
-export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Pulled<T>
-export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Pulled<T>
-export function memoize<T extends Lazy<any>>(definition: () => T): () => Pulled<T>
+export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Lazy.Pulled<T>
+export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Lazy.Pulled<T>
+export function memoize<T extends Lazy<any>>(definition: () => T): () => Lazy.Pulled<T>
 export function memoize<T>(definition: () => T): () => T
 export function memoize<T>(definition: () => T): () => T {
     // Don't double memoize

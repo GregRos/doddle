@@ -1,4 +1,4 @@
-import { lazy, Lazy, LazyAsync, PulledAwaited } from ".."
+import { lazy, Lazy, LazyAsync } from ".."
 
 const sync = lazy(() => 1)
 const asy = lazy(async () => 1)
@@ -88,8 +88,8 @@ it("lazy T map T", () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(x => {
             expect(x).toBe(1 as any)
-            return x satisfies PulledAwaited<T>
-        }) satisfies Lazy<PulledAwaited<T>>
+            return x satisfies Lazy.PulledAwaited<T>
+        }) satisfies Lazy<Lazy.PulledAwaited<T>>
     }
     expect(generic(1).pull() satisfies number).toBe(1)
 })
@@ -98,8 +98,8 @@ it("lazy T map async T", async () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(async x => {
             expect(x).toBe(1 as any)
-            return x satisfies PulledAwaited<T>
-        }) satisfies LazyAsync<PulledAwaited<T>>
+            return x satisfies Lazy.PulledAwaited<T>
+        }) satisfies LazyAsync<Lazy.PulledAwaited<T>>
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
@@ -108,8 +108,8 @@ it("lazy T map lazy T", () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(x => {
             expect(x).toBe(1 as any)
-            return lazy(() => x satisfies PulledAwaited<T>)
-        }) satisfies Lazy<PulledAwaited<T>>
+            return lazy(() => x satisfies Lazy.PulledAwaited<T>)
+        }) satisfies Lazy<Lazy.PulledAwaited<T>>
     }
     expect(generic(1).pull() satisfies number).toBe(1)
 })
@@ -118,8 +118,8 @@ it("lazy T map async lazy T", async () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(async x => {
             expect(x).toBe(1 as any)
-            return lazy(() => x satisfies PulledAwaited<T>)
-        }) satisfies LazyAsync<PulledAwaited<T>>
+            return lazy(() => x satisfies Lazy.PulledAwaited<T>)
+        }) satisfies LazyAsync<Lazy.PulledAwaited<T>>
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
@@ -128,8 +128,8 @@ it("lazy T map lazy async T", async () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(x => {
             expect(x).toBe(1 as any)
-            return lazy(async () => x satisfies PulledAwaited<T>)
-        }) satisfies LazyAsync<PulledAwaited<T>>
+            return lazy(async () => x satisfies Lazy.PulledAwaited<T>)
+        }) satisfies LazyAsync<Lazy.PulledAwaited<T>>
     }
     await expect(generic(1).pull()).resolves.toBe(1)
 })
@@ -138,8 +138,8 @@ it("lazy T map async lazy async T", async () => {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(async x => {
             expect(x).toBe(1 as any)
-            return lazy(async () => x satisfies PulledAwaited<T>)
-        }) satisfies LazyAsync<PulledAwaited<T>>
+            return lazy(async () => x satisfies Lazy.PulledAwaited<T>)
+        }) satisfies LazyAsync<Lazy.PulledAwaited<T>>
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
@@ -147,8 +147,8 @@ it("lazy T map async lazy async T", async () => {
 it("lazy T map lazy async T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(() => x) satisfies Lazy<T>
-        return lz.map(x => lazy(async () => x satisfies PulledAwaited<T>)) satisfies LazyAsync<
-            PulledAwaited<T>
+        return lz.map(x => lazy(async () => x satisfies Lazy.PulledAwaited<T>)) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
         >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
@@ -157,8 +157,8 @@ it("lazy T map async lazy async T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(() => x) satisfies Lazy<T>
         return lz.map(async x =>
-            lazy(async () => x satisfies PulledAwaited<T>)
-        ) satisfies LazyAsync<PulledAwaited<T>>
+            lazy(async () => x satisfies Lazy.PulledAwaited<T>)
+        ) satisfies LazyAsync<Lazy.PulledAwaited<T>>
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
@@ -166,7 +166,9 @@ it("lazy T map async lazy async T", async () => {
 it("lazy async T map T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(async () => x) satisfies LazyAsync<T>
-        return lz.map(x => x satisfies PulledAwaited<T>) satisfies LazyAsync<PulledAwaited<T>>
+        return lz.map(x => x satisfies Lazy.PulledAwaited<T>) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
+        >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
@@ -174,15 +176,17 @@ it("lazy async T map T", async () => {
 it("lazy async T map async T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(async () => x) satisfies LazyAsync<T>
-        return lz.map(async x => x satisfies PulledAwaited<T>) satisfies LazyAsync<PulledAwaited<T>>
+        return lz.map(async x => x satisfies Lazy.PulledAwaited<T>) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
+        >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
 })
 it("lazy async T map lazy T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(async () => x) satisfies LazyAsync<T>
-        return lz.map(x => lazy(() => x satisfies PulledAwaited<T>)) satisfies LazyAsync<
-            PulledAwaited<T>
+        return lz.map(x => lazy(() => x satisfies Lazy.PulledAwaited<T>)) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
         >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
@@ -190,8 +194,8 @@ it("lazy async T map lazy T", async () => {
 it("lazy async T map async lazy T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(async () => x) satisfies LazyAsync<T>
-        return lz.map(async x => lazy(() => x satisfies PulledAwaited<T>)) satisfies LazyAsync<
-            PulledAwaited<T>
+        return lz.map(async x => lazy(() => x satisfies Lazy.PulledAwaited<T>)) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
         >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)
@@ -199,8 +203,8 @@ it("lazy async T map async lazy T", async () => {
 it("lazy async T map lazy async T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(async () => x) satisfies LazyAsync<T>
-        return lz.map(x => lazy(async () => x satisfies PulledAwaited<T>)) satisfies LazyAsync<
-            PulledAwaited<T>
+        return lz.map(x => lazy(async () => x satisfies Lazy.PulledAwaited<T>)) satisfies LazyAsync<
+            Lazy.PulledAwaited<T>
         >
     }
     await expect(generic(1).pull() satisfies Promise<number>).resolves.toBe(1)

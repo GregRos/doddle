@@ -1,5 +1,6 @@
 import { declare, type } from "declare-it"
-import { Lazy, lazy, type LazyAsync, type Pulled, type PulledAwaited } from "."
+import { Lazy, lazy } from "."
+import type { LazyAsync } from "./lazy"
 
 describe("sync", () => {
     test("iterates as singleton when value non-iterable", () => {
@@ -221,7 +222,7 @@ it("lazy<async<1>> for lazy async lazy async 1", async () => {
 it("lazyAsync<T> for lazy async T", async () => {
     async function generic<T>(x: T) {
         const lz = lazy(async () => x as T) satisfies LazyAsync<T>
-        const pulledAwaited = (await lz.pull()) satisfies PulledAwaited<T>
+        const pulledAwaited = (await lz.pull()) satisfies Lazy.PulledAwaited<T>
         return pulledAwaited
     }
     ;(await generic(1)) satisfies number
@@ -230,7 +231,7 @@ it("lazyAsync<T> for lazy async T", async () => {
 it("lazy<T> for lazy lazy T", async () => {
     function generic<T>(x: T) {
         const lz = lazy(() => lazy(() => x as T)) satisfies Lazy<T>
-        const pulled = lz.pull() satisfies Pulled<T>
+        const pulled = lz.pull() satisfies Lazy.Pulled<T>
         return pulled
     }
     generic(1) satisfies number
@@ -239,7 +240,7 @@ it("lazy<T> for lazy lazy T", async () => {
 it("lazyAsync<T> for lazy lazy async T", async () => {
     async function generic<T extends { a: 1 }>(x: T) {
         const lz = lazy(() => lazy(async () => x as T)) satisfies LazyAsync<T>
-        const pulled = (await lz.pull()) satisfies PulledAwaited<T>
+        const pulled = (await lz.pull()) satisfies Lazy.PulledAwaited<T>
         return pulled
     }
     ;(await generic({ a: 1 })) satisfies { a: 1 }
@@ -248,7 +249,7 @@ it("lazyAsync<T> for lazy lazy async T", async () => {
 it("lazyAsync<T> for lazy async lazy T", async () => {
     async function generic<T>(x: T) {
         const lz = lazy(async () => lazy(() => x)) satisfies LazyAsync<T>
-        const pulled = (await lz.pull()) satisfies PulledAwaited<T>
+        const pulled = (await lz.pull()) satisfies Lazy.PulledAwaited<T>
         return pulled
     }
     const pulled = await generic(1)
@@ -257,7 +258,7 @@ it("lazyAsync<T> for lazy async lazy T", async () => {
 it("lazyAsync<T> for lazy async lazy async T", async <T>() => {
     async function generic<T>(x: T) {
         const lz = lazy(async () => lazy(async () => null! as T)) satisfies LazyAsync<T>
-        const pulled = (await lz.pull()) satisfies PulledAwaited<T>
+        const pulled = (await lz.pull()) satisfies Lazy.PulledAwaited<T>
         return pulled
     }
     const pulled = await generic(1)

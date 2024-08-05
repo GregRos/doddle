@@ -5,7 +5,7 @@ import {
     getInitializerName,
     isAsyncIterable,
     isIterable,
-    isPullable,
+    isLazy,
     isThenable
 } from "../utils"
 import assemble from "./operators/assemble"
@@ -13,24 +13,21 @@ import each from "./operators/each"
 import equals from "./operators/equals"
 import map from "./operators/map"
 import zip from "./operators/zip"
-import { LazyInfo, Pullable, Pulled, type _IterationType, type LazyAsync } from "./types"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
 /**
- * A TypeScript-first lazy evaluation primitive. A {@link Pullable} that will only evaluate its
- * initializer function when the {@link pull} method is called.
+ * A TypeScript-first lazy evaluation primitive. An object that will only evaluate its initializer
+ * function when the {@link pull} method is called.
  *
  * The initializer can return another {@link Lazy}, which will be chained like a promise.
  */
-export class Lazy<T>
-    implements Pullable<T>, Iterable<_IterationType<T>>, AsyncIterable<_IterationType<T>>
-{
+export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_IterationType<T>> {
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _desc: string
-    private _info: LazyInfo
-    get info(): Readonly<LazyInfo> {
+    private _info: Lazy.Info
+    get info(): Readonly<Lazy.Info> {
         return this._info
     }
     /**
@@ -105,7 +102,7 @@ export class Lazy<T>
      *   {@link Promise} instances.
      * @throws The error thrown during initialization, if any.
      */
-    pull(): Pulled<T> {
+    pull(): Lazy.Pulled<T> {
         const info = this._info
         if (info.stage === "threw") {
             throw this._cached
@@ -125,7 +122,7 @@ export class Lazy<T>
         let resource: any
         try {
             const result = this._init!()
-            resource = isPullable(result) ? result.pull() : result
+            resource = isLazy(result) ? result.pull() : result
         } catch (e) {
             this._cached = e
             info.stage = "threw"
@@ -138,7 +135,7 @@ export class Lazy<T>
         if (isThenable(resource)) {
             info.syncness = "async"
             resource = resource.then(value => {
-                if (isPullable(value)) {
+                if (isLazy(value)) {
                     value = value.pull()
                 }
                 info.stage = "done"
@@ -195,3 +192,36 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     return Lazy.create(initializer) as any
 }
+
+export namespace Lazy {
+    export type Stage = "untouched" | "executing" | "done" | "threw"
+    export type Syncness = "sync" | "async" | "untouched"
+    export interface Info {
+        isReady: boolean
+        stage: Stage
+        syncness: Syncness
+        name: string | null
+    }
+    export type Pulled<T> =
+        T extends PromiseLike<infer X>
+            ? Promise<Lazy.PulledAwaited<X>>
+            : T extends Lazy<infer X>
+              ? Lazy.Pulled<X>
+              : T
+
+    export type PulledAwaited<T> =
+        T extends Lazy<infer R>
+            ? Lazy.PulledAwaited<R>
+            : T extends Promise<infer R>
+              ? Lazy.PulledAwaited<R>
+              : T
+}
+
+export type LazyAsync<T> = Lazy<Promise<T>>
+
+/** The stage of a lazily initialized value. */
+
+/** An interface that represents a lazily initialized value. */
+
+export type _IterationType<T> = T extends Iterable<infer R> ? R : T
+export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T

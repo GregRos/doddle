@@ -1,7 +1,6 @@
 import { isThenable } from "../../utils"
 import { lazy } from "../lazy"
-import type { Lazy } from "../lazy"
-import { type LazyAsync, type Pullable, type Pulled, type PulledAwaited } from "../types"
+import type { Lazy, LazyAsync } from "../lazy"
 
 /**
  * Zips **this** {@link Lazy} primitive with one or more others, returning a new {@link Lazy} that,
@@ -24,22 +23,22 @@ function zip<T, Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
 ): LazyAsync<any> extends [Lazy<T>, ...Others][number]
     ? LazyAsync<
           [
-              PulledAwaited<T>,
+              Lazy.PulledAwaited<T>,
               ...{
-                  [K in keyof Others]: PulledAwaited<Others[K]>
+                  [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
               }
           ]
       >
     : Lazy<
           [
-              Pulled<T>,
+              Lazy.Pulled<T>,
               ...{
-                  [K in keyof Others]: Pulled<Others[K]>
+                  [K in keyof Others]: Lazy.Pulled<Others[K]>
               }
           ]
       >
 
-function zip(this: Lazy<any>, ...others: Pullable<any>[]): Lazy<any> {
+function zip(this: Lazy<any>, ...others: Lazy<any>[]): Lazy<any> {
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     return lazy(() => {
         const values = [this, ...others].map(x => x.pull())

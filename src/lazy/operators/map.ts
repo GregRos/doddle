@@ -1,7 +1,6 @@
 import { isThenable } from "../../utils"
 import { lazy } from "../lazy"
-import type { Lazy } from "../lazy"
-import { type LazyAsync, type PulledAwaited } from "../types"
+import type { Lazy, LazyAsync } from "../lazy"
 
 /**
  * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and return its result,
@@ -35,37 +34,43 @@ import { type LazyAsync, type PulledAwaited } from "../types"
  */
 function map<T, S, R>(
     this: LazyAsync<S>,
-    projection: (value: PulledAwaited<S>) => Promise<LazyAsync<R>>
+    projection: (value: Lazy.PulledAwaited<S>) => Promise<LazyAsync<R>>
 ): LazyAsync<R>
 function map<T, S, Y>(
     this: LazyAsync<S>,
-    projection: (value: PulledAwaited<S>) => Promise<LazyAsync<Y>>
+    projection: (value: Lazy.PulledAwaited<S>) => Promise<LazyAsync<Y>>
 ): LazyAsync<Y>
 function map<T, S, X>(
     this: LazyAsync<S>,
-    projection: (value: PulledAwaited<S>) => Promise<Lazy<X>>
+    projection: (value: Lazy.PulledAwaited<S>) => Promise<Lazy<X>>
 ): LazyAsync<X>
 function map<T, S, X>(
     this: LazyAsync<S>,
-    projection: (value: PulledAwaited<S>) => Promise<X>
+    projection: (value: Lazy.PulledAwaited<S>) => Promise<X>
 ): LazyAsync<X>
 function map<T, S, X>(
     this: LazyAsync<S>,
-    projection: (value: PulledAwaited<S>) => LazyAsync<X>
+    projection: (value: Lazy.PulledAwaited<S>) => LazyAsync<X>
 ): LazyAsync<X>
-function map<T, S, R>(this: LazyAsync<S>, f: (value: PulledAwaited<S>) => Lazy<R>): LazyAsync<R>
-function map<T, S, R>(this: LazyAsync<S>, f: (value: PulledAwaited<S>) => R): LazyAsync<R>
+function map<T, S, R>(
+    this: LazyAsync<S>,
+    f: (value: Lazy.PulledAwaited<S>) => Lazy<R>
+): LazyAsync<R>
+function map<T, S, R>(this: LazyAsync<S>, f: (value: Lazy.PulledAwaited<S>) => R): LazyAsync<R>
 function map<T, Y>(
     this: Lazy<T>,
-    projection: (value: PulledAwaited<T>) => Promise<LazyAsync<Y>>
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<Y>>
 ): LazyAsync<Y>
 function map<T, X>(
     this: Lazy<T>,
-    projection: (value: PulledAwaited<T>) => Promise<Lazy<X>>
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<Lazy<X>>
 ): LazyAsync<X>
-function map<T, X>(this: Lazy<T>, projection: (value: PulledAwaited<T>) => Promise<X>): LazyAsync<X>
-function map<T, R>(this: Lazy<T>, projection: (value: PulledAwaited<T>) => Lazy<R>): Lazy<R>
-function map<T, R>(this: Lazy<T>, projection: (value: PulledAwaited<T>) => R): Lazy<R>
+function map<T, X>(
+    this: Lazy<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<X>
+): LazyAsync<X>
+function map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => Lazy<R>): Lazy<R>
+function map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => R): Lazy<R>
 function map(this: Lazy<any>, projection: (a: any) => any): any {
     return lazy(() => {
         const pulled = this.pull()

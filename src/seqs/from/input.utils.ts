@@ -1,3 +1,6 @@
+// We create explicit iterable and iterator classes because
+// most JS objects that are iterable are also iterators, and we want to
+// test specific code paths.
 export namespace Dummy {
     export class _Iterator implements Iterator<number> {
         _count = 0

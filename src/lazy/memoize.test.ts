@@ -1,4 +1,4 @@
-import { lazy, memoize, Pulled, PulledAwaited } from "."
+import { lazy, memoize, type Lazy } from "."
 
 it("memoizes sync", () => {
     let count = 0
@@ -22,23 +22,23 @@ it("doesn't memoize twice", () => {
     expect(memo).toBe(memo2)
 })
 
-it("even if a type arg is involved, Pulled should not be introduced", () => {
+it("even if a type arg is involved, Lazy.Pulled should not be introduced", () => {
     function generic<T>() {
         memoize(() => null! as T) satisfies () => T
     }
     generic()
 })
 
-it("if Lazy is explicitly involved, Pulled should be introduced", () => {
+it("if Lazy is explicitly involved, Lazy.Pulled should be introduced", () => {
     function generic<T>() {
-        memoize(() => lazy(() => null! as T)) satisfies () => Pulled<T>
+        memoize(() => lazy(() => null! as T)) satisfies () => Lazy.Pulled<T>
     }
     generic()
 })
 
-it("if LazyAsync is explicitly involved, Promise<PulledAwaited> should be introduced", () => {
+it("if LazyAsync is explicitly involved, Promise<Lazy.PulledAwaited> should be introduced", () => {
     function generic<T>() {
-        memoize(() => lazy(async () => null! as T)) satisfies () => Promise<PulledAwaited<T>>
+        memoize(() => lazy(async () => null! as T)) satisfies () => Promise<Lazy.PulledAwaited<T>>
     }
     generic()
 })

@@ -1,7 +1,6 @@
 import { isThenable } from "../../utils"
 import { lazy } from "../lazy"
-import type { Lazy } from "../lazy"
-import { type LazyAsync, type Pullable, type Pulled, type PulledAwaited } from "../types"
+import type { Lazy, LazyAsync } from "../lazy"
 
 /**
  * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when
@@ -29,22 +28,22 @@ import { type LazyAsync, type Pullable, type Pulled, type PulledAwaited } from "
  *   object, plus the key `"this"`, with the pulled results.
  * @summary Converts an object of {@link Lazy} values into a {@link Lazy} value producing an object.
  */
-function assemble<T, X extends Record<keyof X, Pullable<unknown>>>(
+function assemble<T, X extends Record<keyof X, Lazy<unknown>>>(
     this: Lazy<T>,
     assembly: X
 ): LazyAsync<any> extends X[keyof X] | Lazy<T>
     ? LazyAsync<
           {
-              [K in keyof X]: PulledAwaited<X[K]>
+              [K in keyof X]: Lazy.PulledAwaited<X[K]>
           } & {
-              this: PulledAwaited<T>
+              this: Lazy.PulledAwaited<T>
           }
       >
     : Lazy<
           {
-              [K in keyof X]: Pulled<X[K]>
+              [K in keyof X]: Lazy.Pulled<X[K]>
           } & {
-              this: Pulled<T>
+              this: Lazy.Pulled<T>
           }
       > {
     return lazy(() => {
