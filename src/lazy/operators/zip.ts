@@ -1,5 +1,5 @@
 import { isThenable } from "../../utils"
-import { lazy } from "../from/input"
+import { lazy } from "../lazy"
 import type { Lazy } from "../lazy"
 import { type LazyAsync, type Pullable, type Pulled, type PulledAwaited } from "../types"
 

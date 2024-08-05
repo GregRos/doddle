@@ -13,7 +13,7 @@ import each from "./operators/each"
 import equals from "./operators/equals"
 import map from "./operators/map"
 import zip from "./operators/zip"
-import { LazyInfo, Pullable, Pulled, type _IterationType } from "./types"
+import { LazyInfo, Pullable, Pulled, type _IterationType, type LazyAsync } from "./types"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
@@ -161,3 +161,37 @@ export class Lazy<T>
 }
 
 const operators = [map, each, zip, assemble, equals, Lazy.prototype.pull] as Function[]
+/**
+ * Creates a lazy primitive around the given function, making sure it's only executed once. Works
+ * for both synchronous and asynchronous evaluation.
+ *
+ * @example
+ *     // Simple initializer:
+ *     const regular = lazy(() => 1) satisfies Lazy<number>
+ *
+ *     // Initializer returning another lazily primitive is flattened:
+ *     const lazyNested = lazy(() => lazy(() => 1)) satisfies Lazy<number>
+ *
+ *     // Async initializer gives a `LazyAsync` instance:
+ *     const lazyAsync = lazy(async () => 1) satisfies LazyAsync<number>
+ *
+ *     // Async initializer returning another lazily primitive is flattened:
+ *     const asyncLazy = lazy(async () => lazy(() => 1)) satisfies LazyAsync<number>
+ *
+ *     // Async initializer returning another lazily async primitive is flattened:
+ *     const asyncLazyAsync = lazy(async () => lazy(async () => 1)) satisfies LazyAsync<number>
+ *
+ * @param initializer An initializer function that will be executed once to produce the value. Can
+ *   be synchronous or asynchronous and will also handle nested lazy primitives.
+ */
+
+export function lazy<X>(initializer: () => Promise<LazyAsync<X>>): LazyAsync<X>
+export function lazy<X>(initializer: () => Promise<Lazy<X>>): LazyAsync<X>
+
+export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>
+
+export function lazy<T>(initializer: () => Lazy<T>): Lazy<T>
+export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
+export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
+    return Lazy.create(initializer) as any
+}

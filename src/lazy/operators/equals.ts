@@ -1,4 +1,4 @@
-import { lazy } from "../from/input"
+import { lazy } from "../lazy"
 import type { Lazy } from "../lazy"
 import type { LazyAsync } from "../types"
 
