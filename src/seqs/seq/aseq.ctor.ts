@@ -1,19 +1,18 @@
-import { async as asyncIterate } from "../from/iterate"
-import { async as asyncOf } from "../from/of"
-import { async as asyncRange } from "../from/range"
-import { async as asyncRepeat } from "../from/repeat"
-import { async as asyncThrows } from "../from/throws"
-import { type ASeq } from "./aseq.class"
-import { aseq as aseqBase } from "./aseq.ctor.base"
-import { aseqSymbol } from "./symbol"
+import type { Lazy, LazyAsync } from "../../lazy"
+import { async as asyncFrom } from "../from/input"
+import type { ASeq } from "./aseq.class"
 
-export const aseq = Object.assign(aseqBase, {
-    of: asyncOf,
-    repeat: asyncRepeat,
-    range: asyncRange,
-    is<T = unknown>(input: any): input is ASeq<T> {
-        return aseqSymbol in input && input[aseqSymbol] === true
-    },
-    iterate: asyncIterate,
-    throws: asyncThrows
-})
+export function aseq<E = never>(): ASeq<E>
+export function aseq<E>(input: readonly E[]): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<LazyAsync<E>>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<LazyAsync<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<Lazy<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<E>): ASeq<E>
+export function aseq<E>(input: ASeq.Input<E>): ASeq<E>
+export function aseq<E>(input?: ASeq.Input<E>): any {
+    if (!input) {
+        return asyncFrom([])
+    }
+    return asyncFrom(input)
+}

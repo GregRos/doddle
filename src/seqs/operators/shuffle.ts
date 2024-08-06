@@ -1,8 +1,8 @@
+import { aseq } from "../seq/aseq"
 import { ASeqOperator } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import { SeqOperator } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {

@@ -1,11 +1,11 @@
 import { mustBeFunction } from "../../errors/error"
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 export function sync<T, S extends T>(this: Iterable<T>, predicate: Seq.TypePredicate<T, S>): Seq<S>
 export function sync<T>(this: Iterable<T>, predicate: Seq.Predicate<T>): Seq<T>

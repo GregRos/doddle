@@ -1,11 +1,11 @@
 import { mustBeFunction, mustReturnTuple } from "../../errors/error"
 import type { LazyAsync } from "../../lazy"
 import { lazyFromOperator } from "../lazy-operator"
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 const mustReturnPair = mustReturnTuple(2)
 export function generic<T, K, V>(input: Seq<T>, projection: Seq.Iteratee<T, readonly [K, V]>) {
     mustBeFunction("projection", projection)

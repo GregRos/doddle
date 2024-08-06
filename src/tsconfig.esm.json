@@ -1,11 +1,12 @@
 {
-  "extends": "../tsconfig.esm.base.json",
+  "extends": "../tsconfig.base.esm.json",
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "../dist/esm/src.tsbuildinfo",
     "outDir": "../dist/esm",
     "rootDir": ".",
-    "noEmit": false
+    "noEmit": false,
+    "declarationMap": true
   },
   "include": ["**/*.ts"],
   "exclude": ["**/dist", "**/node_modules", "**/*.test.ts"]

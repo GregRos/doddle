@@ -21,5 +21,17 @@
     ".nyc_output": true,
     ".yarn": true
   },
-  "typescript.tsserver.experimental.useVsCodeWatcher": true
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.async.test.ts, ${capture}.sync.test.ts, ${capture}.test.ts, ${capture}.ctor.ts, ${capture}.class.ts",
+    "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+    "package.json": "",
+    "tsconfig.json": "tsconfig.esm.json, tsconfig.cjs.json, tsconfig.test.json",
+    "tsconfig.base.json": "tsconfig.base.*.json",
+    ".yarnrc.yml": "yarn.lock",
+    ".eslintrc*": ".eslintignore",
+    ".prettierrc*": ".prettierignore, .editorconfig",
+    ".gitignore": ".gitattributes"
+  }
 }

@@ -2,12 +2,12 @@ import type { Lazy, LazyAsync } from "../../lazy"
 
 import { mustBeFunction } from "../../errors/error"
 import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq.ctor"
+import { aseq } from "../seq/aseq"
 import type { Seq } from "../seq/seq.class"
 
 import { returnKvp } from "../../utils"
 import type { ASeq } from "../seq/aseq.class"
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 const EMPTY = Symbol("EMPTY_SEQ")
 export function generic<T, R, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, R>, alt: Alt) {
     mustBeFunction("iteratee", iteratee)

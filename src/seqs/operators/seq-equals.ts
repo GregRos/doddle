@@ -1,9 +1,9 @@
 import type { Lazy, LazyAsync } from "../../lazy"
 import { lazyFromOperator } from "../lazy-operator"
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
+import { seq } from "../seq/seq"
 import { Seq } from "../seq/seq.class"
-import { seq } from "../seq/seq.ctor"
 
 export function sync<T extends S, S>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>

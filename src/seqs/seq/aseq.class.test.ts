@@ -1,5 +1,5 @@
 import { ASeq } from "../.."
-import { Dummy } from "./input.utils"
+import { Dummy } from "../from/input.utils"
 
 class CustomSeq extends ASeq<number> {
     override [Symbol.asyncIterator]() {

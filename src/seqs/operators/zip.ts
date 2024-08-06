@@ -1,10 +1,10 @@
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 type neverToUndefined<T> = T extends never ? undefined : T
 export type getZipValuesType<Xs extends [any, ...any[]]> = {

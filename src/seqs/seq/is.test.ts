@@ -1,5 +1,5 @@
-import { aseq } from "./aseq.ctor"
-import { seq } from "./seq.ctor"
+import { aseq } from "./aseq"
+import { seq } from "./seq"
 
 it("seq.is returns true for seq", () => {
     expect(seq.is(seq([1, 2, 3]))).toBe(true)

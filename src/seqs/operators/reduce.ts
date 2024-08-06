@@ -3,11 +3,11 @@ import { lazyFromOperator } from "../lazy-operator"
 import type { Lazy, LazyAsync } from "../../lazy"
 
 import { mustBeFunction } from "../../errors/error"
-import { aseq } from "../seq/aseq.ctor"
+import { aseq } from "../seq/aseq"
 import type { Seq } from "../seq/seq.class"
 
 import type { ASeq } from "../seq/aseq.class"
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 const NO_INITIAL = Symbol("NO_INTIAL")
 
 export function generic<Item, Acc>(

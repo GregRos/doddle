@@ -1,13 +1,7 @@
 {
   "references": [
     {
-      "path": "./src/tsconfig.cjs.json"
-    },
-    {
-      "path": "./src/tsconfig.esm.json"
-    },
-    {
-      "path": "./src/tsconfig.test.json"
+      "path": "./src/tsconfig.json"
     },
     {
       "path": "./examples/tsconfig.json"

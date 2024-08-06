@@ -1,12 +1,12 @@
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
 import { ASeqOperator } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 import { SeqOperator } from "../seq/seq.class"
 
 import { mustBeFunction } from "../../errors/error"
 import { isThenable } from "../../utils"
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 class ThrewNonError<T> extends Error {
     constructor(public value: T) {
@@ -41,7 +41,7 @@ export function sync<T, S>(
                     error = new ThrewNonError(error)
                 }
                 const result = handler(error, i)
-                if (result == null) {
+                if (!result || result == null) {
                     return
                 }
                 if (isThenable(result)) {
@@ -83,7 +83,7 @@ export function async<T, S>(
                     error = new ThrewNonError(error)
                 }
                 const result = await handler(error, i)
-                if (result == null) {
+                if (!result || result == null) {
                     return
                 }
                 yield* aseq(result)

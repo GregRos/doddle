@@ -1,5 +1,5 @@
 import { Seq } from "../.."
-import { Dummy } from "./input.utils"
+import { Dummy } from "../from/input.utils"
 
 class CustomSeq extends Seq<number> {
     override [Symbol.iterator]() {

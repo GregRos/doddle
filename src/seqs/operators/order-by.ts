@@ -1,9 +1,9 @@
 import { mustBeBoolean, mustBeFunction } from "../../errors/error"
+import { aseq } from "../seq/aseq"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import { SeqOperator, type Seq } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 import { returnKvp } from "../../utils"
 

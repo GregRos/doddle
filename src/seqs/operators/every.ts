@@ -1,10 +1,10 @@
 import type { Lazy, LazyAsync } from "../../lazy"
 import { lazyFromOperator } from "../lazy-operator"
+import { aseq } from "../seq/aseq"
 import type { ASeq } from "../seq/aseq.class"
-import { aseq } from "../seq/aseq.ctor"
 import type { Seq } from "../seq/seq.class"
 
-import { seq } from "../seq/seq.ctor"
+import { seq } from "../seq/seq"
 
 export function sync<T>(this: Iterable<T>, predicate: Seq.Predicate<T>): Lazy<boolean> {
     return lazyFromOperator("every", this, input => {
