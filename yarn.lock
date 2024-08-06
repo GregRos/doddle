@@ -15,16 +15,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@assertive-ts/core@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@assertive-ts/core@npm:2.1.0"
-  dependencies:
-    dedent: "npm:^1.5.1"
-    fast-deep-equal: "npm:^3.1.3"
-  checksum: 10c0/5928e539bcd118cb95caa4de5ffd68d9835b3a30d304bb9b906b3505623f7dbdc07cc606271963cf0b3fc3886ef17797cff1d53f99f45f84991d870bd0931f73
-  languageName: node
-  linkType: hard
-
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/code-frame@npm:7.24.7"
@@ -903,23 +893,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/eslint@npm:^8.56.9":
-  version: 8.56.11
-  resolution: "@types/eslint@npm:8.56.11"
-  dependencies:
-    "@types/estree": "npm:*"
-    "@types/json-schema": "npm:*"
-  checksum: 10c0/e47d2b8e0ce1aa7e1f2564555576fa55343e942ae8cba5940b4e2566f842810c007beff80a01d74d48c60a45ecf28150cbc5cbd53324b1e55cf672b24ccf4667
-  languageName: node
-  linkType: hard
-
-"@types/estree@npm:*":
-  version: 1.0.5
-  resolution: "@types/estree@npm:1.0.5"
-  checksum: 10c0/b3b0e334288ddb407c7b3357ca67dbee75ee22db242ca7c56fe27db4e1a31989cb8af48a84dd401deb787fe10cc6b2ab1ee82dc4783be87ededbe3d53c79c70d
-  languageName: node
-  linkType: hard
-
 "@types/glob@npm:~7.2.0":
   version: 7.2.0
   resolution: "@types/glob@npm:7.2.0"
@@ -974,20 +947,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/json-schema@npm:*":
-  version: 7.0.15
-  resolution: "@types/json-schema@npm:7.0.15"
-  checksum: 10c0/a996a745e6c5d60292f36731dd41341339d4eeed8180bb09226e5c8d23759067692b1d88e5d91d72ee83dfc00d3aca8e7bd43ea120516c17922cbcb7c3e252db
-  languageName: node
-  linkType: hard
-
-"@types/lodash@npm:^4.14.198":
-  version: 4.17.7
-  resolution: "@types/lodash@npm:4.17.7"
-  checksum: 10c0/40c965b5ffdcf7ff5c9105307ee08b782da228c01b5c0529122c554c64f6b7168fc8f11dc79aa7bae4e67e17efafaba685dc3a47e294dbf52a65ed2b67100561
-  languageName: node
-  linkType: hard
-
 "@types/mdast@npm:^4.0.0":
   version: 4.0.4
   resolution: "@types/mdast@npm:4.0.4"
@@ -1026,15 +985,6 @@ __metadata:
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10c0/4fc8d368df2b6f5497698327b30db68d7d20e32221ce7d057fb15cbd5834685b2fde0440609e4cb2204e5d305b928f008faf41b950a425f3fd55b60cb1b997cf
-  languageName: node
-  linkType: hard
-
-"@types/prettier@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@types/prettier@npm:3.0.0"
-  dependencies:
-    prettier: "npm:*"
-  checksum: 10c0/edab8c0c0e56936e89c919cac17e384a9f231ce12062fb3beeb45bc45e7dcc4035dd3d7df3333b0bdd39f3b4501f22267a9dba45e22b9728c139857142e90282
   languageName: node
   linkType: hard
 
@@ -1895,12 +1845,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"declare-it@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "declare-it@npm:2.0.2"
+"declare-it@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "declare-it@npm:2.1.0"
   dependencies:
-    what-the-test: "npm:^0.1.2"
-  checksum: 10c0/230ce6d8682d3f399eaab3ee27c9860b7329b2d8bdc5715f915795c779e8510f23862a0c745e948735ac06bb9cfd4ce59868d58283d2fc985cd49cf8595a77ea
+    what-the-test: "npm:^1.2.0"
+  checksum: 10c0/bea88fa8ee59e1895cc06114360e8eccce6c25633f67b410ce0b7369c51d17d2f4988523685f5ed2eab02fde7b7124026a962be97414253fa5d74caeb3d01743
   languageName: node
   linkType: hard
 
@@ -1913,7 +1863,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dedent@npm:^1.0.0, dedent@npm:^1.5.1":
+"dedent@npm:^1.0.0":
   version: 1.5.3
   resolution: "dedent@npm:1.5.3"
   peerDependencies:
@@ -2027,17 +1977,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "doddle@workspace:."
   dependencies:
-    "@assertive-ts/core": "npm:^2.1.0"
     "@gregros/eslint-config": "npm:^0.6.0"
-    "@types/eslint": "npm:^8.56.9"
     "@types/jest": "npm:^29.5.12"
-    "@types/lodash": "npm:^4.14.198"
     "@types/node": "npm:^20.12.7"
-    "@types/prettier": "npm:^3.0.0"
     "@types/shelljs": "npm:^0.8.15"
     "@typescript-eslint/eslint-plugin": "npm:^7.6.0"
     "@typescript-eslint/parser": "npm:^7.6.0"
-    declare-it: "npm:^2.0.2"
+    declare-it: "npm:^2.1.0"
     eslint: "npm:^8"
     husky: "npm:^8.0.3"
     jest: "npm:^29.7.0"
@@ -5060,7 +5006,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:*, prettier@npm:^3.2.5":
+"prettier@npm:^3.2.5":
   version: 3.3.3
   resolution: "prettier@npm:3.3.3"
   bin:
@@ -6135,12 +6081,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"what-the-test@npm:^0.1.2":
-  version: 0.1.5
-  resolution: "what-the-test@npm:0.1.5"
+"what-the-test@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "what-the-test@npm:1.2.0"
   dependencies:
     semver-try-require: "npm:^7.0.0"
-  checksum: 10c0/0e98b2bd3050e02b7eda4ba017260056ab35b7c108763a12fe98603848400bb19212957ceb0602943efc03b8da55c27f3911cee64c8d50edd8c5f24ad96aac4c
+  checksum: 10c0/e39076ad81850a5abff40c8e5566b9592f8b7ba3877e3dd7cc31fa75d82e488d7879b3517ca256597a3a319d9166513bb88a3bc9913a8b65c734ae094f5738ae
   languageName: node
   linkType: hard
 

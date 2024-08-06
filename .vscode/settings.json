@@ -26,7 +26,7 @@
   "explorer.fileNesting.patterns": {
     "*.ts": "${capture}.async.test.ts, ${capture}.sync.test.ts, ${capture}.test.ts, ${capture}.ctor.ts, ${capture}.class.ts",
     "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
-    "package.json": "",
+    "package.json": ".npmignore",
     "tsconfig.json": "tsconfig.esm.json, tsconfig.cjs.json, tsconfig.test.json",
     "tsconfig.base.json": "tsconfig.base.*.json",
     ".yarnrc.yml": "yarn.lock",
