@@ -1,4 +1,4 @@
-import { mustBeFunction } from "../../errors/error.js"
+import { checkReducer } from "../../errors/error.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -18,7 +18,7 @@ export function sync<Item, Acc>(
     reducer: Seq.Reducer<NoInfer<Item>, Acc>,
     initial?: Acc
 ) {
-    mustBeFunction("reducer", reducer)
+    checkReducer(reducer)
 
     return SeqOperator(this, function* scan(input) {
         let hasAcc = initial !== undefined
@@ -55,7 +55,7 @@ export function async<Item, Acc>(
     reducer: ASeq.Reducer<Item, Acc>,
     initial?: Acc
 ) {
-    mustBeFunction("reducer", reducer)
+    checkReducer(reducer)
     return ASeqOperator(this, async function* scan(input) {
         let hasAcc = initial !== undefined
 

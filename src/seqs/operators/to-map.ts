@@ -1,4 +1,4 @@
-import { mustBeFunction, mustReturnTuple } from "../../errors/error.js"
+import { checkPairProjectionReturn, checkProjection } from "../../errors/error.js"
 import type { LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import type { ASeq } from "../seq/aseq.class.js"
@@ -6,15 +6,12 @@ import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 
 import { seq } from "../seq/seq.js"
-const mustReturnPair = mustReturnTuple(2)
 export function generic<T, K, V>(input: Seq<T>, projection: Seq.Iteratee<T, readonly [K, V]>) {
-    mustBeFunction("projection", projection)
+    checkProjection(projection)
     return lazyFromOperator(input, function toMap(input) {
         return input
             .map(projection)
-            .each(x => {
-                mustReturnPair("projection", x)
-            })
+            .each(checkPairProjectionReturn)
             .toArray()
             .map(x => new Map(x))
             .pull()

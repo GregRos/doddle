@@ -1,4 +1,4 @@
-import { mustBeFunction } from "../../errors/error.js"
+import { checkPredicate } from "../../errors/error.js"
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import type { ASeq } from "../seq/aseq.class.js"
@@ -8,7 +8,7 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function generic<T, Alt>(input: Seq<T>, predicate: Seq.Predicate<T>, alt?: Alt) {
-    mustBeFunction("predicate", predicate)
+    checkPredicate(predicate)
     return lazyFromOperator(input, function find(input) {
         return input.filter(predicate).first(alt).pull() as any
     })

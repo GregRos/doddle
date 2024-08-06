@@ -4,7 +4,7 @@ import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 import { SeqOperator } from "../seq/seq.class.js"
 
-import { mustBeFunction } from "../../errors/error.js"
+import { checkHandler } from "../../errors/error.js"
 import { _aiter, _iter, isThenable } from "../../utils.js"
 import { seq } from "../seq/seq.js"
 
@@ -23,7 +23,7 @@ export function sync<T, S>(
     this: Iterable<T>,
     handler: Seq.Iteratee<Error, void | Seq.Input<S>>
 ): Seq<unknown> {
-    mustBeFunction("handler", handler)
+    checkHandler(handler)
     return SeqOperator(this, function* catch_(input) {
         let i = 0
         const iterator = _iter(input)
@@ -66,6 +66,7 @@ export function async<T, S>(
     this: AsyncIterable<T>,
     handler: ASeq.Iteratee<Error, void | ASeq.SimpleInput<S>>
 ): ASeq<any> {
+    checkHandler(handler)
     return ASeqOperator(this, async function* catch_(input) {
         let i = 0
         const iterator = _aiter(input)

@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.esm.json",
   "compilerOptions": {
     "composite": true,
-    "tsBuildInfoFile": "../dist/esm/src.tsbuildinfo",
+    "tsBuildInfoFile": "../.buildinfo/esm.tsbuildinfo",
     "outDir": "../dist/esm",
     "rootDir": ".",
     "noEmit": false,

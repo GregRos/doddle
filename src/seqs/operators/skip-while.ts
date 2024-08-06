@@ -1,4 +1,4 @@
-import { mustBeFunction } from "../../errors/error.js"
+import { checkPredicate } from "../../errors/error.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -7,7 +7,7 @@ import { SeqOperator } from "../seq/seq.class.js"
 export interface SkipWhileOptions {
     skipFinal?: boolean
 }
-enum SkippingMode {
+const enum SkippingMode {
     None = 0,
     Skipping = 1,
     NotSkipping = 2
@@ -17,7 +17,7 @@ export function sync<T>(
     predicate: Seq.Predicate<T>,
     options?: SkipWhileOptions
 ): Seq<T> {
-    mustBeFunction("predicate", predicate)
+    checkPredicate(predicate)
     return SeqOperator(this, function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
@@ -41,7 +41,7 @@ export function async<T>(
     predicate: ASeq.Predicate<T>,
     options?: SkipWhileOptions
 ): ASeq<T> {
-    mustBeFunction("predicate", predicate)
+    checkPredicate(predicate)
     return ASeqOperator(this, async function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0

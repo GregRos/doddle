@@ -1,4 +1,4 @@
-import { mustBeInteger } from "../../errors/error.js"
+import { checkCount } from "../../errors/error.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
@@ -8,19 +8,19 @@ import { SeqOperator } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 const END_MARKER = Symbol("DUMMY")
-export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
-    mustBeInteger("count", countArg)
+export function sync<T>(this: Iterable<T>, count: number): Seq<T> {
+    checkCount(count)
     return SeqOperator(this, function* take(input) {
-        let count = countArg
-        if (count === 0) {
+        let myCount = count
+        if (myCount === 0) {
             yield* []
             return
         }
-        if (count < 0) {
-            count = -count
+        if (myCount < 0) {
+            myCount = -myCount
             const results = seq(input)
                 .append(END_MARKER)
-                .window(count + 1, (...window) => {
+                .window(myCount + 1, (...window) => {
                     if (window[window.length - 1] === END_MARKER) {
                         window.pop()
                         return window as T[]
@@ -33,25 +33,25 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
 
             yield* results
         } else {
-            yield* seq(input).takeWhile((_, index) => index < count - 1, {
+            yield* seq(input).takeWhile((_, index) => index < myCount - 1, {
                 takeFinal: true
             })
         }
     }) as any
 }
-export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
-    mustBeInteger("count", countArg)
+export function async<T>(this: AsyncIterable<T>, count: number): ASeq<T> {
+    checkCount(count)
     return ASeqOperator(this, async function* take(input) {
-        let count = countArg
-        if (count === 0) {
+        let myCount = count
+        if (myCount === 0) {
             yield* []
             return
         }
-        if (count < 0) {
-            count = -count
+        if (myCount < 0) {
+            myCount = -myCount
             const results = (await aseq(input)
                 .append(END_MARKER)
-                .window(count + 1, (...window) => {
+                .window(myCount + 1, (...window) => {
                     if (window[window.length - 1] === END_MARKER) {
                         window.pop()
                         return window as T[]
@@ -63,7 +63,7 @@ export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
                 .pull()) as T[]
             yield* results
         } else {
-            yield* aseq(input).takeWhile((_, index) => index < count - 1, {
+            yield* aseq(input).takeWhile((_, index) => index < myCount - 1, {
                 takeFinal: true
             })
         }

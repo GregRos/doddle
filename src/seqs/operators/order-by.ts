@@ -1,4 +1,4 @@
-import { mustBeBoolean, mustBeFunction } from "../../errors/error.js"
+import { checkProjection, checkReverse } from "../../errors/error.js"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
 import { SeqOperator, type Seq } from "../seq/seq.class.js"
@@ -12,8 +12,8 @@ export function sync<T>(
     projection: Seq.NoIndexIteratee<T, any>,
     reverse = false
 ): Seq<T> {
-    mustBeFunction("projection", projection)
-    mustBeBoolean("reverse", reverse)
+    checkProjection(projection)
+    checkReverse(reverse)
     return SeqOperator(this, function* orderBy(input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
@@ -33,8 +33,8 @@ export function async<T, S>(
     projection: ASeq.NoIndexIteratee<T, S>,
     reverse = false
 ): ASeq<T> {
-    mustBeFunction("projection", projection)
-    mustBeBoolean("reverse", reverse)
+    checkProjection(projection)
+    checkReverse(reverse)
     return ASeqOperator(this, async function* orderBy(input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))

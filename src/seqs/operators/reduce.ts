@@ -2,7 +2,7 @@ import { lazyFromOperator } from "../lazy-operator.js"
 
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
 
-import { mustBeFunction } from "../../errors/error.js"
+import { checkReducer } from "../../errors/error.js"
 import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 
@@ -15,7 +15,7 @@ export function generic<Item, Acc>(
     reducer: Seq.Reducer<Item, Acc>,
     initial?: Acc
 ): Lazy<any> {
-    mustBeFunction("reducer", reducer)
+    checkReducer(reducer)
     return lazyFromOperator(input, function reduce(input) {
         return input
             .scan(reducer, initial!)

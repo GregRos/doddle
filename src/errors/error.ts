@@ -1,74 +1,55 @@
-import { getClassName } from "../utils.js"
+import { getClassName, Stage } from "../utils.js"
 
-export class DawdleError extends Error {
-    constructor(code: string, message: string) {
-        super(message)
-        this.name = code
+const isBool = (value: any): value is boolean => !!value === value
+const isInt = (value: any): value is number => Number.isSafeInteger(value)
+const isPos = (value: any): value is number => isInt(value) && value > 0
+export const wasnt = (what: string, name: string, expected: string, value: unknown): never => {
+    throw new TypeError(`${what} '${name}' must be ${expected}, not ${value}`)
+}
+export const argWasnt = (name: string, expected: string, value: unknown): never => {
+    return wasnt("Argument", name, expected, value)
+}
+export const returnWasnt = (name: string, expected: string, value: unknown): never => {
+    return wasnt("Value returned by", name, expected, value)
+}
+export const checkReverse = (value: any) => isBool(value) || argWasnt("reverse", "a boolean", value)
+export const mustBePos = (name: string) => (value: any) =>
+    isPos(value) || argWasnt(name, "positive", value)
+export const mustBeInt = (name: string) => (value: any) =>
+    isInt(value) || argWasnt(name, "an integer", value)
+export const mustNotBeNullish = (name: string) => (value: any) =>
+    value != null || argWasnt(name, "not null or undefined", value)
+export const mustNotReturnNullish = (name: string) => (value: any) =>
+    value != null || returnWasnt(name, "not null or undefined", value)
+export const mustReturnPair = (name: string) => (value: any) =>
+    (Array.isArray(value) && value.length === 2) || returnWasnt(name, "an array of length 2", value)
+export const checkSize = mustBePos("size")
+export const checkCount = mustBeInt("count")
+export const checkIndex = mustBeInt("index")
+export const mustBeFunc = (name: string) => (value: any) =>
+    typeof value === "function" || argWasnt(name, "a function", value)
+export const checkHandler = mustBeFunc("handler")
+export const checkReducer = mustBeFunc("reducer")
+export const checkPredicate = mustBeFunc("predicate")
+export const checkProjection = mustBeFunc("projection")
+export const checkAction = mustBeFunc("action")
+export const parseStage = (value: any) => {
+    switch (value) {
+        case undefined:
+        case "before":
+            return Stage.Before
+        case "after":
+            return Stage.After
+        case "both":
+            return Stage.Both
+        default:
+            return argWasnt("stage", "one of 'before', 'after', 'both'", value)
     }
 }
 
-function argNotExpected(expected: string, check: (value: unknown) => boolean) {
-    return function (name: string, value: unknown) {
-        if (!check(value)) {
-            throw new TypeError(`Argument '${name}' must be ${expected}, but got ${value}`)
-        }
-    }
-}
-
-export const mustBeNatural = argNotExpected(
-    "a natural number",
-    (value: unknown) => typeof value === "number" && value >= 0 && Number.isInteger(value)
-)
-
-export const mustBePositiveInt = argNotExpected(
-    "positive",
-    (value: unknown) => typeof value === "number" && value > 0 && Number.isInteger(value)
-)
-
-export const mustBeInteger = argNotExpected(
-    "an integer",
-    (value: unknown) => typeof value === "number" && Number.isInteger(value)
-)
-
-export const mustBeBoolean = argNotExpected(
-    "a boolean",
-    (value: unknown) => typeof value === "boolean"
-)
-
-export const mustBeFunction = argNotExpected(
-    "a function",
-    (value: unknown) => typeof value === "function"
-)
-
-export const mustBeOneOf = <T>(...options: T[]) => {
-    const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
-    return argNotExpected(description, (value: unknown) => options.includes(value as T))
-}
-
-export const mustNotBeNullish = argNotExpected(
-    "not null or undefined",
-    (value: unknown) => value != null
-)
-
-export function mustNotReturnNullish<T = unknown>(name: string, value: T): T {
-    if (value == null) {
-        throw new TypeError(
-            `Function argument ${name} expected to return a non-nullish value, but got ${value}`
-        )
-    }
-    return value
-}
-
-export function mustReturnTuple(length: number) {
-    return function (name: string, value: unknown) {
-        if (!Array.isArray(value) || value.length !== length) {
-            throw new TypeError(
-                `Function argument ${name} expected to return a tuple of length ${length}, but got ${value}`
-            )
-        }
-        return true
-    }
-}
+export const checkThrows = mustNotBeNullish("throws")
+export const checkThrowsReturn = mustNotReturnNullish("throws")
+export const checkPairProjectionReturn = mustReturnPair("projection")
 
 export function gotNonIterable(object: object, syncness: "sync" | "async", description: string) {
     return new TypeError(
@@ -76,8 +57,5 @@ export function gotNonIterable(object: object, syncness: "sync" | "async", descr
     )
 }
 export function cannotRecurseSync(): Error {
-    return new DawdleError(
-        "lazies/recursed",
-        "Cannot call `pull` in a synchronous context when the initializer is running."
-    )
+    return new Error("Cannot call 'pull' in a synchronous context when the initializer is running.")
 }

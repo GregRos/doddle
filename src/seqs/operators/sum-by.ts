@@ -1,4 +1,4 @@
-import { mustBeFunction } from "../../errors/error.js"
+import { checkProjection } from "../../errors/error.js"
 import type { LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import type { ASeq } from "../seq/aseq.class.js"
@@ -8,7 +8,7 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, projection: Seq.Iteratee<T, number>) {
-    mustBeFunction("projection", projection)
+    checkProjection(projection)
     return lazyFromOperator(input, function sumBy(input) {
         return input
             .map(projection)

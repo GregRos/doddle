@@ -12,6 +12,12 @@ export function isIterable<T>(value: any): value is Iterable<T> {
     )
 }
 
+export const enum Stage {
+    After = 1,
+    Before = 2,
+    Both = 3
+}
+
 export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
     return (
         typeof value === "object" &&

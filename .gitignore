@@ -75,3 +75,4 @@ jspm_packages
 .tmp
 **/.obsidian/workspace.json
 .eslintcache
+.buildinfo

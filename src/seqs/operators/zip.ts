@@ -1,3 +1,4 @@
+import { _aiter, _iter } from "../../utils.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
@@ -34,9 +35,7 @@ export function sync<T, Xs extends [any, ...any[]], R>(
     const others = _others.map(seq)
     projection ??= (...args: any[]) => args as any
     return SeqOperator(this, function* zip(input) {
-        const iterators = [input, ...others].map(
-            i => i[Symbol.iterator]() as Iterator<any> | undefined
-        )
+        const iterators = [input, ...others].map(_iter) as (Iterator<any> | undefined)[]
         while (true) {
             const results = iterators.map((iter, i) => {
                 if (!iter) {
@@ -79,9 +78,7 @@ export function async<T, Xs extends [any, ...any[]], R>(
     const others = _others.map(aseq)
     projection ??= (...args: any[]) => args as any
     return ASeqOperator(this, async function* zip(input) {
-        const iterators = [input, ...others].map(
-            i => i[Symbol.asyncIterator]() as AsyncIterator<any> | undefined
-        )
+        const iterators = [input, ...others].map(_aiter) as (AsyncIterator<any> | undefined)[]
         while (true) {
             const pResults = iterators.map(async (iter, i) => {
                 if (!iter) {

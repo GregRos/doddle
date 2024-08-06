@@ -1,4 +1,4 @@
-import { mustBeInteger } from "../../errors/error.js"
+import { checkIndex } from "../../errors/error.js"
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import { aseq } from "../seq/aseq.js"
@@ -7,7 +7,7 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, index: number): Lazy<T | undefined> {
-    mustBeInteger("index", index)
+    checkIndex(index)
 
     return lazyFromOperator(input, function at(input) {
         if (index < 0) {

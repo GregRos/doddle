@@ -1,4 +1,4 @@
-import { mustBePositiveInt } from "../../errors/error.js"
+import { checkSize } from "../../errors/error.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -19,7 +19,7 @@ export function sync<T, L extends number, S>(
     size: L,
     projection?: (...window: getWindowArgsType<T, L>) => S
 ): Seq<any> {
-    mustBePositiveInt("windowSize", size)
+    checkSize(size)
     projection ??= (...window: any) => window as any
     return SeqOperator(this, function* window(input) {
         const buffer = Array<T>(size)
@@ -53,7 +53,7 @@ export function async<T, L extends number, S>(
     size: L,
     projection?: (...window: getWindowArgsType<T, L>) => S
 ): ASeq<any> {
-    mustBePositiveInt("windowSize", size)
+    checkSize(size)
     projection ??= (...window: any) => window as any
     return ASeqOperator(this, async function* window(input) {
         const buffer = Array<T>(size)

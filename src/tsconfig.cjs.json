@@ -2,7 +2,7 @@
   "extends": "../tsconfig.base.cjs.json",
   "compilerOptions": {
     "composite": true,
-    "tsBuildInfoFile": "../dist/cjs/src.tsbuildinfo",
+    "tsBuildInfoFile": "../.buildinfo/cjs.tsbuildinfo",
     "outDir": "../dist/cjs",
     "rootDir": ".",
     "noEmit": false,

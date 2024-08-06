@@ -109,7 +109,6 @@ export const ASeqOperator = function aseq<In, Out>(
         }
     })
 }
-ASeqOperator.prototype = new (ASeq as any)()
 
 export namespace ASeq {
     type MaybePromise<T> = T | PromiseLike<T>
