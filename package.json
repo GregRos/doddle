@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
@@ -41,6 +41,7 @@
     }
   },
   "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "types": "./dist/cjs/index.d.ts",
   "typings": "./dist/cjs/index",
   "files": [
