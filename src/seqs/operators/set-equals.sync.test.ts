@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { Lazy, seq, Seq } from "../../index.js"
+import { Lazy, seq, Seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("accepts an input sequence, returns Lazy<boolean>", expect => {

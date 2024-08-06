@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
 
-import type { Seq } from "../../index.js"
-import { seq } from "../../index.js"
-import { countEachItemAppearance } from "./shuffle.utils.test.js"
+import type { Seq } from "@lib"
+import { seq } from "@lib"
+import { countEachItemAppearance } from "./shuffle.utils.helper"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns Seq of same type", expect => {

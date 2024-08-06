@@ -1,4 +1,4 @@
-import { getClassName } from "./utils.js"
+import { getClassName } from "@utils"
 
 it("gets name of object with constructor.name", () => {
     expect(getClassName(new Error())).toBe("Error")

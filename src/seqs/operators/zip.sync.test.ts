@@ -1,8 +1,8 @@
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "../../index.js"
+import { seq } from "@lib"
 
-import type { Seq } from "../../index.js"
+import type { Seq } from "@lib"
 const _seq = seq
 type SType<T> = Seq<T>
 declare.it(

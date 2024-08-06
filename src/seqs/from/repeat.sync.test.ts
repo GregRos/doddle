@@ -1,4 +1,4 @@
-import { seq } from "../../index.js"
+import { seq } from "@lib"
 it("gives empty for 0 count", () => {
     expect(seq.repeat(0, 1)._qr).toEqual([])
 })

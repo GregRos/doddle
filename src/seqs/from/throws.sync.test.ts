@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../../index.js"
-import { seq } from "../../index.js"
+import type { Seq } from "@lib"
+import { seq } from "@lib"
 declare.it("type defaults to Seq<never>", expect => {
     expect(type_of(seq.throws("error"))).to_equal(type<Seq<never>>)
 })

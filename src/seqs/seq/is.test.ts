@@ -1,5 +1,4 @@
-import { aseq } from "./aseq.js"
-import { seq } from "./seq.js"
+import { aseq, seq } from "@lib"
 
 it("seq.is returns true for seq", () => {
     expect(seq.is(seq([1, 2, 3]))).toBe(true)

@@ -1,4 +1,4 @@
-import { lazy } from "../../index.js"
+import { lazy } from "@lib"
 
 it("lazy do doThing", () => {
     let i = ""

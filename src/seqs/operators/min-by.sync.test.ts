@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy } from "../../index.js"
+import type { Lazy } from "@lib"
 
-import { seq } from "../../index.js"
+import { seq } from "@lib"
 const _seq = seq
 
 declare.test("should type as Lazy<T | undefined>", expect => {

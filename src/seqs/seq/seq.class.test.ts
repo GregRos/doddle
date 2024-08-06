@@ -1,5 +1,5 @@
-import { Seq } from "../../index.js"
-import { Dummy } from "../from/input.utils.js"
+import { Seq } from "@lib"
+import { Dummy } from "../from/input.utils.helper"
 
 class CustomSeq extends Seq<number> {
     override [Symbol.iterator]() {

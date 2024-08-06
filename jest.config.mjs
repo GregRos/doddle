@@ -10,8 +10,8 @@ export default {
         ]
     },
     moduleNameMapper: {
-        "../../index.js": "<rootDir>/dist/cjs/index.js",
-        "./utils.js": "<rootDir>/dist/cjs/utils.js"
+        "@lib": "<rootDir>/dist/cjs/index.js",
+        "@utils": "<rootDir>/dist/cjs/utils.js"
 
     },
     testEnvironment: "node",

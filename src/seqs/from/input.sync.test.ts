@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../../index.js"
-import { lazy, seq, type Lazy } from "../../index.js"
-import { Dummy } from "./input.utils.js"
+import type { Seq } from "@lib"
+import { lazy, seq, type Lazy } from "@lib"
+import { Dummy } from "./input.utils.helper"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("can't be called using non-iterable argument", () => {

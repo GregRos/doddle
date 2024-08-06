@@ -1,4 +1,4 @@
-import { aseq } from "../../index.js"
+import { aseq } from "@lib"
 it("gives empty on empty argslist", async () => {
     await expect(aseq.of()._qr).resolves.toEqual([])
 })

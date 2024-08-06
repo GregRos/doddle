@@ -1,4 +1,4 @@
-import { lazy, memoize, type Lazy } from "../index.js"
+import { lazy, memoize, type Lazy } from "@lib"
 
 it("memoizes sync", () => {
     let count = 0

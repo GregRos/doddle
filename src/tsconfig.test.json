@@ -2,8 +2,15 @@
   "extends": "../tsconfig.base.cjs.json",
   "references": [{ "path": "./tsconfig.cjs.json" }],
   "compilerOptions": {
-    "rootDir": "."
+    "rootDir": ".",
+    "baseUrl": ".",
+    "module": "es2015",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@lib": ["./index"],
+      "@utils": ["./utils"]
+    }
   },
-  "include": ["**/*.test.ts"],
+  "include": ["**/*.test.ts", "**/*.helper.ts"],
   "exclude": ["**/dist", "**/node_modules"]
 }

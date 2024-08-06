@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy } from "../../index.js"
+import type { Lazy } from "@lib"
 
-import { seq } from "../../index.js"
+import { seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true))).to_equal(type<Lazy<number | undefined>>)

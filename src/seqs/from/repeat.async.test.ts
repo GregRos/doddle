@@ -1,4 +1,4 @@
-import { aseq } from "../../index.js"
+import { aseq } from "@lib"
 it("gives empty for 0 count", async () => {
     expect(await aseq.repeat(0, 1)._qr).toEqual([])
 })

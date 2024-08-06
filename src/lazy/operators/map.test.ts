@@ -1,4 +1,4 @@
-import { lazy, Lazy, LazyAsync } from "../../index.js"
+import { lazy, Lazy, LazyAsync } from "@lib"
 
 const sync = lazy(() => 1)
 const asy = lazy(async () => 1)

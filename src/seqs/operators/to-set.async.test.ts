@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { aseq, LazyAsync } from "../../index.js"
+import { aseq, LazyAsync } from "@lib"
 
 const _seq = aseq
 

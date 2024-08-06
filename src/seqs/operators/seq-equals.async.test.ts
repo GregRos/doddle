@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../../index.js"
-import { aseq, type LazyAsync } from "../../index.js"
+import type { ASeq } from "@lib"
+import { aseq, type LazyAsync } from "@lib"
 
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
