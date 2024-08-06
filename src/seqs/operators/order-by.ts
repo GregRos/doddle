@@ -35,7 +35,7 @@ export function async<T, S>(
 ): ASeq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new ASeqOperator(this, async function* orderBy(input) {
+    return ASeqOperator(this, async function* orderBy(input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()

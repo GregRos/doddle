@@ -66,7 +66,7 @@ export function async<T, S>(
     this: AsyncIterable<T>,
     handler: ASeq.Iteratee<Error, void | ASeq.SimpleInput<S>>
 ): ASeq<any> {
-    return new ASeqOperator(this, async function* catch_(input) {
+    return ASeqOperator(this, async function* catch_(input) {
         let i = 0
         const iterator = _aiter(input)
         for (;;) {

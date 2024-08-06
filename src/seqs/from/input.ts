@@ -6,17 +6,17 @@ import { SeqOperator } from "../seq/seq.class.js"
 
 export function async<T>(input: ASeq.Input<T>) {
     if (isIterable(input)) {
-        return new ASeqOperator(input, async function* aseq(input) {
+        return ASeqOperator(input, async function* aseq(input) {
             yield* input
         })
     }
     if (isAsyncIterable(input)) {
-        return new ASeqOperator(input, async function* aseq(input) {
+        return ASeqOperator(input, async function* aseq(input) {
             yield* input
         })
     }
     if (typeof input === "function") {
-        return new ASeqOperator(input, async function* aseq(input) {
+        return ASeqOperator(input, async function* aseq(input) {
             const result = input()
             if (isLazy(result)) {
                 yield result.pull()

@@ -34,7 +34,7 @@ export function async<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new ASeqOperator(this, async function* each(input) {
+    return ASeqOperator(this, async function* each(input) {
         let index = 0
         for await (const element of input) {
             if (stage === "before" || stage === "both") {

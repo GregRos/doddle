@@ -55,7 +55,7 @@ export function async<T, L extends number, S>(
 ): ASeq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return new ASeqOperator(this, async function* window(input) {
+    return ASeqOperator(this, async function* window(input) {
         const buffer = Array<T>(size)
         let i = 0
         for await (const item of input) {

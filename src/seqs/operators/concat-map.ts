@@ -26,7 +26,7 @@ export function async<T, S>(
     projection: ASeq.Iteratee<T, ASeq.SimpleInput<S>>
 ): ASeq<getConcatElementType<T, S>> {
     mustBeFunction("projection", projection)
-    return new ASeqOperator(this, async function* concatMap(input) {
+    return ASeqOperator(this, async function* concatMap(input) {
         let index = 0
         for await (const element of input) {
             for await (const projected of aseq(await projection(element, index++))) {

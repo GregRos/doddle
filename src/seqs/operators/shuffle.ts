@@ -22,7 +22,7 @@ export function sync<T>(this: Iterable<T>) {
 }
 
 export function async<T>(this: AsyncIterable<T>) {
-    return new ASeqOperator(this, async function* shuffle(input) {
+    return ASeqOperator(this, async function* shuffle(input) {
         const array = await aseq(input).toArray().pull()
         shuffleArray(array)
         yield* array

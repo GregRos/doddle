@@ -14,7 +14,7 @@ export function sync<T, S>(this: Iterable<T>, projection: Seq.Iteratee<T, S>): S
 }
 export function async<T, S>(this: AsyncIterable<T>, projection: ASeq.Iteratee<T, S>): ASeq<S> {
     mustBeFunction("projection", projection)
-    return new ASeqOperator(this, async function* map(input) {
+    return ASeqOperator(this, async function* map(input) {
         yield* aseq(input).concatMap(async (element, index) => [await projection(element, index)])
     })
 }

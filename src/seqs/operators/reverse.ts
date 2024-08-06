@@ -13,7 +13,7 @@ export function sync<T>(this: Iterable<T>) {
     })
 }
 export function async<T>(this: AsyncIterable<T>) {
-    return new ASeqOperator(this, async function* reverse(input) {
+    return ASeqOperator(this, async function* reverse(input) {
         yield* await aseq(input)
             .toArray()
             .map(x => x.reverse())

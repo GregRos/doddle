@@ -50,7 +50,7 @@ export function async<T>(this: AsyncIterable<T>): ASeq<T> {
     let alreadyDone = false
     let iterator: AsyncIterator<T>
     let pending: Promise<void> | undefined
-    return new ASeqOperator(this, async function* cache() {
+    return ASeqOperator(this, async function* cache() {
         let i = 0
         for (;;) {
             if (i < _cache.length) {

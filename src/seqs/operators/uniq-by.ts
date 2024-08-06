@@ -20,7 +20,7 @@ export function async<T>(
     projection: ASeq.NoIndexIteratee<T, any>
 ): ASeq<T> {
     mustBeFunction("projection", projection)
-    return new ASeqOperator(this, async function* uniqBy(input) {
+    return ASeqOperator(this, async function* uniqBy(input) {
         const seen = new Set()
         for await (const element of input) {
             const key = await projection(element)

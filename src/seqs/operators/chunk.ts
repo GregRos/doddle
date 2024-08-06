@@ -52,7 +52,7 @@ export function async<T, L extends number, S>(
 ): ASeq<getWindowOutputType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new ASeqOperator(this, async function* chunk(input) {
+    return ASeqOperator(this, async function* chunk(input) {
         let chunk: T[] = []
         for await (const item of input) {
             chunk.push(item)

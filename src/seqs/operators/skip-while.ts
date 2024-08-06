@@ -42,7 +42,7 @@ export function async<T>(
     options?: SkipWhileOptions
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return new ASeqOperator(this, async function* skipWhile(input) {
+    return ASeqOperator(this, async function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for await (const element of input) {

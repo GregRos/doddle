@@ -25,7 +25,7 @@ export function async<T, S extends T>(
 export function async<T>(this: AsyncIterable<T>, predicate: ASeq.Predicate<T>): ASeq<T>
 export function async<T>(this: AsyncIterable<T>, predicate: ASeq.Predicate<T>) {
     mustBeFunction("predicate", predicate)
-    return new ASeqOperator(this, async function* filter(input) {
+    return ASeqOperator(this, async function* filter(input) {
         yield* aseq(input).concatMap(async (element, index) =>
             (await predicate(element, index)) ? [element] : []
         )

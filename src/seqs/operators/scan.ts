@@ -56,7 +56,7 @@ export function async<Item, Acc>(
     initial?: Acc
 ) {
     mustBeFunction("reducer", reducer)
-    return new ASeqOperator(this, async function* scan(input) {
+    return ASeqOperator(this, async function* scan(input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any

@@ -78,7 +78,7 @@ export function async<T, Xs extends [any, ...any[]], R>(
 ): ASeq<[T, ...Xs]> {
     const others = _others.map(aseq)
     projection ??= (...args: any[]) => args as any
-    return new ASeqOperator(this, async function* zip(input) {
+    return ASeqOperator(this, async function* zip(input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.asyncIterator]() as AsyncIterator<any> | undefined
         )

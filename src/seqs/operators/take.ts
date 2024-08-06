@@ -41,7 +41,7 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
 }
 export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
     mustBeInteger("count", countArg)
-    return new ASeqOperator(this, async function* take(input) {
+    return ASeqOperator(this, async function* take(input) {
         let count = countArg
         if (count === 0) {
             yield* []

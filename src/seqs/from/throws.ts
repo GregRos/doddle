@@ -21,7 +21,7 @@ export function sync<T = never>(thrown: unknown): Seq<T> {
 
 export function async<T = never>(thrown: unknown): ASeq<T> {
     mustNotBeNullish("thrown", thrown)
-    return new ASeqOperator(thrown, async function* throws(input) {
+    return ASeqOperator(thrown, async function* throws(input) {
         if (typeof input === "function") {
             const result = input()
             mustNotReturnNullish("thrown", result)

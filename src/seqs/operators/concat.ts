@@ -23,7 +23,7 @@ export function async<T, ASeqs extends ASeq.SimpleInput<any>[]>(
     ..._otherInputs: ASeqs
 ): ASeq<T | ASeq.ElementOfInput<ASeqs[number]>> {
     const inputs = _otherInputs.map(aseq)
-    return new ASeqOperator(this, async function* concat(input) {
+    return ASeqOperator(this, async function* concat(input) {
         for await (const element of input) {
             yield element
         }

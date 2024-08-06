@@ -16,7 +16,7 @@ export function async<T, Items extends any[]>(
     this: AsyncIterable<T>,
     ...items: Items
 ): ASeq<T | Items[number]> {
-    return new ASeqOperator(this, async function* append(input) {
+    return ASeqOperator(this, async function* append(input) {
         yield* aseq(input).concat(items)
     })
 }

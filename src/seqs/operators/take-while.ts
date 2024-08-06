@@ -33,7 +33,7 @@ export function async<T>(
     specifier?: TakeWhileSpecifier
 ): ASeq<T> {
     mustBeFunction("predicate", predicate)
-    return new ASeqOperator(this, async function* takeWhile(input) {
+    return ASeqOperator(this, async function* takeWhile(input) {
         let index = 0
 
         for await (const element of input) {

@@ -10,7 +10,7 @@ export function sync<T>(this: Iterable<T>) {
     })
 }
 export function async<T>(this: AsyncIterable<T>) {
-    return new ASeqOperator(this, async function* uniq(input) {
+    return ASeqOperator(this, async function* uniq(input) {
         yield* aseq(input).uniqBy(x => x)
     })
 }
