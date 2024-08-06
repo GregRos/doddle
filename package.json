@@ -49,6 +49,12 @@
     "test:coverage": "jest --coverage",
     "tidy": "yarn install && run-s lint:fix build:clean test"
   },
+    "files": [
+    "README.md",
+    "dist",
+    "LICENSE.md",
+    "CHANGELOG.md"
+  ],
   "devDependencies": {
     "@gregros/eslint-config": "^0.6.0",
     "@types/eslint": "^8.56.9",
