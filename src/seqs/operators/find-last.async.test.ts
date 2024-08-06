@@ -1,6 +1,6 @@
-import { declare, type, type_of } from "declare-it"
 import type { LazyAsync } from "@lib"
 import { aseq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 declare.test("should type as LazyAsync<T | undefined>", expect => {

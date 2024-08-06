@@ -12,7 +12,6 @@ export default {
     moduleNameMapper: {
         "@lib": "<rootDir>/dist/cjs/index.js",
         "@utils": "<rootDir>/dist/cjs/utils.js"
-
     },
     testEnvironment: "node",
     testMatch: ["<rootDir>/src/**/*.test.ts"],

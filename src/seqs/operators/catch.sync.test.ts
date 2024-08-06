@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-throw-literal */
-import { declare, type, type_of } from "declare-it"
 import type { Seq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 

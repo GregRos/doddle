@@ -1,6 +1,6 @@
-import { declare, type, type_of } from "declare-it"
 import type { ASeq } from "@lib"
 import { aseq, lazy, type Lazy } from "@lib"
+import { declare, type, type_of } from "declare-it"
 import { Dummy } from "./input.utils.helper"
 const _seq = aseq
 type _Seq<T> = ASeq<T>

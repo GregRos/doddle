@@ -1,6 +1,6 @@
-import { declare, type, type_of } from "declare-it"
 import type { ASeq } from "@lib"
 import { aseq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 import { countEachItemAppearance } from "./shuffle.utils.helper"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>

@@ -1,5 +1,5 @@
-import { aseq } from "../seq/aseq.js"
 import type { ASeq } from "../seq/aseq.class.js"
+import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 
 import { seq } from "../seq/seq.js"

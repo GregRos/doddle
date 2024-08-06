@@ -1,5 +1,5 @@
-import { declare, type, type_of } from "declare-it"
 import type { ASeq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 import { aseq } from "@lib"
 const _aseq = aseq

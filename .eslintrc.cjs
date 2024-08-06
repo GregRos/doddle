@@ -4,7 +4,7 @@ module.exports = {
     root: true,
     extends: ["@gregros/eslint-config"],
     parserOptions: {
-        project: ["./src/tsconfig.cjs.json", "./src/tsconfig.test.json", "./examples/tsconfig.json"],
+        project: ["./src/tsconfig.cjs.json", "./src/tsconfig.test.json", "./examples/tsconfig.json"]
     },
     rules: {
         "no-invalid-this": "off",

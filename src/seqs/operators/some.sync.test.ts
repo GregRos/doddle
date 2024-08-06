@@ -1,5 +1,5 @@
-import { declare, type, type_of } from "declare-it"
 import type { Lazy } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 declare.it("should type as Lazy<boolean>", expect => {

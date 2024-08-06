@@ -1,5 +1,5 @@
-import { declare, type, type_of } from "declare-it"
 import type { Seq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq

@@ -1,6 +1,6 @@
-import { aseq } from "../seq/aseq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
+import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 import { SeqOperator } from "../seq/seq.class.js"
 

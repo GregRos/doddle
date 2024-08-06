@@ -1,6 +1,6 @@
-import { declare, type, type_of } from "declare-it"
 import type { ASeq } from "@lib"
 import { aseq } from "@lib"
+import { declare, type, type_of } from "declare-it"
 
 declare.it("type defaults to ASeq<never>", expect => {
     expect(type_of(aseq.throws("error"))).to_equal(type<ASeq<never>>)

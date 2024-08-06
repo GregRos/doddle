@@ -1,5 +1,5 @@
-import { declare, type } from "declare-it"
 import { Lazy, lazy, LazyAsync } from "@lib"
+import { declare, type } from "declare-it"
 
 describe("sync", () => {
     test("iterates as singleton when value non-iterable", () => {
