@@ -3,9 +3,9 @@ import type { Seq } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
-declare.it("should type as Seq<T>", expect => {
-    expect(type_of(_seq([1, 2, 3]).cache())).to_equal(type<Seq<number>>)
+type _Seq<T> = Seq<T>
+declare.it("should type as _Seq<T>", expect => {
+    expect(type_of(_seq([1, 2, 3]).cache())).to_equal(type<_Seq<number>>)
 })
 
 it("returns empty for empty", () => {
@@ -57,7 +57,6 @@ it("side-effects only once", () => {
 it("can iterate different lengths", () => {
     const each = jest.fn()
     const s = _seq([1, 2, 3, 4]).each(each).cache()
-    let i = 0
     const first3 = s.take(3)
     expect(first3._qr).toEqual([1, 2, 3])
     expect(each).toHaveBeenCalledTimes(3)

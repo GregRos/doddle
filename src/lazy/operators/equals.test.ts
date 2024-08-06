@@ -1,9 +1,6 @@
 import { declare, type, type_of } from "declare-it"
 import { lazy, Lazy, LazyAsync } from "../.."
 
-const sync = lazy(() => 1)
-const asy = lazy(async () => 1)
-
 declare.it("lazy equals value gives Lazy<boolean>", expect => {
     expect(type_of(lazy(() => 1).equals(1))).to_equal(type<Lazy<boolean>>)
     expect(type_of(lazy(() => 1 as 1).equals(1 as number))).to_equal(type<Lazy<boolean>>)

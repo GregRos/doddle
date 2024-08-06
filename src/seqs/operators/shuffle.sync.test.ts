@@ -31,8 +31,8 @@ it("randomness: every element appears in every position", () => {
 
     const shuffles = seq.repeat(10000, 1).map(() => _seq([...array]).shuffle()._qr)._qr
     const positions = countEachItemAppearance(shuffles)
-    for (const [i, pos] of Object.entries(positions)) {
-        for (const [j, count] of Object.entries(pos)) {
+    for (const [, pos] of Object.entries(positions)) {
+        for (const [, count] of Object.entries(pos)) {
             expect(Math.abs(count - 1 / array.length)).toBeLessThan(0.15)
         }
     }

@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq, LazyAsync } from "../.."
+import type { LazyAsync } from "../.."
 import { aseq } from "../.."
 
 const _aseq = aseq
-type _ASeq<T> = ASeq<T>
 
 declare.test("should type as LazyAsync<T | undefined>", expect => {
     expect(type_of(_aseq([1, 2, 3]).maxBy(() => true))).to_equal(
@@ -86,7 +85,7 @@ it("returns first max value", async () => {
 })
 
 it("doesn't error for non-comparable keys", async () => {
-    const s = _aseq([1, 2, 3]).maxBy(x => ({}))
+    const s = _aseq([1, 2, 3]).maxBy(_ => ({}))
     await expect(s.pull()).resolves.not.toThrow()
 })
 

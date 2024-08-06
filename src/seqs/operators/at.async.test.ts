@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq, LazyAsync } from "../.."
+import type { LazyAsync } from "../.."
 import { aseq } from "../.."
 
 const _seq = aseq
-type _Seq<T> = ASeq<T>
 declare.test("correctly typed as LazyAsync and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
     expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)

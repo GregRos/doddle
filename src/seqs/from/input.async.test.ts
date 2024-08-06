@@ -144,7 +144,7 @@ it("calls next as many times as needed", async () => {
     const it = new Dummy._Iterator()
     it.next = jest.fn(it.next)
     _seq(() => it)
-    for await (const x of _seq(() => it)) {
+    for await (const _ of _seq(() => it)) {
         break
     }
     expect(it.next).toHaveBeenCalledTimes(1)
@@ -158,7 +158,7 @@ it("converts from function returning iterable", async () => {
 declare.it("can specify type when converting from array", expect => {
     const s = _seq<1>([1])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
-    const s2 = _seq<number>()
+    _seq<number>()
 })
 
 declare.it("can specify type when converting from empty array", expect => {

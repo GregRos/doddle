@@ -10,7 +10,7 @@ declare.test("should type as Lazy<number>", expect => {
 })
 it("returns empty for constant true", async () => {
     const s = _seq([1, 2, 3]).skipWhile(() => true)
-    expect(s._qr).resolves.toEqual([])
+    await expect(s._qr).resolves.toEqual([])
 })
 
 it("returns all for constant false", async () => {

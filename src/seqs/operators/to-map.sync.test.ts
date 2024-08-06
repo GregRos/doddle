@@ -1,11 +1,8 @@
 import { declare, type, type_of } from "declare-it"
 import type { Lazy } from "../.."
 
-import type { Seq } from "../.."
-
 import { seq } from "../.."
 const _seq = seq
-type _Seq<T> = Seq<T>
 declare.it("accepts projection to pair", expect => {
     const s = _seq([1, 2, 3]).toMap(x => [x, x])
     expect(type_of(s)).to_equal(type<Lazy<Map<number, number>>>)
@@ -23,27 +20,27 @@ declare.it("accepts projection to pair with different types", expect => {
 
 declare.it("doesn't accept projection to other", expect => {
     // @ts-expect-error
-    const s = _seq([1, 2, 3]).toMap(x => x)
+    _seq([1, 2, 3]).toMap(x => x)
 })
 
 declare.it("doesn't accept projection to triple", expect => {
     // @ts-expect-error
-    const s = _seq([1, 2, 3]).toMap(x => [x, x, x])
+    _seq([1, 2, 3]).toMap(x => [x, x, x])
 })
 
 declare.it("doesn't accept projection to single", expect => {
     // @ts-expect-error
-    const s = _seq([1, 2, 3]).toMap(() => [1])
+    _seq([1, 2, 3]).toMap(() => [1])
 })
 
 declare.it("doesn't accept projection to optional pair", expect => {
     // @ts-expect-error
-    const s = _seq([1, 2, 3]).toMap(x => [x, x] as [number, number?])
+    _seq([1, 2, 3]).toMap(x => [x, x] as [number, number?])
 })
 
 declare.it("doesn't accept projection to union with undefined", expect => {
     // @ts-expect-error
-    const s = _seq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
+    _seq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
 })
 
 declare.it("is typed correctly for mixed types", expect => {
@@ -60,7 +57,7 @@ it("converts empty to empty", () => {
 
 it("doesn't call projection on empty", () => {
     const fn = jest.fn()
-    const s = _seq([]).toMap(fn)
+    _seq([]).toMap(fn).pull()
     expect(fn).not.toHaveBeenCalled()
 })
 

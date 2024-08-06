@@ -19,7 +19,7 @@ export function sync<T>(
             .map(e => returnKvp(e, projection(e), e))
             .toArray()
             .map(xs => {
-                xs.sort((a: any, b: any) => {
+                void xs.sort((a: any, b: any) => {
                     const result = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
                     return reverse ? -result : result
                 })

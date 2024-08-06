@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, Seq } from "../.."
+import type { Lazy } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type _Seq<T> = Seq<T>
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toArray()
     expect(type_of(s)).to_equal(type<Lazy<number[]>>)

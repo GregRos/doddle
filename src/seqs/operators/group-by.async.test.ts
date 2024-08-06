@@ -1,10 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../.."
 import { aseq } from "../.."
 
 import type { LazyAsync } from "../.."
 const _aseq = aseq
-type _ASeq<T> = ASeq<T>
 
 declare.it("returns LazyAsync<Map<K, [T, ...T[]]>>", expect => {
     const s = _aseq([1, 2, 3]).groupBy(() => 1)
@@ -19,7 +17,7 @@ declare.it("iteratee has single argument", expect => {
 
 declare.it("iteratee can't have two arguments", expect => {
     // @ts-expect-error
-    _aseq([1, 2, 3]).groupBy((a, b) => 1)
+    _aseq([1, 2, 3]).groupBy((_, __) => 1)
 })
 
 it("returns empty map on empty", async () => {
@@ -33,7 +31,7 @@ it("returns map with singleton on singleton", async () => {
 })
 
 it("groups all by single key, preserves order", async () => {
-    const s = _aseq([1, 2, 1, 2]).groupBy(x => 1)
+    const s = _aseq([1, 2, 1, 2]).groupBy(_ => 1)
     expect(await s.pull()).toEqual(new Map([[1, [1, 2, 1, 2]]]))
 })
 

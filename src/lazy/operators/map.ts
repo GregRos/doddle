@@ -32,31 +32,28 @@ import { lazy } from "../lazy"
  * @see {@link Promise.then} for a similar method on promises.
  * @see {@link Lazy.each} for a similar method that doesn't change the result.
  */
-function map<T, S, R>(
-    this: LazyAsync<S>,
-    projection: (value: Lazy.PulledAwaited<S>) => Promise<LazyAsync<R>>
+function map<T, R>(
+    this: LazyAsync<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<R>>
 ): LazyAsync<R>
-function map<T, S, Y>(
-    this: LazyAsync<S>,
-    projection: (value: Lazy.PulledAwaited<S>) => Promise<LazyAsync<Y>>
+function map<T, Y>(
+    this: LazyAsync<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<Y>>
 ): LazyAsync<Y>
-function map<T, S, X>(
-    this: LazyAsync<S>,
-    projection: (value: Lazy.PulledAwaited<S>) => Promise<Lazy<X>>
+function map<T, X>(
+    this: LazyAsync<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<Lazy<X>>
 ): LazyAsync<X>
-function map<T, S, X>(
-    this: LazyAsync<S>,
-    projection: (value: Lazy.PulledAwaited<S>) => Promise<X>
+function map<T, X>(
+    this: LazyAsync<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => Promise<X>
 ): LazyAsync<X>
-function map<T, S, X>(
-    this: LazyAsync<S>,
-    projection: (value: Lazy.PulledAwaited<S>) => LazyAsync<X>
+function map<T, X>(
+    this: LazyAsync<T>,
+    projection: (value: Lazy.PulledAwaited<T>) => LazyAsync<X>
 ): LazyAsync<X>
-function map<T, S, R>(
-    this: LazyAsync<S>,
-    f: (value: Lazy.PulledAwaited<S>) => Lazy<R>
-): LazyAsync<R>
-function map<T, S, R>(this: LazyAsync<S>, f: (value: Lazy.PulledAwaited<S>) => R): LazyAsync<R>
+function map<T, R>(this: LazyAsync<T>, f: (value: Lazy.PulledAwaited<T>) => Lazy<R>): LazyAsync<R>
+function map<T, R>(this: LazyAsync<T>, f: (value: Lazy.PulledAwaited<T>) => R): LazyAsync<R>
 function map<T, Y>(
     this: Lazy<T>,
     projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<Y>>

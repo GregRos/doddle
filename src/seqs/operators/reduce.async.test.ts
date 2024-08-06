@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq, LazyAsync } from "../.."
+import type { LazyAsync } from "../.."
 import { aseq } from "../.."
 
 const _seq = aseq
-type _ASeq<T> = ASeq<T>
 
 declare.test("can be called with initial, type changes to match", expect => {
     const s = _seq([1, 2, 3]).reduce((acc, x) => `${acc}${x}`, "")

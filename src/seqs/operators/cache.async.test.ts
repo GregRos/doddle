@@ -3,10 +3,10 @@ import type { ASeq } from "../.."
 import { aseq } from "../.."
 
 const _aseq = aseq
-type _ASeq<T> = ASeq<T>
+type _Seq<T> = ASeq<T>
 
-declare.it("should type as ASeq<T>", expect => {
-    expect(type_of(_aseq([1, 2, 3]).cache())).to_equal(type<ASeq<number>>)
+declare.it("should type as _Seq<T>", expect => {
+    expect(type_of(_aseq([1, 2, 3]).cache())).to_equal(type<_Seq<number>>)
 })
 
 it("returns empty for empty", async () => {

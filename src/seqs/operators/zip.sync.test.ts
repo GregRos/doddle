@@ -14,12 +14,12 @@ declare.it(
     }
 )
 
-declare.it("can't be called using an array input, as it would be ambiguous", expect => {
+declare.it("can't be called using an array input, as it would be ambiguous", () => {
     // @ts-expect-error
     _seq([1, 2, 3]).zip([[]] as string[][])
 })
 
-declare.it("can't be called on empty array input, as it would be ambiguous", expect => {
+declare.it("can't be called on empty array input, as it would be ambiguous", () => {
     // @ts-expect-error
     _seq([]).zip([])
 })

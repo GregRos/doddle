@@ -1,15 +1,15 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../.."
+import type { ASeq } from "../.."
 
-import { seq } from "../.."
-const _aseq = seq
-type _ASeq<T> = Seq<T>
+import { aseq } from "../.."
+const _aseq = aseq
+type _ASeq<T> = ASeq<T>
 declare.it("should type as Lazy<T>", expect => {
     expect(type_of(_aseq([1, 2, 3]).uniqBy(() => 1))).to_equal(type<_ASeq<number>>)
 })
 declare.it("should not accept iteratee with 2 arguments", expect => {
     // @ts-expect-error
-    _aseq([1, 2, 3]).uniqBy((x, i) => x)
+    _aseq([1, 2, 3]).uniqBy((x, _) => x)
 })
 
 it("returns empty on empty", async () => {

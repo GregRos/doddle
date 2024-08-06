@@ -40,14 +40,14 @@ describe("async", () => {
         await expect(results).resolves.toEqual([1])
     })
 
-    test("async iterates inner elements when value iterable", () => {
+    test("async iterates inner elements when value iterable", async () => {
         const results = asyncIterateToArray(lazy(async () => [1, 2, 3]))
-        expect(results).resolves.toEqual([1, 2, 3])
+        await expect(results).resolves.toEqual([1, 2, 3])
     })
 
-    test("async iterates inner elements when value iterable and nested", () => {
+    test("async iterates inner elements when value iterable and nested", async () => {
         const results = asyncIterateToArray(lazy(async () => lazy(() => [1, 2, 3])))
-        expect(results).resolves.toEqual([1, 2, 3])
+        await expect(results).resolves.toEqual([1, 2, 3])
     })
 
     test("async iterates elements when nested array", () => {
@@ -92,9 +92,9 @@ it("starts out untouched", () => {
 })
 declare.it("If S ⊆ T then Lazy<S> ⊆ Lazy<T>", expect => {
     expect(type<Lazy<1>>).to_subtype(type<Lazy<number>>)
-    let a: Lazy<number> = lazy(() => 1 as const)
-    function generic<T, S extends T>() {
-        let lz: Lazy<T> = null! as Lazy<S>
+    const _: Lazy<number> = lazy(() => 1 as const)
+    function __<T, S extends T>() {
+        const _: Lazy<T> = null! as Lazy<S>
     }
 })
 
@@ -210,12 +210,12 @@ it("lazy<async<1>> for lazy lazy async 1", async () => {
 
 it("lazy<async<1>> lazy async lazy 1", async () => {
     const lz = lazy(async () => lazy(() => 1)) satisfies LazyAsync<number>
-    lz.pull() satisfies Promise<number>
+    await (lz.pull() satisfies Promise<number>)
 })
 
 it("lazy<async<1>> for lazy async lazy async 1", async () => {
     const lz = lazy(async () => lazy(async () => 1)) satisfies LazyAsync<number>
-    lz.pull() satisfies Promise<number>
+    await (lz.pull() satisfies Promise<number>)
 })
 
 it("lazyAsync<T> for lazy async T", async () => {
@@ -254,12 +254,12 @@ it("lazyAsync<T> for lazy async lazy T", async () => {
     const pulled = await generic(1)
     expect(pulled).toEqual(1)
 })
-it("lazyAsync<T> for lazy async lazy async T", async <T>() => {
-    async function generic<T>(x: T) {
+it("lazyAsync<T> for lazy async lazy async T", async () => {
+    async function generic<T>(_: T) {
         const lz = lazy(async () => lazy(async () => null! as T)) satisfies LazyAsync<T>
         const pulled = (await lz.pull()) satisfies Lazy.PulledAwaited<T>
         return pulled
     }
-    const pulled = await generic(1)
+    await generic(1)
     return
 })

@@ -1,27 +1,24 @@
 import { declare, type, type_of } from "declare-it"
-import { Lazy } from "../.."
-
-import type { Seq } from "../.."
-import { seq } from "../.."
+import { Lazy, seq, Seq } from "../.."
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("accepts an input sequence, returns Lazy<boolean>", expect => {
-    const s = null! as Seq<number>
+    const s = null! as _Seq<number>
     expect(type_of(s.setEquals(s))).to_equal(type<Lazy<boolean>>)
 })
 declare.it("accepts input sequence of subtype, returns Lazy<boolean>", expect => {
-    const s1 = null! as Seq<number>
-    const s2 = null! as Seq<1 | 2 | 3>
+    const s1 = null! as _Seq<number>
+    const s2 = null! as _Seq<1 | 2 | 3>
     expect(type_of(s1.setEquals(s2))).to_equal(type<Lazy<boolean>>)
 })
 declare.it("accepts input sequence of supertype, returns Lazy<boolean>", expect => {
-    const s1 = null! as Seq<1 | 2 | 3>
-    const s2 = null! as Seq<number>
+    const s1 = null! as _Seq<1 | 2 | 3>
+    const s2 = null! as _Seq<number>
     expect(type_of(s1.setEquals(s2))).to_equal(type<Lazy<boolean>>)
 })
 declare.it("doesn't accept non-subtype, non-supertype inputs", expect => {
-    const s1 = null! as Seq<1 | 2>
-    const s2 = null! as Seq<2 | 3>
+    const s1 = null! as _Seq<1 | 2>
+    const s2 = null! as _Seq<2 | 3>
     // @ts-expect-error
     s1.setEquals(s2)
 })

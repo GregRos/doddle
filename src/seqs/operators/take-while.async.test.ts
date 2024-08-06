@@ -47,7 +47,7 @@ it("calls predicate as many times as needed", async () => {
     const s = _seq([1, 2, 3, 4, 5]).takeWhile(f)
     for await (const _ of s) {
     }
-    await expect(f).toHaveBeenCalledTimes(2)
+    expect(f).toHaveBeenCalledTimes(2)
 })
 
 it("works with async predicate", async () => {

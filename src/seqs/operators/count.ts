@@ -8,7 +8,9 @@ import type { Seq } from "../seq/seq.class"
 import { seq } from "../seq/seq.ctor"
 
 function generic<T>(input: Seq<T>, predicate?: Seq.Predicate<T>): Lazy<number> {
-    predicate && mustBeFunction("predicate", predicate)
+    if (predicate) {
+        mustBeFunction("predicate", predicate)
+    }
     return lazyFromOperator("count", input, input => {
         return input
             .filter(predicate ?? (() => true))

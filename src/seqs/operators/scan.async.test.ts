@@ -64,7 +64,7 @@ it("scans without initial value, if stopped at first element, reducer is not cal
 it("works on infinite sequence", async () => {
     const s = _seq.repeat(Infinity, 1).scan((acc, x) => acc + x, 0)
     let count = 0
-    for await (const x of s) {
+    for await (const _ of s) {
         if (++count > 3) break // To avoid infinite loop in test
     }
 })

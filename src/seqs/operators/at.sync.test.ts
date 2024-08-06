@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, Seq } from "../.."
+import type { Lazy } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
 declare.test("correctly typed as Lazy and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
     expect(type_of(s)).to_equal(type<Lazy<number | undefined>>)

@@ -29,15 +29,15 @@ describe("type tests", () => {
     declare.it("correct element type when mapped to different aseq inputs", expect => {
         const expected_type = type<_Seq<string>>
         const input = _seq([1, 2, 3])
-        expect(type_of(input.concatMap(x => _seq(["a"])))).to_equal(expected_type)
-        expect(type_of(input.concatMap(x => null! as AsyncIterable<string>))).to_equal(
+        expect(type_of(input.concatMap(_ => _seq(["a"])))).to_equal(expected_type)
+        expect(type_of(input.concatMap(_ => null! as AsyncIterable<string>))).to_equal(
             expected_type
         )
-        expect(type_of(input.concatMap(x => () => null! as AsyncIterable<string>))).to_equal(
+        expect(type_of(input.concatMap(_ => () => null! as AsyncIterable<string>))).to_equal(
             expected_type
         )
-        expect(type_of(input.concatMap(x => null! as Iterable<string>))).to_equal(expected_type)
-        expect(type_of(input.concatMap(x => () => null! as Iterable<string>))).to_equal(
+        expect(type_of(input.concatMap(_ => null! as Iterable<string>))).to_equal(expected_type)
+        expect(type_of(input.concatMap(_ => () => null! as Iterable<string>))).to_equal(
             expected_type
         )
     })
@@ -62,7 +62,7 @@ it("projects when empty to non empty, function not called", async () => {
 
 it("is not eager", async () => {
     const s = _seq.repeat(Infinity, 1)
-    const projected = s.concatMap(x => _seq.repeat(Infinity, "a"))
+    const projected = s.concatMap(_ => _seq.repeat(Infinity, "a"))
     for await (const _ of projected) {
         break
     }

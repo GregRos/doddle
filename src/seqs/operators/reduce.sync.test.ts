@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, Seq } from "../.."
+import type { Lazy } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
 declare.test("can be called with initial, type changes to match", expect => {
     const s = _seq([1, 2, 3]).reduce((acc, x) => `${acc}${x}`, "")
     expect(type_of(s)).to_equal(type<Lazy<string>>)

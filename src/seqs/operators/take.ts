@@ -18,7 +18,6 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
         }
         if (count < 0) {
             count = -count
-            let anySkipped = false
             const results = seq(input)
                 .append(END_MARKER)
                 .window(count + 1, (...window) => {
@@ -26,7 +25,6 @@ export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
                         window.pop()
                         return window as T[]
                     }
-                    anySkipped = true
                     return undefined
                 })
                 .filter(x => x !== undefined)
@@ -51,7 +49,6 @@ export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
         }
         if (count < 0) {
             count = -count
-            let anySkipped = false
             const results = (await aseq(input)
                 .append(END_MARKER)
                 .window(count + 1, (...window) => {
@@ -59,7 +56,6 @@ export function async<T>(this: AsyncIterable<T>, countArg: number): ASeq<T> {
                         window.pop()
                         return window as T[]
                     }
-                    anySkipped = true
                     return undefined
                 })
                 .filter(x => x !== undefined)

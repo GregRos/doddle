@@ -1,48 +1,47 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq, LazyAsync } from "../.."
+import type { LazyAsync } from "../.."
 import { aseq } from "../.."
 
-const f = aseq
-type SType<T> = ASeq<T>
+const _seq = aseq
 
 declare.it("correctly typed as LazyAsync and disjunction with undefined if no alt", expect => {
-    const s = f([1, 2, 3]).last()
+    const s = _seq([1, 2, 3]).last()
     expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
 })
 
 declare.it("disjunction with alt if it's given", expect => {
-    const s = f([1, 2, 3]).last("alt" as string)
+    const s = _seq([1, 2, 3]).last("alt" as string)
     expect(type_of(s)).to_equal(type<LazyAsync<number | string>>)
 })
 
 declare.it("Alt type is const", expect => {
-    const s = f([1, 2, 3]).last("alt")
+    const s = _seq([1, 2, 3]).last("alt")
     expect(type_of(s)).to_equal(type<LazyAsync<number | "alt">>)
 })
 
 it("gets last element", async () => {
-    const s = f([1, 2, 3]).last()
+    const s = _seq([1, 2, 3]).last()
     expect(await s.pull()).toEqual(3)
 })
 
 it("gets undefined for empty", async () => {
-    const s = f([]).last()
+    const s = _seq([]).last()
     expect(await s.pull()).toEqual(undefined)
 })
 
 it("gets alt for empty with alt", async () => {
-    const s = f([]).last("alt")
+    const s = _seq([]).last("alt")
     expect(await s.pull()).toEqual("alt")
 })
 
 it("alt doesn't affect non-empty", async () => {
-    const s = f([1, 2, 3]).last("alt")
+    const s = _seq([1, 2, 3]).last("alt")
     expect(await s.pull()).toEqual(3)
 })
 
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(async function* () {})
-    const s = f(fn)
+    const s = _seq(fn)
     const lazy = s.last()
     expect(fn).not.toHaveBeenCalled()
     await lazy.pull()
@@ -56,7 +55,7 @@ it("pulls as many as needed", async () => {
         yield 3
         expect(true).toBe(true) // This should trigger only once the whole sequence has been processed
     })
-    const tkw = f(sq).last()
+    const tkw = _seq(sq).last()
     expect(sq).not.toHaveBeenCalled()
     await tkw.pull()
     expect(sq).toHaveBeenCalledTimes(1)

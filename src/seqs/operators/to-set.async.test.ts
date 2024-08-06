@@ -1,9 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../.."
 import { aseq, LazyAsync } from "../.."
 
 const _seq = aseq
-type _Seq<T> = ASeq<T>
 
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toSet()

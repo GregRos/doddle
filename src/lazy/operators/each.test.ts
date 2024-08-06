@@ -1,7 +1,4 @@
-import { lazy, Lazy, LazyAsync } from "../.."
-
-const lz = lazy(() => 1) satisfies Lazy<number>
-const lza = lazy(async () => 1) satisfies LazyAsync<number>
+import { lazy } from "../.."
 
 it("lazy do doThing", () => {
     let i = ""
@@ -20,7 +17,7 @@ it("lazy async do doThing", async () => {
     let i = ""
     await expect(
         lazy(async () => (i += "a"))
-            .each(x => {
+            .each(() => {
                 expect(i).toBe("a")
                 i += "b"
                 return lazy(() => (i += "c"))

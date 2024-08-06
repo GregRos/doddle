@@ -1,11 +1,9 @@
 import { declare, type, type_of } from "declare-it"
 import type { LazyAsync } from "../.."
 
-import type { ASeq } from "../.."
 import { aseq } from "../.."
 
 const _aseq = aseq
-type _ASeq<T> = ASeq<T>
 
 declare.it("accepts projection to pair", expect => {
     const s = _aseq([1, 2, 3]).toMap(x => [x, x])
@@ -22,30 +20,30 @@ declare.it("accepts projection to pair with different types", expect => {
     expect(type_of(s)).to_equal(type<LazyAsync<Map<number, string>>>)
 })
 
-declare.it("doesn't accept projection to other", expect => {
+declare.it("doesn't accept projection to other", () => {
     // This would be a compile-time TypeScript error, not runtime
     // @ts-expect-error
-    const s = _aseq([1, 2, 3]).toMap(x => x)
+    _aseq([1, 2, 3]).toMap(x => x)
 })
 
-declare.it("doesn't accept projection to triple", expect => {
+declare.it("doesn't accept projection to triple", () => {
     // @ts-expect-error
-    const s = _aseq([1, 2, 3]).toMap(x => [x, x, x])
+    _aseq([1, 2, 3]).toMap(x => [x, x, x])
 })
 
-declare.it("doesn't accept projection to single", expect => {
+declare.it("doesn't accept projection to single", () => {
     // @ts-expect-error
-    const s = _aseq([1, 2, 3]).toMap(() => [1])
+    _aseq([1, 2, 3]).toMap(() => [1])
 })
 
-declare.it("doesn't accept projection to optional pair", expect => {
+declare.it("doesn't accept projection to optional pair", () => {
     // @ts-expect-error
-    const s = _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number?])
+    _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number?])
 })
 
-declare.it("doesn't accept projection to union with undefined", expect => {
+declare.it("doesn't accept projection to union with undefined", () => {
     // @ts-expect-error
-    const s = _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
+    _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
 })
 
 it("converts empty to empty", async () => {
@@ -55,7 +53,7 @@ it("converts empty to empty", async () => {
 
 it("doesn't call projection on empty", async () => {
     const fn = jest.fn()
-    const s = _aseq([]).toMap(fn)
+    _aseq([]).toMap(fn)
     expect(fn).not.toHaveBeenCalled()
 })
 

@@ -61,7 +61,7 @@ it("scans without initial value, if stopped at first element, reducer is not cal
 
 it("works on infinite sequence", () => {
     const s = _seq.repeat(Infinity, 1).scan((acc, x) => acc + x, 0)
-    for (const x of s) {
+    for (const _ of s) {
         break
     }
 })

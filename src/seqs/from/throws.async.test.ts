@@ -14,7 +14,7 @@ it("throws error when iterated", async () => {
     const err = new Error("error")
     const s = aseq.throws(err)
     await expect(async () => {
-        for await (const item of s) {
+        for await (const _ of s) {
             /* iteration */
         }
     }).rejects.toThrow(err)
@@ -23,7 +23,7 @@ it("throws error when iterated", async () => {
 it("throws error based on function returning Error", async () => {
     const s = aseq.throws(() => new Error("error"))
     await expect(async () => {
-        for await (const item of s) {
+        for await (const _ of s) {
         }
     }).rejects.toThrow("error")
 })
@@ -31,7 +31,7 @@ it("throws error based on function returning Error", async () => {
 it("throws error based on function returning string", async () => {
     const s = aseq.throws(() => "error")
     await expect(async () => {
-        for await (const item of s) {
+        for await (const _ of s) {
         }
     }).rejects.toThrow("error")
 })
@@ -40,7 +40,7 @@ it("works when appended to another aseq", async () => {
     const each = jest.fn()
     const s = aseq.of(1, 2, 3).concat(aseq.throws("error")).each(each)
     await expect(async () => {
-        for await (const item of s) {
+        for await (const _ of s) {
             /* iteration */
         }
     }).rejects.toThrow("error")
@@ -51,7 +51,7 @@ describe("invalid input", () => {
     it("throws TypeError when iterated if given a function returning null", async () => {
         const s = aseq.throws(() => null)
         await expect(async () => {
-            for await (const item of s) {
+            for await (const _ of s) {
                 /* iteration */
             }
         }).rejects.toThrow(TypeError)

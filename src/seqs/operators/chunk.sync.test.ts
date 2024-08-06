@@ -26,7 +26,7 @@ declare.it("projection parameters typed as [T, T? ...]", expect => {
 })
 
 declare.it("accepts projection with N parameters", expect => {
-    const s = _seq([1, 2, 3]).window(2, (a, b) => {
+    _seq([1, 2, 3]).window(2, (a, b) => {
         expect(type_of(a)).to_equal(type<number>)
         expect(type_of(b)).to_equal(type<number | undefined>)
     })
@@ -79,11 +79,11 @@ it("can iterate twice", () => {
 })
 
 it("chunks empty as empty with projection", () => {
-    const s = _seq([]).chunk(1, x => 1)
+    const s = _seq([]).chunk(1, _ => 1)
     expect(s._qr).toEqual([])
 })
 it("chunks empty as empty with projection", () => {
-    const s = _seq([]).chunk(1, x => 1)
+    const s = _seq([]).chunk(1, _ => 1)
     expect(s._qr).toEqual([])
 })
 it("projects singleton chunks correctly", () => {

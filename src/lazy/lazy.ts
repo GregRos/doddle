@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/await-thenable */
 import { cannotRecurseSync } from "../errors/error"
 import {
     getClassName,
@@ -81,7 +80,7 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
         }
     }
     async *[Symbol.asyncIterator]() {
-        // eslint-disable @typescript-eslint/await-thenable
+        // eslint-disable-next-line @typescript-eslint/await-thenable
         const inner = await this.pull()
         if (isAsyncIterable(inner) || isIterable(inner)) {
             yield* inner as Iterable<_IterationType<T>>
@@ -204,16 +203,16 @@ export namespace Lazy {
     }
     export type Pulled<T> =
         T extends PromiseLike<infer X>
-            ? Promise<Lazy.PulledAwaited<X>>
+            ? Promise<PulledAwaited<X>>
             : T extends Lazy<infer X>
-              ? Lazy.Pulled<X>
+              ? Pulled<X>
               : T
 
     export type PulledAwaited<T> =
         T extends Lazy<infer R>
-            ? Lazy.PulledAwaited<R>
+            ? PulledAwaited<R>
             : T extends Promise<infer R>
-              ? Lazy.PulledAwaited<R>
+              ? PulledAwaited<R>
               : T
 }
 

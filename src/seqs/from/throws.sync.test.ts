@@ -18,7 +18,7 @@ it("throws error when iterated", () => {
 it("throws error based on function returning Error", () => {
     const s = seq.throws(() => new Error("error"))
     expect(() => {
-        for (const item of s) {
+        for (const _ of s) {
         }
     }).toThrow("error")
 })
@@ -26,7 +26,7 @@ it("throws error based on function returning Error", () => {
 it("throws error based on function returning string", () => {
     const s = seq.throws(() => "error")
     expect(() => {
-        for (const item of s) {
+        for (const _ of s) {
         }
     }).toThrow("error")
 })

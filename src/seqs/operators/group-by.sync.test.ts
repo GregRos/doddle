@@ -1,10 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../.."
 
 import type { Lazy } from "../.."
 import { seq } from "../.."
 const _seq = seq
-type _Seq<T> = Seq<T>
 declare.it("returns Lazy<Map<K, [T, ...T[]]>>", expect => {
     const s = _seq([1, 2, 3]).groupBy(() => 1)
     expect(type_of(s)).to_equal(type<Lazy<Map<number, [number, ...number[]]>>>)
@@ -18,7 +16,7 @@ declare.it("iteratee has single argument", expect => {
 
 declare.it("iteratee can't have two arguments", expect => {
     // @ts-expect-error
-    _seq([1, 2, 3]).groupBy((a, b) => 1)
+    _seq([1, 2, 3]).groupBy((_, __) => 1)
 })
 
 it("returns empty map on empty", () => {
@@ -32,7 +30,7 @@ it("returns map with singleton on singleton", () => {
 })
 
 it("groups all by single key, preserves order", () => {
-    const s = _seq([1, 2, 1, 2]).groupBy(x => 1)
+    const s = _seq([1, 2, 1, 2]).groupBy(_ => 1)
     expect(s.pull()).toEqual(new Map([[1, [1, 2, 1, 2]]]))
 })
 

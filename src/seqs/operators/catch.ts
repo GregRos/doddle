@@ -35,12 +35,13 @@ export function sync<T, S>(
                     return
                 }
                 yield value
-            } catch (error: any) {
+            } catch (err: any) {
+                let error = err
                 if (typeof error !== "object" || !(error instanceof Error)) {
                     error = new ThrewNonError(error)
                 }
                 const result = handler(error, i)
-                if (result == undefined) {
+                if (result == null) {
                     return
                 }
                 if (isThenable(result)) {
@@ -76,12 +77,13 @@ export function async<T, S>(
                     return
                 }
                 yield value
-            } catch (error: any) {
+            } catch (err: any) {
+                let error = err
                 if (typeof error !== "object" || !(error instanceof Error)) {
                     error = new ThrewNonError(error)
                 }
                 const result = await handler(error, i)
-                if (result == undefined) {
+                if (result == null) {
                     return
                 }
                 yield* aseq(result)

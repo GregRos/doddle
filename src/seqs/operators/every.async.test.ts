@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq, LazyAsync } from "../.."
+import type { LazyAsync } from "../.."
 import { aseq } from "../.."
 
 const _seq = aseq
-type SType<T> = ASeq<T>
 declare.test("should type as Lazy<boolean>", expect => {
     expect(type_of(_seq([1, 2, 3]).every(() => true))).to_equal(type<LazyAsync<boolean>>)
 })

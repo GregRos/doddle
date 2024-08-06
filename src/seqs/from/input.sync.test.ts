@@ -18,7 +18,7 @@ declare.it("element type is same as iterable", expect => {
 declare.it("can specify type when converting from array", expect => {
     const s = _seq<1>([1])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
-    const s2 = _seq<number>()
+    _seq<number>()
 })
 declare.it("can specify type when converting from empty array", expect => {
     const s = _seq<1>([])
@@ -127,7 +127,7 @@ it("calls next as many times as needed", () => {
     const it = new Dummy._Iterator()
     it.next = jest.fn(it.next)
     seq(() => it)
-    for (const x of seq(() => it)) {
+    for (const _ of seq(() => it)) {
         break
     }
     expect(it.next).toHaveBeenCalledTimes(1)

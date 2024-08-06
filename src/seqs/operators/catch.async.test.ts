@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "../.."
@@ -47,7 +48,7 @@ it("handler stops seq on void", async () => {
             }
         })
         .catch(handler)
-    for await (const x of s) {
+    for await (const _ of s) {
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)
@@ -104,7 +105,7 @@ it("works for rejected promise", async () => {
             }
         })
         .catch(handler)
-    for await (const x of s) {
+    for await (const _ of s) {
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)
@@ -140,7 +141,7 @@ it("works for async handler returning void", async () => {
             }
         })
         .catch(handler)
-    for await (const x of s) {
+    for await (const _ of s) {
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)

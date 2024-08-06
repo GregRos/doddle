@@ -35,8 +35,8 @@ describe("type tests", () => {
     declare.it("is correct element type when mapped to different seq inputs", expect => {
         const expected = type<_Seq<string>>
         const input = seq([1, 2, 3])
-        expect(type_of(input.concatMap(x => null! as Iterable<string>))).to_equal(expected)
-        expect(type_of(input.concatMap(x => () => null! as Iterable<string>))).to_equal(expected)
+        expect(type_of(input.concatMap(_ => null! as Iterable<string>))).to_equal(expected)
+        expect(type_of(input.concatMap(_ => () => null! as Iterable<string>))).to_equal(expected)
     })
 })
 
@@ -63,18 +63,18 @@ it("receives index", () => {
 it("projects correctly when mapped to different inputs", () => {
     const s = _seq([1, 2, 3])
     expect(
-        s.concatMap(function* (x) {
+        s.concatMap(function* (_) {
             yield 1
         })._qr
     ).toEqual([1, 1, 1])
 
-    expect(s.concatMap(x => _seq.of(1, 2))._qr).toEqual([1, 2, 1, 2, 1, 2])
-    expect(s.concatMap(x => () => _seq.of(1, 2)[Symbol.iterator]())._qr).toEqual([1, 2, 1, 2, 1, 2])
+    expect(s.concatMap(_ => _seq.of(1, 2))._qr).toEqual([1, 2, 1, 2, 1, 2])
+    expect(s.concatMap(_ => () => _seq.of(1, 2)[Symbol.iterator]())._qr).toEqual([1, 2, 1, 2, 1, 2])
 })
 
 it("is not eager", () => {
     const s = _seq.repeat(Infinity, 1)
-    const projected = s.concatMap(x => _seq.repeat(Infinity, "a"))
+    const projected = s.concatMap(_ => _seq.repeat(Infinity, "a"))
     for (const _ of projected) {
         break
     }

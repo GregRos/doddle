@@ -8,9 +8,9 @@ declare.it("returns seq of same type", expect => {
     const s = _seq([1, 2, 3]).uniqBy(() => 1)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
-declare.it("should not accept iteratee with 2 arguments", expect => {
+declare.it("should not accept iteratee with 2 arguments", () => {
     // @ts-expect-error
-    _seq([1, 2, 3]).uniqBy((x, i) => x)
+    _seq([1, 2, 3]).uniqBy((x, _) => x)
 })
 it("returns empty on empty", () => {
     const s = _seq([]).uniqBy(() => 1)

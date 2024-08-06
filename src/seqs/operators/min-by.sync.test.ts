@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, Seq } from "../.."
+import type { Lazy } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
 
 declare.test("should type as Lazy<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(type<Lazy<number | undefined>>)
@@ -80,9 +79,9 @@ it("returns first min value", () => {
 })
 
 it("doesn't error for non-comparable keys", () => {
-    const s = expect(() =>
+    expect(() =>
         _seq([1, 2, 3])
-            .minBy(x => {})
+            .minBy(_ => {})
             .pull()
     ).not.toThrow()
 })

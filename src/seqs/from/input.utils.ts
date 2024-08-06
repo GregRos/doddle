@@ -4,7 +4,7 @@
 export namespace Dummy {
     export class _Iterator implements Iterator<number> {
         _count = 0
-        next(...args: any[]) {
+        next(..._: any[]) {
             if (this._count === 3) {
                 return { done: true, value: undefined } as const
             }
@@ -13,7 +13,7 @@ export namespace Dummy {
     }
     export class _AsyncIterator implements AsyncIterator<number> {
         _count = 0
-        async next(...args: any[]) {
+        async next(..._: any[]) {
             if (this._count === 3) {
                 return { done: true, value: null } as const
             }

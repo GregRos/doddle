@@ -24,7 +24,7 @@ declare.it("projection parameters typed as [T, T? ...]", expect => {
 })
 
 declare.it("accepts projection with N parameters", expect => {
-    const s = _seq([1, 2, 3]).window(2, (a, b) => {
+    _seq([1, 2, 3]).window(2, (a, b) => {
         expect(type_of(a)).to_equal(type<number>)
         expect(type_of(b)).to_equal(type<number | undefined>)
     })
@@ -51,7 +51,7 @@ it("windows pairs", async () => {
 })
 
 it("windows empty as empty with projection", async () => {
-    const s = _seq([]).window(1, x => 1)
+    const s = _seq([]).window(1, _ => 1)
     await expect(s._qr).resolves.toEqual([])
 })
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-throw-literal */
 import { declare, type, type_of } from "declare-it"
 import type { Seq } from "../.."
 
@@ -46,7 +47,7 @@ it("handler stops seq on void", () => {
             }
         })
         .catch(handler)
-    for (const x of s) {
+    for (const _ of s) {
     }
 
     expect(handler).toHaveBeenCalledTimes(1)

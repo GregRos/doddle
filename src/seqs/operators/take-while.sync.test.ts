@@ -39,7 +39,7 @@ it("has no side-effects, pulls as many as needed", () => {
         yield 2
         expect(false).toBe(true)
     })
-    const tkw = _seq(sq).takeWhile(x => x < 2)
+    _seq(sq).takeWhile(x => x < 2)
     expect(sq).not.toHaveBeenCalled()
     expect(_seq(sq).takeWhile(x => x < 2)._qr).toEqual([1])
     expect(sq).toHaveBeenCalledTimes(1)

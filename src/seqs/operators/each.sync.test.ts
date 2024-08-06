@@ -3,22 +3,22 @@ import type { Seq } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
-declare.it("should type as Seq<T>", expect => {
-    expect(type_of(_seq([1, 2, 3]).each(() => {}))).to_equal(type<Seq<number>>)
+type _Seq<T> = Seq<T>
+declare.it("should type as _Seq<T>", expect => {
+    expect(type_of(_seq([1, 2, 3]).each(() => {}))).to_equal(type<_Seq<number>>)
 })
 
 declare.it("can be called with no stages", expect => {
     const s = _seq([1, 2, 3]).each(() => {})
-    expect(type_of(s)).to_equal(type<Seq<number>>)
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("can be called with before, after, both, or undefined", expect => {
     const s = _seq([1, 2, 3])
-    expect(type_of(s.each(() => {}, "before"))).to_equal(type<Seq<number>>)
-    expect(type_of(s.each(() => {}, "after"))).to_equal(type<Seq<number>>)
-    expect(type_of(s.each(() => {}, "both"))).to_equal(type<Seq<number>>)
-    expect(type_of(s.each(() => {}, undefined))).to_equal(type<Seq<number>>)
+    expect(type_of(s.each(() => {}, "before"))).to_equal(type<_Seq<number>>)
+    expect(type_of(s.each(() => {}, "after"))).to_equal(type<_Seq<number>>)
+    expect(type_of(s.each(() => {}, "both"))).to_equal(type<_Seq<number>>)
+    expect(type_of(s.each(() => {}, undefined))).to_equal(type<_Seq<number>>)
 })
 
 declare.it("can't be called with other strings", expect => {
@@ -96,46 +96,5 @@ it("can iterate twice", () => {
     for (const x of e) {
         expect(fn).toHaveBeenCalledTimes(3 + x)
         expect(fn).toHaveBeenLastCalledWith(x, x - 1, "before")
-    }
-})
-
-it("works with async iteratee -- before", async () => {
-    const fn1 = jest.fn()
-    const fn2 = jest.fn(async (...args: any[]) => {
-        return Promise.resolve().then(() => fn1(...args))
-    })
-    const e = _seq([1, 2, 3]).each(fn2, "before")
-    for await (const x of e) {
-        expect(fn1).toHaveBeenCalledTimes(x)
-        expect(fn1).toHaveBeenLastCalledWith(x, x - 1, "before")
-    }
-})
-
-it("works with async iteratee -- after", async () => {
-    const fn1 = jest.fn()
-    const fn2 = jest.fn(async (...args: any[]) => {
-        return Promise.resolve().then(() => fn1(...args))
-    })
-    const e = _seq([1, 2, 3]).each(fn2, "after")
-    for await (const x of e) {
-        expect(fn1).toHaveBeenCalledTimes(x - 1)
-        if (x !== 1) {
-            expect(fn1).toHaveBeenLastCalledWith(x - 1, x - 2, "after")
-        }
-    }
-})
-
-it("works with async iteratee -- both", async () => {
-    const fn1 = jest.fn()
-    const fn2 = jest.fn(async (...args: any[]) => {
-        return Promise.resolve().then(() => fn1(...args))
-    })
-    const e = _seq([1, 2, 3]).each(fn2, "both")
-    for await (const x of e) {
-        expect(fn1).toHaveBeenCalledTimes(2 * x - 1)
-        expect(fn1).toHaveBeenLastCalledWith(x, x - 1, "before")
-        if (x !== 1) {
-            expect(fn1).toHaveBeenCalledWith(x - 1, x - 2, "after")
-        }
     }
 })

@@ -1,9 +1,8 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy, Seq } from "../.."
+import type { Lazy } from "../.."
 
 import { seq } from "../.."
 const _seq = seq
-type SType<T> = Seq<T>
 
 declare.test("should type as Lazy<number>", expect => {
     expect(type_of(_seq([1, 2, 3]).sumBy(() => 1))).to_equal(type<Lazy<number>>)

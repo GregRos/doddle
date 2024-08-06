@@ -24,10 +24,7 @@ export function generic<T, R, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, R>, 
     })
 }
 
-export function sync<T, K, Alt>(
-    this: Iterable<T>,
-    iteratee: Seq.Iteratee<T, K>
-): Lazy<T | undefined>
+export function sync<T, K>(this: Iterable<T>, iteratee: Seq.Iteratee<T, K>): Lazy<T | undefined>
 export function sync<T, K, const Alt>(
     this: Iterable<T>,
     iteratee: Seq.Iteratee<T, K>,

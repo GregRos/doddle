@@ -6,19 +6,19 @@ const _aseq = aseq
 type _ASeq<T> = ASeq<T>
 
 declare.it("accepts an input sequence, returns LazyAsync<boolean>", expect => {
-    const s = null! as ASeq<number>
+    const s = null! as _ASeq<number>
     expect(type_of(s.seqEquals(s))).to_equal(type<LazyAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of subtype, returns LazyAsync<boolean>", expect => {
-    const s1 = null! as ASeq<number>
-    const s2 = null! as ASeq<1 | 2 | 3>
+    const s1 = null! as _ASeq<number>
+    const s2 = null! as _ASeq<1 | 2 | 3>
     expect(type_of(s1.seqEquals(s2))).to_equal(type<LazyAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of supertype, returns LazyAsync<boolean>", expect => {
-    const s1 = null! as ASeq<1 | 2 | 3>
-    const s2 = null! as ASeq<number>
+    const s1 = null! as _ASeq<1 | 2 | 3>
+    const s2 = null! as _ASeq<number>
     expect(type_of(s1.seqEquals(s2))).to_equal(type<LazyAsync<boolean>>)
 })
 

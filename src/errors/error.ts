@@ -7,8 +7,6 @@ export class DawdleError extends Error {
     }
 }
 
-const BAD_ARGUMENT = "call/bad-argument"
-const BAD_RETURN = "call/bad-return"
 function argNotExpected(expected: string, check: (value: unknown) => boolean) {
     return function (name: string, value: unknown) {
         if (!check(value)) {
@@ -42,7 +40,7 @@ export const mustBeFunction = argNotExpected(
     (value: unknown) => typeof value === "function"
 )
 
-export const mustBeOneOf = <T>(...options: T[]) => {
+export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }

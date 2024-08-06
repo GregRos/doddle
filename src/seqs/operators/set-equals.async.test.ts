@@ -3,28 +3,28 @@ import type { ASeq } from "../.."
 import { aseq, type LazyAsync } from "../.."
 
 const _aseq = aseq
-type _ASeq<T> = ASeq<T>
+type _Seq<T> = ASeq<T>
 
 declare.it("accepts an input sequence, returns LazyAsync<boolean>", expect => {
-    const s = null! as ASeq<number>
+    const s = null! as _Seq<number>
     expect(type_of(s.setEquals(s))).to_equal(type<LazyAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of subtype, returns LazyAsync<boolean>", expect => {
-    const s1 = null! as ASeq<number>
-    const s2 = null! as ASeq<1 | 2 | 3>
+    const s1 = null! as _Seq<number>
+    const s2 = null! as _Seq<1 | 2 | 3>
     expect(type_of(s1.setEquals(s2))).to_equal(type<LazyAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of supertype, returns LazyAsync<boolean>", expect => {
-    const s1 = null! as ASeq<1 | 2 | 3>
-    const s2 = null! as ASeq<number>
+    const s1 = null! as _Seq<1 | 2 | 3>
+    const s2 = null! as _Seq<number>
     expect(type_of(s1.setEquals(s2))).to_equal(type<LazyAsync<boolean>>)
 })
 
 declare.it("doesn't accept non-subtype, non-supertype inputs", expect => {
-    const s1 = null! as ASeq<1 | 2>
-    const s2 = null! as ASeq<2 | 3>
+    const s1 = null! as _Seq<1 | 2>
+    const s2 = null! as _Seq<2 | 3>
     // @ts-expect-error
     s1.setEquals(s2)
 })

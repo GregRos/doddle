@@ -39,7 +39,6 @@ function zip<T, Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
       >
 
 function zip(this: Lazy<any>, ...others: Lazy<any>[]): Lazy<any> {
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
     return lazy(() => {
         const values = [this, ...others].map(x => x.pull())
         if (values.some(isThenable)) {
