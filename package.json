@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
@@ -64,7 +64,8 @@
     "lint:check": "run-s eslint:check prettier:check",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "prepublishOnly": "node tools/packaging.js"
+    "prepublishOnly": "node tools/packaging.js",
+    "tidy": "yarn install && run-s lint:fix build:clean test"
   },
   "devDependencies": {
     "@gregros/eslint-config": "^0.6.0",
