@@ -1,6 +1,6 @@
-import { ASeqOperator } from "../seq/aseq.class.js"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
-import { SeqOperator } from "../seq/seq.class.js"
+import { SeqOperator, type Seq } from "../seq/seq.class.js"
 
 import { seq } from "../seq/seq.js"
 
@@ -13,18 +13,20 @@ function shuffleArray<T>(array: T[]) {
     }
     return array
 }
-export function sync<T>(this: Iterable<T>) {
+function compute<T>(input: Seq<T>): any {
+    return input
+        .toArray()
+        .map(x => shuffleArray(x))
+        .pull()
+}
+export function sync<T>(this: Iterable<T>): Seq<T> {
     return SeqOperator(this, function* shuffle(input) {
-        const array = seq(input).toArray().pull()
-        shuffleArray(array)
-        yield* array
+        yield* compute(seq(input))
     })
 }
 
-export function async<T>(this: AsyncIterable<T>) {
+export function async<T>(this: AsyncIterable<T>): ASeq<T> {
     return ASeqOperator(this, async function* shuffle(input) {
-        const array = await aseq(input).toArray().pull()
-        shuffleArray(array)
-        yield* array
-    })
+        yield* await compute(aseq(input) as any)
+    }) as any
 }

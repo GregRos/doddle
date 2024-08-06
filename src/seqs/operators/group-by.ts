@@ -1,37 +1,42 @@
+import { aseq, seq, type Lazy, type LazyAsync } from "../../index.js"
+import { returnKvp } from "../../utils.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
 
-export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee<T, K>) {
-    return lazyFromOperator(this, function groupBy(input) {
-        const map = new Map<K, [T, ...T[]]>()
-        for (const element of input) {
-            const key = keyProjection(element)
+function compute<T, K>(input: Seq<T>, keyProjection: Seq.NoIndexIteratee<T, K>) {
+    const map = new Map<K, [T, ...T[]]>()
+    return input
+        .map(element => {
+            return returnKvp(input, keyProjection(element), element) as any
+        })
+        .reduce((map, { key, value }) => {
             let group = map.get(key)
             if (!group) {
-                group = [element]
+                group = [value]
                 map.set(key, group)
             } else {
-                group.push(element)
+                group.push(value)
             }
-        }
-        return map
+            return map
+        }, map)
+        .pull()
+}
+
+export function sync<T, K>(
+    this: Iterable<T>,
+    keyProjection: Seq.NoIndexIteratee<T, K>
+): Lazy<Map<K, [T, ...T[]]>> {
+    return lazyFromOperator(this, function groupBy(input) {
+        return compute(seq(input), keyProjection)
     })
 }
 
-export function async<T, K>(this: AsyncIterable<T>, keyProjection: ASeq.NoIndexIteratee<T, K>) {
+export function async<T, K>(
+    this: AsyncIterable<T>,
+    keyProjection: ASeq.NoIndexIteratee<T, K>
+): LazyAsync<Map<K, [T, ...T[]]>> {
     return lazyFromOperator(this, async function groupBy(input) {
-        const map = new Map<K, [T, ...T[]]>()
-        for await (const element of input) {
-            const key = await keyProjection(element)
-            let group = map.get(key)
-            if (!group) {
-                group = [element]
-                map.set(key, group)
-            } else {
-                group.push(element)
-            }
-        }
-        return map
+        return compute(aseq(input) as any, keyProjection) as any
     })
 }

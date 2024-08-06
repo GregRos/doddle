@@ -1,9 +1,36 @@
 import { checkSize } from "../../errors/error.js"
+import { aseq } from "../../index.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
 import { SeqOperator } from "../seq/seq.class.js"
+import { seq } from "../seq/seq.ctor.js"
 import type { getWindowArgsType, getWindowOutputType } from "./window.types.js"
+
+export function compute<T, S>(
+    input: Seq<T>,
+    size: number,
+    projection: (...window: any[]) => S
+): any {
+    const buffer = Array<T>(size)
+    let i = 0
+    return input
+        .concatMap(element => {
+            buffer[i++ % size] = element
+            if (i >= size) {
+                return [projection(...buffer.slice(i % size), ...buffer.slice(0, i % size))]
+            }
+            return []
+        })
+        .concat(
+            seq(() => {
+                if (i > 0 && i < size) {
+                    return [projection(...buffer.slice(0, i))]
+                }
+                return []
+            })
+        )
+}
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,
@@ -22,21 +49,7 @@ export function sync<T, L extends number, S>(
     checkSize(size)
     projection ??= (...window: any) => window as any
     return SeqOperator(this, function* window(input) {
-        const buffer = Array<T>(size)
-        let i = 0
-        for (const item of input) {
-            buffer[i++ % size] = item
-            if (i >= size) {
-                yield (projection as any).call(
-                    null,
-                    ...buffer.slice(i % size),
-                    ...buffer.slice(0, i % size)
-                )
-            }
-        }
-        if (i > 0 && i < size) {
-            yield (projection as any).call(null, ...buffer.slice(0, i))
-        }
+        yield* compute(seq(input), size, projection)
     })
 }
 export function async<T, L extends number, S>(
@@ -56,21 +69,6 @@ export function async<T, L extends number, S>(
     checkSize(size)
     projection ??= (...window: any) => window as any
     return ASeqOperator(this, async function* window(input) {
-        const buffer = Array<T>(size)
-        let i = 0
-        for await (const item of input) {
-            buffer[i++ % size] = item
-            if (i >= size) {
-                yield (projection as any).call(
-                    null,
-                    ...buffer.slice(i % size),
-                    ...buffer.slice(0, i % size)
-                )
-            }
-        }
-
-        if (i > 0 && i < size) {
-            yield (projection as any).call(null, ...buffer.slice(0, i))
-        }
+        yield* await compute(aseq(input) as any, size, projection)
     })
 }
