@@ -14,7 +14,7 @@ function shuffleArray<T>(array: T[]) {
     return array
 }
 export function sync<T>(this: Iterable<T>) {
-    return new SeqOperator(this, function* shuffle(input) {
+    return SeqOperator(this, function* shuffle(input) {
         const array = seq(input).toArray().pull()
         shuffleArray(array)
         yield* array

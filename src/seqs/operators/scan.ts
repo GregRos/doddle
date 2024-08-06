@@ -20,7 +20,7 @@ export function sync<Item, Acc>(
 ) {
     mustBeFunction("reducer", reducer)
 
-    return new SeqOperator(this, function* scan(input) {
+    return SeqOperator(this, function* scan(input) {
         let hasAcc = initial !== undefined
 
         let acc: Acc = initial as any

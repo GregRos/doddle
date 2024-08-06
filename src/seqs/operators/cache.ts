@@ -13,7 +13,7 @@ export function sync<T>(this: Iterable<T>): Seq<T> {
     let alreadyDone = false
     let iterator: Iterator<T>
 
-    return new SeqOperator(this, function* cache() {
+    return SeqOperator(this, function* cache() {
         let i = 0
         for (;;) {
             if (i < _cache.length) {

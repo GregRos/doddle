@@ -9,7 +9,7 @@ function getThrownError(thrown: unknown) {
 
 export function sync<T = never>(thrown: unknown): Seq<T> {
     mustNotBeNullish("thrown", thrown)
-    return new SeqOperator(thrown, function* throws(input) {
+    return SeqOperator(thrown, function* throws(input) {
         if (typeof input === "function") {
             const result = input()
             mustNotReturnNullish("thrown", result)

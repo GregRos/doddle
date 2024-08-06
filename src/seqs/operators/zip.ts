@@ -33,7 +33,7 @@ export function sync<T, Xs extends [any, ...any[]], R>(
 ): Seq<[T, ...Xs]> {
     const others = _others.map(seq)
     projection ??= (...args: any[]) => args as any
-    return new SeqOperator(this, function* zip(input) {
+    return SeqOperator(this, function* zip(input) {
         const iterators = [input, ...others].map(
             i => i[Symbol.iterator]() as Iterator<any> | undefined
         )

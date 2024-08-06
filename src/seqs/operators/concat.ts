@@ -11,7 +11,7 @@ export function sync<T, Seqs extends Seq.Input<any>[]>(
     ..._iterables: Seqs
 ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
     const iterables = _iterables.map(seq)
-    return new SeqOperator(this, function* concat(input) {
+    return SeqOperator(this, function* concat(input) {
         yield* input
         for (const iterable of iterables) {
             yield* iterable

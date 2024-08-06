@@ -10,7 +10,7 @@ import { seq } from "../seq/seq.js"
 const SKIP = Symbol("SKIP")
 export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
-    return new SeqOperator(this, function* skip(input) {
+    return SeqOperator(this, function* skip(input) {
         let count = countArg
         if (count === 0) {
             yield* seq(input)

@@ -18,7 +18,7 @@ export function sync<T>(
     options?: SkipWhileOptions
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return new SeqOperator(this, function* skipWhile(input) {
+    return SeqOperator(this, function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
         for (const element of input) {

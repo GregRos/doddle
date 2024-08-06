@@ -92,25 +92,24 @@ export abstract class Seq<T> implements Iterable<T> {
     readonly zip = zipSync
 }
 
-interface SyncOperator<In, Out> extends Iterable<Out> {
-    _operator: string
-    _operand: In
-}
-
-export const SeqOperator = function seq<In extends Iterable<any>, Out>(
-    this: SyncOperator<In, Out>,
+let baseSeq!: Seq<any>
+export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
-) {
-    this._operator = impl.name
-    this._operand = operand
-    this[Symbol.iterator] = function operator() {
-        return _iter(impl.call(this, this._operand))
+): Seq<Out> {
+    if (!baseSeq) {
+        baseSeq = new (Seq as any)()
     }
-} as any as {
-    new <In, Out>(operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
+    const obj = Object.create(baseSeq)
+    return Object.assign(obj, {
+        _operator: impl.name,
+        _operand: operand,
+        [Symbol.iterator]: function operator() {
+            return _iter(impl.call(this, this._operand))
+        }
+    })
 }
-SeqOperator.prototype = new (Seq as any)()
+
 export namespace Seq {
     export type IndexIteratee<O> = (index: number) => O
 

@@ -5,7 +5,7 @@ import { SeqOperator } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function sync<T>(this: Iterable<T>) {
-    return new SeqOperator(this, function* reverse(input) {
+    return SeqOperator(this, function* reverse(input) {
         yield* seq(input)
             .toArray()
             .map(x => x.reverse())

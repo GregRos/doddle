@@ -12,7 +12,7 @@ export function sync<T>(
     mustBeFunction("action", action)
     mustBeStage("stage", stage)
     stage ??= "before"
-    return new SeqOperator(this, function* each(input) {
+    return SeqOperator(this, function* each(input) {
         let index = 0
         for (const element of input) {
             if (stage === "before" || stage === "both") {

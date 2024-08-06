@@ -21,7 +21,7 @@ export function sync<T, L extends number, S>(
 ): Seq<any> {
     mustBePositiveInt("windowSize", size)
     projection ??= (...window: any) => window as any
-    return new SeqOperator(this, function* window(input) {
+    return SeqOperator(this, function* window(input) {
         const buffer = Array<T>(size)
         let i = 0
         for (const item of input) {

@@ -40,12 +40,12 @@ export function async<T>(input: ASeq.Input<T>) {
 
 export function sync<T>(input: Seq.Input<T>) {
     if (isIterable(input)) {
-        return new SeqOperator(input, function* seq(input) {
+        return SeqOperator(input, function* seq(input) {
             yield* input
         })
     }
     if (typeof input === "function") {
-        return new SeqOperator(input, function* seq(input) {
+        return SeqOperator(input, function* seq(input) {
             const result = input()
             if (isIterable(result)) {
                 yield* result

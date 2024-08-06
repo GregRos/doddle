@@ -12,7 +12,7 @@ export function sync<T, S>(
     projection: Seq.Iteratee<T, Seq.Input<S>>
 ): Seq<getConcatElementType<T, S>> {
     mustBeFunction("projection", projection)
-    return new SeqOperator(this, function* concatMap(input) {
+    return SeqOperator(this, function* concatMap(input) {
         let index = 0
         for (const element of input) {
             for (const projected of seq(projection(element, index++))) {

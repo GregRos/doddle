@@ -8,7 +8,7 @@ export function sync<T, Items extends any[]>(
     this: Iterable<T>,
     ...items: Items
 ): Seq<T | Items[number]> {
-    return new SeqOperator(this, function* append(input) {
+    return SeqOperator(this, function* append(input) {
         yield* seq(input).concat(items)
     })
 }

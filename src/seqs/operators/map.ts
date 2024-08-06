@@ -8,7 +8,7 @@ import { SeqOperator } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 export function sync<T, S>(this: Iterable<T>, projection: Seq.Iteratee<T, S>): Seq<S> {
     mustBeFunction("projection", projection)
-    return new SeqOperator(this, function* map(input) {
+    return SeqOperator(this, function* map(input) {
         yield* seq(input).concatMap((element, index) => [projection(element, index)])
     })
 }

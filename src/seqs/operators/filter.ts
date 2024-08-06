@@ -11,7 +11,7 @@ export function sync<T, S extends T>(this: Iterable<T>, predicate: Seq.TypePredi
 export function sync<T>(this: Iterable<T>, predicate: Seq.Predicate<T>): Seq<T>
 export function sync<T>(this: Iterable<T>, predicate: Seq.Predicate<T>) {
     mustBeFunction("predicate", predicate)
-    return new SeqOperator(this, function* filter(input) {
+    return SeqOperator(this, function* filter(input) {
         yield* seq(input).concatMap((element, index) =>
             predicate(element, index) ? [element] : []
         )

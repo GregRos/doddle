@@ -21,7 +21,7 @@ export function sync<T, L extends number>(
 ): Seq<getWindowOutputType<T, L>> {
     mustBePositiveInt("size", size)
     projection ??= (...chunk: any) => chunk as any
-    return new SeqOperator(this, function* chunk(input) {
+    return SeqOperator(this, function* chunk(input) {
         let chunk: T[] = []
         for (const item of input) {
             chunk.push(item)

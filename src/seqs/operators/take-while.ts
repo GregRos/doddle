@@ -13,7 +13,7 @@ export function sync<T>(
     specifier?: TakeWhileSpecifier
 ): Seq<T> {
     mustBeFunction("predicate", predicate)
-    return new SeqOperator(this, function* takeWhile(input) {
+    return SeqOperator(this, function* takeWhile(input) {
         let index = 0
         for (const element of input) {
             if (predicate(element, index++)) {

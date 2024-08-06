@@ -4,7 +4,7 @@ import { SeqOperator, type Seq } from "../seq/seq.class.js"
 
 export function sync<T>(this: Iterable<T>, projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
     mustBeFunction("projection", projection)
-    return new SeqOperator(this, function* uniqBy(input) {
+    return SeqOperator(this, function* uniqBy(input) {
         const seen = new Set()
         for (const element of input) {
             const key = projection(element)

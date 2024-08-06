@@ -24,7 +24,7 @@ export function sync<T, S>(
     handler: Seq.Iteratee<Error, void | Seq.Input<S>>
 ): Seq<unknown> {
     mustBeFunction("handler", handler)
-    return new SeqOperator(this, function* catch_(input) {
+    return SeqOperator(this, function* catch_(input) {
         let i = 0
         const iterator = _iter(input)
         for (;;) {

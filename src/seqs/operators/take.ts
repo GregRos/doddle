@@ -10,7 +10,7 @@ import { seq } from "../seq/seq.js"
 const END_MARKER = Symbol("DUMMY")
 export function sync<T>(this: Iterable<T>, countArg: number): Seq<T> {
     mustBeInteger("count", countArg)
-    return new SeqOperator(this, function* take(input) {
+    return SeqOperator(this, function* take(input) {
         let count = countArg
         if (count === 0) {
             yield* []

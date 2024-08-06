@@ -14,7 +14,7 @@ export function sync<T>(
 ): Seq<T> {
     mustBeFunction("projection", projection)
     mustBeBoolean("reverse", reverse)
-    return new SeqOperator(this, function* orderBy(input) {
+    return SeqOperator(this, function* orderBy(input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
             .toArray()
