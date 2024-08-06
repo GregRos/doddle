@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.cjs.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "tsBuildInfoFile": "../dist/cjs/src.tsbuildinfo",
+    "outDir": "../dist/cjs",
+    "rootDir": ".",
+    "noEmit": false
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/dist", "**/node_modules", "**/*.test.ts"]
+}

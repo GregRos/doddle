@@ -1,7 +1,7 @@
 {
   "name": "doddle",
   "version": "1.0.0",
-  "description": "Simple, flexible, and thoroughly tested library for iteration and lazy evaluation.",
+  "description": "Tiny, flexible, and meticulously tested library for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
     "iterable",

@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.cjs.base.json",
+  "references": [{ "path": "./tsconfig.cjs.json" }],
+  "compilerOptions": {
+    "rootDir": "."
+  },
+  "include": ["**/*.test.ts"],
+  "exclude": ["**/dist", "**/node_modules"]
+}

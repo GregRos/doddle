@@ -4,7 +4,7 @@ export default {
         "^.+\\.ts$": [
             "ts-jest",
             {
-                tsconfig: "<rootDir>/src/tsconfig.json",
+                tsconfig: "<rootDir>/src/tsconfig.test.json",
                 transpileOnly: true
             }
         ]
