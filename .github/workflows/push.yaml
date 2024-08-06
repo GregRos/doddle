@@ -1,4 +1,4 @@
-name: Publish stdlazy
+name: CI
 on:
   push:
     branches:

@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
@@ -26,6 +26,7 @@
   "repository": "github:GregRos/doddle",
   "license": "MIT",
   "author": "GregRos",
+  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
