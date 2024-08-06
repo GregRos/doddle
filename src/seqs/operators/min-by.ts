@@ -12,7 +12,7 @@ const EMPTY = Symbol("EMPTY_SEQ")
 
 export function generic<T, K, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, K>, alt: Alt) {
     mustBeFunction("iteratee", iteratee)
-    return lazyFromOperator("minBy", input, input => {
+    return lazyFromOperator(input, function minBy(input) {
         return input
             .map((element, index) => {
                 return returnKvp(input, iteratee(element, index), element)

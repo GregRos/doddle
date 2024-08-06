@@ -7,14 +7,14 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function sync<T>(this: Iterable<T>, predicate: Seq.Predicate<T>): Lazy<boolean> {
-    return lazyFromOperator("every", this, input => {
+    return lazyFromOperator(this, function every(input) {
         return !seq(input)
             .some((x, i) => !predicate(x, i))
             .pull()
     })
 }
 export function async<T>(this: AsyncIterable<T>, predicate: ASeq.Predicate<T>): LazyAsync<boolean> {
-    return lazyFromOperator("every", this, async input => {
+    return lazyFromOperator(this, async function every(input) {
         return aseq(input)
             .some(async (x, i) => !(await predicate(x, i)))
             .map(x => !x)

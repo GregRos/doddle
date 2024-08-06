@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 export function generic<T>(input: Seq<T>, index: number): Lazy<T | undefined> {
     mustBeInteger("index", index)
 
-    return lazyFromOperator("at", input, input => {
+    return lazyFromOperator(input, function at(input) {
         if (index < 0) {
             return input.take(index).first().pull()
         }

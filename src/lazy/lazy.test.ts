@@ -84,6 +84,7 @@ it("toString() is equal to Symbol.toStringTag", () => {
 it("starts out untouched", () => {
     const lz = lazy(() => 1)
     expect(lz.info).toEqual({
+        desc: expect.any(String),
         isReady: false,
         name: null,
         stage: "untouched",

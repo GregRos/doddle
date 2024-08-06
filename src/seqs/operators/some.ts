@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 const NO_MATCH = Symbol("NO_MATCH")
 function generic<T>(input: Seq<T>, predicate: Seq.Predicate<T>): Lazy<boolean> {
     mustBeFunction("predicate", predicate)
-    return lazyFromOperator("some", input, input => {
+    return lazyFromOperator(input, function some(input) {
         return input
             .find(predicate, NO_MATCH)
             .map(x => x !== NO_MATCH)

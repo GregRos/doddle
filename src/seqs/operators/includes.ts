@@ -6,7 +6,7 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, value: T) {
-    return lazyFromOperator("includes", input, input => {
+    return lazyFromOperator(input, function includes(input) {
         return input.some(element => element === value).pull()
     })
 }

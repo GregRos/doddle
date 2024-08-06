@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 
 export function generic<T, Alt>(input: Seq<T>, predicate: Seq.Predicate<T>, alt?: Alt) {
     mustBeFunction("predicate", predicate)
-    return lazyFromOperator("find", input, input => {
+    return lazyFromOperator(input, function find(input) {
         return input.filter(predicate).first(alt).pull() as any
     })
 }

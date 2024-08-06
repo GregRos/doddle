@@ -16,7 +16,7 @@ export function generic<Item, Acc>(
     initial?: Acc
 ): Lazy<any> {
     mustBeFunction("reducer", reducer)
-    return lazyFromOperator("reduce", input, input => {
+    return lazyFromOperator(input, function reduce(input) {
         return input
             .scan(reducer, initial!)
             .last(NO_INITIAL)

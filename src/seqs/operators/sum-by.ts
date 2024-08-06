@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, projection: Seq.Iteratee<T, number>) {
     mustBeFunction("projection", projection)
-    return lazyFromOperator("sumBy", input, input => {
+    return lazyFromOperator(input, function sumBy(input) {
         return input
             .map(projection)
             .reduce((acc, element) => acc + element, 0)

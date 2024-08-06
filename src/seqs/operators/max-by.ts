@@ -11,7 +11,7 @@ import { seq } from "../seq/seq.js"
 const EMPTY = Symbol("EMPTY_SEQ")
 export function generic<T, R, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, R>, alt: Alt) {
     mustBeFunction("iteratee", iteratee)
-    return lazyFromOperator("maxBy", input, input => {
+    return lazyFromOperator(input, function maxBy(input) {
         return input
             .map((element, index) => {
                 return returnKvp(input, iteratee(element, index), element)

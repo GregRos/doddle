@@ -3,7 +3,7 @@ import type { ASeq } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
 
 export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee<T, K>) {
-    return lazyFromOperator("groupBy", this, input => {
+    return lazyFromOperator(this, function groupBy(input) {
         const map = new Map<K, [T, ...T[]]>()
         for (const element of input) {
             const key = keyProjection(element)
@@ -20,7 +20,7 @@ export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee
 }
 
 export function async<T, K>(this: AsyncIterable<T>, keyProjection: ASeq.NoIndexIteratee<T, K>) {
-    return lazyFromOperator("groupBy", this, async input => {
+    return lazyFromOperator(this, async function groupBy(input) {
         const map = new Map<K, [T, ...T[]]>()
         for await (const element of input) {
             const key = await keyProjection(element)

@@ -11,7 +11,7 @@ function generic<T>(input: Seq<T>, predicate?: Seq.Predicate<T>): Lazy<number> {
     if (predicate) {
         mustBeFunction("predicate", predicate)
     }
-    return lazyFromOperator("count", input, input => {
+    return lazyFromOperator(input, function count(input) {
         return input
             .filter(predicate ?? (() => true))
             .reduce(acc => acc + 1, 0)

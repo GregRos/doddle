@@ -1,3 +1,3 @@
-*.tsbuildinfo
+**/*.tsbuildinfo
 tsconfig*.json
 site

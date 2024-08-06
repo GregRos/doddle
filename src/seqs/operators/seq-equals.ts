@@ -9,7 +9,7 @@ export function sync<T extends S, S>(this: Iterable<T>, _other: Seq.Input<S>): L
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>) {
     const other = seq(_other)
-    return lazyFromOperator("seqEquals", this, input => {
+    return lazyFromOperator(this, function seqEquals(input) {
         const otherIterator = other[Symbol.iterator]()
         for (const element of input) {
             const otherElement = otherIterator.next()
@@ -31,7 +31,7 @@ export function async<T, S extends T>(
 ): LazyAsync<boolean>
 export function async<T>(this: AsyncIterable<T>, _other: ASeq.SimpleInput<T>) {
     const other = aseq(_other)
-    return lazyFromOperator("seqEquals", this, async input => {
+    return lazyFromOperator(this, async function seqEquals(input) {
         const otherIterator = other[Symbol.asyncIterator]()
         for await (const element of input) {
             const otherElement = await otherIterator.next()

@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 const mustReturnPair = mustReturnTuple(2)
 export function generic<T, K, V>(input: Seq<T>, projection: Seq.Iteratee<T, readonly [K, V]>) {
     mustBeFunction("projection", projection)
-    return lazyFromOperator("toMap", input, input => {
+    return lazyFromOperator(input, function toMap(input) {
         return input
             .map(projection)
             .each(x => {

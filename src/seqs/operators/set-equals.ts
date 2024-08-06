@@ -10,7 +10,7 @@ export function sync<T extends S, S>(this: Iterable<T>, _other: Seq.Input<S>): L
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>) {
     const other = seq(_other)
-    return lazyFromOperator("setEquals", this, input => {
+    return lazyFromOperator(this, function setEquals(input) {
         const set = new Set(other) as Set<any>
         for (const element of input) {
             if (!set.delete(element)) {
@@ -31,7 +31,7 @@ export function async<T extends S, S>(
 ): LazyAsync<boolean>
 export function async<T, S>(this: AsyncIterable<T>, _other: ASeq.SimpleInput<S>) {
     const other = aseq(_other)
-    return lazyFromOperator("setEquals", this, async input => {
+    return lazyFromOperator(this, async function setEquals(input) {
         const set = new Set<T>() as Set<any>
         for await (const element of other) {
             set.add(element)
