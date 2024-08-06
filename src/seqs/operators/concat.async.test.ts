@@ -3,6 +3,7 @@ import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
+import { _iter } from "@utils"
 const _seq = aseq
 type _Seq<T> = ASeq<T>
 describe("type tests", () => {
@@ -64,7 +65,7 @@ it("concats with different types of inputs", async () => {
         function* () {
             yield 6
         },
-        () => seq.of(7)[Symbol.iterator]()
+        () => _iter(seq.of(7))
     )
     await expect(s._qr).resolves.toEqual([1, 2, 3, 4, 5, 6, 7])
 })

@@ -1,5 +1,6 @@
 import type { ASeq } from "@lib"
 import { aseq } from "@lib"
+import { _aiter } from "@utils"
 import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
@@ -89,8 +90,8 @@ it("reproduces thrown error at the same index", async () => {
 
 it("can handle multiple concurrent iterators", async () => {
     const s = _aseq([1, 2, 3, 4]).cache()
-    const iter1 = s[Symbol.asyncIterator]()
-    const iter2 = s[Symbol.asyncIterator]()
+    const iter1 = _aiter(s)
+    const iter2 = _aiter(s)
     const ps = [
         iter1.next(),
         iter2.next(),

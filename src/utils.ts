@@ -1,5 +1,11 @@
 import { Lazy } from "./lazy/index.js"
 
+export function _iter<T>(input: Iterable<T>): Iterator<T> {
+    return input[Symbol.iterator]()
+}
+export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
+    return input[Symbol.asyncIterator]()
+}
 export function isIterable<T>(value: any): value is Iterable<T> {
     return (
         typeof value === "object" && value != null && typeof value[Symbol.iterator] === "function"

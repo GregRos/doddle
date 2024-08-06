@@ -2,6 +2,7 @@ import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
+import { _iter } from "@utils"
 const _seq = seq
 type _Seq<T> = Seq<T>
 describe("type tests", () => {
@@ -58,7 +59,7 @@ it("concats with different types of inputs", () => {
         function* () {
             yield 6
         },
-        () => seq.of(7)[Symbol.iterator]()
+        () => _iter(seq.of(7))
     )
     expect(s._qr).toEqual([1, 2, 3, 4, 5, 6, 7])
 })

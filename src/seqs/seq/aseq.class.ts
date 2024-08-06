@@ -8,6 +8,7 @@ import { async as eachAsync } from "../operators/each.js"
 import { async as catchAsync } from "../operators/catch.js"
 import { async as chunkAsync } from "../operators/chunk.js"
 
+import { _aiter } from "../../utils.js"
 import { async as concatMapAsync } from "../operators/concat-map.js"
 import { async as everyAsync } from "../operators/every.js"
 import { async as filterAsync } from "../operators/filter.js"
@@ -96,7 +97,7 @@ type ASyncOperator<In, Out> = AsyncIterable<Out> & {
     _operand: In
 }
 
-export const ASeqOperator = function aseq<In, Out>(
+export const ASeqOperator = function aseq<In extends AsyncIterable<any>, Out>(
     this: ASyncOperator<In, Out>,
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
@@ -104,7 +105,7 @@ export const ASeqOperator = function aseq<In, Out>(
     this._operator = impl.name
     this._operand = operand
     this[Symbol.asyncIterator] = function operator() {
-        return impl.call(this, this._operand)[Symbol.asyncIterator]()
+        return _aiter(impl.call(this, this._operand))
     }
 } as any as {
     new <In, Out>(operand: In, impl: (input: In) => AsyncIterable<Out>): ASeq<Out>

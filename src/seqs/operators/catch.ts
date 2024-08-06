@@ -5,7 +5,7 @@ import type { Seq } from "../seq/seq.class.js"
 import { SeqOperator } from "../seq/seq.class.js"
 
 import { mustBeFunction } from "../../errors/error.js"
-import { isThenable } from "../../utils.js"
+import { _aiter, _iter, isThenable } from "../../utils.js"
 import { seq } from "../seq/seq.js"
 
 class ThrewNonError<T> extends Error {
@@ -26,7 +26,7 @@ export function sync<T, S>(
     mustBeFunction("handler", handler)
     return new SeqOperator(this, function* catch_(input) {
         let i = 0
-        const iterator = input[Symbol.iterator]()
+        const iterator = _iter(input)
         for (;;) {
             try {
                 const result = iterator.next()
@@ -68,7 +68,7 @@ export function async<T, S>(
 ): ASeq<any> {
     return new ASeqOperator(this, async function* catch_(input) {
         let i = 0
-        const iterator = input[Symbol.asyncIterator]()
+        const iterator = _aiter(input)
         for (;;) {
             try {
                 const result = await iterator.next()

@@ -2,6 +2,7 @@ import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
+import { _iter } from "@utils"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("should type as _Seq<T>", expect => {
@@ -70,8 +71,8 @@ it("can iterate different lengths", () => {
 
 it("can handle multiple concurrent iterators", () => {
     const s = _seq([1, 2, 3, 4]).cache()
-    const iter1 = s[Symbol.iterator]()
-    const iter2 = s[Symbol.iterator]()
+    const iter1 = _iter(s)
+    const iter2 = _iter(s)
     expect(iter1.next()).toEqual({ value: 1, done: false })
     expect(iter2.next()).toEqual({ value: 1, done: false })
     expect(iter1.next()).toEqual({ value: 2, done: false })

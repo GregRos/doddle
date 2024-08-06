@@ -1,3 +1,4 @@
+import { _aiter, _iter } from "../../utils.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -23,7 +24,7 @@ export function sync<T>(this: Iterable<T>): Seq<T> {
                 yield cur
                 i++
             } else if (!alreadyDone) {
-                iterator ??= self[Symbol.iterator]()
+                iterator ??= _iter(self)
                 try {
                     const { done, value } = iterator.next()
                     if (done) {
@@ -60,7 +61,7 @@ export function async<T>(this: AsyncIterable<T>): ASeq<T> {
                 yield cur
                 i++
             } else if (!alreadyDone) {
-                iterator ??= self[Symbol.asyncIterator]()
+                iterator ??= _aiter(self)
                 if (!pending) {
                     pending = (async () => {
                         try {

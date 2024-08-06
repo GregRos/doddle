@@ -1,3 +1,4 @@
+import { _iter } from "../../utils.js"
 import { sync as appendSync } from "../operators/append.js"
 import { sync as aseqSync } from "../operators/aseq.js"
 import { sync as atSync } from "../operators/at.js"
@@ -96,7 +97,7 @@ interface SyncOperator<In, Out> extends Iterable<Out> {
     _operand: In
 }
 
-export const SeqOperator = function seq<In, Out>(
+export const SeqOperator = function seq<In extends Iterable<any>, Out>(
     this: SyncOperator<In, Out>,
     operand: In,
     impl: (input: In) => Iterable<Out>
@@ -104,7 +105,7 @@ export const SeqOperator = function seq<In, Out>(
     this._operator = impl.name
     this._operand = operand
     this[Symbol.iterator] = function operator() {
-        return impl.call(this, this._operand)[Symbol.iterator]()
+        return _iter(impl.call(this, this._operand))
     }
 } as any as {
     new <In, Out>(operand: In, impl: (input: In) => Iterable<Out>): Seq<Out>
