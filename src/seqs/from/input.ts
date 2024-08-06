@@ -1,8 +1,8 @@
-import { gotNonIterable } from "../../errors/error"
-import { isAsyncIterable, isIterable, isLazy, isNextable, isThenable } from "../../utils"
-import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
-import { SeqOperator } from "../seq/seq.class"
+import { gotNonIterable } from "../../errors/error.js"
+import { isAsyncIterable, isIterable, isLazy, isNextable, isThenable } from "../../utils.js"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 
 export function async<T>(input: ASeq.Input<T>) {
     if (isIterable(input)) {

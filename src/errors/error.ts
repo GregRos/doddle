@@ -1,4 +1,4 @@
-import { getClassName } from "../utils"
+import { getClassName } from "../utils.js"
 
 export class DawdleError extends Error {
     constructor(code: string, message: string) {
@@ -40,7 +40,7 @@ export const mustBeFunction = argNotExpected(
     (value: unknown) => typeof value === "function"
 )
 
-export const mustBeOneOf = <T>(...options: T[]) => {
+export const mustBeOneOf = <T,>(...options: T[]) => {
     const description = `one of ${options.map(x => `'${x}'`).join(", ")}`
     return argNotExpected(description, (value: unknown) => options.includes(value as T))
 }

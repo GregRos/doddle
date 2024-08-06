@@ -1,6 +1,6 @@
-import { isThenable } from "../../utils"
-import type { Lazy, LazyAsync } from "../lazy"
-import { lazy } from "../lazy"
+import { isThenable } from "../../utils.js"
+import type { Lazy, LazyAsync } from "../lazy.js"
+import { lazy } from "../lazy.js"
 
 /**
  * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when

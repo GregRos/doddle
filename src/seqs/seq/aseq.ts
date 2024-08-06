@@ -1,11 +1,11 @@
-import { async as asyncIterate } from "../from/iterate"
-import { async as asyncOf } from "../from/of"
-import { async as asyncRange } from "../from/range"
-import { async as asyncRepeat } from "../from/repeat"
-import { async as asyncThrows } from "../from/throws"
-import { type ASeq } from "./aseq.class"
-import { aseq as aseqBase } from "./aseq.ctor"
-import { aseqSymbol } from "./symbol"
+import { async as asyncIterate } from "../from/iterate.js"
+import { async as asyncOf } from "../from/of.js"
+import { async as asyncRange } from "../from/range.js"
+import { async as asyncRepeat } from "../from/repeat.js"
+import { async as asyncThrows } from "../from/throws.js"
+import { type ASeq } from "./aseq.class.js"
+import { aseq as aseqBase } from "./aseq.ctor.js"
+import { aseqSymbol } from "./symbol.js"
 
 export const aseq = Object.assign(aseqBase, {
     of: asyncOf,

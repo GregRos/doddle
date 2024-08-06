@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { lazy, Lazy, LazyAsync } from "../.."
+import { lazy, Lazy, LazyAsync } from "../../index.js"
 
 declare.it("lazy equals value gives Lazy<boolean>", expect => {
     expect(type_of(lazy(() => 1).equals(1))).to_equal(type<Lazy<boolean>>)

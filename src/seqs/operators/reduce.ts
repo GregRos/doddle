@@ -1,13 +1,13 @@
-import { lazyFromOperator } from "../lazy-operator"
+import { lazyFromOperator } from "../lazy-operator.js"
 
-import type { Lazy, LazyAsync } from "../../lazy"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
 
-import { mustBeFunction } from "../../errors/error"
-import { aseq } from "../seq/aseq"
-import type { Seq } from "../seq/seq.class"
+import { mustBeFunction } from "../../errors/error.js"
+import { aseq } from "../seq/aseq.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import type { ASeq } from "../seq/aseq.class"
-import { seq } from "../seq/seq"
+import type { ASeq } from "../seq/aseq.class.js"
+import { seq } from "../seq/seq.js"
 const NO_INITIAL = Symbol("NO_INTIAL")
 
 export function generic<Item, Acc>(

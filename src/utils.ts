@@ -1,4 +1,4 @@
-import { Lazy } from "./lazy"
+import { Lazy } from "./lazy/index.js"
 
 export function isIterable<T>(value: any): value is Iterable<T> {
     return (

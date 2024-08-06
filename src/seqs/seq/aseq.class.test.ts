@@ -1,5 +1,5 @@
-import { ASeq } from "../.."
-import { Dummy } from "../from/input.utils"
+import { ASeq } from "../../index.js"
+import { Dummy } from "../from/input.utils.js"
 
 class CustomSeq extends ASeq<number> {
     override [Symbol.asyncIterator]() {

@@ -1,6 +1,6 @@
-import type { Lazy, LazyAsync } from "../../lazy"
-import { async as asyncFrom } from "../from/input"
-import type { ASeq } from "./aseq.class"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { async as asyncFrom } from "../from/input.js"
+import type { ASeq } from "./aseq.class.js"
 
 export function aseq<E = never>(): ASeq<E>
 export function aseq<E>(input: readonly E[]): ASeq<E>

@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { LazyAsync } from "../.."
-import { aseq } from "../.."
+import type { LazyAsync } from "../../index.js"
+import { aseq } from "../../index.js"
 const _seq = aseq
 declare.test("should type as Lazy<number>", expect => {
     expect(type_of(_seq([1, 2, 3]).count(() => true))).to_equal(type<LazyAsync<number>>)

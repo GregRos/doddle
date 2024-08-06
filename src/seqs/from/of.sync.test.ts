@@ -1,4 +1,4 @@
-import { seq } from "../.."
+import { seq } from "../../index.js"
 it("gives empty on empty argslist", () => {
     expect(seq.of()._qr).toEqual([])
 })

@@ -1,9 +1,9 @@
-import { mustBePositiveInt } from "../../errors/error"
-import type { ASeq } from "../seq/aseq.class"
-import { ASeqOperator } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
-import { SeqOperator } from "../seq/seq.class"
-import type { getWindowArgsType, getWindowOutputType } from "./window.types"
+import { mustBePositiveInt } from "../../errors/error.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import { ASeqOperator } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
+import type { getWindowArgsType, getWindowOutputType } from "./window.types.js"
 
 export function sync<T, L extends number, S>(
     this: Iterable<T>,

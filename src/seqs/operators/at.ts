@@ -1,10 +1,10 @@
-import { mustBeInteger } from "../../errors/error"
-import type { Lazy, LazyAsync } from "../../lazy"
-import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq"
-import type { Seq } from "../seq/seq.class"
+import { mustBeInteger } from "../../errors/error.js"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator } from "../lazy-operator.js"
+import { aseq } from "../seq/aseq.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, index: number): Lazy<T | undefined> {
     mustBeInteger("index", index)

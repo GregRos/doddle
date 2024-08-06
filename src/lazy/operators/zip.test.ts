@@ -1,4 +1,4 @@
-import { lazy, type LazyAsync } from "../.."
+import { lazy, type LazyAsync } from "../../index.js"
 
 it("zips only sync", () => {
     const [a, b, c] = [lazy(() => 1 as const), lazy(() => 2), lazy(() => 3)]

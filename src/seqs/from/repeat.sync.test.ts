@@ -1,4 +1,4 @@
-import { seq } from "../.."
+import { seq } from "../../index.js"
 it("gives empty for 0 count", () => {
     expect(seq.repeat(0, 1)._qr).toEqual([])
 })

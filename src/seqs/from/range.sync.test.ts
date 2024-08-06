@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
-import type { Seq } from "../.."
-import { seq } from "../.."
+import type { Seq } from "../../index.js"
+import { seq } from "../../index.js"
 type _Seq<T> = Seq<T>
 const _seq = seq
 declare.it("is typed as Seq<number>", expect => {

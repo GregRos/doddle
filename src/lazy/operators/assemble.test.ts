@@ -1,4 +1,4 @@
-import { lazy } from "../.."
+import { lazy } from "../../index.js"
 it("assembles only sync", () => {
     const obj = {
         a: lazy(() => 1 as const),

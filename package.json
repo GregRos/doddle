@@ -18,6 +18,7 @@
   ],
   "license": "MIT",
   "author": "GregRos",
+  "type": "module",
   "exports": {
     ".": {
       "require": {

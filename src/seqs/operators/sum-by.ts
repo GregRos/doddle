@@ -1,11 +1,11 @@
-import { mustBeFunction } from "../../errors/error"
-import type { LazyAsync } from "../../lazy"
-import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq"
-import type { ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
+import { mustBeFunction } from "../../errors/error.js"
+import type { LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator } from "../lazy-operator.js"
+import { aseq } from "../seq/aseq.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function generic<T>(input: Seq<T>, projection: Seq.Iteratee<T, number>) {
     mustBeFunction("projection", projection)

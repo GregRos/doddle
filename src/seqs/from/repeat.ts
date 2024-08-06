@@ -1,8 +1,8 @@
-import { aseq } from "../seq/aseq"
-import type { ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
+import { aseq } from "../seq/aseq.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function sync<T>(times: number, value: T): Seq<T> {
     return seq(function* () {

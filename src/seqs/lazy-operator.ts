@@ -1,4 +1,4 @@
-import { Lazy } from "../lazy"
+import { Lazy } from "../lazy/index.js"
 
 class LazyFromOperator<In, Out> extends Lazy<Out> {
     constructor(

@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../.."
-import { aseq } from "../.."
-import { countEachItemAppearance } from "./shuffle.utils"
+import type { ASeq } from "../../index.js"
+import { aseq } from "../../index.js"
+import { countEachItemAppearance } from "./shuffle.utils.js"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
 

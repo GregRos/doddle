@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../.."
+import type { ASeq } from "../../index.js"
 
-import { aseq } from "../.."
+import { aseq } from "../../index.js"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
 declare.it("should type as Lazy<T>", expect => {

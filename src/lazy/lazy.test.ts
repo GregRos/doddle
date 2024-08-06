@@ -1,5 +1,5 @@
 import { declare, type } from "declare-it"
-import { Lazy, lazy, LazyAsync } from ".."
+import { Lazy, lazy, LazyAsync } from "../index.js"
 
 describe("sync", () => {
     test("iterates as singleton when value non-iterable", () => {

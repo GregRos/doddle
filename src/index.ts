@@ -1,2 +1,2 @@
-export * from "./lazy"
-export * from "./seqs"
+export * from "./lazy/index.js"
+export * from "./seqs/index.js"

@@ -1,4 +1,4 @@
-import { seq } from "../src"
+import { seq } from "../src/index.js"
 Error.stackTraceLimit = Infinity
 const s = seq
     .of(1, 2, 3)

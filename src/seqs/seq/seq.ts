@@ -1,11 +1,11 @@
-import { sync as syncIterate } from "../from/iterate"
-import { sync as syncOf } from "../from/of"
-import { sync as syncRange } from "../from/range"
-import { sync as syncRepeat } from "../from/repeat"
-import { sync as syncThrows } from "../from/throws"
-import { type Seq } from "./seq.class"
-import { seq as seqBase } from "./seq.ctor"
-import { seqSymbol } from "./symbol"
+import { sync as syncIterate } from "../from/iterate.js"
+import { sync as syncOf } from "../from/of.js"
+import { sync as syncRange } from "../from/range.js"
+import { sync as syncRepeat } from "../from/repeat.js"
+import { sync as syncThrows } from "../from/throws.js"
+import { type Seq } from "./seq.class.js"
+import { seq as seqBase } from "./seq.ctor.js"
+import { seqSymbol } from "./symbol.js"
 
 export const seq = Object.assign(seqBase, {
     of: syncOf,

@@ -1,2 +1,2 @@
-export { Lazy, LazyAsync, lazy } from "./lazy"
-export { memoize } from "./memoize"
+export { Lazy, LazyAsync, lazy } from "./lazy.js"
+export { memoize } from "./memoize.js"

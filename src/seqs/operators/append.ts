@@ -1,8 +1,8 @@
-import { aseq } from "../seq/aseq"
-import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import { SeqOperator, type Seq } from "../seq/seq.class"
+import { aseq } from "../seq/aseq.js"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
+import { SeqOperator, type Seq } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function sync<T, Items extends any[]>(
     this: Iterable<T>,

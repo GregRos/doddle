@@ -1,7 +1,7 @@
-import { mustBeFunction, mustBeOneOf } from "../../errors/error"
-import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
-import { SeqOperator } from "../seq/seq.class"
+import { mustBeFunction, mustBeOneOf } from "../../errors/error.js"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 export type EachCallStage = "before" | "after" | "both" | undefined
 const mustBeStage = mustBeOneOf("before", "after", "both", undefined)
 export function sync<T>(

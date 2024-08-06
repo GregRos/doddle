@@ -1,9 +1,9 @@
-import type { Lazy, LazyAsync } from "../../lazy"
-import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq"
-import type { ASeq } from "../seq/aseq.class"
-import { seq } from "../seq/seq"
-import { Seq } from "../seq/seq.class"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator } from "../lazy-operator.js"
+import { aseq } from "../seq/aseq.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import { seq } from "../seq/seq.js"
+import { Seq } from "../seq/seq.class.js"
 
 export function sync<T extends S, S>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>
 export function sync<T, S extends T>(this: Iterable<T>, _other: Seq.Input<S>): Lazy<boolean>

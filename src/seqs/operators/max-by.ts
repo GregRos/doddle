@@ -1,13 +1,13 @@
-import type { Lazy, LazyAsync } from "../../lazy"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
 
-import { mustBeFunction } from "../../errors/error"
-import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq"
-import type { Seq } from "../seq/seq.class"
+import { mustBeFunction } from "../../errors/error.js"
+import { lazyFromOperator } from "../lazy-operator.js"
+import { aseq } from "../seq/aseq.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import { returnKvp } from "../../utils"
-import type { ASeq } from "../seq/aseq.class"
-import { seq } from "../seq/seq"
+import { returnKvp } from "../../utils.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import { seq } from "../seq/seq.js"
 const EMPTY = Symbol("EMPTY_SEQ")
 export function generic<T, R, Alt>(input: Seq<T>, iteratee: Seq.Iteratee<T, R>, alt: Alt) {
     mustBeFunction("iteratee", iteratee)

@@ -1,11 +1,11 @@
-import { mustBeFunction } from "../../errors/error"
-import { aseq } from "../seq/aseq"
-import type { ASeq } from "../seq/aseq.class"
-import { ASeqOperator } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
-import { SeqOperator } from "../seq/seq.class"
+import { mustBeFunction } from "../../errors/error.js"
+import { aseq } from "../seq/aseq.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import { ASeqOperator } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 export function sync<T, S>(this: Iterable<T>, projection: Seq.Iteratee<T, S>): Seq<S> {
     mustBeFunction("projection", projection)
     return new SeqOperator(this, function* map(input) {

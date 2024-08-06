@@ -1,7 +1,7 @@
-import type { ASeq } from "../seq/aseq.class"
-import { ASeqOperator } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
-import { SeqOperator } from "../seq/seq.class"
+import type { ASeq } from "../seq/aseq.class.js"
+import { ASeqOperator } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 
 class ThrownErrorMarker {
     constructor(public error: any) {}

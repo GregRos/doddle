@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { Lazy } from "../.."
+import type { Lazy } from "../../index.js"
 
-import { seq } from "../.."
+import { seq } from "../../index.js"
 declare.it("should type as Lazy<boolean>", expect => {
     expect(type_of(seq([1, 2, 3]).some(() => true))).to_equal(type<Lazy<boolean>>)
 })

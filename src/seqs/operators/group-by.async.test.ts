@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import { aseq } from "../.."
+import { aseq } from "../../index.js"
 
-import type { LazyAsync } from "../.."
+import type { LazyAsync } from "../../index.js"
 const _aseq = aseq
 
 declare.it("returns LazyAsync<Map<K, [T, ...T[]]>>", expect => {

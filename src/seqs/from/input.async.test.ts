@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import type { ASeq } from "../.."
-import { aseq, lazy, type Lazy } from "../.."
-import { Dummy } from "./input.utils"
+import type { ASeq } from "../../index.js"
+import { aseq, lazy, type Lazy } from "../../index.js"
+import { Dummy } from "./input.utils.js"
 const _seq = aseq
 type _Seq<T> = ASeq<T>
 

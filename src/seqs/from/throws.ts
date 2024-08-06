@@ -1,6 +1,6 @@
-import { mustNotBeNullish, mustNotReturnNullish } from "../../errors/error"
-import { ASeqOperator, type ASeq } from "../seq/aseq.class"
-import { SeqOperator, type Seq } from "../seq/seq.class"
+import { mustNotBeNullish, mustNotReturnNullish } from "../../errors/error.js"
+import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
+import { SeqOperator, type Seq } from "../seq/seq.class.js"
 
 function getThrownError(thrown: unknown) {
     mustNotReturnNullish("thrown", thrown)

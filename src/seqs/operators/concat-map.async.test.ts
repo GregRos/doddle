@@ -1,5 +1,5 @@
 import { declare, type, type_of } from "declare-it"
-import { aseq, type ASeq } from "../.."
+import { aseq, type ASeq } from "../../index.js"
 
 const _seq = aseq
 type _Seq<T> = ASeq<T>

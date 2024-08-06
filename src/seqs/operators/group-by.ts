@@ -1,6 +1,6 @@
-import { lazyFromOperator } from "../lazy-operator"
-import type { ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
+import { lazyFromOperator } from "../lazy-operator.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
 
 export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee<T, K>) {
     return lazyFromOperator("groupBy", this, input => {

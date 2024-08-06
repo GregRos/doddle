@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
-import { type Lazy } from "../.."
+import { type Lazy } from "../../index.js"
 
-import { seq } from "../.."
+import { seq } from "../../index.js"
 const _seq = seq
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toSet()

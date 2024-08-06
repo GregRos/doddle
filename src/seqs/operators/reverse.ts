@@ -1,8 +1,8 @@
-import { aseq } from "../seq/aseq"
-import { ASeqOperator } from "../seq/aseq.class"
-import { SeqOperator } from "../seq/seq.class"
+import { aseq } from "../seq/aseq.js"
+import { ASeqOperator } from "../seq/aseq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function sync<T>(this: Iterable<T>) {
     return new SeqOperator(this, function* reverse(input) {

@@ -1,6 +1,6 @@
-import { mustBeNatural } from "../../errors/error"
+import { mustBeNatural } from "../../errors/error.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 
 export function sync(start: number, end: number, stepSize = 1) {
     mustBeNatural("stepSize", stepSize)

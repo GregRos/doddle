@@ -1,4 +1,4 @@
-import { lazy, memoize, type Lazy } from ".."
+import { lazy, memoize, type Lazy } from "../index.js"
 
 it("memoizes sync", () => {
     let count = 0

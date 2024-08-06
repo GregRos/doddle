@@ -1,4 +1,4 @@
-import { cannotRecurseSync } from "../errors/error"
+import { cannotRecurseSync } from "../errors/error.js"
 import {
     getClassName,
     getInitializerName,
@@ -6,12 +6,12 @@ import {
     isIterable,
     isLazy,
     isThenable
-} from "../utils"
-import assemble from "./operators/assemble"
-import each from "./operators/each"
-import equals from "./operators/equals"
-import map from "./operators/map"
-import zip from "./operators/zip"
+} from "../utils.js"
+import assemble from "./operators/assemble.js"
+import each from "./operators/each.js"
+import equals from "./operators/equals.js"
+import map from "./operators/map.js"
+import zip from "./operators/zip.js"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 

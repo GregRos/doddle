@@ -1,11 +1,11 @@
-import { mustBeFunction } from "../../errors/error"
-import type { Lazy, LazyAsync } from "../../lazy"
-import { lazyFromOperator } from "../lazy-operator"
-import { aseq } from "../seq/aseq"
-import type { ASeq } from "../seq/aseq.class"
-import type { Seq } from "../seq/seq.class"
+import { mustBeFunction } from "../../errors/error.js"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator } from "../lazy-operator.js"
+import { aseq } from "../seq/aseq.js"
+import type { ASeq } from "../seq/aseq.class.js"
+import type { Seq } from "../seq/seq.class.js"
 
-import { seq } from "../seq/seq"
+import { seq } from "../seq/seq.js"
 const NO_MATCH = Symbol("NO_MATCH")
 function generic<T>(input: Seq<T>, predicate: Seq.Predicate<T>): Lazy<boolean> {
     mustBeFunction("predicate", predicate)
