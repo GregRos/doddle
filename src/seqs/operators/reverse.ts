@@ -1,23 +1,22 @@
-import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
+import { ASeqOperator } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
-import { SeqOperator, type Seq } from "../seq/seq.class.js"
+import { SeqOperator } from "../seq/seq.class.js"
 
 import { seq } from "../seq/seq.js"
 
-export function compute<T>(input: Seq<T>): any {
-    return input
-        .toArray()
-        .map(x => x.reverse())
-        .pull()
-}
-
-export function sync<T>(this: Iterable<T>): Seq<T> {
+export function sync<T>(this: Iterable<T>) {
     return SeqOperator(this, function* reverse(input) {
-        yield* compute(seq(input))
-    }) as any
+        yield* seq(input)
+            .toArray()
+            .map(x => x.reverse())
+            .pull()
+    })
 }
-export function async<T>(this: AsyncIterable<T>): ASeq<T> {
+export function async<T>(this: AsyncIterable<T>) {
     return ASeqOperator(this, async function* reverse(input) {
-        yield* await compute(aseq(input) as any)
-    }) as any
+        yield* await aseq(input)
+            .toArray()
+            .map(x => x.reverse())
+            .pull()
+    })
 }

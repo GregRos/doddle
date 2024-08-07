@@ -1,9 +1,6 @@
 # Doddle
 
-[![CI](https://github.com/GregRos/doddle/actions/workflows/push.yaml/badge.svg)](https://github.com/GregRos/doddle/actions/workflows/push.yaml)
-
-Doddle is a tiny yet comprehensive library for lazy evaluation and iteration.
-but incredibly versatile library for working with iterables. It also introduces its own simple yet elegant lazy primitive, which has many of the same qualities as a promise.
+Doddle is a tiny but incredibly versatile library for working with iterables. It also introduces its own simple yet elegant lazy primitive, which has many of the same qualities as a promise.
 
 Doddle serves the same purpose as lodash, reproducing much of its functionality, except that works on any iterable or async iterable, and is a tiny fraction of the size. This comes at some performance cost, so it's best to use Doddle in I/O bound applications, or when you don't care that much about performance.
 

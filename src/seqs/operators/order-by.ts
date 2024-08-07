@@ -7,23 +7,6 @@ import { seq } from "../seq/seq.js"
 
 import { returnKvp } from "../../utils.js"
 
-export function computeIt<T>(
-    input: Seq<T>,
-    projection: Seq.NoIndexIteratee<T, any>,
-    reverse = false
-): any {
-    return input
-        .map(e => returnKvp(e, projection(e), e))
-        .toArray()
-        .map(xs => {
-            void xs.sort((a: any, b: any) => {
-                const result = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
-                return reverse ? -result : result
-            })
-            return xs.map((x: any) => x.value) as T[]
-        })
-        .pull()
-}
 export function sync<T>(
     this: Iterable<T>,
     projection: Seq.NoIndexIteratee<T, any>,
@@ -32,7 +15,17 @@ export function sync<T>(
     checkProjection(projection)
     checkReverse(reverse)
     return SeqOperator(this, function* orderBy(input) {
-        yield* computeIt(seq(input), projection, reverse)
+        yield* seq(input)
+            .map(e => returnKvp(e, projection(e), e))
+            .toArray()
+            .map(xs => {
+                void xs.sort((a: any, b: any) => {
+                    const result = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
+                    return reverse ? -result : result
+                })
+                return xs.map((x: any) => x.value)
+            })
+            .pull()
     })
 }
 export function async<T, S>(
@@ -43,6 +36,16 @@ export function async<T, S>(
     checkProjection(projection)
     checkReverse(reverse)
     return ASeqOperator(this, async function* orderBy(input) {
-        yield* await computeIt(aseq(input) as any, projection, reverse)
+        yield* await aseq(input)
+            .map(e => returnKvp(e, projection(e), e))
+            .toArray()
+            .map(async xs => {
+                xs.sort((a, b) => {
+                    const comp = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
+                    return reverse ? -comp : comp
+                })
+                return xs.map(x => x.value)
+            })
+            .pull()
     })
 }
