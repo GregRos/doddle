@@ -1,46 +1,46 @@
-import { async as appendAsync } from "../operators/append.js"
-import { async as atAsync } from "../operators/at.js"
-import { async as cacheAsync } from "../operators/cache.js"
-import { async as concatAsync } from "../operators/concat.js"
-import { async as countAsync } from "../operators/count.js"
-import { async as eachAsync } from "../operators/each.js"
+import append from "../operators/append.async.js"
+import at from "../operators/at.async.js"
+import cache from "../operators/cache.async.js"
+import concat from "../operators/concat.async.js"
+import count from "../operators/count.async.js"
+import each from "../operators/each.async.js"
 
-import { async as catchAsync } from "../operators/catch.js"
-import { async as chunkAsync } from "../operators/chunk.js"
+import catch_ from "../operators/catch.async.js"
+import chunk from "../operators/chunk.async.js"
 
 import { _aiter } from "../../utils.js"
-import { async as concatMapAsync } from "../operators/concat-map.js"
-import { async as everyAsync } from "../operators/every.js"
-import { async as filterAsync } from "../operators/filter.js"
-import { async as findLastAsync } from "../operators/find-last.js"
-import { async as findAsync } from "../operators/find.js"
-import { async as firstAsync } from "../operators/first.js"
-import { async as groupByAsync } from "../operators/group-by.js"
-import { async as includesAsync } from "../operators/includes.js"
-import { async as lastAsync } from "../operators/last.js"
-import { async as mapAsync } from "../operators/map.js"
-import { async as maxByAsync } from "../operators/max-by.js"
-import { async as minByAsync } from "../operators/min-by.js"
-import { async as orderByAsync } from "../operators/order-by.js"
-import { async as reduceAsync } from "../operators/reduce.js"
-import { async as reverseAsync } from "../operators/reverse.js"
-import { async as scanAsync } from "../operators/scan.js"
-import { async as seqEqualsAsync } from "../operators/seq-equals.js"
-import { async as setEqualsAsync } from "../operators/set-equals.js"
-import { async as shuffleAsync } from "../operators/shuffle.js"
-import { async as skipWhileAsync } from "../operators/skip-while.js"
-import { async as skipAsync } from "../operators/skip.js"
-import { async as someAsync } from "../operators/some.js"
-import { async as sumByAsync } from "../operators/sum-by.js"
-import { async as takeWhileAsync } from "../operators/take-while.js"
-import { async as takeAsync } from "../operators/take.js"
-import { async as toArrayAsync } from "../operators/to-array.js"
-import { async as toMapAsync } from "../operators/to-map.js"
-import { async as toSetAsync } from "../operators/to-set.js"
-import { async as uniqByAsync } from "../operators/uniq-by.js"
-import { async as uniqAsync } from "../operators/uniq.js"
-import { async as windowAsync } from "../operators/window.js"
-import { async as zipAsync } from "../operators/zip.js"
+import concatMap from "../operators/concat-map.async.js"
+import every from "../operators/every.async.js"
+import filter from "../operators/filter.async.js"
+import findLast from "../operators/find-last.async.js"
+import find from "../operators/find.async.js"
+import first from "../operators/first.async.js"
+import groupBy from "../operators/group-by.async.js"
+import includes from "../operators/includes.async.js"
+import last from "../operators/last.async.js"
+import map from "../operators/map.async.js"
+import maxBy from "../operators/max-by.async.js"
+import minBy from "../operators/min-by.async.js"
+import orderBy from "../operators/order-by.async.js"
+import reduce from "../operators/reduce.async.js"
+import reverse from "../operators/reverse.async.js"
+import scan from "../operators/scan.async.js"
+import seqEquals from "../operators/seq-equals.async.js"
+import setEquals from "../operators/set-equals.async.js"
+import shuffle from "../operators/shuffle.async.js"
+import skipWhile from "../operators/skip-while.async.js"
+import skip from "../operators/skip.async.js"
+import some from "../operators/some.async.js"
+import sumBy from "../operators/sum-by.async.js"
+import takeWhile from "../operators/take-while.async.js"
+import take from "../operators/take.async.js"
+import toArray from "../operators/to-array.async.js"
+import toMap from "../operators/to-map.async.js"
+import toSet from "../operators/to-set.async.js"
+import uniqBy from "../operators/uniq-by.async.js"
+import uniq from "../operators/uniq.async.js"
+import window from "../operators/window.async.js"
+import zip from "../operators/zip.async.js"
 import { _Seq } from "./_seq.js"
 import { aseqSymbol } from "./symbol.js"
 
@@ -54,47 +54,47 @@ export abstract class ASeq<T> extends _Seq implements AsyncIterable<T> {
         return this.toArray().pull()
     }
     readonly [aseqSymbol] = true
-    readonly append = appendAsync
-    readonly at = atAsync
-    readonly catch = catchAsync
-    readonly concat = concatAsync
-    readonly concatMap = concatMapAsync
-    readonly chunk = chunkAsync
-    readonly cache = cacheAsync
-    readonly count = countAsync
-    readonly each = eachAsync
-    readonly every = everyAsync
-    readonly filter = filterAsync
-    readonly findLast = findLastAsync
-    readonly find = findAsync
-    readonly first = firstAsync
-    readonly flatMap = concatMapAsync
-    readonly groupBy = groupByAsync
-    readonly includes = includesAsync
-    readonly last = lastAsync
-    readonly map = mapAsync
-    readonly maxBy = maxByAsync
-    readonly minBy = minByAsync
-    readonly orderBy = orderByAsync
-    readonly reduce = reduceAsync
-    readonly reverse = reverseAsync
-    readonly scan = scanAsync
-    readonly seqEquals = seqEqualsAsync
-    readonly setEquals = setEqualsAsync
-    readonly shuffle = shuffleAsync
-    readonly skipWhile = skipWhileAsync
-    readonly skip = skipAsync
-    readonly some = someAsync
-    readonly sumBy = sumByAsync
-    readonly takeWhile = takeWhileAsync
-    readonly take = takeAsync
-    readonly toArray = toArrayAsync
-    readonly toSet = toSetAsync
-    readonly toMap = toMapAsync
-    readonly uniqBy = uniqByAsync
-    readonly uniq = uniqAsync
-    readonly window = windowAsync
-    readonly zip = zipAsync
+    readonly append = append
+    readonly at = at
+    readonly catch = catch_
+    readonly concat = concat
+    readonly concatMap = concatMap
+    readonly chunk = chunk
+    readonly cache = cache
+    readonly count = count
+    readonly each = each
+    readonly every = every
+    readonly filter = filter
+    readonly findLast = findLast
+    readonly find = find
+    readonly first = first
+    readonly flatMap = concatMap
+    readonly groupBy = groupBy
+    readonly includes = includes
+    readonly last = last
+    readonly map = map
+    readonly maxBy = maxBy
+    readonly minBy = minBy
+    readonly orderBy = orderBy
+    readonly reduce = reduce
+    readonly reverse = reverse
+    readonly scan = scan
+    readonly seqEquals = seqEquals
+    readonly setEquals = setEquals
+    readonly shuffle = shuffle
+    readonly skipWhile = skipWhile
+    readonly skip = skip
+    readonly some = some
+    readonly sumBy = sumBy
+    readonly takeWhile = takeWhile
+    readonly take = take
+    readonly toArray = toArray
+    readonly toSet = toSet
+    readonly toMap = toMap
+    readonly uniqBy = uniqBy
+    readonly uniq = uniq
+    readonly window = window
+    readonly zip = zip
 }
 
 let baseASeq!: ASeq<any>

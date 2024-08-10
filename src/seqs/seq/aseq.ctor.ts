@@ -1,5 +1,5 @@
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
-import { async as asyncFrom } from "../from/input.js"
+import { async as asyncFrom } from "../from/input.async.js"
 import type { ASeq } from "./aseq.class.js"
 
 export function aseq<E = never>(): ASeq<E>

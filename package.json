@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.6.0-preview.3",
+  "version": "1.6.0-preview.4",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
@@ -61,8 +61,8 @@
     "build:clean": "run-s clean build",
     "clean": "shx rm -rf dist .buildinfo || true",
     "prettier:fix": "prettier --write .",
-    "eslint:fix": "eslint src/**/*.ts --fix",
-    "eslint:check": "eslint src/**/*.ts",
+    "eslint:fix": "eslint 'src/**/*.ts' --fix",
+    "eslint:check": "eslint 'src/**/*.ts'",
     "prettier:check": "prettier --check .",
     "lint:fix": "run-s eslint:fix prettier:fix",
     "lint:check": "run-s eslint:check prettier:check",

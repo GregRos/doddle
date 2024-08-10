@@ -13,6 +13,6 @@
       "@error": ["./errors/error"]
     }
   },
-  "include": ["**/*.test.ts", "**/*.helper.ts"],
+  "include": ["**/*.test.ts", "**/*.helper.ts", "*.refactor.ts"],
   "exclude": ["**/dist", "**/node_modules"]
 }

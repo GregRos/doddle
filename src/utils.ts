@@ -36,7 +36,8 @@ export const isStage = (value: any) => {
 
 export const isNumber = (v: number) => +v === v
 export const isInt = Number.isSafeInteger
-export const isNat = (v: number) => isInt(v) && v >= 0
+export const isIntOrInfinity = (v: number) => isInt(v) || v === Infinity
+export const isNatOrInfinity = (v: number) => isIntOrInfinity(v) && v >= 0
 export const isBool = (value: boolean) => !!value === value
 export const isNotNullish = (value: any) => value != null
 export const isPair = (value: any) => Array.isArray(value) && value.length === 2

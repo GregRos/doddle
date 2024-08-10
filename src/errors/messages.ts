@@ -6,7 +6,7 @@ import {
     isFunction,
     isInt,
     isIterable,
-    isNat,
+    isNatOrInfinity,
     isNextable,
     isPair,
     isPosInt,
@@ -77,7 +77,11 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
     }
 }
 const expectInt = expectation(`a ${wInteger}`, isInt)
-const expectNat = expectation(`a non-negative ${wInteger}`, isNat)
+const expectIntOrInfinity = expectation(
+    `an ${wInteger} or Infinity`,
+    x => isInt(x) || x === Infinity
+)
+const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or Infinity`, isNatOrInfinity)
 const expectPosInt = expectation(`a positive ${wInteger}`, isPosInt)
 const expectBool = expectation("true or false", isBool)
 const expectError = expectation("an error", isError)
@@ -145,10 +149,10 @@ export const forOperator = (operator: string) => {
     const entries = [
         checkValue("size", expectPosInt),
         checkValue("start", expectInt),
-        checkValue("times", expectNat),
+        checkValue("times", expectNatOrInfinity),
         checkValue("end", expectInt),
         checkValue("index", expectInt),
-        checkValue("count", expectInt),
+        checkValue("count", expectIntOrInfinity),
         checkValue("projection", expectFunc),
         checkValue("action", expectFunc),
         checkValue("handler", expectFunc),
@@ -158,7 +162,7 @@ export const forOperator = (operator: string) => {
         checkValue("keyProjection", expectFunc),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
-        checkFuncReturn("throws", expectError)
+        checkFuncReturn("thrower", expectError)
     ] as const
     type Entries = typeof entries
     type ResultingObjectType = {

@@ -19,7 +19,7 @@ it("seq.is returns false for async iterable", () => {
 })
 
 it("seq.is returns false for aseq", () => {
-    expect(seq.is(seq([1, 2, 3]).aseq())).toBe(false)
+    expect(seq.is(aseq([1, 2, 3]))).toBe(false)
 })
 
 it("aseq.is returns false for seq", () => {
@@ -41,5 +41,5 @@ it("aseq.is returns false for async iterable", () => {
 })
 
 it("aseq.is returns true for aseq", () => {
-    expect(aseq.is(seq([1, 2, 3]).aseq())).toBe(true)
+    expect(aseq.is(aseq([1, 2, 3]))).toBe(true)
 })
