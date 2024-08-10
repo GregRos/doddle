@@ -1,5 +1,5 @@
-import { checkAction, parseStage } from "../../errors/error.js"
-import { Stage } from "../../utils.js"
+import { parseStage, Stage } from "../../utils.js"
+import { chk } from "../seq/_seq.js"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
 import { SeqOperator } from "../seq/seq.class.js"
@@ -7,9 +7,10 @@ export type EachCallStage = "before" | "after" | "both" | undefined
 export function sync<T>(
     this: Iterable<T>,
     action: Seq.StageIteratee<T, void>,
-    stage: EachCallStage = "before"
+    stage: EachCallStage | undefined = "before"
 ) {
-    checkAction(action)
+    chk(sync).action(action)
+    chk(sync).stage(stage)
     const myStage = parseStage(stage)
     return SeqOperator(this, function* each(input) {
         let index = 0
@@ -30,7 +31,8 @@ export function async<T>(
     action: ASeq.StageIteratee<T, void>,
     stage: EachCallStage = "before"
 ) {
-    checkAction(action)
+    chk(async).action(action)
+    chk(async).stage(stage)
     const myStage = parseStage(stage)
     return ASeqOperator(this, async function* each(input) {
         let index = 0

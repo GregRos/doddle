@@ -1,4 +1,4 @@
-import { checkProjection } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
@@ -11,7 +11,7 @@ export function sync<T, S>(
     this: Iterable<T>,
     projection: Seq.Iteratee<T, Seq.Input<S>>
 ): Seq<getConcatElementType<T, S>> {
-    checkProjection(projection)
+    chk(sync).projection(projection)
     return SeqOperator(this, function* concatMap(input) {
         let index = 0
         for (const element of input) {
@@ -25,7 +25,7 @@ export function async<T, S>(
     this: AsyncIterable<T>,
     projection: ASeq.Iteratee<T, ASeq.SimpleInput<S>>
 ): ASeq<getConcatElementType<T, S>> {
-    checkProjection(projection)
+    chk(async).projection(projection)
     return ASeqOperator(this, async function* concatMap(input) {
         let index = 0
         for await (const element of input) {

@@ -2,6 +2,7 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
+import { Doddle } from "@error"
 import { seq } from "@lib"
 
 const _seq = seq
@@ -109,7 +110,7 @@ it("catches non-error and turns it into error", () => {
     for (const _ of s) {
     }
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith(expect.any(Error), 2)
+    expect(handler).toHaveBeenCalledWith("test", 2)
 })
 
 describe("invalid inputs", () => {
@@ -127,18 +128,18 @@ describe("invalid inputs", () => {
 
     describe("throws on iteration", () => {
         it("throws conversion TypeError if handler returns random value", () => {
-            const throwing = _seq.throws("error")
+            const throwing = _seq.throws(() => new Error("asdsad"))
             // @ts-expect-error
-            expect(() => [...throwing.catch(() => 1)]).toThrow(TypeError)
+            expect(() => [...throwing.catch(() => 1)]).toThrow(Doddle)
             expect(() => [
                 // @ts-expect-error
                 ...throwing.catch(() => {
                     return {}
                 })
-            ]).toThrow(TypeError)
+            ]).toThrow(Doddle)
         })
         it("throws if catch returns a Promise", () => {
-            const throwing = _seq.throws("error")
+            const throwing = _seq.throws(() => new Error("asdsad"))
             // @ts-expect-error
             expect(() => [...throwing.catch(() => Promise.resolve(1))]).toThrow()
         })

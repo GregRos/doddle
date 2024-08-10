@@ -1,6 +1,7 @@
 import type { LazyAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
+import { Doddle } from "@error"
 import { aseq } from "@lib"
 
 const _aseq = aseq
@@ -140,7 +141,7 @@ describe("invalid inputs", () => {
 
                 .toMap(() => [1])
                 .pull()
-        ).rejects.toThrow(TypeError)
+        ).rejects.toThrow(Doddle)
     })
 
     it("doesn't accept projection to triple", async () => {
@@ -149,6 +150,6 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(x => [x, x, x])
                 .pull()
-        ).rejects.toThrow(TypeError)
+        ).rejects.toThrow(Doddle)
     })
 })

@@ -1,5 +1,4 @@
-import { echo } from "shelljs"
-
+const { echo } = require("shelljs")
 echo(
     JSON.stringify({
         type: "module"

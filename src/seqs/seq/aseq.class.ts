@@ -41,9 +41,14 @@ import { async as uniqByAsync } from "../operators/uniq-by.js"
 import { async as uniqAsync } from "../operators/uniq.js"
 import { async as windowAsync } from "../operators/window.js"
 import { async as zipAsync } from "../operators/zip.js"
+import { _Seq } from "./_seq.js"
 import { aseqSymbol } from "./symbol.js"
 
-export abstract class ASeq<T> implements AsyncIterable<T> {
+export abstract class ASeq<T> extends _Seq implements AsyncIterable<T> {
+    constructor() {
+        super()
+        this.loadCheckers()
+    }
     abstract [Symbol.asyncIterator](): AsyncIterator<T>
     get _qr() {
         return this.toArray().pull()

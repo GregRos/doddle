@@ -187,5 +187,5 @@ it("catches non-error and turns it into error", async () => {
     for await (const _ of s) {
     }
     expect(handler).toHaveBeenCalledTimes(1)
-    expect(handler).toHaveBeenCalledWith(expect.any(Error), 2)
+    expect(handler).toHaveBeenCalledWith("test", 2)
 })

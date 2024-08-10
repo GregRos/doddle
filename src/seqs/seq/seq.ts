@@ -3,6 +3,7 @@ import { sync as syncOf } from "../from/of.js"
 import { sync as syncRange } from "../from/range.js"
 import { sync as syncRepeat } from "../from/repeat.js"
 import { sync as syncThrows } from "../from/throws.js"
+import { loadCheckers } from "./load-checkers.js"
 import { type Seq } from "./seq.class.js"
 import { seq as seqBase } from "./seq.ctor.js"
 import { seqSymbol } from "./symbol.js"
@@ -17,3 +18,5 @@ export const seq = Object.assign(seqBase, {
     iterate: syncIterate,
     throws: syncThrows
 })
+
+loadCheckers(seq)

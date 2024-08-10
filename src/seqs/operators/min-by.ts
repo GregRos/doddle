@@ -1,4 +1,3 @@
-import { checkProjection } from "../../errors/error.js"
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
 import type { ASeq } from "../seq/aseq.class.js"
@@ -8,10 +7,16 @@ import type { Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 import { returnKvp } from "../../utils.js"
+import { chk } from "../seq/_seq.js"
 const EMPTY = Symbol("EMPTY_SEQ")
 
-export function generic<T, K, Alt>(input: Seq<T>, projection: Seq.Iteratee<T, K>, alt: Alt) {
-    checkProjection(projection)
+export function generic<T, K, Alt>(
+    caller: any,
+    input: Seq<T>,
+    projection: Seq.Iteratee<T, K>,
+    alt: Alt
+) {
+    chk(caller).projection(projection)
     return lazyFromOperator(input, function minBy(input) {
         return input
             .map((element, index) => {
@@ -32,7 +37,7 @@ export function sync<T, K, const Alt>(
     alt: Alt
 ): Lazy<T | Alt>
 export function sync<T, K>(this: Iterable<T>, projection: Seq.Iteratee<T, K>, alt?: any) {
-    return generic(seq(this), projection, alt)
+    return generic(sync, seq(this), projection, alt)
 }
 
 export function async<T, K>(
@@ -45,5 +50,5 @@ export function async<T, K, const Alt>(
     alt?: Alt
 ): LazyAsync<T | Alt>
 export function async<T, K>(this: AsyncIterable<T>, projection: ASeq.Iteratee<T, K>, alt?: any) {
-    return generic(aseq(this) as any, projection as any, alt)
+    return generic(async, aseq(this) as any, projection as any, alt)
 }

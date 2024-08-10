@@ -7,7 +7,7 @@
       "request": "launch",
       "name": "Launch Refactor",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/dist/cleanup.js"
+      "program": "${workspaceFolder}/dist/esm/refactor.js"
     }
   ]
 }

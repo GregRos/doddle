@@ -9,7 +9,8 @@
     "moduleResolution": "Bundler",
     "paths": {
       "@lib": ["./index"],
-      "@utils": ["./utils"]
+      "@utils": ["./utils"],
+      "@error": ["./errors/error"]
     }
   },
   "include": ["**/*.test.ts", "**/*.helper.ts"],

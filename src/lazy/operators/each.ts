@@ -19,19 +19,17 @@ import { lazy } from "../lazy.js"
  */
 function each<S>(
     this: LazyAsync<S>,
-    callback: (
-        value: S
-    ) => any | Lazy<any> | Promise<any> | Promise<LazyAsync<any>> | LazyAsync<any>
+    action: (value: S) => any | Lazy<any> | Promise<any> | Promise<LazyAsync<any>> | LazyAsync<any>
 ): LazyAsync<S>
 function each<T>(
     this: Lazy<T>,
-    callback: (value: Lazy.PulledAwaited<T>) => Promise<any> | LazyAsync<any>
+    action: (value: Lazy.PulledAwaited<T>) => Promise<any> | LazyAsync<any>
 ): LazyAsync<T>
-function each<T>(this: Lazy<T>, callback: (value: Lazy.PulledAwaited<T>) => Lazy<any>): Lazy<T>
-function each<T>(this: Lazy<T>, callback: (value: Lazy.PulledAwaited<T>) => any): Lazy<T>
-function each<T>(this: LazyAsync<T>, callback: (value: any) => any): any {
+function each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => Lazy<any>): Lazy<T>
+function each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => any): Lazy<T>
+function each<T>(this: LazyAsync<T>, action: (value: any) => any): any {
     return this.map(x => {
-        const result = callback(x)
+        const result = action(x)
         return lazy(() => {
             return result
         }).map(() => x)

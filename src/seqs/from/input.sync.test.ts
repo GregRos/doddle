@@ -1,3 +1,4 @@
+import { Doddle } from "@error"
 import type { Seq } from "@lib"
 import { lazy, seq, type Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
@@ -96,17 +97,17 @@ it("converts from function returning lazy", () => {
     expect(iterable._qr).toEqual([1])
 })
 it("errors if given iterator directly", () => {
-    expect(() => seq(new Dummy._Iterator() as any)).toThrow(TypeError)
+    expect(() => seq(new Dummy._Iterator() as any)).toThrow(Doddle)
 })
 it("errors if given something else", () => {
-    expect(() => seq(1 as any)).toThrow(TypeError)
+    expect(() => seq(1 as any)).toThrow(Doddle)
 })
 it("errors if given an async iterable", () => {
-    expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow(TypeError)
+    expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow(Doddle)
 })
 it("errors when iterated when given a function returning something else", () => {
     const iterable = seq(() => 1 as any)
-    expect(() => [...iterable]).toThrow(TypeError)
+    expect(() => [...iterable]).toThrow(Doddle)
 })
 it("errors when iterated when given a function returning async iterable", () => {
     const iterable = seq(() => new Dummy._AsyncIterable() as any)

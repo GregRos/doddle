@@ -1,9 +1,9 @@
-import { checkProjection } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
 import { SeqOperator, type Seq } from "../seq/seq.class.js"
 
 export function sync<T>(this: Iterable<T>, projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
-    checkProjection(projection)
+    chk(sync).projection(projection)
     return SeqOperator(this, function* uniqBy(input) {
         const seen = new Set()
         for (const element of input) {
@@ -19,7 +19,7 @@ export function async<T>(
     this: AsyncIterable<T>,
     projection: ASeq.NoIndexIteratee<T, any>
 ): ASeq<T> {
-    checkProjection(projection)
+    chk(async).projection(projection)
     return ASeqOperator(this, async function* uniqBy(input) {
         const seen = new Set()
         for await (const element of input) {

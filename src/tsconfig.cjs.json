@@ -5,8 +5,7 @@
     "tsBuildInfoFile": "../.buildinfo/cjs.tsbuildinfo",
     "outDir": "../dist/cjs",
     "rootDir": ".",
-    "noEmit": false,
-    "declarationMap": true
+    "noEmit": false
   },
   "include": ["**/*.ts"],
   "exclude": ["**/dist", "**/node_modules", "**/*.test.ts"]

@@ -40,10 +40,15 @@ import { sync as uniqBySync } from "../operators/uniq-by.js"
 import { sync as uniqSync } from "../operators/uniq.js"
 import { sync as windowSync } from "../operators/window.js"
 import { sync as zipSync } from "../operators/zip.js"
+import { _Seq } from "./_seq.js"
 import { seqSymbol } from "./symbol.js"
 
-export abstract class Seq<T> implements Iterable<T> {
+export abstract class Seq<T> extends _Seq implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
+    constructor() {
+        super()
+        this.loadCheckers()
+    }
     get _qr() {
         return this.toArray().pull()
     }

@@ -47,7 +47,7 @@ it("chunks pairs", () => {
 })
 
 it("errors on length of 0", () => {
-    expect(() => _seq([1, 2, 3]).chunk(0)).toThrow("must be positive")
+    expect(() => _seq([1, 2, 3]).chunk(0)).toThrow("must be a positive")
 })
 
 it("is not eager", () => {

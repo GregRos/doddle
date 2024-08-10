@@ -1,4 +1,4 @@
-import { checkCount } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
@@ -9,7 +9,7 @@ import { seq } from "../seq/seq.js"
 
 const SKIP = Symbol("SKIP")
 export function sync<T>(this: Iterable<T>, count: number): Seq<T> {
-    checkCount(count)
+    chk(sync).count(count)
     return SeqOperator(this, function* skip(input) {
         let myCount = count
         if (myCount === 0) {
@@ -32,7 +32,7 @@ export function sync<T>(this: Iterable<T>, count: number): Seq<T> {
     }) as any
 }
 export function async<T>(this: AsyncIterable<T>, count: number): ASeq<T> {
-    checkCount(count)
+    chk(async).count(count)
     return ASeqOperator(this, async function* skip(input) {
         let myCount = count
         if (myCount === 0) {

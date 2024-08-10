@@ -1,4 +1,4 @@
-import { checkSize } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -19,8 +19,10 @@ export function sync<T, L extends number>(
     size: L,
     projection?: (...window: getWindowArgsType<T, L>) => any
 ): Seq<getWindowOutputType<T, L>> {
-    checkSize(size)
+    chk(sync).size(size)
     projection ??= (...chunk: any) => chunk as any
+    chk(sync).projection(projection)
+
     return SeqOperator(this, function* chunk(input) {
         let chunk: T[] = []
         for (const item of input) {
@@ -50,8 +52,9 @@ export function async<T, L extends number, S>(
     size: L,
     projection?: (...window: getWindowArgsType<T, L>) => S
 ): ASeq<getWindowOutputType<T, L>> {
-    checkSize(size)
+    chk(async).size(size)
     projection ??= (...chunk: any) => chunk as any
+    chk(async).projection(projection)
     return ASeqOperator(this, async function* chunk(input) {
         let chunk: T[] = []
         for await (const item of input) {

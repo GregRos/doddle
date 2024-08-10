@@ -1,4 +1,3 @@
-import { checkProjection, checkReverse } from "../../errors/error.js"
 import { ASeqOperator, type ASeq } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
 import { SeqOperator, type Seq } from "../seq/seq.class.js"
@@ -6,14 +5,15 @@ import { SeqOperator, type Seq } from "../seq/seq.class.js"
 import { seq } from "../seq/seq.js"
 
 import { returnKvp } from "../../utils.js"
+import { chk } from "../seq/_seq.js"
 
 export function sync<T>(
     this: Iterable<T>,
     projection: Seq.NoIndexIteratee<T, any>,
     reverse = false
 ): Seq<T> {
-    checkProjection(projection)
-    checkReverse(reverse)
+    chk(sync).projection(projection)
+    chk(sync).reverse(reverse)
     return SeqOperator(this, function* orderBy(input) {
         yield* seq(input)
             .map(e => returnKvp(e, projection(e), e))
@@ -33,8 +33,8 @@ export function async<T, S>(
     projection: ASeq.NoIndexIteratee<T, S>,
     reverse = false
 ): ASeq<T> {
-    checkProjection(projection)
-    checkReverse(reverse)
+    chk(async).projection(projection)
+    chk(async).reverse(reverse)
     return ASeqOperator(this, async function* orderBy(input) {
         yield* await aseq(input)
             .map(e => returnKvp(e, projection(e), e))

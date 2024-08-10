@@ -1,8 +1,10 @@
 import { lazyFromOperator } from "../lazy-operator.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
 
 export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee<T, K>) {
+    chk(sync).keyProjection(keyProjection)
     return lazyFromOperator(this, function groupBy(input) {
         const map = new Map<K, [T, ...T[]]>()
         for (const element of input) {
@@ -20,6 +22,7 @@ export function sync<T, K>(this: Iterable<T>, keyProjection: Seq.NoIndexIteratee
 }
 
 export function async<T, K>(this: AsyncIterable<T>, keyProjection: ASeq.NoIndexIteratee<T, K>) {
+    chk(async).keyProjection(keyProjection)
     return lazyFromOperator(this, async function groupBy(input) {
         const map = new Map<K, [T, ...T[]]>()
         for await (const element of input) {

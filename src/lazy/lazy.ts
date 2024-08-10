@@ -1,7 +1,7 @@
 import { cannotRecurseSync } from "../errors/error.js"
 import {
     getClassName,
-    getInitializerName,
+    getFunctionName,
     isAsyncIterable,
     isIterable,
     isLazy,
@@ -52,7 +52,7 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
         this._info = {
             syncness: Lazy.Syncness.Untouched,
             stage: Lazy.Stage.Untouched,
-            name: getInitializerName(initializer)
+            name: getFunctionName(initializer)
         }
         this._init = initializer
 

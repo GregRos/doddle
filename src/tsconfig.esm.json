@@ -5,8 +5,7 @@
     "tsBuildInfoFile": "../.buildinfo/esm.tsbuildinfo",
     "outDir": "../dist/esm",
     "rootDir": ".",
-    "noEmit": false,
-    "declarationMap": true
+    "noEmit": false
   },
   "include": ["**/*.ts"],
   "exclude": ["**/dist", "**/node_modules", "**/*.test.ts"]

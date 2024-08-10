@@ -1,14 +1,19 @@
-import { checkPredicate } from "../../errors/error.js"
 import type { Lazy, LazyAsync } from "../../lazy/index.js"
 import { lazyFromOperator } from "../lazy-operator.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { aseq } from "../seq/aseq.js"
 import type { Seq } from "../seq/seq.class.js"
 
 import { seq } from "../seq/seq.js"
 
-export function generic<T, Alt>(input: Seq<T>, predicate: Seq.Predicate<T>, alt?: Alt) {
-    checkPredicate(predicate)
+export function generic<T, Alt>(
+    caller: any,
+    input: Seq<T>,
+    predicate: Seq.Predicate<T>,
+    alt?: Alt
+) {
+    predicate = chk(caller).predicate(predicate)
     return lazyFromOperator(input, function findLast(input) {
         return input.filter(predicate).last(alt).pull() as any
     })
@@ -25,7 +30,7 @@ export function sync<T, Alt = undefined>(
     predicate: Seq.Predicate<T>,
     alt?: Alt
 ) {
-    return generic(seq(this), predicate, alt)
+    return generic(sync, seq(this), predicate, alt)
 }
 
 export function async<T>(
@@ -38,5 +43,5 @@ export function async<T, const Alt>(
     alt: Alt
 ): LazyAsync<T | Alt>
 export function async<T, Alt = T>(this: AsyncIterable<T>, predicate: ASeq.Predicate<T>, alt?: Alt) {
-    return generic(aseq(this) as any, predicate as any, alt)
+    return generic(async, aseq(this) as any, predicate as any, alt)
 }

@@ -45,7 +45,7 @@ it("chunks pairs", async () => {
 })
 
 it("errors on chunk length of 0 immediately", async () => {
-    expect(() => _seq([1, 2, 3]).chunk(0)).toThrow("must be positive")
+    expect(() => _seq([1, 2, 3]).chunk(0)).toThrow("must be a positive")
 })
 
 it("is not eager", async () => {

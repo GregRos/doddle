@@ -1,4 +1,4 @@
-import { checkPredicate } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -12,7 +12,7 @@ export function sync<T>(
     predicate: Seq.Predicate<T>,
     specifier?: TakeWhileSpecifier
 ): Seq<T> {
-    checkPredicate(predicate)
+    chk(sync).predicate(predicate)
     return SeqOperator(this, function* takeWhile(input) {
         let index = 0
         for (const element of input) {
@@ -32,7 +32,7 @@ export function async<T>(
     predicate: ASeq.Predicate<T>,
     specifier?: TakeWhileSpecifier
 ): ASeq<T> {
-    checkPredicate(predicate)
+    chk(async).predicate(predicate)
     return ASeqOperator(this, async function* takeWhile(input) {
         let index = 0
 

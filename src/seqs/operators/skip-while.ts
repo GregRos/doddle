@@ -1,4 +1,4 @@
-import { checkPredicate } from "../../errors/error.js"
+import { chk } from "../seq/_seq.js"
 import type { ASeq } from "../seq/aseq.class.js"
 import { ASeqOperator } from "../seq/aseq.class.js"
 import type { Seq } from "../seq/seq.class.js"
@@ -17,7 +17,7 @@ export function sync<T>(
     predicate: Seq.Predicate<T>,
     options?: SkipWhileOptions
 ): Seq<T> {
-    checkPredicate(predicate)
+    predicate = chk(sync).predicate(predicate)
     return SeqOperator(this, function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0
@@ -41,7 +41,7 @@ export function async<T>(
     predicate: ASeq.Predicate<T>,
     options?: SkipWhileOptions
 ): ASeq<T> {
-    checkPredicate(predicate)
+    predicate = chk(async).predicate(predicate)
     return ASeqOperator(this, async function* skipWhile(input) {
         let prevMode = SkippingMode.None as SkippingMode
         let index = 0

@@ -5,6 +5,7 @@ import { async as asyncRepeat } from "../from/repeat.js"
 import { async as asyncThrows } from "../from/throws.js"
 import { type ASeq } from "./aseq.class.js"
 import { aseq as aseqBase } from "./aseq.ctor.js"
+import { loadCheckers } from "./load-checkers.js"
 import { aseqSymbol } from "./symbol.js"
 
 export const aseq = Object.assign(aseqBase, {
@@ -17,3 +18,5 @@ export const aseq = Object.assign(aseqBase, {
     iterate: asyncIterate,
     throws: asyncThrows
 })
+
+loadCheckers(aseq)

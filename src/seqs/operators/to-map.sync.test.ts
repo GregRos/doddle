@@ -1,6 +1,7 @@
 import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
+import { Doddle } from "@error"
 import { seq } from "@lib"
 const _seq = seq
 declare.it("accepts projection to pair", expect => {
@@ -143,7 +144,7 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(() => [1])
                 .pull()
-        ).toThrow(TypeError)
+        ).toThrow(Doddle)
     })
 
     it("doesn't accept projection to triple", () => {
@@ -152,6 +153,6 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(x => [x, x, x])
                 .pull()
-        ).toThrow(TypeError)
+        ).toThrow(Doddle)
     })
 })
