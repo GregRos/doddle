@@ -34,7 +34,7 @@ const Builders = {
         })
     },
     is<T = unknown>(input: any): input is Seq<T> {
-        return input[Symbol.toStringTag] === "ASeq" && isFunction(input.map)
+        return input[Symbol.toStringTag] === "Seq" && isFunction(input.map)
     },
     throws<T = never>(thrower: () => Error): Seq<T> {
         thrower = chk(this.throws).thrower(thrower)

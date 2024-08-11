@@ -1,7 +1,7 @@
 import { chk, Doddle, loadCheckers } from "../../errors/error.js"
-import type { Lazy } from "../../lazy/lazy.js"
+import type { Lazy } from "../../lazy/index.js"
+import { lazyFromOperator } from "../../lazy/index.js"
 import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../../utils.js"
-import { lazyFromOperator } from "../lazy-operator.js"
 
 import {
     SkippingMode,
@@ -157,12 +157,11 @@ export abstract class Seq<T> implements Iterable<T> {
     count(predicate: Seq.Predicate<T>): Lazy<number>
     count(predicate?: Seq.Predicate<T>): Lazy<number> {
         // ! POLYMORPHIC !
-
         predicate ??= () => true
         predicate = chk(this.count).predicate(predicate)
         return lazyFromOperator(this, function count(input) {
             return input
-                .filter(predicate ?? (() => true))
+                .filter(predicate)
                 .reduce(acc => acc + 1, 0)
                 .pull()
         })

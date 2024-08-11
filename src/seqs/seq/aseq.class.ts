@@ -1,7 +1,7 @@
 import { chk, loadCheckers } from "../../errors/error.js"
-import type { LazyAsync } from "../../lazy/lazy.js"
+import type { LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator } from "../../lazy/index.js"
 import { Stage, _aiter, parseStage, returnKvp, shuffleArray } from "../../utils.js"
-import { lazyFromOperator } from "../lazy-operator.js"
 import { aseq } from "./aseq.ctor.js"
 import {
     type EachCallStage,

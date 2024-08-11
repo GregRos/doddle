@@ -10,9 +10,11 @@ export default {
         ]
     },
     moduleNameMapper: {
-        "@lib": "<rootDir>/dist/cjs/index.js",
-        "@utils": "<rootDir>/dist/cjs/utils.js",
-        "@error": "<rootDir>/dist/cjs/errors/error.js"
+        // map .js to .ts
+        '^(\\.{1,2}/.*)\\.js$': '$1',
+        "@lib": "<rootDir>/src/index",
+        "@utils": "<rootDir>/src/utils",
+        "@error": "<rootDir>/src/errors/error"
     },
     testEnvironment: "node",
     testMatch: ["<rootDir>/src/**/*.test.ts"],

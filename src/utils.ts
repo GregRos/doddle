@@ -15,10 +15,6 @@ export function isFunction(value: any): boolean {
     return typeof value === "function"
 }
 
-export function isNum(value: any): value is number {
-    return typeof value === "number"
-}
-
 export function isIterable<T>(value: any): value is Iterable<T> {
     return isObject(value) && isFunction(value[Symbol.iterator])
 }
