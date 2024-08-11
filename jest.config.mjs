@@ -11,7 +11,7 @@ export default {
     },
     moduleNameMapper: {
         // map .js to .ts
-        '^(\\.{1,2}/.*)\\.js$': '$1',
+        "^(\\.{1,2}/.*)\\.js$": "$1",
         "@lib": "<rootDir>/src/index",
         "@utils": "<rootDir>/src/utils",
         "@error": "<rootDir>/src/errors/error"

@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.6.0-preview.9",
+  "version": "2.0.0-beta",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
