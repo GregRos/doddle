@@ -157,3 +157,15 @@ export function returnKvp(input: any, key: any, value: any) {
         value: value
     }
 }
+export function getThrownError(thrown: unknown) {
+    return thrown instanceof Error ? thrown : new Error(String(thrown))
+}
+export function shuffleArray<T>(array: T[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const temp = array[i]
+        array[i] = array[j]
+        array[j] = temp
+    }
+    return array
+}

@@ -1,98 +1,650 @@
-import { _iter } from "../../utils.js"
-import append from "../operators/append.sync.js"
-import at from "../operators/at.sync.js"
-import cache from "../operators/cache.sync.js"
-import catch_ from "../operators/catch.sync.js"
-import chunk from "../operators/chunk.sync.js"
-import concatMap from "../operators/concat-map.sync.js"
-import concat from "../operators/concat.sync.js"
-import count from "../operators/count.sync.js"
-import each from "../operators/each.sync.js"
-import every from "../operators/every.sync.js"
-import filter from "../operators/filter.sync.js"
-import findLast from "../operators/find-last.sync.js"
-import find from "../operators/find.sync.js"
-import first from "../operators/first.sync.js"
-import groupBy from "../operators/group-by.sync.js"
-import includes from "../operators/includes.sync.js"
-import last from "../operators/last.sync.js"
-import map from "../operators/map.sync.js"
-import maxBy from "../operators/max-by.sync.js"
-import minBy from "../operators/min-by.sync.js"
-import orderBy from "../operators/order-by.sync.js"
-import reduce from "../operators/reduce.sync.js"
-import reverse from "../operators/reverse.sync.js"
-import scan from "../operators/scan.sync.js"
-import seqEquals from "../operators/seq-equals.sync.js"
-import setEquals from "../operators/set-equals.sync.js"
-import shuffle from "../operators/shuffle.sync.js"
-import skipWhile from "../operators/skip-while.sync.js"
-import skip from "../operators/skip.sync.js"
-import some from "../operators/some.sync.js"
-import sumBy from "../operators/sum-by.sync.js"
-import takeWhile from "../operators/take-while.sync.js"
-import take from "../operators/take.sync.js"
-import toArray from "../operators/to-array.sync.js"
-import toMap from "../operators/to-map.sync.js"
-import toSet from "../operators/to-set.sync.js"
-import uniqBy from "../operators/uniq-by.sync.js"
-import uniq from "../operators/uniq.sync.js"
-import window from "../operators/window.sync.js"
-import zip from "../operators/zip.sync.js"
-import { _Seq } from "./_seq.js"
-import { seqSymbol } from "./symbol.js"
+import { chk, Doddle, loadCheckers } from "../../errors/error.js"
+import type { Lazy } from "../../lazy/lazy.js"
+import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../../utils.js"
+import { lazyFromOperator } from "../lazy-operator.js"
 
-export abstract class Seq<T> extends _Seq implements Iterable<T> {
+import {
+    SkippingMode,
+    type EachCallStage,
+    type getConcatElementType,
+    type getWindowArgsType,
+    type getWindowOutputType,
+    type getZipValuesType,
+    type SkipWhileOptions,
+    type TakeWhileSpecifier
+} from "./common-types.js"
+import { seq } from "./seq.ctor.js"
+class ThrownErrorMarker {
+    constructor(public error: any) {}
+}
+export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
-    constructor() {
-        super()
-        this.loadCheckers()
+    get [Symbol.toStringTag]() {
+        return "Seq"
     }
     get _qr() {
         return this.toArray().pull()
     }
-    readonly [seqSymbol] = true
-    readonly append = append
-    readonly at = at
-    readonly cache = cache
-    readonly catch = catch_
-    readonly concat = concat
-    readonly chunk = chunk
-    readonly concatMap = concatMap
-    readonly count = count
-    readonly each = each
-    readonly every = every
-    readonly filter = filter
-    readonly findLast = findLast
-    readonly find = find
-    readonly first = first
-    readonly flatMap = concatMap
-    readonly groupBy = groupBy
-    readonly includes = includes
-    readonly last = last
-    readonly map = map
-    readonly maxBy = maxBy
-    readonly minBy = minBy
-    readonly orderBy = orderBy
-    readonly reduce = reduce
-    readonly reverse = reverse
-    readonly scan = scan
-    readonly seqEquals = seqEquals
-    readonly setEquals = setEquals
-    readonly shuffle = shuffle
-    readonly skipWhile = skipWhile
-    readonly skip = skip
-    readonly some = some
-    readonly sumBy = sumBy
-    readonly takeWhile = takeWhile
-    readonly take = take
-    readonly toArray = toArray
-    readonly toSet = toSet
-    readonly toMap = toMap
-    readonly uniqBy = uniqBy
-    readonly uniq = uniq
-    readonly window = window
-    readonly zip = zip
+    append<Ts extends any[]>(...items: Ts): Seq<T | Ts[number]> {
+        return SeqOperator(this, function* append(input) {
+            yield* seq(input).concat(items)
+        })
+    }
+    at(index: number): Lazy<T | undefined> {
+        chk(this.at).index(index)
+        return lazyFromOperator(this, function at(input) {
+            if (index < 0) {
+                return input.take(index).first().pull()
+            }
+            return input.skip(index).first().pull()
+        })
+    }
+    cache(): Seq<T> {
+        const self = this
+        const _cache: (T | ThrownErrorMarker)[] = []
+        let alreadyDone = false
+        let iterator: Iterator<T>
+
+        return SeqOperator(this, function* cache() {
+            let i = 0
+            for (;;) {
+                if (i < _cache.length) {
+                    const cur = _cache[i]
+                    if (cur instanceof ThrownErrorMarker) {
+                        throw cur.error
+                    }
+                    yield cur
+                    i++
+                } else if (!alreadyDone) {
+                    iterator ??= _iter(self)
+                    try {
+                        const { done, value } = iterator.next()
+                        if (done) {
+                            alreadyDone = true
+                            return
+                        }
+                        _cache.push(value)
+                        yield value
+                        i++
+                    } catch (err) {
+                        _cache.push(new ThrownErrorMarker(err as any))
+                        throw err
+                    }
+                } else {
+                    return
+                }
+            }
+        })
+    }
+    catch<S>(handler: Seq.Iteratee<unknown, Seq.Input<S>>): Seq<T | S>
+    catch(handler: Seq.Iteratee<unknown, void | undefined>): Seq<T>
+    catch<S>(handler: Seq.Iteratee<unknown, void | Seq.Input<S>>): Seq<unknown> {
+        chk(this.catch).handler(handler)
+        return SeqOperator(this, function* catch_(input) {
+            let i = 0
+            const iterator = _iter(input)
+            for (;;) {
+                try {
+                    const result = iterator.next()
+                    var value = result.value
+                    if (result.done) {
+                        return
+                    }
+                    yield value
+                } catch (err: any) {
+                    const error = err
+                    const result = handler(error, i)
+                    if (!result || result == null) {
+                        return
+                    }
+                    yield* seq(result)
+                    return
+                }
+                i++
+            }
+        })
+    }
+    chunk<L extends number, S>(
+        size: L,
+        projection: (...window: getWindowArgsType<T, L>) => S
+    ): Seq<S>
+    chunk<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
+    chunk<L extends number>(
+        size: L,
+        projection?: (...window: getWindowArgsType<T, L>) => any
+    ): Seq<getWindowOutputType<T, L>> {
+        chk(this.chunk).size(size)
+        projection ??= (...chunk: any) => chunk as any
+        chk(this.chunk).projection(projection)
+
+        return SeqOperator(this, function* chunk(input) {
+            let chunk: T[] = []
+            for (const item of input) {
+                chunk.push(item)
+                if (chunk.length === size) {
+                    yield projection(...(chunk as any))
+                    chunk = []
+                }
+            }
+            if (chunk.length) {
+                yield projection(...(chunk as any))
+            }
+        }) as any
+    }
+    concatMap<S>(projection: Seq.Iteratee<T, Seq.Input<S>>): Seq<getConcatElementType<T, S>> {
+        chk(this.concatMap).projection(projection)
+        return SeqOperator(this, function* concatMap(input) {
+            let index = 0
+            for (const element of input) {
+                for (const projected of seq(projection(element, index++))) {
+                    yield projected
+                }
+            }
+        }) as any
+    }
+    concat<Seqs extends Seq.Input<any>[]>(
+        ..._iterables: Seqs
+    ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
+        const iterables = _iterables.map(seq)
+        return SeqOperator(this, function* concat(input) {
+            yield* input
+            for (const iterable of iterables) {
+                yield* iterable
+            }
+        }) as any
+    }
+    count(): Lazy<number>
+    count(predicate: Seq.Predicate<T>): Lazy<number>
+    count(predicate?: Seq.Predicate<T>): Lazy<number> {
+        // ! POLYMORPHIC !
+
+        predicate ??= () => true
+        predicate = chk(this.count).predicate(predicate)
+        return lazyFromOperator(this, function count(input) {
+            return input
+                .filter(predicate ?? (() => true))
+                .reduce(acc => acc + 1, 0)
+                .pull()
+        })
+    }
+    each(action: Seq.StageIteratee<T, void>, stage: EachCallStage | undefined = "before") {
+        chk(this.each).action(action)
+        chk(this.each).stage(stage)
+        const myStage = parseStage(stage)
+        return SeqOperator(this, function* each(input) {
+            let index = 0
+            for (const element of input) {
+                if (myStage & Stage.Before) {
+                    action(element, index, "before")
+                }
+                yield element
+                if (myStage & Stage.After) {
+                    action(element, index, "after")
+                }
+                index++
+            }
+        })
+    }
+    every(predicate: Seq.Predicate<T>): Lazy<boolean> {
+        // ! POLYMORPHIC !
+        predicate = chk(this.every).predicate(predicate)
+        return lazyFromOperator(this, function every(input) {
+            return input
+                .map(predicate)
+                .some(x => !x)
+                .pull()
+        }).map(x => !x)
+    }
+    filter<S extends T>(predicate: Seq.TypePredicate<T, S>): Seq<S>
+    filter(predicate: Seq.Predicate<T>): Seq<T>
+    filter(predicate: Seq.Predicate<T>) {
+        predicate = chk(this.filter).predicate(predicate)
+        return SeqOperator(this, function* filter(input) {
+            yield* seq(input).concatMap((element, index) =>
+                predicate(element, index) ? [element] : []
+            )
+        })
+    }
+    findLast(predicate: Seq.Predicate<T>): Lazy<T | undefined>
+    findLast<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Lazy<T | Alt>
+    findLast<Alt = undefined>(predicate: Seq.Predicate<T>, alt?: Alt) {
+        // ! POLYMORPHIC !
+
+        predicate = chk(this.findLast).predicate(predicate)
+        return lazyFromOperator(this, function findLast(input) {
+            return input.filter(predicate).last(alt).pull() as any
+        })
+    }
+    find(predicate: Seq.Predicate<T>): Lazy<T | undefined>
+    find<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Lazy<T | Alt>
+    find<Alt = T>(predicate: Seq.Predicate<T>, alt?: Alt) {
+        // ! POLYMORPHIC !
+
+        predicate = chk(this.find).predicate(predicate)
+        return lazyFromOperator(this, function find(input) {
+            return input.filter(predicate).first(alt).pull() as any
+        })
+    }
+    first(): Lazy<T | undefined>
+    first<const Alt>(alt: Alt): Lazy<T | Alt>
+    first<const Alt = undefined>(alt?: Alt): Lazy<any> {
+        return lazyFromOperator(this, function first(input) {
+            for (const element of input) {
+                return element
+            }
+            return alt
+        })
+    }
+    groupBy<K>(keyProjection: Seq.NoIndexIteratee<T, K>) {
+        chk(this.groupBy).keyProjection(keyProjection)
+        return lazyFromOperator(this, function groupBy(input) {
+            const map = new Map<K, [T, ...T[]]>()
+            for (const element of input) {
+                const key = keyProjection(element)
+                let group = map.get(key)
+                if (!group) {
+                    group = [element]
+                    map.set(key, group)
+                } else {
+                    group.push(element)
+                }
+            }
+            return map
+        })
+    }
+    includes<T extends S, S>(this: Seq<T>, value: S): Lazy<boolean>
+    includes<S extends T>(value: S): Lazy<boolean>
+    includes(value: any): Lazy<boolean> {
+        // ! POLYMORPHIC !
+        return lazyFromOperator(this, function includes(input) {
+            return input.some(element => element === value).pull()
+        })
+    }
+    last(): Lazy<T | undefined>
+    last<const Alt>(alt: Alt): Lazy<T | Alt>
+    last<Alt = undefined>(alt?: Alt) {
+        return lazyFromOperator(this, function last(input) {
+            let last: T | Alt = alt as Alt
+            for (const element of input) {
+                last = element
+            }
+            return last
+        })
+    }
+    map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
+        chk(this.map).projection(projection)
+        return SeqOperator(this, function* map(input) {
+            yield* seq(input).concatMap((element, index) => [projection(element, index)])
+        })
+    }
+    maxBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
+    maxBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Lazy<T | Alt>
+    maxBy<K, Alt>(projection: Seq.Iteratee<T, K>, alt?: Alt): Lazy<T | Alt> {
+        const EMPTY = Symbol("EMPTY_SEQ")
+        // ! POLYMORPHIC !
+        chk(this.maxBy).projection(projection)
+        return lazyFromOperator(this, function maxBy(input) {
+            return input
+                .map((element, index) => {
+                    return returnKvp(input, projection(element, index), element)
+                })
+                .reduce((max: any, value: any) => {
+                    return max.key >= value.key ? max : value
+                }, EMPTY as any)
+                .map(x => (x === EMPTY ? alt : x.value))
+                .pull()
+        })
+    }
+    minBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
+    minBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Lazy<T | Alt>
+    minBy<K>(projection: Seq.Iteratee<T, K>, alt?: any) {
+        const EMPTY = Symbol("EMPTY_SEQ")
+        // ! POLYMORPHIC !
+        chk(this.minBy).projection(projection)
+        return lazyFromOperator(this, function minBy(input) {
+            return input
+                .map((element, index) => {
+                    return returnKvp(input, projection(element, index), element)
+                })
+                .reduce((min: any, value: any) => {
+                    return min.key <= value.key ? min : value
+                }, EMPTY as any)
+                .map(x => (x === EMPTY ? alt : x.value))
+                .pull()
+        })
+    }
+    orderBy(projection: Seq.NoIndexIteratee<T, any>, reverse = false): Seq<T> {
+        chk(this.orderBy).projection(projection)
+        chk(this.orderBy).reverse(reverse)
+        return SeqOperator(this, function* orderBy(input) {
+            yield* seq(input)
+                .map(e => returnKvp(e, projection(e), e))
+                .toArray()
+                .map(xs => {
+                    void xs.sort((a: any, b: any) => {
+                        const result = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
+                        return reverse ? -result : result
+                    })
+                    return xs.map((x: any) => x.value)
+                })
+                .pull()
+        })
+    }
+    reduce(reducer: Seq.Reducer<T, T>): Lazy<T>
+    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial: Acc): Lazy<Acc>
+    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial?: Acc): Lazy<any> {
+        // ! POLYMORPHIC !
+        const NO_INITIAL = Symbol("NO_INITIAL")
+        chk(this.reduce).reducer(reducer)
+        return lazyFromOperator(this, function reduce(input) {
+            return input
+                .scan(reducer, initial!)
+                .last(NO_INITIAL)
+                .map(x => {
+                    if (x === NO_INITIAL) {
+                        throw new Doddle("Cannot reduce empty sequence with no initial value")
+                    }
+                    return x
+                })
+                .pull()
+        }) as any
+    }
+    reverse() {
+        return SeqOperator(this, function* reverse(input) {
+            yield* seq(input)
+                .toArray()
+                .map(x => x.reverse())
+                .pull()
+        })
+    }
+    scan(reducer: Seq.Reducer<T, T>): Seq<T>
+    scan<Acc>(reducer: Seq.Reducer<T, Acc>, initial: Acc): Seq<Acc>
+    scan<Acc>(reducer: Seq.Reducer<T, Acc>, initial?: Acc) {
+        chk(this.scan).reducer(reducer)
+        return SeqOperator(this, function* scan(input) {
+            let hasAcc = initial !== undefined
+
+            let acc: Acc = initial as any
+            let index = 0
+            if (hasAcc) {
+                yield acc
+            }
+            for (const element of input) {
+                if (!hasAcc) {
+                    acc = element as any
+                    hasAcc = true
+                } else {
+                    acc = reducer(acc, element, index++)
+                }
+
+                yield acc
+            }
+        })
+    }
+    seqEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
+    seqEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
+    seqEquals<S extends T>(_other: Seq.Input<S>) {
+        const other = seq(_other)
+        return lazyFromOperator(this, function seqEquals(input) {
+            const otherIterator = _iter(other)
+            for (const element of input) {
+                const otherElement = otherIterator.next()
+                if (otherElement.done || element !== otherElement.value) {
+                    return false
+                }
+            }
+            return !!otherIterator.next().done
+        })
+    }
+    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>) {
+        const other = seq(_other)
+        return lazyFromOperator(this, function setEquals(input) {
+            const set = new Set(other) as Set<any>
+            for (const element of input) {
+                if (!set.delete(element)) {
+                    return false
+                }
+            }
+            return set.size === 0
+        })
+    }
+
+    shuffle() {
+        return SeqOperator(this, function* shuffle(input) {
+            const array = seq(input).toArray().pull()
+            shuffleArray(array)
+            yield* array
+        })
+    }
+    skipWhile(predicate: Seq.Predicate<T>, options?: SkipWhileOptions): Seq<T> {
+        predicate = chk(this.skipWhile).predicate(predicate)
+        return SeqOperator(this, function* skipWhile(input) {
+            let prevMode = SkippingMode.None as SkippingMode
+            let index = 0
+            for (const element of input) {
+                if (prevMode === SkippingMode.NotSkipping) {
+                    yield element
+                    continue
+                }
+                const newSkipping: boolean = predicate(element, index++)
+                if (!newSkipping) {
+                    if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
+                        yield element
+                    }
+                }
+                prevMode = newSkipping ? SkippingMode.Skipping : SkippingMode.NotSkipping
+            }
+        }) as any
+    }
+    skip(count: number): Seq<T> {
+        const SKIP = Symbol("SKIP")
+        chk(this.skip).count(count)
+        return SeqOperator(this, function* skip(input) {
+            let myCount = count
+            if (myCount === 0) {
+                yield* seq(input)
+                return
+            }
+            if (myCount < 0) {
+                myCount = -myCount
+                yield* seq(input)
+                    .window(myCount + 1, (...window) => {
+                        if (window.length === myCount + 1) {
+                            return window[0]
+                        }
+                        return SKIP
+                    })
+                    .filter(x => x !== SKIP)
+            } else {
+                yield* seq(input).skipWhile((_, index) => index < myCount, {})
+            }
+        }) as any
+    }
+    some(predicate: Seq.Predicate<T>): Lazy<boolean> {
+        // ! POLYMORPHIC !
+
+        const NO_MATCH = Symbol("NO_MATCH")
+        predicate = chk(this.some).predicate(predicate)
+        return lazyFromOperator(this, function some(input) {
+            return input
+                .find(predicate, NO_MATCH)
+                .map(x => x !== NO_MATCH)
+                .pull()
+        })
+    }
+    sumBy(projection: Seq.Iteratee<T, number>) {
+        // ! POLYMORPHIC !
+
+        chk(this.sumBy).projection(projection)
+        return lazyFromOperator(this, function sumBy(input) {
+            return input
+                .map(projection)
+                .reduce((acc, element) => acc + element, 0)
+                .pull()
+        })
+    }
+    takeWhile(predicate: Seq.Predicate<T>, specifier?: TakeWhileSpecifier): Seq<T> {
+        chk(this.takeWhile).predicate(predicate)
+        return SeqOperator(this, function* takeWhile(input) {
+            let index = 0
+            for (const element of input) {
+                if (predicate(element, index++)) {
+                    yield element
+                } else {
+                    if (specifier?.takeFinal) {
+                        yield element
+                    }
+                    return
+                }
+            }
+        }) as any
+    }
+    take(count: number): Seq<T> {
+        const END_MARKER = Symbol("DUMMY")
+
+        chk(this.take).count(count)
+        return SeqOperator(this, function* take(input) {
+            let myCount = count
+            if (myCount === 0) {
+                yield* []
+                return
+            }
+            if (myCount < 0) {
+                myCount = -myCount
+                const results = seq(input)
+                    .append(END_MARKER)
+                    .window(myCount + 1, (...window) => {
+                        if (window[window.length - 1] === END_MARKER) {
+                            window.pop()
+                            return window as T[]
+                        }
+                        return undefined
+                    })
+                    .filter(x => x !== undefined)
+                    .first()
+                    .pull() as T[]
+
+                yield* results
+            } else {
+                yield* seq(input).takeWhile((_, index) => index < myCount - 1, {
+                    takeFinal: true
+                })
+            }
+        }) as any
+    }
+    toArray() {
+        return lazyFromOperator(this, function toArray(input) {
+            return [...input]
+        })
+    }
+    toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
+        // ! POLYMORPHIC !
+
+        kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
+        return lazyFromOperator(this, function toMap(input) {
+            return input
+                .map(kvpProjection)
+                .toArray()
+                .map(x => new Map(x))
+                .pull()
+        })
+    }
+    toSet() {
+        return lazyFromOperator(this, function toSet(input) {
+            return new Set(input)
+        })
+    }
+    uniqBy(projection: Seq.NoIndexIteratee<T, any>): Seq<T> {
+        chk(this.uniqBy).projection(projection)
+        return SeqOperator(this, function* uniqBy(input) {
+            const seen = new Set()
+            for (const element of input) {
+                const key = projection(element)
+                if (!seen.has(key)) {
+                    seen.add(key)
+                    yield element
+                }
+            }
+        })
+    }
+    uniq() {
+        // ! POLYMORPHIC !
+
+        return SeqOperator(this, function* uniq(input) {
+            yield* seq(input).uniqBy(x => x)
+        })
+    }
+    window<L extends number, S>(
+        size: L,
+        projection: (...window: getWindowArgsType<T, L>) => S
+    ): Seq<S>
+    window<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
+    window<L extends number, S>(
+        size: L,
+        projection?: (...window: getWindowArgsType<T, L>) => S
+    ): Seq<any> {
+        chk(this.window).size(size)
+        projection ??= (...window: any) => window as any
+        chk(this.window).projection(projection)
+        return SeqOperator(this, function* window(input) {
+            const buffer = Array<T>(size)
+            let i = 0
+            for (const item of input) {
+                buffer[i++ % size] = item
+                if (i >= size) {
+                    yield (projection as any).call(
+                        null,
+                        ...buffer.slice(i % size),
+                        ...buffer.slice(0, i % size)
+                    )
+                }
+            }
+            if (i > 0 && i < size) {
+                yield (projection as any).call(null, ...buffer.slice(0, i))
+            }
+        })
+    }
+    zip<Xs extends [any, ...any[]]>(others: {
+        [K in keyof Xs]: Seq.Input<Xs[K]>
+    }): Seq<getZipValuesType<[T, ...Xs]>>
+    zip<Xs extends [any, ...any[]], R>(
+        others: {
+            [K in keyof Xs]: Seq.Input<Xs[K]>
+        },
+        projection: (...args: getZipValuesType<[T, ...Xs]>) => R
+    ): Seq<R>
+    zip<Xs extends [any, ...any[]], R>(
+        _others: {
+            [K in keyof Xs]: Seq.Input<Xs[K]>
+        },
+        projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
+    ): Seq<any> {
+        const others = _others.map(seq)
+        projection ??= (...args: any[]) => args as any
+        chk(this.zip).projection(projection)
+        return SeqOperator(this, function* zip(input) {
+            const iterators = [input, ...others].map(_iter) as (Iterator<any> | undefined)[]
+            while (true) {
+                const results = iterators.map((iter, i) => {
+                    if (!iter) {
+                        return undefined
+                    }
+                    const result = iter.next()
+                    if (result.done) {
+                        iterators[i] = undefined
+                        return undefined
+                    }
+                    return result
+                })
+                if (results.every(r => !r)) {
+                    break
+                }
+                yield projection.apply(undefined, results.map(r => r?.value) as any)
+            }
+        }) as any
+    }
 }
 
 let baseSeq!: Seq<any>
@@ -131,3 +683,5 @@ export namespace Seq {
     export type Input<E> = IterableInput<E> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
 }
+
+loadCheckers(Seq.prototype)

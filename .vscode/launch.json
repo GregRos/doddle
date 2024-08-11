@@ -6,8 +6,11 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Refactor",
+      "runtimeExecutable": "tsx",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
       "skipFiles": ["<node_internals>/**"],
-      "program": "${workspaceFolder}/dist/esm/refactor.js"
+      "program": "${workspaceFolder}/src/split-sync-async.refactor.js"
     }
   ]
 }

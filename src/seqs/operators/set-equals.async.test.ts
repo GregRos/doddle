@@ -60,7 +60,7 @@ it("returns false for subsets", async () => {
 })
 
 it("returns false for different elements", async () => {
-    const s = _aseq([1, 2, 3]).setEquals(_aseq([1, 2, "3"]))
+    const s = _aseq([1, 2, 3]).setEquals(_aseq([1, 2, 6]))
     expect(await s.pull()).toEqual(false)
 })
 

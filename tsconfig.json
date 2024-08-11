@@ -2,9 +2,6 @@
   "references": [
     {
       "path": "./src/tsconfig.json"
-    },
-    {
-      "path": "./examples/tsconfig.json"
     }
   ],
 

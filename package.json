@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "1.6.0-preview.4",
+  "version": "1.6.0-preview.7",
   "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
   "keywords": [
     "iteration",
@@ -64,7 +64,7 @@
     "eslint:fix": "eslint 'src/**/*.ts' --fix",
     "eslint:check": "eslint 'src/**/*.ts'",
     "prettier:check": "prettier --check .",
-    "lint:fix": "run-s eslint:fix prettier:fix",
+    "lint:fix": "run-s prettier:fix eslint:fix",
     "lint:check": "run-s eslint:check prettier:check",
     "test": "jest",
     "test:coverage": "jest --coverage",

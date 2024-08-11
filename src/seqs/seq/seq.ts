@@ -1,22 +1,49 @@
-import iterate from "../from/iterate.sync.js"
-import of from "../from/of.sync.js"
-import range from "../from/range.sync.js"
-import repeat from "../from/repeat.sync.js"
-import throws from "../from/throws.sync.js"
-import { loadCheckers } from "./load-checkers.js"
-import { type Seq } from "./seq.class.js"
+import { chk, loadCheckers } from "../../errors/error.js"
+import { getThrownError, isFunction } from "../../utils.js"
+import { SeqOperator, type Seq } from "./seq.class.js"
 import { seq as seqBase } from "./seq.ctor.js"
-import { seqSymbol } from "./symbol.js"
-
-export const seq = Object.assign(seqBase, {
-    of: of,
-    repeat: repeat,
-    range: range,
-    is<T = unknown>(input: any): input is Seq<T> {
-        return seqSymbol in input && input[seqSymbol] === true
+const Builders = {
+    iterate<T>(count: number, projection: Seq.IndexIteratee<T>): Seq<T> {
+        chk(this.iterate).count(count)
+        chk(this.iterate).projection(projection)
+        return seq(function* () {
+            for (let i = 0; i < count; i++) {
+                yield projection(i)
+            }
+        })
     },
-    iterate: iterate,
-    throws: throws
-})
+    of<T>(...items: T[]): Seq<T> {
+        return seq(items)
+    },
+    range(start: number, end: number, size = 1) {
+        chk(this.range).size(size)
+        chk(this.range).start(start)
+        chk(this.range).end(end)
+        const direction = Math.sign(end - start)
+        return seq(function* range() {
+            for (let i = start; direction * i < direction * end; i += direction * size) {
+                yield i
+            }
+        })
+    },
+    repeat<T>(times: number, value: T): Seq<T> {
+        return seq(function* () {
+            for (let i = 0; i < times; i++) {
+                yield value
+            }
+        })
+    },
+    is<T = unknown>(input: any): input is Seq<T> {
+        return input[Symbol.toStringTag] === "ASeq" && isFunction(input.map)
+    },
+    throws<T = never>(thrower: () => Error): Seq<T> {
+        thrower = chk(this.throws).thrower(thrower)
+        return SeqOperator(thrower, function* throws(input) {
+            const result = input()
+            throw getThrownError(result)
+        })
+    }
+}
+export const seq = Object.assign(seqBase, Builders)
 
 loadCheckers(seq)
