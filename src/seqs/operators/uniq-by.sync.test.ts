@@ -1,7 +1,7 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns seq of same type", expect => {
@@ -69,4 +69,9 @@ it("pulls, calls iteratee as many as needed", () => {
     }
     expect(map).toHaveBeenCalledTimes(6)
     expect(sq).toHaveBeenCalledTimes(1)
+})
+
+it("works with lazy iteratee", () => {
+    const s = _seq([1, 2, 1, 2]).uniqBy(x => lazy(() => x))
+    expect(s._qr).toEqual([1, 2])
 })

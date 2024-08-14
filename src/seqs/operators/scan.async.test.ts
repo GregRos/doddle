@@ -6,7 +6,7 @@ const _seq = aseq
 type _ASeq<T> = ASeq<T>
 
 declare.it("element type is Acc", expect => {
-    const s = _seq(null! as string).scan(() => 1, 0)
+    const s = _seq(null! as string[]).scan(() => 1, 0)
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 

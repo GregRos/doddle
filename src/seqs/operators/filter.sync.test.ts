@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("element stays the same type with no type predicate", expect => {
@@ -65,5 +65,10 @@ it("calls predicate as many times as needed", () => {
 it("can iterate twice", () => {
     const s = _seq([1, 2, 3]).filter(x => x > 1)
     expect(s._qr).toEqual([2, 3])
+    expect(s._qr).toEqual([2, 3])
+})
+
+it("works with lazy predicate", () => {
+    const s = _seq([1, 2, 3]).filter(x => lazy(() => x > 1))
     expect(s._qr).toEqual([2, 3])
 })

@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Lazy } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 declare.it("returns Lazy<Map<K, [T, ...T[]]>>", expect => {
     const s = _seq([1, 2, 3]).groupBy(() => 1)
@@ -84,4 +84,14 @@ it("no side-effects before pull", () => {
     result.pull()
     expect(fn).toHaveBeenCalledTimes(1)
     expect(map).toHaveBeenCalledTimes(3)
+})
+
+it("works with lazy iteratee", () => {
+    const s = _seq([1, 2, 3]).groupBy(x => lazy(() => x % 2))
+    expect(s.pull()).toEqual(
+        new Map([
+            [0, [2]],
+            [1, [1, 3]]
+        ])
+    )
 })

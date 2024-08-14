@@ -1,11 +1,11 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("element type is Acc", expect => {
-    const s = _seq(null! as string).scan(() => 1, 0)
+    const s = _seq(null! as string[]).scan(() => 1, 0)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 declare.it("can be called with no initial value but the type is T", expect => {
@@ -113,4 +113,9 @@ it("has no side-effects before pull", () => {
     for (const _ of lazy) {
     }
     expect(fn).toHaveBeenCalledTimes(1)
+})
+
+it("works with lazy reducer", () => {
+    const s = _seq([0, 1, 2]).scan((acc, x) => lazy(() => acc + x), 0)
+    expect(s._qr).toEqual([0, 0, 1, 3])
 })

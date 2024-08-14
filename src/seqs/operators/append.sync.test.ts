@@ -6,13 +6,13 @@ const _seq = seq
 type SType<T> = Seq<T>
 describe("0 arguments", () => {
     declare.test("type stays never", expect => {
-        const sNever = _seq().append()
+        const sNever = _seq.empty().append()
         expect(type_of(sNever)).to_equal(type<SType<never>>)
-        const sNumber = _seq<number>().append()
+        const sNumber = _seq.empty<number>().append()
         expect(type_of(sNumber)).to_equal(type<SType<number>>)
     })
     it("stays empty", () => {
-        const s = _seq().append()
+        const s = _seq.empty().append()
         expect(s._qr).toEqual([])
     })
     it("stays with same elements", () => {
@@ -34,7 +34,7 @@ describe("1 argument", () => {
         expect(s._qr).toEqual([1, 2, 3, 4])
     })
     it("appends one element to empty", () => {
-        const s = _seq().append(4)
+        const s = _seq.empty().append(4)
         expect(s._qr).toEqual([4])
     })
     it("appends to infinite passes", () => {

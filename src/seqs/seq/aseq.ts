@@ -22,6 +22,9 @@ const Builders = {
         chk(this.range).end(end)
         return aseq(seq.range(start, end, size))
     },
+    empty<T = never>(): ASeq<T> {
+        return aseq([])
+    },
     repeat<T>(times: number, value: T): ASeq<T> {
         chk(this.repeat).times(times)
         return aseq(seq.repeat(times, value))
@@ -38,5 +41,4 @@ const Builders = {
     }
 }
 export const aseq = Object.assign(aseqBase, Builders)
-
 loadCheckers(aseq)

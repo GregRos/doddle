@@ -130,6 +130,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
+
     concatMap<S>(
         projection: ASeq.Iteratee<T, ASeq.SimpleInput<S>>
     ): ASeq<getConcatElementType<T, S>> {
@@ -587,6 +588,7 @@ export const ASeqOperator = function aseq<In, Out>(
 export namespace ASeq {
     type MaybePromise<T> = T | PromiseLike<T>
     export type IndexIteratee<O> = (index: number) => MaybePromise<O>
+    
     export type Iteratee<E, O> = (element: E, index: number) => MaybePromise<O>
     export type NoIndexIteratee<E, O> = (element: E) => MaybePromise<O>
 
@@ -601,10 +603,10 @@ export namespace ASeq {
     export type IterableOrIterator<E> =
         | AsyncIterable<E>
         | AsyncIterator<E>
-        | Iterable<E>
+        | Seq.ObjectIterable<E>
         | Iterator<E>
     export type FunctionInput<E> = () => MaybePromise<IterableOrIterator<E>>
-    export type DesyncedInput<E> = Iterable<MaybePromise<E>>
+    export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
     export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E>
     export type SimpleInput<E> = IterableInput<E> | FunctionInput<E>
     export type Input<E> = SimpleInput<MaybePromise<E>>

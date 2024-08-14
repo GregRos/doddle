@@ -1,7 +1,7 @@
 import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true))).to_equal(type<Lazy<number | undefined>>)
@@ -13,6 +13,14 @@ declare.test("should type as Lazy<T | string> with alt", expect => {
 })
 declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true, "alt"))).to_equal(type<Lazy<number | "alt">>)
+})
+declare.test("works when projection is Lazy<number>", expect => {
+    const s = _seq([1, 2, 3]).maxBy(() => lazy(() => 1))
+    expect(type_of(s)).to_equal(type<Lazy<number | undefined>>)
+})
+declare.test("works when projection is disjunction with lazy", expect => {
+    const s = _seq([1, 2, 3]).maxBy(() => lazy(() => "1") as string | Lazy<string>)
+    expect(type_of(s)).to_equal(type<Lazy<number | undefined>>)
 })
 it("returns undefined for empty", () => {
     const s = _seq([]).maxBy(() => true)
@@ -90,4 +98,9 @@ it("iteratee receives index", () => {
         return x
     })
     expect(s.pull()).toEqual(3)
+})
+
+it("lazy key is pulled", () => {
+    const s = _seq([0, 1, 2]).maxBy(x => lazy(() => x))
+    expect(s.pull()).toEqual(2)
 })

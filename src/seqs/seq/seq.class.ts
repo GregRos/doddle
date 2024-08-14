@@ -1,7 +1,7 @@
 import { chk, Doddle, loadCheckers } from "../../errors/error.js"
 import type { Lazy } from "../../lazy/index.js"
 import { lazyFromOperator } from "../../lazy/index.js"
-import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../../utils.js"
+import { _iter, parseStage, pull, returnKvp, shuffleArray, Stage } from "../../utils.js"
 
 import {
     SkippingMode,
@@ -93,7 +93,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     yield value
                 } catch (err: any) {
                     const error = err
-                    const result = handler(error, i)
+                    const result = pull(handler(error, i))
                     if (!result || result == null) {
                         return
                     }
@@ -106,7 +106,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     chunk<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S
+        projection: (...window: getWindowArgsType<T, L>) => S | Lazy<S>
     ): Seq<S>
     chunk<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
     chunk<L extends number>(
@@ -122,12 +122,12 @@ export abstract class Seq<T> implements Iterable<T> {
             for (const item of input) {
                 chunk.push(item)
                 if (chunk.length === size) {
-                    yield projection(...(chunk as any))
+                    yield pull(projection(...(chunk as any)))
                     chunk = []
                 }
             }
             if (chunk.length) {
-                yield projection(...(chunk as any))
+                yield pull(projection(...(chunk as any)))
             }
         }) as any
     }
@@ -136,7 +136,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* concatMap(input) {
             let index = 0
             for (const element of input) {
-                for (const projected of seq(projection(element, index++))) {
+                for (const projected of seq(pull(projection(element, index++)))) {
                     yield projected
                 }
             }
@@ -174,11 +174,11 @@ export abstract class Seq<T> implements Iterable<T> {
             let index = 0
             for (const element of input) {
                 if (myStage & Stage.Before) {
-                    action(element, index, "before")
+                    pull(action(element, index, "before"))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    action(element, index, "after")
+                    pull(action(element, index, "after"))
                 }
                 index++
             }
@@ -200,7 +200,7 @@ export abstract class Seq<T> implements Iterable<T> {
         predicate = chk(this.filter).predicate(predicate)
         return SeqOperator(this, function* filter(input) {
             yield* seq(input).concatMap((element, index) =>
-                predicate(element, index) ? [element] : []
+                pull(predicate(element, index)) ? [element] : []
             )
         })
     }
@@ -239,7 +239,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return lazyFromOperator(this, function groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
             for (const element of input) {
-                const key = keyProjection(element)
+                const key = pull(keyProjection(element))
                 let group = map.get(key)
                 if (!group) {
                     group = [element]
@@ -270,10 +270,11 @@ export abstract class Seq<T> implements Iterable<T> {
             return last
         })
     }
+
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
         chk(this.map).projection(projection)
         return SeqOperator(this, function* map(input) {
-            yield* seq(input).concatMap((element, index) => [projection(element, index)])
+            yield* seq(input).concatMap((element, index) => [pull(projection(element, index))])
         })
     }
     maxBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
@@ -373,7 +374,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     acc = element as any
                     hasAcc = true
                 } else {
-                    acc = reducer(acc, element, index++)
+                    acc = pull(reducer(acc, element, index++))
                 }
 
                 yield acc
@@ -427,7 +428,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     yield element
                     continue
                 }
-                const newSkipping: boolean = predicate(element, index++)
+                const newSkipping: boolean = pull(predicate(element, index++))
                 if (!newSkipping) {
                     if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
                         yield element
@@ -489,7 +490,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* takeWhile(input) {
             let index = 0
             for (const element of input) {
-                if (predicate(element, index++)) {
+                if (pull(predicate(element, index++))) {
                     yield element
                 } else {
                     if (specifier?.takeFinal) {
@@ -560,7 +561,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* uniqBy(input) {
             const seen = new Set()
             for (const element of input) {
-                const key = projection(element)
+                const key = pull(projection(element))
                 if (!seen.has(key)) {
                     seen.add(key)
                     yield element
@@ -577,7 +578,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     window<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S
+        projection: (...window: getWindowArgsType<T, L>) => S | Lazy<S>
     ): Seq<S>
     window<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
     window<L extends number, S>(
@@ -593,15 +594,17 @@ export abstract class Seq<T> implements Iterable<T> {
             for (const item of input) {
                 buffer[i++ % size] = item
                 if (i >= size) {
-                    yield (projection as any).call(
-                        null,
-                        ...buffer.slice(i % size),
-                        ...buffer.slice(0, i % size)
+                    yield pull(
+                        (projection as any).call(
+                            null,
+                            ...buffer.slice(i % size),
+                            ...buffer.slice(0, i % size)
+                        )
                     )
                 }
             }
             if (i > 0 && i < size) {
-                yield (projection as any).call(null, ...buffer.slice(0, i))
+                yield pull((projection as any).call(null, ...buffer.slice(0, i)))
             }
         })
     }
@@ -640,7 +643,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 if (results.every(r => !r)) {
                     break
                 }
-                yield projection.apply(undefined, results.map(r => r?.value) as any)
+                yield pull(projection.apply(undefined, results.map(r => r?.value) as any))
             }
         }) as any
     }
@@ -667,19 +670,18 @@ export const SeqOperator = function seq<In, Out>(
 export namespace Seq {
     export type IndexIteratee<O> = (index: number) => O
 
-    export type Iteratee<E, O> = (element: E, index: number) => O
+    export type Iteratee<E, O> = (element: E, index: number) => O | Lazy<O>
     export type NoIndexIteratee<E, O> = (element: E) => O
-
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
     export type Predicate<E> = Iteratee<E, boolean>
     export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
 
-    export type Reducer<E, O> = (acc: O, element: E, index: number) => O
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => O | Lazy<O>
     export type IterableOrIterator<E> = Iterable<E> | Iterator<E>
     export type FunctionInput<E> = () => IterableOrIterator<E>
 
-    export type IterableInput<E> = Iterable<E>
-    export type Input<E> = IterableInput<E> | FunctionInput<E>
+    export type ObjectIterable<E> = object & Iterable<E>
+    export type Input<E> = ObjectIterable<E> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
 }
 

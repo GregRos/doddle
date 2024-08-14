@@ -1,7 +1,7 @@
 import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 declare.test("can be called with initial, type changes to match", expect => {
     const s = _seq([1, 2, 3]).reduce((acc, x) => `${acc}${x}`, "")
@@ -73,4 +73,9 @@ it("has no side-effects before pull", () => {
     expect(fn).not.toHaveBeenCalled()
     s.pull()
     expect(fn).toHaveBeenCalledTimes(3)
+})
+
+it("works with lazy reducer", () => {
+    const s = _seq([1, 2, 3]).reduce((acc, cur) => lazy(() => acc + cur), 0)
+    expect(s.pull()).toEqual(6)
 })

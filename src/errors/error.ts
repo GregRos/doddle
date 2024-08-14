@@ -8,6 +8,7 @@ import {
     isFunction,
     isInt,
     isIterable,
+    isLazy,
     isNatOrInfinity,
     isNextable,
     isPair,
@@ -37,6 +38,8 @@ Sample error messages:
 
 > Doddle: Function argument 'predicate' to operator 'Seq.filter' must return
 > true or false, but got 1.
+
+> Doddle: {conversion|operator} 'X' must be called with  {A-B|A} arguments, but got Z.
 
 > Doddle: Input of conversion 'aseq' must be an async iterable, iterable, or a function,
 > but got "hello world"
@@ -70,12 +73,28 @@ const wIterator = "iterator"
 const wConversion = "conversion"
 const wButGot = "but got"
 const wBe = "be"
+const wCalledWith = "called with"
+const wArguments = "arguments"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
 
 export const getSubject = (thing: Text, context: Text, verb: Text) => {
     return [thing, "of", context, "must", verb]
+}
+export function checkNumberArgs(context: string) {
+    return (min: number, max: number = min) => {
+        return (args: any[]) => {
+            if (args.length < min || args.length > max) {
+                throw new Doddle([
+                    getSubject(wCalledWith, [context], wBe),
+                    min === max ? min : [min, "to", max],
+                    wArguments,
+                    getButGot(args.length)
+                ])
+            }
+        }
+    }
 }
 type Expectation = (start: Text) => (x: any) => any
 const expectation = (expectation: Text, check: (x: any) => boolean) => {
@@ -121,7 +140,8 @@ const checkFunctionReturn = (
     thing: Text,
     context: Text,
     expectReturn: Expectation,
-    allowAsync: boolean
+    allowAsync: boolean,
+    unfoldLazy = false
 ) => {
     return (f: (...args: any[]) => any) => {
         expectFunc(getSubject(thing, context, wBe))(f)
@@ -129,8 +149,17 @@ const checkFunctionReturn = (
             const result = f(...args)
             const resultChecker = expectReturn(getSubject([wFunction, thing], context, wReturn))
             if (isThenable(result) && allowAsync) {
-                return result.then(resultChecker)
+                return result.then(x => {
+                    if (isLazy(x) && unfoldLazy) {
+                        return x.map(resultChecker)
+                    }
+                    return resultChecker(x)
+                })
             }
+            if (isLazy(result) && unfoldLazy) {
+                return result.map(resultChecker)
+            }
+
             return resultChecker(result)
         }
     }
@@ -150,7 +179,10 @@ export const forOperator = (operator: string) => {
     }
 
     function checkFuncReturn<K extends string>(name: K, exp: Expectation) {
-        return [name, checkFunctionReturn(getArgThing(name), context, exp, allowAsync)] as const
+        return [
+            name,
+            checkFunctionReturn(getArgThing(name), context, exp, allowAsync, true)
+        ] as const
     }
 
     const entries = [
@@ -218,8 +250,9 @@ export const gotAsyncIteratorInSyncContext = () => {
     ])
 }
 
-export type _Text<T> = readonly (string | T)[]
-export type Text = string | _Text<_Text<_Text<_Text<_Text<string>>>>>
+export type _Text<T> = readonly (TextLeaf | T)[]
+export type TextLeaf = string | number | boolean | undefined | null
+export type Text = TextLeaf | _Text<_Text<_Text<_Text<_Text<string>>>>>
 export function splat(bits: Text): string {
     if (!isArray(bits)) {
         return bits as string

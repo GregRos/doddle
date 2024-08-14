@@ -54,9 +54,37 @@ declare.it("element type ivalue type for iterable of lazy async", expect => {
     const s = _seq(null! as Iterable<Lazy<Promise<number>>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
+declare.it("fails if explicitly given a string", expect => {
+    // @ts-expect-error
+    _seq("a")
+})
+
+declare.it("fails if explicitly given a () => string", expect => {
+    // @ts-expect-error
+    _seq(() => "a")
+})
+
+declare.it("works for generic Iterable<T> and () => Iterable<T>", expect => {
+    function _<T extends Iterable<any>>() {
+        _seq(null! as Iterable<T>)
+        _seq(() => null! as Iterable<T>)
+    }
+})
+
+it("throws immediately if given a string", () => {
+    expect(() => _seq("a" as any)).toThrow(Doddle)
+})
+
+it("throws on iteration if given a function returning a string", async () => {
+    const iterable = _seq(() => "a" as any)
+    await expect(async () => {
+        for await (const _ of iterable) {
+        }
+    }).rejects.toThrow(Doddle)
+})
 
 it("empty argslist gives empty aseq", async () => {
-    expect(await _seq()._qr).toEqual([])
+    expect(await _seq.empty()._qr).toEqual([])
 })
 
 it("converts from array", async () => {
@@ -157,7 +185,7 @@ it("converts from function returning iterable", async () => {
 declare.it("can specify type when converting from array", expect => {
     const s = _seq<1>([1])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
-    _seq<number>()
+    _seq.empty<number>()
 })
 
 declare.it("can specify type when converting from empty array", expect => {

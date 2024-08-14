@@ -1,1 +1,2 @@
 *.js linguist-generated=true
+.obsidian/*/** linguist-generated=true

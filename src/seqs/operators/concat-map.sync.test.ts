@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 describe("type tests", () => {
@@ -97,5 +97,10 @@ it("doesn't pull more than necessary", () => {
 it("can iterate twice", () => {
     const s = _seq([1, 2, 3]).concatMap(x => [x, `${x}`])
     expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
+    expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
+})
+
+it("projects correctly with lazy projection", () => {
+    const s = _seq([1, 2, 3]).concatMap(x => lazy(() => [x, `${x}`]))
     expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
 })

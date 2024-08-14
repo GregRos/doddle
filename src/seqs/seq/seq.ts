@@ -33,6 +33,9 @@ const Builders = {
             }
         })
     },
+    empty<T = never>(): Seq<T> {
+        return seq([])
+    },
     is<T = unknown>(input: any): input is Seq<T> {
         return input[Symbol.toStringTag] === "Seq" && isFunction(input.map)
     },

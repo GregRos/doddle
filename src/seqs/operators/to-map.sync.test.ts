@@ -2,7 +2,7 @@ import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { Doddle } from "@error"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 declare.it("accepts projection to pair", expect => {
     const s = _seq([1, 2, 3]).toMap(x => [x, x])
@@ -135,6 +135,17 @@ it("calls projection with index", () => {
     expect(fn).toHaveBeenCalledWith(1, 0)
     expect(fn).toHaveBeenCalledWith(2, 1)
     expect(fn).toHaveBeenCalledWith(3, 2)
+})
+
+it("works with lazy projection", () => {
+    const s = _seq([1, 2, 3]).toMap(x => lazy(() => [x, x] as const))
+    expect(s.pull()).toEqual(
+        new Map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+    )
 })
 
 describe("invalid inputs", () => {

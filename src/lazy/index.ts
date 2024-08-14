@@ -19,18 +19,18 @@ export const ownerInstance = Symbol("ownerInstance")
 export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_IterationType<T>> {
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
-    private _info: Lazy.InnerInfo
+    private _info: InnerInfo
     private _cacheName!: string
     get info(): Readonly<Lazy.Info> {
         const { stage, syncness, name } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
-        const syncnessPart = syncness === Lazy.Syncness.Untouched ? [] : [syncnessWord]
+        const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
         const stageWord = ["untouched", "executing", "done", "threw"][stage]
-        const stagePart = stage === Lazy.Stage.Done ? this._cacheName : `<${stageWord}>`
+        const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
         const namePart = name ? `lazy(${name})` : "lazy"
 
         return {
-            isReady: stage >= Lazy.Stage.Done,
+            isReady: stage >= Stage.Done,
             desc: [namePart, ...syncnessPart, stagePart].join(" "),
             stage: stageWord,
             syncness: syncnessWord,
@@ -45,8 +45,8 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
 
     protected constructor(initializer: (...args: any[]) => any) {
         this._info = {
-            syncness: Lazy.Syncness.Untouched,
-            stage: Lazy.Stage.Untouched,
+            syncness: Syncness.Untouched,
+            stage: Stage.Untouched,
             name: getFunctionName(initializer)
         }
         this._init = initializer
@@ -322,45 +322,45 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
      */
     pull(): Lazy.Pulled<T> {
         const info = this._info
-        if (info.stage === Lazy.Stage.Threw) {
+        if (info.stage === Stage.Threw) {
             throw this._cached
         }
-        if (info.stage === Lazy.Stage.Executing) {
-            if (info.syncness === Lazy.Syncness.Async) {
+        if (info.stage === Stage.Executing) {
+            if (info.syncness === Syncness.Async) {
                 return this._cached
             } else {
                 throw cannotRecurseSync()
             }
         }
-        if (info.stage === Lazy.Stage.Done) {
+        if (info.stage === Stage.Done) {
             return this._cached!
         }
-        info.stage = Lazy.Stage.Executing
+        info.stage = Stage.Executing
         let resource: any
         try {
             const result = this._init!()
             resource = isLazy(result) ? result.pull() : result
         } catch (e) {
             this._cached = e
-            info.stage = Lazy.Stage.Threw
+            info.stage = Stage.Threw
             throw e
         }
         // No need to keep holding a reference to the constructor.
         this._init = null
 
         if (isThenable(resource)) {
-            info.syncness = Lazy.Syncness.Async
+            info.syncness = Syncness.Async
             resource = resource.then(value => {
                 if (isLazy(value)) {
                     value = value.pull()
                 }
-                info.stage = Lazy.Stage.Done
+                info.stage = Stage.Done
                 this._cacheName = getClassName(value)
                 return value
             })
         } else {
-            info.syncness = Lazy.Syncness.Sync
-            info.stage = Lazy.Stage.Done
+            info.syncness = Syncness.Sync
+            info.stage = Stage.Done
             this._cacheName = getClassName(resource)
         }
         this._cached = resource
@@ -406,24 +406,23 @@ export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     return Lazy.create(initializer) as any
 }
-
+const enum Stage {
+    Untouched = 0,
+    Executing = 1,
+    Done = 2,
+    Threw = 3
+}
+const enum Syncness {
+    Untouched = 0,
+    Sync = 1,
+    Async = 2
+}
+interface InnerInfo {
+    syncness: Syncness
+    stage: Stage
+    name: string | null
+}
 export namespace Lazy {
-    export const enum Stage {
-        Untouched = 0,
-        Executing = 1,
-        Done = 2,
-        Threw = 3
-    }
-    export const enum Syncness {
-        Untouched = 0,
-        Sync = 1,
-        Async = 2
-    }
-    export interface InnerInfo {
-        syncness: Syncness
-        stage: Stage
-        name: string | null
-    }
     export interface Info {
         readonly isReady: boolean
         readonly stage: string
@@ -452,14 +451,14 @@ export type LazyAsync<T> = Lazy<Promise<T>>
 
 /** An interface that represents a lazily initialized value. */
 
-export type _IterationType<T> = T extends Iterable<infer R> ? R : T
+export type _IterationType<T> = T extends string ? T : T extends Iterable<infer R> ? R : T
 export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T
 
 export function lazyFromOperator<In, Out>(
     operand: In,
     func: (input: In) => Out | Lazy.Pulled<Out>
 ): Lazy<Out> {
-    const lz = lazy(() => func(operand)) as any
+    const lz = lazy(() => func.call(operand, operand)) as any
     Object.assign(lz, {
         operator: func.name,
         operand

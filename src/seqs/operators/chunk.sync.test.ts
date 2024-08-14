@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type SType<T> = Seq<T>
 declare.it("typed as 1-N length tuple", expect => {
@@ -93,6 +93,11 @@ it("projects singleton chunks correctly", () => {
 it("projects pairs", () => {
     const s = _seq([1, 2, 3, 4]).chunk(2, (a, b) => a + b!)
     expect(s._qr).toEqual([3, 7])
+})
+
+it("works with lazy projection", () => {
+    const s = _seq([1, 2, 3]).chunk(2, (a, b) => lazy(() => a! + (b ?? 0)))
+    expect(s._qr).toEqual([3, 3])
 })
 
 describe("invalid inputs", () => {

@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 describe("type tests", () => {
@@ -55,4 +55,9 @@ it("calls predicate as many times as needed", () => {
         break
     }
     expect(f).toHaveBeenCalledTimes(2)
+})
+
+it("works with lazy predicate", () => {
+    const s = _seq([1, 2, 3, 4, 5]).skipWhile(() => lazy(() => false))
+    expect(s._qr).toEqual([1, 2, 3, 4, 5])
 })

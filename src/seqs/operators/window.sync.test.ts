@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 type SType<T> = Seq<T>
 declare.it("typed as 1-N length tuple", expect => {
@@ -105,4 +105,9 @@ it("can iterate twice", () => {
         [1, 2],
         [2, 3]
     ])
+})
+
+it("works with lazy projection", () => {
+    const s = _seq([1, 2, 3]).window(2, (a, b) => lazy(() => a + b!))
+    expect(s._qr).toEqual([3, 5])
 })

@@ -3,6 +3,9 @@ import { Lazy } from "./lazy/index.js"
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
     return input[Symbol.iterator]()
 }
+export function pull<T>(input: Lazy<T> | T): T {
+    return isLazy(input) ? (input.pull() as T) : input
+}
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
     return input[Symbol.asyncIterator]()
 }
@@ -83,6 +86,9 @@ export function getSymbolDescription(symbol: symbol) {
 }
 
 export function getObjDesc(object: any) {
+    if (isLazy(object)) {
+        return object.toString()
+    }
     if (isIterable(object)) {
         return `iterable ${getClassName(object)}`
     } else if (isAsyncIterable(object)) {
@@ -142,6 +148,7 @@ export function isLazy(value: any): value is Lazy<any> {
 export const isArray = Array.isArray
 
 export function returnKvp(input: any, key: any, value: any) {
+    key = pull(key)
     if (isAsyncIterable(input) && isThenable(key)) {
         return key.then(key => ({
             key: key,

@@ -1,7 +1,7 @@
 import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 
 declare.test("should type as Lazy<T | undefined>", expect => {
@@ -91,5 +91,10 @@ it("iteratee receives index", () => {
         expect(i).toBe(x - 1)
         return x
     })
+    expect(s.pull()).toEqual(1)
+})
+
+it("lazy result is pulled", () => {
+    const s = _seq([2, 1, 3]).minBy(x => lazy(() => x))
     expect(s.pull()).toEqual(1)
 })

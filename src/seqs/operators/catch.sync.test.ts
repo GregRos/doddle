@@ -113,6 +113,18 @@ it("catches non-error and turns it into error", () => {
     expect(handler).toHaveBeenCalledWith("test", 2)
 })
 
+it("works with lazy handler", () => {
+    const handler = jest.fn(() => [1, 2, 3])
+    const s = _seq([1, 2, 3])
+        .each(x => {
+            if (x === 3) {
+                throw new Error("test")
+            }
+        })
+        .catch(() => handler())
+    expect(s._qr).toEqual([1, 2, 1, 2, 3])
+})
+
 describe("invalid inputs", () => {
     describe("throws on invocation", () => {
         it("non-function handler", () => {

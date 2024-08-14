@@ -12,7 +12,7 @@ describe("type tests", () => {
         expect(type_of(s123.concat())).to_equal(type<_Seq<number>>)
     })
     declare.it("never stays never when given no args", expect => {
-        expect(type_of(_seq().concat())).to_equal(Seq_never)
+        expect(type_of(_seq.empty().concat())).to_equal(Seq_never)
     })
 
     declare.it("disjunction with different element types", expect => {
@@ -23,11 +23,11 @@ describe("type tests", () => {
     })
 
     declare.it("disjunction with different input types", expect => {
-        expect(type_of(s123.concat(_seq(), [1]))).to_equal(type<_Seq<number>>)
+        expect(type_of(s123.concat(_seq.empty(), [1]))).to_equal(type<_Seq<number>>)
         expect(
             type_of(
                 s123.concat(
-                    _seq(),
+                    _seq.empty(),
                     function* () {
                         yield "aaa"
                     },

@@ -1,7 +1,7 @@
 import type { Lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
+import { lazy, seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).find(() => true))).to_equal(type<Lazy<number | undefined>>)
@@ -69,4 +69,9 @@ it("calls predicate as many times as needed", () => {
     const s = _seq([1, 2, 3]).find(fn)
     s.pull()
     expect(fn).toHaveBeenCalledTimes(1)
+})
+
+it("works with lazy predicate", () => {
+    const s = _seq([1, 2, 3]).find(x => lazy(() => x % 2 === 0))
+    expect(s.pull()).toEqual(2)
 })
