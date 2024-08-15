@@ -75,6 +75,7 @@ const wButGot = "but got"
 const wBe = "be"
 const wCalledWith = "called with"
 const wArguments = "arguments"
+const wLazy = "lazy"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
@@ -120,12 +121,12 @@ const expectPair = expectation("an array of length 2", isPair)
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
-    anOrStructure(wIterable, wFunction),
-    x => isIterable(x) || isFunction(x)
+    anOrStructure([wIterable, wLazy].join(", "), wFunction),
+    x => isIterable(x) || isFunction(x) || isLazy(x)
 )
 const expectAsyncInputValue = expectation(
-    anOrStructure([wAsync, wIterable], wFunction),
-    x => isAnyIterable(x) || isFunction(x)
+    anOrStructure([[wAsync, wIterable], wLazy].join(", "), wFunction),
+    x => isAnyIterable(x) || isFunction(x) || isLazy(x)
 )
 const iterableOrIterator = anOrStructure(wIterable, wIterator)
 const expectSyncIterableOrIterator = expectation(

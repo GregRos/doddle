@@ -19,7 +19,7 @@ export function aseq<E>(input: ASeq.Input<E>): any {
     }
     return ASeqOperator(input, async function* aseq(input) {
         const result = typeof input === "function" ? input() : input
-        const pulled = pull(result)
+        const pulled = await pull(result)
         if (isAsyncIterable(pulled) || isIterable(pulled)) {
             yield* pulled
             return

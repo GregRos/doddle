@@ -98,10 +98,6 @@ export class Lazy<T> {
         this: LazyAsync<T>,
         projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<R>>
     ): LazyAsync<R>
-    map<T, Y>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<Y>>
-    ): LazyAsync<Y>
     map<T, X>(
         this: LazyAsync<T>,
         projection: (value: Lazy.PulledAwaited<T>) => Promise<Lazy<X>>
