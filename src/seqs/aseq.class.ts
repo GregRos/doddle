@@ -1,6 +1,6 @@
-import { chk, loadCheckers } from "../../errors/error.js"
-import type { Lazy, LazyAsync } from "../../lazy/index.js"
-import { lazyFromOperator, pull } from "../../lazy/index.js"
+import { chk, loadCheckers } from "../errors/error.js"
+import type { Lazy, LazyAsync } from "../lazy/index.js"
+import { lazyFromOperator, pull } from "../lazy/index.js"
 import {
     Stage,
     _aiter,
@@ -9,7 +9,7 @@ import {
     shuffleArray,
     type MaybeLazy,
     type MaybePromise
-} from "../../utils.js"
+} from "../utils.js"
 import { aseq } from "./aseq.ctor.js"
 import {
     SkippingMode,

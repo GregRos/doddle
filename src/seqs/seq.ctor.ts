@@ -1,6 +1,6 @@
-import { checkSeqInputValue, gotAsyncIteratorInSyncContext } from "../../errors/error.js"
-import { pull, type Lazy } from "../../lazy/index.js"
-import { isIterable, isThenable } from "../../utils.js"
+import { checkSeqInputValue, gotAsyncIteratorInSyncContext } from "../errors/error.js"
+import { pull, type Lazy } from "../lazy/index.js"
+import { isIterable, isThenable } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 
 export function seq(input: readonly never[]): Seq<never>

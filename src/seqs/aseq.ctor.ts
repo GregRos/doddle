@@ -1,6 +1,6 @@
-import { checkASeqInputValue } from "../../errors/error.js"
-import { pull, type Lazy, type LazyAsync } from "../../lazy/index.js"
-import { isAsyncIterable, isIterable, isNextable } from "../../utils.js"
+import { checkASeqInputValue } from "../errors/error.js"
+import { pull, type Lazy, type LazyAsync } from "../lazy/index.js"
+import { isAsyncIterable, isIterable, isNextable } from "../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
 
 export function aseq<E>(input: readonly E[]): ASeq<E>

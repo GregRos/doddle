@@ -1,7 +1,7 @@
-import { chk, Doddle, loadCheckers } from "../../errors/error.js"
-import type { Lazy } from "../../lazy/index.js"
-import { lazyFromOperator, pull } from "../../lazy/index.js"
-import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../../utils.js"
+import { chk, Doddle, loadCheckers } from "../errors/error.js"
+import type { Lazy } from "../lazy/index.js"
+import { lazyFromOperator, pull } from "../lazy/index.js"
+import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
 
 import {
     SkippingMode,

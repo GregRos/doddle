@@ -1,5 +1,5 @@
-import { chk, loadCheckers } from "../../errors/error.js"
-import { getThrownError, isFunction } from "../../utils.js"
+import { chk, loadCheckers } from "../errors/error.js"
+import { getThrownError, isFunction } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 import { seq as seqBase } from "./seq.ctor.js"
 const Builders = {
