@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
@@ -11,6 +11,26 @@ declare.it("element type the same with id projection", expect => {
 
 declare.it("element type changes", expect => {
     const s = _aseq([1, 2, 3]).map(x => x + "")
+    expect(type_of(s)).to_equal(type<_ASeq<string>>)
+})
+
+declare.it("handles async projections", expect => {
+    const s = _aseq([1, 2, 3]).map(async x => x + "")
+    expect(type_of(s)).to_equal(type<_ASeq<string>>)
+})
+
+declare.it("handles lazy projections", expect => {
+    const s = _aseq([1, 2, 3]).map(() => lazy(() => "1"))
+    expect(type_of(s)).to_equal(type<_ASeq<string>>)
+})
+
+declare.it("handles lazy async projections", expect => {
+    const s = _aseq([1, 2, 3]).map(async x => lazy(async () => x + ""))
+    expect(type_of(s)).to_equal(type<_ASeq<string>>)
+})
+
+declare.it("handles async lazy async projections", expect => {
+    const s = _aseq([1, 2, 3]).map(async x => lazy(async () => x + ""))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
@@ -66,5 +86,25 @@ it("can iterate twice", async () => {
 
 it("works for async projections", async () => {
     const s = _aseq([1, 2, 3]).map(async x => x + 1)
+    expect(await s._qr).toEqual([2, 3, 4])
+})
+
+it("allows lazy projection", async () => {
+    const s = _aseq([1, 2, 3]).map(i => lazy(() => i + 1))
+    expect(await s._qr).toEqual([2, 3, 4])
+})
+
+it("allows lazy async projection", async () => {
+    const s = _aseq([1, 2, 3]).map(i => lazy(async () => i + 1))
+    expect(await s._qr).toEqual([2, 3, 4])
+})
+
+it("allows async lazy projection", async () => {
+    const s = _aseq([1, 2, 3]).map(async i => lazy(() => i + 1))
+    expect(await s._qr).toEqual([2, 3, 4])
+})
+
+it("allows async lazy async projection", async () => {
+    const s = _aseq([1, 2, 3]).map(async i => lazy(async () => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })

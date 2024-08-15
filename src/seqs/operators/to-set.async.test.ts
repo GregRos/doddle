@@ -13,6 +13,21 @@ declare.it("is typed correctly for mixed types", expect => {
     expect(type_of(s)).to_equal(type<LazyAsync<Set<string | number | boolean>>>)
 })
 
+declare.it("allows lazy iteratee", expect => {
+    const s = _seq([1, 2, 3]).toSet()
+    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+})
+
+declare.it("allows lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).toSet()
+    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+})
+
+declare.it("allows async lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).toSet()
+    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+})
+
 it("converts an empty sequence to an empty set", async () => {
     const s = _seq([])
     expect(await s.toSet().pull()).toEqual(new Set())

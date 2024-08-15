@@ -1,4 +1,4 @@
-import { aseq, type ASeq } from "@lib"
+import { aseq, lazy, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -29,6 +29,22 @@ declare.it("accepts projection with N parameters", expect => {
         expect(type_of(b)).to_equal(type<number | undefined>)
     })
 })
+
+declare.it("allows lazy projection", expect => {
+    const s = _seq([1, 2, 3]).chunk(2, () => lazy(() => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
+})
+
+declare.it("allows lazy async projection", expect => {
+    const s = _seq([1, 2, 3]).chunk(2, () => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
+})
+
+declare.it("allows async lazy async projection", expect => {
+    const s = _seq([1, 2, 3]).chunk(2, async () => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
+})
+
 it("chunks empty as empty", async () => {
     const s = _seq([]).chunk(1)
     await expect(s._qr).resolves.toEqual([])
@@ -95,4 +111,24 @@ it("accepts async projection", async () => {
         .chunk(2)
         .map(async ([a, b]) => a + b!)
     await expect(s._qr).resolves.toEqual([3, 7])
+})
+
+it("allows lazy projection", async () => {
+    const s = _seq([1, 2, 3]).chunk(1, x => lazy(() => x))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("allows lazy async projection", async () => {
+    const s = _seq([1, 2, 3]).chunk(1, x => lazy(async () => x))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("allows async lazy async projection", async () => {
+    const s = _seq([1, 2, 3]).chunk(1, async x => lazy(async () => x))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("allows async lazy projection", async () => {
+    const s = _seq([1, 2, 3]).chunk(1, async x => lazy(() => x))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

@@ -1,11 +1,8 @@
-import { Lazy } from "./lazy/index.js"
-
+import { pull, type Lazy, type LazyAsync } from "./lazy/index.js"
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
     return input[Symbol.iterator]()
 }
-export function pull<T>(input: Lazy<T> | T): T {
-    return isLazy(input) ? (input.pull() as T) : input
-}
+
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
     return input[Symbol.asyncIterator]()
 }
@@ -142,7 +139,7 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
 }
 
 export function isLazy(value: any): value is Lazy<any> {
-    return isObject(value) && value instanceof Lazy
+    return isObject(value) && typeof value.pull === "function" && typeof value.map === "function"
 }
 
 export const isArray = Array.isArray
@@ -151,7 +148,7 @@ export function returnKvp(input: any, key: any, value: any) {
     key = pull(key)
     if (isAsyncIterable(input) && isThenable(key)) {
         return key.then(key => ({
-            key: key,
+            key: pull(key),
             value: value
         })) as Promise<any>
     }
@@ -160,6 +157,8 @@ export function returnKvp(input: any, key: any, value: any) {
         value: value
     }
 }
+export type MaybePromise<T> = T | Promise<T>
+export type MaybeLazy<T> = T | Lazy<T> | LazyAsync<T>
 export function getThrownError(thrown: unknown) {
     return thrown instanceof Error ? thrown : new Error(String(thrown))
 }

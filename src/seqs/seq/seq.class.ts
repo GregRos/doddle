@@ -1,7 +1,7 @@
 import { chk, Doddle, loadCheckers } from "../../errors/error.js"
 import type { Lazy } from "../../lazy/index.js"
-import { lazyFromOperator } from "../../lazy/index.js"
-import { _iter, parseStage, pull, returnKvp, shuffleArray, Stage } from "../../utils.js"
+import { lazyFromOperator, pull } from "../../lazy/index.js"
+import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../../utils.js"
 
 import {
     SkippingMode,
@@ -239,7 +239,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return lazyFromOperator(this, function groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
             for (const element of input) {
-                const key = pull(keyProjection(element))
+                const key = pull(keyProjection(element)) as K
                 let group = map.get(key)
                 if (!group) {
                     group = [element]
@@ -274,7 +274,7 @@ export abstract class Seq<T> implements Iterable<T> {
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
         chk(this.map).projection(projection)
         return SeqOperator(this, function* map(input) {
-            yield* seq(input).concatMap((element, index) => [pull(projection(element, index))])
+            yield* seq(input).concatMap((element, index) => [pull(projection(element, index)) as S])
         })
     }
     maxBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
@@ -374,7 +374,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     acc = element as any
                     hasAcc = true
                 } else {
-                    acc = pull(reducer(acc, element, index++))
+                    acc = pull(reducer(acc, element, index++)) as any
                 }
 
                 yield acc
@@ -668,20 +668,21 @@ export const SeqOperator = function seq<In, Out>(
 }
 
 export namespace Seq {
-    export type IndexIteratee<O> = (index: number) => O
+    type MaybeLazy<T> = T | Lazy<T>
+    export type IndexIteratee<O> = (index: number) => MaybeLazy<O>
 
-    export type Iteratee<E, O> = (element: E, index: number) => O | Lazy<O>
+    export type Iteratee<E, O> = (element: E, index: number) => MaybeLazy<O>
     export type NoIndexIteratee<E, O> = (element: E) => O
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
     export type Predicate<E> = Iteratee<E, boolean>
     export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
 
-    export type Reducer<E, O> = (acc: O, element: E, index: number) => O | Lazy<O>
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybeLazy<O>
     export type IterableOrIterator<E> = Iterable<E> | Iterator<E>
-    export type FunctionInput<E> = () => IterableOrIterator<E>
+    export type FunctionInput<E> = () => MaybeLazy<IterableOrIterator<MaybeLazy<E>>>
 
     export type ObjectIterable<E> = object & Iterable<E>
-    export type Input<E> = ObjectIterable<E> | FunctionInput<E>
+    export type Input<E> = MaybeLazy<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
 }
 

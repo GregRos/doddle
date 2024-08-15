@@ -2,7 +2,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 const _seq = aseq
 type _ASeq<T> = ASeq<T>
 
@@ -29,6 +29,20 @@ declare.it("handler explicitly returning undefined is also okay", expect => {
     expect(type_of(s.catch(() => undefined))).to_equal(type<_ASeq<number>>)
 })
 
+declare.it("allows lazy handler", expect => {
+    const s = _seq([1, 2, 3]).catch(() => lazy(() => [1, 2, 3]))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
+
+declare.it("allows lazy async handler", expect => {
+    const s = _seq([1, 2, 3]).catch(() => lazy(async () => [1, 2, 3]))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
+
+declare.it("allows async lazy async handler", expect => {
+    const s = _seq([1, 2, 3]).catch(async () => lazy(async () => [1, 2, 3]))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
 it("returns same for no errors", async () => {
     const s = _seq([1, 2, 3]).catch(() => {})
     expect(await s._qr).toEqual([1, 2, 3])
@@ -188,4 +202,40 @@ it("catches non-error and turns it into error", async () => {
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("test", 2)
+})
+
+it("allows lazy handler", async () => {
+    const handler = jest.fn(() => {})
+    const s = _seq([1, 2, 3])
+        .each(x => {
+            if (x === 3) {
+                throw new Error("test")
+            }
+        })
+        .catch(() => lazy(() => [1, 2, 3]))
+    expect(await s._qr).toEqual([1, 2, 1, 2, 3])
+})
+
+it("allows lazy async handler", async () => {
+    const handler = jest.fn(() => {})
+    const s = _seq([1, 2, 3])
+        .each(x => {
+            if (x === 3) {
+                throw new Error("test")
+            }
+        })
+        .catch(() => lazy(async () => [1, 2, 3]))
+    expect(await s._qr).toEqual([1, 2, 1, 2, 3])
+})
+
+it("allows async lazy async handler", async () => {
+    const handler = jest.fn(() => {})
+    const s = _seq([1, 2, 3])
+        .each(x => {
+            if (x === 3) {
+                throw new Error("test")
+            }
+        })
+        .catch(async () => lazy(async () => [1, 2, 3]))
+    expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })

@@ -1,4 +1,4 @@
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import type { LazyAsync } from "@lib"
@@ -20,6 +20,18 @@ declare.it("iteratee can't have two arguments", expect => {
     _aseq([1, 2, 3]).groupBy((_, __) => 1)
 })
 
+declare.it("allows lazy iteratee", expect => {
+    const s = _aseq([1, 2, 3]).groupBy(() => lazy(() => 1))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, [number, ...number[]]>>>)
+})
+declare.it("allows lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).groupBy(() => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, [number, ...number[]]>>>)
+})
+declare.it("allows async lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).groupBy(async () => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, [number, ...number[]]>>>)
+})
 it("returns empty map on empty", async () => {
     const s = _aseq([]).groupBy(() => 1)
     expect(await s.pull()).toEqual(new Map())
@@ -95,4 +107,44 @@ it("no side-effects before pull", async () => {
     await result.pull()
     expect(fn).toHaveBeenCalledTimes(1)
     expect(map).toHaveBeenCalledTimes(3)
+})
+
+it("works for lazy iteratee", async () => {
+    const s = _aseq([1, 2, 3]).groupBy(i => lazy(() => i % 2))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, [1, 3]],
+            [0, [2]]
+        ])
+    )
+})
+
+it("works for lazy async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).groupBy(i => lazy(async () => i % 2))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, [1, 3]],
+            [0, [2]]
+        ])
+    )
+})
+
+it("works for async lazy iteratee", async () => {
+    const s = _aseq([1, 2, 3]).groupBy(async i => lazy(() => i % 2))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, [1, 3]],
+            [0, [2]]
+        ])
+    )
+})
+
+it("works for async lazy async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).groupBy(async i => lazy(async () => i % 2))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, [1, 3]],
+            [0, [2]]
+        ])
+    )
 })

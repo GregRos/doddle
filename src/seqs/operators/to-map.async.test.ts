@@ -2,7 +2,7 @@ import type { LazyAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { Doddle } from "@error"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 
 const _aseq = aseq
 
@@ -45,6 +45,21 @@ declare.it("doesn't accept projection to optional pair", () => {
 declare.it("doesn't accept projection to union with undefined", () => {
     // @ts-expect-error
     _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
+})
+
+declare.it("allows lazy projection", expect => {
+    const s = _aseq([1, 2, 3]).toMap(() => lazy(() => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
+})
+
+declare.it("allows lazy async projection", expect => {
+    const s = _aseq([1, 2, 3]).toMap(() => lazy(async () => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
+})
+
+declare.it("allows async lazy async projection", expect => {
+    const s = _aseq([1, 2, 3]).toMap(async () => lazy(async () => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
 })
 
 it("converts empty to empty", async () => {
@@ -124,6 +139,50 @@ it("calls projection with index", async () => {
 
 it("works for async projections", async () => {
     const s = _aseq([1, 2, 3]).toMap(async x => [x, x])
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+    )
+})
+
+it("works for lazy projections", async () => {
+    const s = _aseq([1, 2, 3]).toMap(x => lazy(() => [x, x] as const))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+    )
+})
+
+it("works for async lazy projections", async () => {
+    const s = _aseq([1, 2, 3]).toMap(async x => lazy(() => [x, x] as const))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+    )
+})
+
+it("works for lazy async projections", async () => {
+    const s = _aseq([1, 2, 3]).toMap(x => lazy(async () => [x, x] as const))
+    expect(await s.pull()).toEqual(
+        new Map([
+            [1, 1],
+            [2, 2],
+            [3, 3]
+        ])
+    )
+})
+
+it("works for async lazy async projections", async () => {
+    const s = _aseq([1, 2, 3]).toMap(async x => lazy(async () => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
             [1, 1],

@@ -140,8 +140,7 @@ const checkFunctionReturn = (
     thing: Text,
     context: Text,
     expectReturn: Expectation,
-    allowAsync: boolean,
-    unfoldLazy = false
+    allowAsync: boolean
 ) => {
     return (f: (...args: any[]) => any) => {
         expectFunc(getSubject(thing, context, wBe))(f)
@@ -150,13 +149,13 @@ const checkFunctionReturn = (
             const resultChecker = expectReturn(getSubject([wFunction, thing], context, wReturn))
             if (isThenable(result) && allowAsync) {
                 return result.then(x => {
-                    if (isLazy(x) && unfoldLazy) {
+                    if (isLazy(x)) {
                         return x.map(resultChecker)
                     }
                     return resultChecker(x)
                 })
             }
-            if (isLazy(result) && unfoldLazy) {
+            if (isLazy(result)) {
                 return result.map(resultChecker)
             }
 
@@ -179,10 +178,7 @@ export const forOperator = (operator: string) => {
     }
 
     function checkFuncReturn<K extends string>(name: K, exp: Expectation) {
-        return [
-            name,
-            checkFunctionReturn(getArgThing(name), context, exp, allowAsync, true)
-        ] as const
+        return [name, checkFunctionReturn(getArgThing(name), context, exp, allowAsync)] as const
     }
 
     const entries = [

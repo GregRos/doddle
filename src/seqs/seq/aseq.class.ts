@@ -1,12 +1,20 @@
 import { chk, loadCheckers } from "../../errors/error.js"
-import type { LazyAsync } from "../../lazy/index.js"
-import { lazyFromOperator } from "../../lazy/index.js"
-import { Stage, _aiter, parseStage, returnKvp, shuffleArray } from "../../utils.js"
+import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { lazyFromOperator, pull } from "../../lazy/index.js"
+import {
+    Stage,
+    _aiter,
+    parseStage,
+    returnKvp,
+    shuffleArray,
+    type MaybeLazy,
+    type MaybePromise
+} from "../../utils.js"
 import { aseq } from "./aseq.ctor.js"
 import {
+    SkippingMode,
     type EachCallStage,
     type SkipWhileOptions,
-    SkippingMode,
     type TakeWhileSpecifier,
     type getConcatElementType,
     type getWindowArgsType,
@@ -78,7 +86,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     catch<S>(handler: ASeq.Iteratee<unknown, ASeq.SimpleInput<S>>): ASeq<T | S>
     catch(handler: ASeq.Iteratee<unknown, void>): ASeq<T>
-    catch<S>(handler: ASeq.Iteratee<unknown, void | ASeq.SimpleInput<S>>): ASeq<any> {
+    catch<S>(
+        handler: ASeq.Iteratee<unknown, void | Promise<void> | ASeq.SimpleInput<S>>
+    ): ASeq<any> {
         chk(this.catch).handler(handler)
         return ASeqOperator(this, async function* catch_(input) {
             let i = 0
@@ -93,11 +103,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     yield value
                 } catch (err: any) {
                     const error = err
-                    const result = await handler(error, i)
-                    if (!result || result == null) {
+                    const result = await pull(handler(error, i))
+                    if (!result) {
                         return
                     }
-                    yield* aseq(result)
+                    const pulled = pull(result as any)
+                    yield* aseq(pulled)
                     return
                 }
                 i++
@@ -106,7 +117,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     chunk<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S
+        projection: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
     ): ASeq<S>
     chunk<L extends number>(size: L): ASeq<getWindowOutputType<T, L>>
     chunk<L extends number, S>(
@@ -121,12 +132,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             for await (const item of input) {
                 chunk.push(item)
                 if (chunk.length === size) {
-                    yield projection(...(chunk as any))
+                    yield pull(projection(...(chunk as any)))
                     chunk = []
                 }
             }
             if (chunk.length) {
-                yield projection(...(chunk as any))
+                yield pull(projection(...(chunk as any)))
             }
         }) as any
     }
@@ -138,8 +149,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return ASeqOperator(this, async function* concatMap(input) {
             let index = 0
             for await (const element of input) {
-                for await (const projected of aseq(await projection(element, index++))) {
-                    yield projected
+                for await (const projected of aseq(await pull(projection(element, index++)))) {
+                    yield pull(projected)
                 }
             }
         }) as any
@@ -172,11 +183,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             let index = 0
             for await (const element of input) {
                 if (myStage & Stage.Before) {
-                    await action(element, index, "before")
+                    await pull(action(element, index, "before"))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    await action(element, index, "after")
+                    await pull(action(element, index, "after"))
                 }
                 index++
             }
@@ -191,7 +202,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         predicate = chk(this.filter).predicate(predicate)
         return ASeqOperator(this, async function* filter(input) {
             yield* aseq(input).concatMap(async (element, index) =>
-                (await predicate(element, index)) ? [element] : []
+                (await pull(predicate(element, index))) ? [element] : []
             )
         })
     }
@@ -220,7 +231,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return lazyFromOperator(this, async function groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
             for await (const element of input) {
-                const key = await keyProjection(element)
+                const key = (await pull(keyProjection(element))) as K
                 let group = map.get(key)
                 if (!group) {
                     group = [element]
@@ -252,7 +263,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         chk(this.map).projection(projection)
         return ASeqOperator(this, async function* map(input) {
             yield* aseq(input).concatMap(async (element, index) => [
-                await projection(element, index)
+                (await pull(projection(element, index))) as S
             ])
         })
     }
@@ -271,7 +282,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         chk(this.orderBy).reverse(reverse)
         return ASeqOperator(this, async function* orderBy(input) {
             yield* await aseq(input)
-                .map(e => returnKvp(e, projection(e), e))
+                .map(e => returnKvp(input, projection(e), e))
                 .toArray()
                 .map(async xs => {
                     xs.sort((a, b) => {
@@ -313,7 +324,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     acc = element as any
                     hasAcc = true
                 } else {
-                    acc = await reducer(acc, element, index++)
+                    acc = (await pull(reducer(acc, element, index++))) as any
                 }
 
                 yield acc
@@ -372,7 +383,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     yield element
                     continue
                 }
-                const newSkipping: boolean = await predicate(element, index++)
+                const newSkipping: boolean = await pull(predicate(element, index++))
                 if (!newSkipping) {
                     if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
                         yield element
@@ -418,7 +429,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             let index = 0
 
             for await (const element of input) {
-                if (await predicate(element, index++)) {
+                if (await pull(predicate(element, index++))) {
                     yield element
                 } else {
                     if (specifier?.takeFinal) {
@@ -435,7 +446,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return ASeqOperator(this, async function* take(input) {
             let myCount = count
             if (myCount === 0) {
-                yield* []
                 return
             }
             if (myCount < 0) {
@@ -486,7 +496,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return ASeqOperator(this, async function* uniqBy(input) {
             const seen = new Set()
             for await (const element of input) {
-                const key = await projection(element)
+                const key = await pull(projection(element))
                 if (!seen.has(key)) {
                     seen.add(key)
                     yield element
@@ -501,12 +511,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     window<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S
+        projection: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
     ): ASeq<S>
     window<L extends number>(size: L): ASeq<getWindowOutputType<T, L>>
     window<L extends number, S>(
         size: L,
-        projection?: (...window: getWindowArgsType<T, L>) => S
+        projection?: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
     ): ASeq<any> {
         chk(this.window).size(size)
         projection ??= (...window: any) => window as any
@@ -517,16 +527,18 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             for await (const item of input) {
                 buffer[i++ % size] = item
                 if (i >= size) {
-                    yield (projection as any).call(
-                        null,
-                        ...buffer.slice(i % size),
-                        ...buffer.slice(0, i % size)
+                    yield pull(
+                        (projection as any).call(
+                            null,
+                            ...buffer.slice(i % size),
+                            ...buffer.slice(0, i % size)
+                        )
                     )
                 }
             }
 
             if (i > 0 && i < size) {
-                yield (projection as any).call(null, ...buffer.slice(0, i))
+                yield pull((projection as any).call(null, ...buffer.slice(0, i)))
             }
         })
     }
@@ -537,13 +549,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         _others: {
             [K in keyof Xs]: ASeq.Input<Xs[K]>
         },
-        projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
+        projection: (...args: getZipValuesType<[T, ...Xs]>) => Lazy.MaybePromised<R>
     ): ASeq<R>
     zip<Xs extends [any, ...any[]], R>(
         _others: {
             [K in keyof Xs]: ASeq.Input<Xs[K]>
         },
-        projection?: (...args: getZipValuesType<[T, ...Xs]>) => R | Promise<R>
+        projection?: (...args: getZipValuesType<[T, ...Xs]>) => Lazy.MaybePromised<R>
     ): ASeq<any> {
         const others = _others.map(aseq)
         projection ??= (...args: any[]) => args as any
@@ -566,7 +578,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 if (results.every(r => !r)) {
                     break
                 }
-                yield projection.apply(undefined, results.map(r => r?.value) as any)
+                yield pull(projection.apply(undefined, results.map(r => r?.value) as any))
             }
         }) as any
     }
@@ -586,29 +598,26 @@ export const ASeqOperator = function aseq<In, Out>(
 }
 
 export namespace ASeq {
-    type MaybePromise<T> = T | PromiseLike<T>
-    export type IndexIteratee<O> = (index: number) => MaybePromise<O>
-    
-    export type Iteratee<E, O> = (element: E, index: number) => MaybePromise<O>
-    export type NoIndexIteratee<E, O> = (element: E) => MaybePromise<O>
-
+    export type IndexIteratee<O> = (index: number) => Lazy.MaybePromised<O>
+    export type Iteratee<E, O> = (element: E, index: number) => Lazy.MaybePromised<O>
+    export type NoIndexIteratee<E, O> = (element: E) => Lazy.MaybePromised<O>
     export type StageIteratee<E, O> = (
         element: E,
         index: number,
         stage: "before" | "after"
-    ) => MaybePromise<O>
+    ) => Lazy.MaybePromised<O>
     export type Predicate<E> = Iteratee<E, boolean>
-    export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybePromise<O>
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => Lazy.MaybePromised<O>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type IterableOrIterator<E> =
         | AsyncIterable<E>
         | AsyncIterator<E>
         | Seq.ObjectIterable<E>
         | Iterator<E>
-    export type FunctionInput<E> = () => MaybePromise<IterableOrIterator<E>>
+    export type FunctionInput<E> = () => Lazy.MaybePromised<IterableOrIterator<E>>
     export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
     export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E>
-    export type SimpleInput<E> = IterableInput<E> | FunctionInput<E>
+    export type SimpleInput<E> = MaybeLazy<IterableInput<E>> | FunctionInput<E>
     export type Input<E> = SimpleInput<MaybePromise<E>>
 }
 

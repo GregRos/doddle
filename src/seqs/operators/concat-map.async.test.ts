@@ -1,4 +1,4 @@
-import { aseq, type ASeq } from "@lib"
+import { aseq, lazy, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -7,6 +7,7 @@ describe("type tests", () => {
     const Seq_never = type<_Seq<never>>
     const empty = _seq([])
     const s123 = _seq([1, 2, 3])
+
     declare.it("typed as never when input is empty", expect => {
         expect(type_of(empty.concatMap(() => null! as []))).to_equal(Seq_never)
     })
@@ -40,6 +41,21 @@ describe("type tests", () => {
         expect(type_of(input.concatMap(_ => () => null! as Iterable<string>))).to_equal(
             expected_type
         )
+    })
+
+    declare.it("allows lazy projection", expect => {
+        const s = s123.concatMap(() => lazy(() => [1]))
+        expect(type_of(s)).to_equal(type<_Seq<number>>)
+    })
+
+    declare.it("allows lazy async projection", expect => {
+        const s = s123.concatMap(() => lazy(async () => [1]))
+        expect(type_of(s)).to_equal(type<_Seq<number>>)
+    })
+
+    declare.it("allows async lazy async projection", expect => {
+        const s = s123.concatMap(async () => lazy(async () => [1]))
+        expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 })
 
@@ -91,4 +107,24 @@ it("can iterate twice", async () => {
 it("works for async projections", async () => {
     const s = _seq([1, 2, 3]).concatMap(async x => [x, `${x}`])
     await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
+})
+
+it("works for lazy  projections", async () => {
+    const s = _seq([1, 2, 3]).concatMap(x => lazy(() => [x]))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("works for lazy async projections", async () => {
+    const s = _seq([1, 2, 3]).concatMap(x => lazy(async () => [x]))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("works for async lazy async projections", async () => {
+    const s = _seq([1, 2, 3]).concatMap(async x => lazy(async () => [x]))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("works for async lazy projections", async () => {
+    const s = _seq([1, 2, 3]).concatMap(async x => lazy(() => [x]))
+    await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

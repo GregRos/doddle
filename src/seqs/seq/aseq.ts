@@ -1,4 +1,5 @@
 import { chk, loadCheckers } from "../../errors/error.js"
+import { pull } from "../../lazy/index.js"
 import { getThrownError, isFunction } from "../../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { aseq as aseqBase } from "./aseq.ctor.js"
@@ -9,7 +10,7 @@ const Builders = {
         chk(this.iterate).projection(projection)
         return aseq(async function* () {
             for (let i = 0; i < count; i++) {
-                yield projection(i)
+                yield pull(projection(i)) as T
             }
         })
     },

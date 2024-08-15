@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 const _seq = aseq
 type _Seq<T> = ASeq<T>
 
@@ -25,6 +25,26 @@ declare.it("can be called with before, after, both, or undefined", expect => {
 declare.it("can't be called with other strings", expect => {
     // @ts-expect-error
     _seq([1, 2, 3]).each(() => {}, "other")
+})
+
+declare.it("allows lazy iteratee", expect => {
+    const s = _seq([1, 2, 3]).each(() => lazy(() => {}))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows async iteratee", expect => {
+    const s = _seq([1, 2, 3]).each(async () => {})
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).each(() => lazy(async () => {}))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows async lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).each(async () => lazy(async () => {}))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 it("calls iteratee with after", async () => {
@@ -140,4 +160,62 @@ it("works with async iteratee -- both", async () => {
             expect(fn1).toHaveBeenCalledWith(x - 1, x - 2, "after")
         }
     }
+})
+
+it("allows lazy iteratee", async () => {
+    const fn = jest.fn()
+    const e = _seq([1, 2, 3]).each(() => {
+        return lazy(fn)
+    })
+    expect(fn).not.toHaveBeenCalled()
+    let i = 0
+    for await (const _ of e) {
+        expect(fn).toHaveBeenCalledTimes(++i)
+    }
+    expect(fn).toHaveBeenCalledTimes(3)
+})
+
+it("allows lazy async iteratee", async () => {
+    const fn = jest.fn()
+    const e = _seq([1, 2, 3]).each(() => {
+        return lazy(async () => {
+            fn()
+        })
+    })
+    expect(fn).not.toHaveBeenCalled()
+    let i = 0
+    for await (const _ of e) {
+        expect(fn).toHaveBeenCalledTimes(++i)
+    }
+    expect(fn).toHaveBeenCalledTimes(3)
+})
+
+it("allows async lazy iteratee", async () => {
+    const fn = jest.fn()
+    const e = _seq([1, 2, 3]).each(async () => {
+        return lazy(() => {
+            fn()
+        })
+    })
+    expect(fn).not.toHaveBeenCalled()
+    let i = 0
+    for await (const _ of e) {
+        expect(fn).toHaveBeenCalledTimes(++i)
+    }
+    expect(fn).toHaveBeenCalledTimes(3)
+})
+
+it("works for async lazy async iteratee", async () => {
+    const fn = jest.fn()
+    const e = _seq([1, 2, 3]).each(async () => {
+        return lazy(async () => {
+            fn()
+        })
+    })
+    expect(fn).not.toHaveBeenCalled()
+    let i = 0
+    for await (const _ of e) {
+        expect(fn).toHaveBeenCalledTimes(++i)
+    }
+    expect(fn).toHaveBeenCalledTimes(3)
 })

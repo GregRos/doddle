@@ -1,5 +1,5 @@
-import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import type { ASeq, LazyAsync } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -9,7 +9,20 @@ declare.it("returns aseq of same type", expect => {
     const s = _seq([1, 2, 3]).orderBy(() => 1)
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
+declare.test("allows lazy iteratee", expect => {
+    const s = _seq([1, 2, 3]).minBy(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
 
+declare.test("allows lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).minBy(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
+
+declare.test("allows async lazy async iteratee", expect => {
+    const s = _seq([1, 2, 3]).minBy(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
 it("returns empty on empty", async () => {
     const s = _seq([]).orderBy(() => 1)
     expect(await s._qr).toEqual([])
@@ -80,4 +93,29 @@ it("doesn't throw for incomparable key", async () => {
             .toArray()
             .pull()
     ).resolves.not.toThrow()
+})
+
+it("allows lazy iteratee", async () => {
+    const s = _seq([1, 2, 3]).orderBy(i => lazy(() => i % 2))
+    expect(await s._qr).toEqual([2, 1, 3])
+})
+
+it("allows async iteratee", async () => {
+    const s = _seq([1, 2, 3]).orderBy(async i => i % 2)
+    expect(await s._qr).toEqual([2, 1, 3])
+})
+
+it("allows lazy async iteratee", async () => {
+    const s = _seq([1, 2, 3]).orderBy(i => lazy(async () => i % 2))
+    expect(await s._qr).toEqual([2, 1, 3])
+})
+
+it("allows async lazy iteratee", async () => {
+    const s = _seq([1, 2, 3]).orderBy(async i => lazy(() => i % 2))
+    expect(await s._qr).toEqual([2, 1, 3])
+})
+
+it("allows async lazy async iteratee", async () => {
+    const s = _seq([1, 2, 3]).orderBy(async i => lazy(async () => i % 2))
+    expect(await s._qr).toEqual([2, 1, 3])
 })

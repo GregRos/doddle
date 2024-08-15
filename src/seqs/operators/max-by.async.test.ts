@@ -1,5 +1,5 @@
 import type { LazyAsync } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
@@ -20,6 +20,21 @@ declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
     expect(type_of(_aseq([1, 2, 3]).maxBy(() => true, "alt"))).to_equal(
         type<LazyAsync<number | "alt">>
     )
+})
+
+declare.test("allows lazy iteratee", expect => {
+    const s = _aseq([1, 2, 3]).maxBy(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
+
+declare.test("allows lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).maxBy(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
+
+declare.test("allows async lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).maxBy(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
 })
 
 it("returns undefined for empty", async () => {
@@ -100,5 +115,25 @@ it("iteratee receives index", async () => {
 
 it("works with async iteratee", async () => {
     const s = _aseq([1, 3, 2]).maxBy(async x => x)
+    expect(await s.pull()).toEqual(3)
+})
+
+it("works for lazy iteratee", async () => {
+    const s = _aseq([1, 3, 2]).maxBy(i => lazy(() => i))
+    expect(await s.pull()).toEqual(3)
+})
+
+it("works for lazy async iteratee", async () => {
+    const s = _aseq([1, 3, 2]).maxBy(i => lazy(async () => i))
+    expect(await s.pull()).toEqual(3)
+})
+
+it("works for async lazy iteratee", async () => {
+    const s = _aseq([1, 3, 2]).maxBy(async i => lazy(() => i))
+    expect(await s.pull()).toEqual(3)
+})
+
+it("works for async lazy async iteratee", async () => {
+    const s = _aseq([1, 3, 2]).maxBy(async i => lazy(async () => i))
     expect(await s.pull()).toEqual(3)
 })

@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -17,6 +17,21 @@ declare.it("element type changes with type predicate which is a subtype", expect
 declare.it("element type doesn't change if the predicate is for a supertype", expect => {
     const s = _seq([1, 1] as 1[]).filter(x => typeof x === "number")
     expect(type_of(s)).to_equal(type<_Seq<1>>)
+})
+
+declare.it("allows lazy predicate", expect => {
+    const s = _seq([1, 2, 3]).filter(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).filter(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows async lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).filter(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 it("filters out elements", async () => {
@@ -68,4 +83,24 @@ it("works for async predicates (true)", async () => {
 it("works for async predicates (false)", async () => {
     const s = _seq([1, 2, 3]).filter(async x => x === 4)
     expect(await s._qr).toEqual([])
+})
+
+it("allows lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).filter(i => lazy(() => i % 2 === 0))
+    expect(await s._qr).toEqual([2])
+})
+
+it("allows lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).filter(i => lazy(async () => i % 2 === 0))
+    expect(await s._qr).toEqual([2])
+})
+
+it("allows async lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).filter(async i => lazy(() => i % 2 === 0))
+    expect(await s._qr).toEqual([2])
+})
+
+it("allows async lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).filter(async i => lazy(async () => i % 2 === 0))
+    expect(await s._qr).toEqual([2])
 })

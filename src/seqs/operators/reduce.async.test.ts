@@ -1,5 +1,5 @@
 import type { LazyAsync } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -16,6 +16,20 @@ declare.test("can be called with no initial, type is T", expect => {
     s.reduce((acc, x) => `${acc}${x}`)
 })
 
+declare.test("allows lazy reducer", expect => {
+    const s = _seq([1, 2, 3]).reduce(() => lazy(() => true), false)
+    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+})
+
+declare.test("allows lazy async reducer", expect => {
+    const s = _seq([1, 2, 3]).reduce(() => lazy(async () => true), false)
+    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+})
+
+declare.test("allows async lazy async reducer", expect => {
+    const s = _seq([1, 2, 3]).reduce(async () => lazy(async () => true), false)
+    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+})
 it("reduces with initial value on empty, giving initial", async () => {
     const s = _seq([]).reduce((acc, x) => acc + x, 0)
     expect(await s.pull()).toEqual(0)
@@ -78,5 +92,25 @@ it("has no side-effects before pull", async () => {
 
 it("works for async reducers", async () => {
     const s = _seq([1, 2, 3]).reduce(async (acc, x) => acc + x, 1)
+    expect(await s.pull()).toEqual(7)
+})
+
+it("works for lazy reducers", async () => {
+    const s = _seq([1, 2, 3]).reduce((a, b) => lazy(() => a + b), 1)
+    expect(await s.pull()).toEqual(7)
+})
+
+it("works for lazy async reducers", async () => {
+    const s = _seq([1, 2, 3]).reduce((a, b) => lazy(async () => a + b), 1)
+    expect(await s.pull()).toEqual(7)
+})
+
+it("works for async lazy reducers", async () => {
+    const s = _seq([1, 2, 3]).reduce(async (a, b) => lazy(() => a + b), 1)
+    expect(await s.pull()).toEqual(7)
+})
+
+it("works for async lazy async reducers", async () => {
+    const s = _seq([1, 2, 3]).reduce(async (a, b) => lazy(async () => a + b), 1)
     expect(await s.pull()).toEqual(7)
 })

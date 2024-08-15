@@ -2,10 +2,10 @@ import { cannotRecurseSync } from "../errors/error.js"
 import {
     getClassName,
     getFunctionName,
-    isAsyncIterable,
-    isIterable,
     isLazy,
-    isThenable
+    isThenable,
+    type MaybeLazy,
+    type MaybePromise
 } from "../utils.js"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
@@ -16,7 +16,7 @@ export const ownerInstance = Symbol("ownerInstance")
  *
  * The initializer can return another {@link Lazy}, which will be chained like a promise.
  */
-export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_IterationType<T>> {
+export class Lazy<T> {
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _info: InnerInfo
@@ -136,6 +136,24 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
             return projection(pulled)
         })
     }
+
+    catch<R, T>(this: LazyAsync<T>, handler: (error: any) => Lazy.MaybePromised<R>): LazyAsync<R>
+    catch<R>(handler: (error: any) => Lazy.SomeAsync<R>): LazyAsync<R>
+    catch<R>(handler: (error: any) => MaybeLazy<R>): Lazy<R>
+    catch(handler: (error: any) => any): any {
+        return lazy(() => {
+            try {
+                const pulled = this.pull()
+                if (isThenable(pulled)) {
+                    return pulled.then(undefined, handler)
+                }
+                return pulled
+            } catch (e) {
+                return handler(e)
+            }
+        })
+    }
+
     /**
      * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and apply the given
      * callback to the result. The new {@link Lazy} will still return the same value as **this**,
@@ -216,6 +234,7 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
             return values
         })
     }
+
     /**
      * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when
      * pulled, will pull all of them and return an object with the same keys, but with the values
@@ -290,23 +309,7 @@ export class Lazy<T> implements Iterable<_IterationType<T>>, AsyncIterable<_Iter
     equals<T>(this: Lazy<T>, other: any): any {
         return this.zip(lazy(() => other) as any).map(([a, b]) => a === b)
     }
-    *[Symbol.iterator]() {
-        const inner = this.pull()
-        if (isIterable(inner)) {
-            yield* inner as Iterable<_IterationType<T>>
-        } else {
-            yield inner as _IterationType<T>
-        }
-    }
-    async *[Symbol.asyncIterator]() {
-        // eslint-disable-next-line @typescript-eslint/await-thenable
-        const inner = await this.pull()
-        if (isAsyncIterable(inner) || isIterable(inner)) {
-            yield* inner as Iterable<_IterationType<T>>
-        } else {
-            yield inner as _IterationType<T>
-        }
-    }
+
     /** Returns a short description of the Lazy value and its state. */
     toString() {
         return this.info.desc
@@ -443,6 +446,9 @@ export namespace Lazy {
             : T extends Promise<infer R>
               ? PulledAwaited<R>
               : T
+
+    export type SomeAsync<T> = Promise<T> | LazyAsync<T> | Promise<Lazy<T>> | Promise<LazyAsync<T>>
+    export type MaybePromised<T> = MaybePromise<LazyAsync<T> | MaybeLazy<T>>
 }
 
 export type LazyAsync<T> = Lazy<Promise<T>>
@@ -489,13 +495,21 @@ export function lazyFromOperator<In, Out>(
 
 export function memoize<T>(definition: 0 extends 1 & T ? any : never): () => any
 export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Lazy.Pulled<T>
-export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Lazy.Pulled<T>
 export function memoize<T extends Lazy<any>>(definition: () => T): () => Lazy.Pulled<T>
 export function memoize<T>(definition: () => T): () => T
-export function memoize<T>(definition: () => T): () => T {
+export function memoize<T>(definition: (() => T) | Lazy<T>): () => T {
+    if (isLazy(definition)) {
+        return definition.pull as any
+    }
+
     // Don't double memoize
     if (ownerInstance in definition) {
         return definition as any
     }
     return lazy(definition).pull as any
+}
+
+export function pull<S, T extends Lazy<S> | S>(input: S): Lazy.Pulled<S>
+export function pull<T>(input: Lazy<T> | T): Lazy.Pulled<T> {
+    return lazy(() => input).pull()
 }

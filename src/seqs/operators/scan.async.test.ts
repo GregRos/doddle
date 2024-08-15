@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -16,7 +16,20 @@ declare.it("can be called with no initial value but the type is T", expect => {
     // @ts-expect-error does not allow a different type
     s.scan(() => 1)
 })
+declare.test("allows lazy reducer", expect => {
+    const s = _seq([1, 2, 3]).scan(() => lazy(() => true), false)
+    expect(type_of(s)).to_equal(type<ASeq<boolean>>)
+})
 
+declare.test("allows lazy async reducer", expect => {
+    const s = _seq([1, 2, 3]).scan(() => lazy(async () => true), false)
+    expect(type_of(s)).to_equal(type<ASeq<boolean>>)
+})
+
+declare.test("allows async lazy async reducer", expect => {
+    const s = _seq([1, 2, 3]).scan(async () => lazy(async () => true), false)
+    expect(type_of(s)).to_equal(type<ASeq<boolean>>)
+})
 it("scans with initial value on empty, giving singleton", async () => {
     const s = _seq([]).scan(() => 1, 0)
     expect(await s._qr).toEqual([0])
@@ -131,5 +144,25 @@ it("calls reducer as many times as needed", async () => {
 
 it("works for async reducers", async () => {
     const s = _seq([1, 2, 3]).scan(async (acc, x) => acc + x, 0)
+    expect(await s._qr).toEqual([0, 1, 3, 6])
+})
+
+it("allows lazy reducer", async () => {
+    const s = _seq([1, 2, 3]).scan((a, b) => lazy(() => a + b), 0)
+    expect(await s._qr).toEqual([0, 1, 3, 6])
+})
+
+it("allows lazy async reducer", async () => {
+    const s = _seq([1, 2, 3]).scan((a, b) => lazy(async () => a + b), 0)
+    expect(await s._qr).toEqual([0, 1, 3, 6])
+})
+
+it("allows async lazy reducer", async () => {
+    const s = _seq([1, 2, 3]).scan(async (a, b) => lazy(() => a + b), 0)
+    expect(await s._qr).toEqual([0, 1, 3, 6])
+})
+
+it("allows async lazy async reducer", async () => {
+    const s = _seq([1, 2, 3]).scan(async (a, b) => lazy(async () => a + b), 0)
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })

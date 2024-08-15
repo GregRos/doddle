@@ -1,7 +1,7 @@
 import type { ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
 declare.it("should type as Lazy<T>", expect => {
@@ -10,6 +10,31 @@ declare.it("should type as Lazy<T>", expect => {
 declare.it("should not accept iteratee with 2 arguments", expect => {
     // @ts-expect-error
     _aseq([1, 2, 3]).uniqBy((x, _) => x)
+})
+
+declare.it("allows lazy iteratee", expect => {
+    const s = _aseq([1, 2, 3]).uniqBy(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
+
+declare.it("allows lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).uniqBy(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
+
+declare.it("allows async lazy async iteratee", expect => {
+    const s = _aseq([1, 2, 3]).uniqBy(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_ASeq<number>>)
+})
+
+it("allows lazy iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(() => 1)
+    expect(await s._qr).toEqual([1])
+})
+
+it("allows lazy async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(() => 1)
+    expect(await s._qr).toEqual([1])
 })
 
 it("returns empty on empty", async () => {
@@ -79,4 +104,29 @@ it("pulls, calls iteratee as many as needed", async () => {
     }
     expect(map).toHaveBeenCalledTimes(6)
     expect(sq).toHaveBeenCalledTimes(1)
+})
+
+it("works for async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(async x => x)
+    expect(await s._qr).toEqual([1, 2, 3])
+})
+
+it("works for lazy iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(x => lazy(() => x))
+    expect(await s._qr).toEqual([1, 2, 3])
+})
+
+it("works for async lazy iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(async x => lazy(() => x))
+    expect(await s._qr).toEqual([1, 2, 3])
+})
+
+it("works for async lazy async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(async x => lazy(async () => x))
+    expect(await s._qr).toEqual([1, 2, 3])
+})
+
+it("works for lazy async iteratee", async () => {
+    const s = _aseq([1, 2, 3]).uniqBy(x => lazy(async () => x))
+    expect(await s._qr).toEqual([1, 2, 3])
 })

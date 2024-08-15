@@ -1,4 +1,4 @@
-import { aseq, type ASeq } from "@lib"
+import { aseq, lazy, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -8,6 +8,21 @@ declare.it("typed as 1-N length tuple", expect => {
         type<SType<[number] | [number, number] | [number, number, number]>>
     )
     expect(type_of(_seq([1, 2, 3]).window(1))).to_equal(type<SType<[number]>>)
+})
+
+declare.it("allows lazy projection", expect => {
+    const s = _seq([1, 2, 3]).window(2, () => lazy(() => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
+})
+
+declare.it("allows lazy async projection", expect => {
+    const s = _seq([1, 2, 3]).window(2, () => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
+})
+
+declare.it("allows async lazy async projection", expect => {
+    const s = _seq([1, 2, 3]).window(2, async () => lazy(async () => 1))
+    expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
 declare.it("typed as length 1-∞ tuple when non-literal window length", expect => {
@@ -136,4 +151,29 @@ it("calls iteratee with incomplete windows", async () => {
     for await (const _ of tkw) {
     }
     expect(map).toHaveBeenCalledWith(1, 2, 3)
+})
+
+it("works for async iteratee", async () => {
+    const s = _seq([1, 2, 3]).window(2, async (a, b) => a + b!)
+    await expect(s._qr).resolves.toEqual([3, 5])
+})
+
+it("works for lazy iteratee", async () => {
+    const s = _seq([1, 2, 3]).window(2, (a, b) => lazy(() => a + b!))
+    await expect(s._qr).resolves.toEqual([3, 5])
+})
+
+it("works for async lazy iteratee", async () => {
+    const s = _seq([1, 2, 3]).window(2, async (a, b) => lazy(() => a + b!))
+    await expect(s._qr).resolves.toEqual([3, 5])
+})
+
+it("works for async lazy async iteratee", async () => {
+    const s = _seq([1, 2, 3]).window(2, async (a, b) => lazy(async () => a + b!))
+    await expect(s._qr).resolves.toEqual([3, 5])
+})
+
+it("works for lazy async iteratee", async () => {
+    const s = _seq([1, 2, 3]).window(2, (a, b) => lazy(async () => a + b!))
+    await expect(s._qr).resolves.toEqual([3, 5])
 })

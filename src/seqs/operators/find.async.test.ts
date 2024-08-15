@@ -1,5 +1,5 @@
 import type { LazyAsync } from "@lib"
-import { aseq } from "@lib"
+import { aseq, lazy } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -15,6 +15,20 @@ declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).find(() => true, "alt"))).to_equal(
         type<LazyAsync<number | "alt">>
     )
+})
+declare.test("allows lazy predicate", expect => {
+    const s = _seq([1, 2, 3]).find(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
+
+declare.test("allows lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).find(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+})
+
+declare.test("allows async lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).find(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
 })
 it("returns undefined for empty", async () => {
     const s = _seq([]).find(() => true)
@@ -81,4 +95,24 @@ it("works for async predicates (true)", async () => {
 it("works for async predicates (false)", async () => {
     const s = _seq([1, 2, 3]).find(async x => x === 4)
     expect(await s.pull()).toEqual(undefined)
+})
+
+it("allows lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).find(i => lazy(() => i % 2 === 0))
+    expect(await s.pull()).toEqual(2)
+})
+
+it("allows lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).find(i => lazy(async () => i % 2 === 0))
+    expect(await s.pull()).toEqual(2)
+})
+
+it("allows async lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).find(async i => lazy(() => i % 2 === 0))
+    expect(await s.pull()).toEqual(2)
+})
+
+it("allows async lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).find(async i => lazy(async () => i % 2 === 0))
+    expect(await s.pull()).toEqual(2)
 })

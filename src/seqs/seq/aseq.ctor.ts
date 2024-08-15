@@ -1,5 +1,5 @@
 import { checkASeqInputValue } from "../../errors/error.js"
-import type { Lazy, LazyAsync } from "../../lazy/index.js"
+import { pull, type Lazy, type LazyAsync } from "../../lazy/index.js"
 import { isAsyncIterable, isIterable, isNextable } from "../../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
 
@@ -18,13 +18,14 @@ export function aseq<E>(input: ASeq.Input<E>): any {
         })
     }
     return ASeqOperator(input, async function* aseq(input) {
-        const result = await input()
-        if (isAsyncIterable(result) || isIterable(result)) {
-            yield* result
+        const result = typeof input === "function" ? input() : input
+        const pulled = pull(result)
+        if (isAsyncIterable(pulled) || isIterable(pulled)) {
+            yield* pulled
             return
         }
-        if (isNextable(result)) {
-            for (let item = await result.next(); !item.done; item = await result.next()) {
+        if (isNextable(pulled)) {
+            for (let item = await pulled.next(); !item.done; item = await pulled.next()) {
                 yield item.value
             }
         }

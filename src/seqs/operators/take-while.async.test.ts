@@ -1,12 +1,26 @@
-import { aseq, type ASeq } from "@lib"
+import { aseq, lazy, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 type _Seq<T> = ASeq<T>
-describe("type tests", () => {
-    declare.it("keeps same type as input when no ellipsis is given", expect => {
-        expect(type_of(_seq([1]).takeWhile(() => true))).to_equal(type<_Seq<number>>)
-    })
+declare.it("keeps same type as input", expect => {
+    const s = _seq([1, 2, 3]).takeWhile(() => true)
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows lazy predicate", expect => {
+    const s = _seq([1, 2, 3]).takeWhile(() => lazy(() => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).takeWhile(() => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
+})
+
+declare.it("allows async lazy async predicate", expect => {
+    const s = _seq([1, 2, 3]).takeWhile(async () => lazy(async () => true))
+    expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 it("immediate false gives empty", async () => {
@@ -53,4 +67,24 @@ it("calls predicate as many times as needed", async () => {
 it("works with async predicate", async () => {
     const s = _seq([1, 2, 3]).takeWhile(async () => true)
     await expect(s._qr).resolves.toEqual([1, 2, 3])
+})
+
+it("works for lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).takeWhile(i => lazy(() => i < 3))
+    await expect(s._qr).resolves.toEqual([1, 2])
+})
+
+it("works for lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).takeWhile(i => lazy(async () => i < 3))
+    await expect(s._qr).resolves.toEqual([1, 2])
+})
+
+it("works for async lazy predicate", async () => {
+    const s = _seq([1, 2, 3]).takeWhile(async i => lazy(() => i < 3))
+    await expect(s._qr).resolves.toEqual([1, 2])
+})
+
+it("works for async lazy async predicate", async () => {
+    const s = _seq([1, 2, 3]).takeWhile(async i => lazy(async () => i < 3))
+    await expect(s._qr).resolves.toEqual([1, 2])
 })
