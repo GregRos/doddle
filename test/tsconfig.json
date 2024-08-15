@@ -1,0 +1,27 @@
+{
+  "extends": "../tsconfig.base.cjs.json",
+  "references": [{ "path": "../src/tsconfig.cjs.json" }],
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "module": "es2015",
+    "target": "ES2020",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@lib": ["../src/index"],
+      "@utils": ["../src/utils"],
+      "@error": ["../src/errors/error"]
+    }
+  },
+  "include": [
+    "**/*.test.ts",
+    "**/*.helper.ts",
+    "*.refactor.ts",
+    "seq/is.test.ts",
+    "seq/seq.class.test.ts",
+    "seq/aseq.class.test.ts",
+    "lazy/lazy.test.ts",
+    "lazy/memoize.test.ts"
+  ],
+  "exclude": ["**/dist", "**/node_modules"]
+}

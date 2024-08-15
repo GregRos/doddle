@@ -4,7 +4,7 @@ export default {
         "^.+\\.ts$": [
             "ts-jest",
             {
-                tsconfig: "<rootDir>/src/tsconfig.test.json",
+                tsconfig: "<rootDir>/test/tsconfig.json",
                 transpileOnly: true
             }
         ]
@@ -17,7 +17,7 @@ export default {
         "@error": "<rootDir>/src/errors/error"
     },
     testEnvironment: "node",
-    testMatch: ["<rootDir>/src/**/*.test.ts"],
+    testMatch: ["<rootDir>/test/**/*.test.ts"],
     collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
     coverageDirectory: "./coverage",
     collectCoverage: false

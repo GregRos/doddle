@@ -509,7 +509,8 @@ export function memoize<T>(definition: (() => T) | Lazy<T>): () => T {
     return lazy(definition).pull as any
 }
 
-export function pull<S, T extends Lazy<S> | S>(input: S): Lazy.Pulled<S>
+export function pull<T>(input: 1 extends 0 & T ? T : never): any
+export function pull<T>(input: T): Lazy.Pulled<T>
 export function pull<T>(input: Lazy<T> | T): Lazy.Pulled<T> {
     return lazy(() => input).pull()
 }
