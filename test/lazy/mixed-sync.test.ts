@@ -1,0 +1,1 @@
+import { lazy } from "@lib"

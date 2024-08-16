@@ -122,6 +122,10 @@ export class Lazy<T> {
     ): LazyAsync<X>
     map<T, X>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => Promise<X>): LazyAsync<X>
     map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => Lazy<R>): Lazy<R>
+    map<T, R>(
+        this: Promise<any> extends T ? Lazy<T> : never,
+        f: (value: Lazy.PulledAwaited<T>) => R
+    ): Lazy<R | Promise<R>>
     map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => R): Lazy<R>
     map(this: Lazy<any>, projection: (a: any) => any): any {
         return lazy(() => {
@@ -170,7 +174,7 @@ export class Lazy<T> {
         this: LazyAsync<S>,
         action: (
             value: S
-        ) => any | Lazy<any> | Promise<any> | Promise<LazyAsync<any>> | LazyAsync<any>
+        ) => void | Lazy<void> | Promise<void> | Promise<LazyAsync<void>> | LazyAsync<void>
     ): LazyAsync<S>
     each<T>(
         this: Lazy<T>,
@@ -301,6 +305,10 @@ export class Lazy<T> {
     equals<T, Other extends T>(this: LazyAsync<T>, other: Lazy<Other> | Other): LazyAsync<boolean>
     equals<T, Other extends T>(this: LazyAsync<T>, other: LazyAsync<Other>): LazyAsync<boolean>
     equals<T, Other extends T>(this: Lazy<T>, other: LazyAsync<Other>): LazyAsync<boolean>
+    equals<T, Other>(
+        this: Awaited<T> extends T ? never : Lazy<T>,
+        other: Other
+    ): Lazy<boolean | Promise<boolean>>
     equals<T, Other extends T>(this: Lazy<T>, other: Other | Lazy<Other>): Lazy<boolean>
     equals<T>(this: Lazy<T>, other: any): any {
         return this.zip(lazy(() => other) as any).map(([a, b]) => a === b)
@@ -403,6 +411,9 @@ export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>
 export function lazy<T>(initializer: () => Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
+    if (ownerInstance in initializer) {
+        return initializer[ownerInstance] as any
+    }
     return Lazy.create(initializer) as any
 }
 const enum Stage {
