@@ -1,107 +1,186 @@
-import { lazy, type Lazy, type LazyAsync } from "@lib"
+import { Lazy, lazy, type LazyAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
+import { lazies } from "./lazies.helper"
 
-declare.it("void callback doens't change type", expect => {
-    const lz = lazy(() => 1).each(() => {})
-    expect(type_of(lz)).to_equal(type<Lazy<number>>)
-})
+const callbacks = {
+    sync() {
+        return jest.fn(() => {})
+    },
+    async() {
+        return jest.fn(async () => {})
+    },
+    mixed() {
+        return jest.fn(() => null! as Promise<void> | void)
+    },
+    lazy_sync() {
+        return jest.fn(() => lazy(() => {}))
+    },
+    lazy_async() {
+        return jest.fn(() => lazy(async () => {}))
+    },
+    lazy_mixed() {
+        return jest.fn(() => lazy(() => null! as Promise<void> | void))
+    }
+}
 
-declare.it("async callback changes to lazyAsync", expect => {
-    const lz = lazy(() => 1).each(async () => {})
-    expect(type_of(lz)).to_equal(type<LazyAsync<number>>)
-})
-
-declare.it("mixedsync stays mixedsync with sync callback", expect => {
-    const lz = lazy(() => null! as Promise<1> | 1).each(() => {})
-    expect(type_of(lz)).to_equal(type<Lazy<1 | Promise<1>>>)
-})
-
-declare.it("mixedsync normalized with async callback", expect => {
-    const lz = lazy(() => null! as Promise<1> | 1).each(async () => {})
-    expect(type_of(lz)).to_equal(type<LazyAsync<1>>)
-})
-
-it("callback is invoked exactly once", () => {
-    const fn = jest.fn()
-    const lz = lazy(() => 1).each(fn)
-    expect(fn).not.toHaveBeenCalled()
-    lz.pull()
-    expect(fn).toHaveBeenCalledTimes(1)
-    lz.pull()
-    expect(fn).toHaveBeenCalledTimes(1)
-})
-
-it("lazy returned by callback is pulled", () => {
-    const fn = jest.fn()
-    const lz = lazy(() => 1).each(() => lazy(fn))
-    expect(fn).not.toHaveBeenCalled()
-    lz.pull()
-    expect(fn).toHaveBeenCalledTimes(1)
-    lz.pull()
-    expect(fn).toHaveBeenCalledTimes(1)
-})
-
-it("lazy do doThing", () => {
-    let i = ""
-    expect(
-        lazy(() => (i += "a"))
-            .each(x => {
-                expect(x).toBe("a")
-                i += "b"
-            })
-            .pull()
-    ).toBe("a")
-    expect(i).toBe("ab")
-})
-
-it("lazy async do doThing", async () => {
-    let i = ""
-    await expect(
-        lazy(async () => (i += "a"))
-            .each(() => {
-                expect(i).toBe("a")
-                i += "b"
-                return lazy(() => (i += "c"))
-            })
-            .pull()
-    ).resolves.toBe("a")
-    expect(i).toBe("abc")
-})
-
-it("lazy do doThing", async () => {
-    let i = ""
-    await expect(
-        lazy(() => (i += "a"))
-            .each(async x => {
-                expect(x).toBe("a")
-                i += "b"
-                return lazy(() => (i += "c"))
-            })
-            .pull()
-    ).resolves.toBe("a")
-    expect(i).toBe("abc")
-})
-
-it("lazy async do doThing", async () => {
-    let i = ""
-    await lazy(async () => (i += "a"))
-        .each(async x => {
-            expect(x).toBe("a")
-            i += "b"
-            return lazy(() => (i += "c"))
+{
+    const myCallback = callbacks.sync()
+    const myLazy = lazies.sync().each(myCallback)
+    declare.it("sync.each(sync) = sync", expect => {
+        expect(type_of(myLazy)).to_equal(type<Lazy<1>>)
+    })
+    it("sync.each(sync) = sync", () => {
+        expect(myLazy.pull()).toBe(1)
+        expect(myLazy.pull()).toBe(1)
+        expect(myCallback).toHaveBeenCalledWith(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+    })
+    {
+        const myCallback = callbacks.lazy_sync()
+        const myLazy = lazies.sync().each(myCallback)
+        declare.it("sync.each(lazy sync) = sync", expect => {
+            expect(type_of(myLazy)).to_equal(type<Lazy<1>>)
         })
-        .pull()
-    expect(i).toBe("abc")
-})
-
-it("lazy do doThing", () => {
-    let i = ""
-    lazy(() => (i += "a"))
-        .each(x => {
-            expect(x).toBe("a")
-            i += "b"
-            return lazy(() => (i += "c"))
+        it("sync.each(lazy sync) = sync", () => {
+            expect(myLazy.pull()).toBe(1)
+            expect(myLazy.pull()).toBe(1)
         })
-        .pull()
-    expect(i).toBe("abc")
-})
+    }
+}
+{
+    const myCallback = callbacks.async()
+    const myLazy = lazies.sync().each(myCallback)
+    declare.it("sync.each(async) = async", expect => {
+        expect(type_of(myLazy)).to_equal(type<LazyAsync<1>>)
+    })
+    it("sync.each(async) = async", async () => {
+        await expect(myLazy.pull()).resolves.toBe(1)
+        await expect(myLazy.pull()).resolves.toBe(1)
+        expect(myCallback).toHaveBeenCalledWith(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+    })
+    {
+        const myCallback = callbacks.lazy_async()
+        const myLazy = lazy(() => 1).each(myCallback)
+        declare.it("sync.each(lazy async) = async", expect => {
+            expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+        })
+        it("sync.each(lazy async) = async", async () => {
+            await expect(myLazy.pull()).resolves.toBe(1)
+            await expect(myLazy.pull()).resolves.toBe(1)
+        })
+    }
+}
+{
+    const myCallback = callbacks.mixed()
+    const myLazy = lazies.sync().each(myCallback)
+    declare.it("sync.each(mixed) = mixed", expect => {
+        expect(type_of(myLazy)).to_equal(type<Lazy<1 | Promise<1>>>)
+    })
+
+    {
+        const myCallback = callbacks.lazy_mixed()
+        const myLazy = lazies.sync().each(myCallback)
+        declare.it("sync.each(lazy mixed) = mixed", expect => {
+            expect(type_of(myLazy)).to_equal(type<Lazy<1 | Promise<1>>>)
+        })
+    }
+}
+{
+    const myCallback = callbacks.sync()
+    const myLazy = lazy(async () => 1).each(myCallback)
+    declare.it("async.each(sync) = async", expect => {
+        expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+    })
+    it("async.each(sync) = async", async () => {
+        await expect(myLazy.pull()).resolves.toBe(1)
+        await expect(myLazy.pull()).resolves.toBe(1)
+        expect(myCallback).toHaveBeenCalledWith(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+    })
+    {
+        const myCallback = callbacks.lazy_sync()
+        const myLazy = lazy(async () => 1).each(myCallback)
+        declare.it("async.each(lazy sync) = async", expect => {
+            expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+        })
+        it("async.each(lazy sync) = async", async () => {
+            await expect(myLazy.pull()).resolves.toBe(1)
+            await expect(myLazy.pull()).resolves.toBe(1)
+        })
+    }
+}
+{
+    const myCallback = callbacks.async()
+    const myLazy = lazy(async () => 1).each(myCallback)
+    declare.it("async.each(async) = async", expect => {
+        expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+    })
+
+    it("async.each(async) = async", async () => {
+        await expect(myLazy.pull()).resolves.toBe(1)
+        await expect(myLazy.pull()).resolves.toBe(1)
+        expect(myCallback).toHaveBeenCalledWith(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+        expect(myCallback).toHaveBeenCalledTimes(1)
+    })
+    {
+        const myCallback = callbacks.lazy_async()
+        const myLazy = lazy(async () => 1).each(myCallback)
+        declare.it("async.each(lazy async) = async", expect => {
+            expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+        })
+        it("async.each(lazy async) = async", async () => {
+            await expect(myLazy.pull()).resolves.toBe(1)
+            await expect(myLazy.pull()).resolves.toBe(1)
+        })
+    }
+}
+{
+    const myCallback = callbacks.mixed()
+    const myLazy = lazy(async () => 1).each(myCallback)
+    declare.it("async.each(mixed) = async", expect => {
+        expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+    })
+
+    {
+        const myCallback = callbacks.lazy_mixed()
+        const myLazy = lazy(async () => 1).each(myCallback)
+        declare.it("async.each(lazy mixed) = async", expect => {
+            expect(type_of(myLazy)).to_equal(type<LazyAsync<number>>)
+        })
+    }
+}
+{
+    const myCallback = callbacks.sync()
+    const myLazy = lazies.mixed().each(myCallback)
+    declare.it("mixed.each(sync) = mixed", expect => {
+        expect(type_of(myLazy)).to_equal(type<Lazy<1 | Promise<1>>>)
+    })
+
+    {
+        const myCallback = callbacks.lazy_sync()
+        const myLazy = lazies.mixed().each(myCallback)
+        declare.it("mixed.each(lazy sync) = mixed", expect => {
+            expect(type_of(myLazy)).to_equal(type<Lazy<1 | Promise<1>>>)
+        })
+    }
+}
+{
+    const myCallback = callbacks.async()
+    const myLazy = lazies.mixed().each(myCallback)
+    declare.it("mixed.each(async) = asynb", expect => {
+        expect(type_of(myLazy)).to_equal(type<LazyAsync<1>>)
+    })
+
+    {
+        const myCallback = callbacks.lazy_async()
+        const myLazy = lazies.mixed().each(myCallback)
+        declare.it("mixed.each(lazy async) = async", expect => {
+            expect(type_of(myLazy)).to_equal(type<LazyAsync<1>>)
+        })
+    }
+}

@@ -138,7 +138,7 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
     return isObject(what) && isFunction((what as any).then)
 }
 
-export function isLazy(value: any): value is Lazy<any> {
+export function isLazy<T>(value: any): value is Lazy<T> {
     return isObject(value) && typeof value.pull === "function" && typeof value.map === "function"
 }
 

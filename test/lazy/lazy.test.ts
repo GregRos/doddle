@@ -1,4 +1,4 @@
-import { Lazy, lazy, LazyAsync } from "@lib"
+import { lazy, Lazy } from "@lib"
 import { declare, type } from "declare-it"
 
 it("no name normalizes to null", () => {

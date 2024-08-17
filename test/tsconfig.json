@@ -13,15 +13,6 @@
       "@error": ["../src/errors/error"]
     }
   },
-  "include": [
-    "**/*.test.ts",
-    "**/*.helper.ts",
-    "*.refactor.ts",
-    "seq/is.test.ts",
-    "seq/seq.class.test.ts",
-    "seq/aseq.class.test.ts",
-    "lazy/lazy.test.ts",
-    "lazy/memoize.test.ts"
-  ],
+  "include": ["**/*.test.ts", "**/*.helper.ts"],
   "exclude": ["**/dist", "**/node_modules"]
 }

@@ -1,4 +1,4 @@
-export { Lazy, LazyAsync, lazy, memoize } from "./lazy/index.js"
+export { Lazy, LazyAsync, lazy } from "./lazy/index.js"
 export { ASeq } from "./seqs/aseq.class.js"
 export { aseq } from "./seqs/aseq.js"
 export { Seq } from "./seqs/seq.class.js"

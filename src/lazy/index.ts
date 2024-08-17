@@ -1,4 +1,4 @@
-import { cannotRecurseSync } from "../errors/error.js"
+import { cannotRecurseSync, chk, loadCheckers } from "../errors/error.js"
 import {
     getClassName,
     getFunctionName,
@@ -10,6 +10,16 @@ import {
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
+type IsAnyPureAsync<T extends Lazy<any>[], IfTrue, IfFalse> = {
+    [K in keyof T]: T[K] extends LazyAsync<any> ? K : never
+}[number] extends never
+    ? IfFalse
+    : IfTrue
+
+type IsAnyMixed<T extends Lazy<any>[], IfTrue, IfFalse> =
+    LazyAsync<any> extends T[number] ? IfTrue : IfFalse
+
+type OnlyIfMixed<Input, LazyType = Lazy<Input>> = Promise<any> extends Input ? LazyType : never
 /**
  * A TypeScript-first lazy evaluation primitive. An object that will only evaluate its initializer
  * function when the {@link pull} method is called.
@@ -51,96 +61,73 @@ export class Lazy<T> {
         }
         this._init = initializer
 
-        for (const name of ["map", "each", "zip", "assemble", "pull", "equals"]) {
+        for (const name of ["map", "each", "zip", "catch", "pull"]) {
             const bound = (this as any)[name].bind(this)
             Object.defineProperty(bound, ownerInstance, { value: this })
             ;(this as any)[name] = bound
         }
+        loadCheckers(this)
     }
 
     static create<T>(f: () => T): Lazy<T> {
         return new Lazy(f)
     }
 
-    /**
-     * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and return its
-     * result, projected using the given function. If the Lazy primitive is async, the projection
-     * will receive the awaited value.
-     *
-     * @example
-     *     // sync projectionL
-     *     const sync = lazy(() => "hello").map(x => `${x} world`) satisfies Lazy<string>
-     *     expect(sync.pull()).toBe("hello world")
-     *
-     *     // sync projection on async lazy:
-     *     const async = lazy(async () => [1]).map(x => [...x, 2]) satisfies LazyAsync<number[]>
-     *     await expect(async.pull()).resolves.toBe(2)
-     *
-     *     // async projection on sync lazy:
-     *     const nested = lazy(() => 1).map(async x => x + 1) satisfies LazyAsync<number>
-     *     await expect(nested.pull()).resolves.toBe(2)
-     *
-     *     // async projection on async lazy:
-     *     const asyncToAsync = lazy(async () => 1).map(
-     *         async x => x + 1
-     *     ) satisfies LazyAsync<number>
-     *     await expect(asyncToAsync.pull()).resolves.toBe(2)
-     *
-     * @param projection The to apply to the value of the Lazy primitive. It will flatten any nested
-     *   {@link Lazy} and {@link Promise} instances.
-     * @summary
-     * Projects the result of this {@link Lazy} primitive using the given function.
-     * @see {@link Array.map} for a similar method on arrays.
-     * @see {@link Promise.then} for a similar method on promises.
-     * @see {@link Lazy.each} for a similar method that doesn't change the result.
-     */
+    // When the projection is async, the result is always LazyAsync, no matter
+    // what the `this` is.
     map<T, R>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<R>>
+        this: Lazy<T>,
+        projection: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<R>
     ): LazyAsync<R>
-    map<T, X>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<Lazy<X>>
-    ): LazyAsync<X>
-    map<T, X>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<X>
-    ): LazyAsync<X>
-    map<T, X>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => LazyAsync<X>
-    ): LazyAsync<X>
-    map<T, R>(this: LazyAsync<T>, f: (value: Lazy.PulledAwaited<T>) => Lazy<R>): LazyAsync<R>
-    map<T, R>(this: LazyAsync<T>, f: (value: Lazy.PulledAwaited<T>) => R): LazyAsync<R>
-    map<T, Y>(
-        this: Lazy<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<LazyAsync<Y>>
-    ): LazyAsync<Y>
-    map<T, X>(
-        this: Lazy<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Promise<Lazy<X>>
-    ): LazyAsync<X>
-    map<T, X>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => Promise<X>): LazyAsync<X>
-    map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => Lazy<R>): Lazy<R>
+    // When the input is async, and the projection is mixed, the result is always async.
     map<T, R>(
-        this: Promise<any> extends T ? Lazy<T> : never,
-        f: (value: Lazy.PulledAwaited<T>) => R
+        this: OnlyIfMixed<R, LazyAsync<T>>,
+        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
+    ): LazyAsync<Awaited<R>>
+    map<T, R>(
+        this: LazyAsync<T>,
+        projection: (value: Lazy.PulledAwaited<T>) => Lazy<R> | R
+    ): LazyAsync<R>
+
+    // When this is mixed, and the projection is also mixed, the result type should stay the same.
+    map<T, R>(
+        this: OnlyIfMixed<T> & OnlyIfMixed<R, Lazy<T>>,
+        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
+    ): Lazy<R>
+    // When `this` is mixed and the projection is sync, the sync result needs to be mixed.
+    map<T, R>(
+        this: OnlyIfMixed<T>,
+        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
     ): Lazy<R | Promise<R>>
-    map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => R): Lazy<R>
+    map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>): Lazy<R>
     map(this: Lazy<any>, projection: (a: any) => any): any {
+        const _projection = chk(this.map).projection(projection)
         return lazy(() => {
             const pulled = this.pull()
             if (isThenable(pulled)) {
-                return pulled.then(projection)
+                return pulled.then(_projection)
             }
-            return projection(pulled)
+            return _projection(pulled)
         })
     }
 
-    catch<R, T>(this: LazyAsync<T>, handler: (error: any) => Lazy.MaybePromised<R>): LazyAsync<R>
-    catch<R>(handler: (error: any) => Lazy.SomeAsync<R>): LazyAsync<R>
-    catch<R>(handler: (error: any) => MaybeLazy<R>): Lazy<R>
+    // async.catch(async) = async
+    catch<T, R>(
+        this: LazyAsync<T>,
+        handler: (error: any) => Lazy.SomeAsync<R>
+    ): LazyAsync<T | Awaited<R>>
+    // async.catch(mixed) = async
+    catch<T, R>(
+        this: LazyAsync<T>,
+        handler: (error: any) => R | Lazy<R> | Lazy.SomeAsync<R>
+    ): LazyAsync<T | Awaited<R>>
+    // sync.catch(async) = mixed
+    // sync.catch(sync) = sync
+    // mixed.catch(mixed) = mixed
+    // mixed.catch(sync) = mixed
+    catch<R>(handler: (error: any) => R | Lazy<R>): Lazy<T | R>
     catch(handler: (error: any) => any): any {
+        chk(this.catch).handler(handler)
         return lazy(() => {
             try {
                 const pulled = this.pull()
@@ -154,78 +141,80 @@ export class Lazy<T> {
         })
     }
 
-    /**
-     * Creates a new {@link Lazy} primitive that, when pulled, will pull **this** and apply the given
-     * callback to the result. The new {@link Lazy} will still return the same value as **this**,
-     * only waiting for the handler to finish first.
-     *
-     * @example
-     *     const lazy = lazy(() => 1).do(x => console.log(x)) satisfies Lazy<number>
-     *     expect(lazy.pull()).toBe(1) // Logs "1" to the console as a side effect.
-     *     const wait30 = lazy(() => 1).do(
-     *         async x => new Promise(r => setTimeout(r, 30))
-     *     ) satisfies Lazy<number>
-     *     await expect(wait30.pull()).resolves.toBe(1) // Waits 30ms before returning 1.
-     *
-     * @param callback The callback
-     * @summary Applies the given callback to the result of this {@link Lazy} primitive.
-     */
-    each<S>(
-        this: LazyAsync<S>,
-        action: (
-            value: S
-        ) => void | Lazy<void> | Promise<void> | Promise<LazyAsync<void>> | LazyAsync<void>
-    ): LazyAsync<S>
+    // mixed.each(async) = async
+    each<T>(
+        this: OnlyIfMixed<T>,
+        action: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<void>
+    ): LazyAsync<Awaited<T>>
+    // async.each(anything) = async
+    each<T>(
+        this: LazyAsync<T>,
+        action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void> | Lazy.SomeAsync<void>
+    ): LazyAsync<T>
+    // mixed.each(mixed | sync) = mixed
+    each<T>(
+        this: OnlyIfMixed<T>,
+        action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void> | Lazy.SomeAsync<void>
+    ): Lazy<T>
+    // sync.each(async) = async
     each<T>(
         this: Lazy<T>,
-        action: (value: Lazy.PulledAwaited<T>) => Promise<any> | LazyAsync<any>
+        action: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<void>
     ): LazyAsync<T>
-    each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => Lazy<any>): Lazy<T>
-    each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => any): Lazy<T>
-    each<T>(this: LazyAsync<T>, action: (value: any) => any): any {
-        return this.map(x => {
+    // sync.each(mixed) = mixed
+    each<T, R>(
+        this: OnlyIfMixed<R, Lazy<T>>,
+        action: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
+    ): Lazy<T | Promise<T>>
+    // sync.each(sync) = sync
+    each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void>): Lazy<T>
+
+    each(this: any, action: (value: any) => any): any {
+        chk(this.each).action(action)
+        return this.map((x: any) => {
             const result = action(x)
             return lazy(() => {
                 return result
             }).map(() => x)
         })
     }
-    /**
-     * Zips **this** {@link Lazy} primitive with one or more others, returning a new {@link Lazy}
-     * that, when pulled, will pull all of them and return an array with the results. If any
-     * primitive involved is async, the new {@link Lazy} will also be async.
-     *
-     * @example
-     *     const a = lazy(() => 1).zip(lazy(() => 2)) satisfies Lazy<[number, number]>
-     *     expect(a.pull()).toEqual([1, 2])
-     *
-     *     const b = lazy(async () => 1).zip(lazy(() => 2)) satisfies LazyAsync<[number, number]>
-     *     await expect(b.pull()).resolves.toEqual([1, 2])
-     *
-     * @param others One or more {@link Lazy} primitives to zip with **this**.
-     * @summary Turns multiple lazy values into a single lazy value producing an array.
-     */
-    zip<Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
-        ...others: Others
-    ): LazyAsync<any> extends [this, ...Others][number]
-        ? LazyAsync<
-              [
-                  Lazy.PulledAwaited<T>,
-                  ...{
-                      [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
-                  }
-              ]
-          >
-        : Lazy<
-              [
-                  Lazy.Pulled<T>,
-                  ...{
-                      [K in keyof Others]: Lazy.Pulled<Others[K]>
-                  }
-              ]
-          >
 
-    zip(this: Lazy<any>, ...others: Lazy<any>[]): Lazy<any> {
+    zip<const Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
+        ...others: Others
+    ): IsAnyPureAsync<
+        [Lazy<T>, ...Others],
+        LazyAsync<
+            [
+                Lazy.PulledAwaited<T>,
+                ...{
+                    [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
+                }
+            ]
+        >,
+        IsAnyMixed<
+            [Lazy<T>, ...Others],
+            Lazy<
+                MaybePromise<
+                    [
+                        Lazy.PulledAwaited<T>,
+                        ...{
+                            [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
+                        }
+                    ]
+                >
+            >,
+            Lazy<
+                [
+                    Lazy.Pulled<T>,
+                    ...{
+                        [K in keyof Others]: Lazy.Pulled<Others[K]>
+                    }
+                ]
+            >
+        >
+    >
+
+    zip(this: Lazy<any>, ...others: Lazy<any>[]): any {
         return lazy(() => {
             const values = [this, ...others].map(x => x.pull())
             if (values.some(isThenable)) {
@@ -235,88 +224,13 @@ export class Lazy<T> {
         })
     }
 
-    /**
-     * Takes an key-value object with {@link Lazy} values and returns a new {@link Lazy} that, when
-     * pulled, will pull all of them and return an object with the same keys, but with the values
-     * replaced by the pulled results. If any of the values are async, the new {@link Lazy} will also
-     * be async.
-     *
-     * The value of **this** {@link Lazy} will be available under the key `"this"`.
-     *
-     * @example
-     *     const self = lazy(() => 1).assemble({
-     *         a: lazy(() => 2),
-     *         b: lazy(() => 3)
-     *     })
-     *     expect(self.pull()).toEqual({ this: 1, a: 2, b: 3 })
-     *
-     *     const asyncSelf = lazy(async () => 1).assemble({
-     *         a: lazy(() => 2),
-     *         b: lazy(() => 3)
-     *     })
-     *     await expect(asyncSelf.pull()).resolves.toEqual({ this: 1, a: 2, b: 3 })
-     *
-     * @param assembly An object with {@link Lazy} values.
-     * @returns A new {@link Lazy} primitive that will return an object with the same keys as the
-     *   input object, plus the key `"this"`, with the pulled results.
-     * @summary Converts an object of {@link Lazy} values into a {@link Lazy} value producing an object.
-     */ assemble<T, X extends Record<keyof X, Lazy<unknown>>>(
-        this: Lazy<T>,
-        assembly: X
-    ): LazyAsync<any> extends X[keyof X] | Lazy<T>
-        ? LazyAsync<
-              {
-                  [K in keyof X]: Lazy.PulledAwaited<X[K]>
-              } & {
-                  this: Lazy.PulledAwaited<T>
-              }
-          >
-        : Lazy<
-              {
-                  [K in keyof X]: Lazy.Pulled<X[K]>
-              } & {
-                  this: Lazy.Pulled<T>
-              }
-          > {
-        return lazy(() => {
-            const keys = ["this", ...Object.keys(assembly)]
-            const values = [this, ...Object.values(assembly)].map((x: any) => x.pull())
-            if (values.some(isThenable)) {
-                return Promise.all(values).then(values =>
-                    keys.reduce((acc, key, i) => {
-                        acc[key] = values[i]
-                        return acc
-                    }, {} as any)
-                )
-            }
-            return values.reduce((acc, value, i) => {
-                acc[keys[i]] = value
-                return acc
-            }, {} as any)
-        }) as any
-    }
-    equals<T extends Other, Other>(
-        this: LazyAsync<T>,
-        other: Lazy<Other> | Other
-    ): LazyAsync<boolean>
-    equals<T extends Other, Other>(this: LazyAsync<T>, other: LazyAsync<Other>): LazyAsync<boolean>
-    equals<T extends Other, Other>(this: Lazy<T>, other: LazyAsync<Other>): LazyAsync<boolean>
-    equals<T extends Other, Other>(this: Lazy<T>, other: Other | Lazy<Other>): Lazy<boolean>
-    equals<T, Other extends T>(this: LazyAsync<T>, other: Lazy<Other> | Other): LazyAsync<boolean>
-    equals<T, Other extends T>(this: LazyAsync<T>, other: LazyAsync<Other>): LazyAsync<boolean>
-    equals<T, Other extends T>(this: Lazy<T>, other: LazyAsync<Other>): LazyAsync<boolean>
-    equals<T, Other>(
-        this: Awaited<T> extends T ? never : Lazy<T>,
-        other: Other
-    ): Lazy<boolean | Promise<boolean>>
-    equals<T, Other extends T>(this: Lazy<T>, other: Other | Lazy<Other>): Lazy<boolean>
-    equals<T>(this: Lazy<T>, other: any): any {
-        return this.zip(lazy(() => other) as any).map(([a, b]) => a === b)
-    }
-
     /** Returns a short description of the Lazy value and its state. */
     toString() {
         return this.info.desc
+    }
+
+    memoize(): () => T {
+        return this.pull as any
     }
 
     /**
@@ -409,6 +323,7 @@ export function lazy<X>(initializer: () => Promise<Lazy<X>>): LazyAsync<X>
 export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>
 
 export function lazy<T>(initializer: () => Lazy<T>): Lazy<T>
+
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
 export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
     if (ownerInstance in initializer) {
@@ -477,43 +392,6 @@ export function lazyFromOperator<In, Out>(
         operand
     })
     return lz
-}
-/**
- * Memoizes the given function, caching its result and making sure it's only executed once. Uses
- * {@link Lazy} under the hood.
- *
- * @example
- *     // Synchronous memoization:
- *     let count = 0
- *     const func = () => count++
- *     const memFunc = memoize(func) satisfies () => number
- *     memFunc() // 0
- *     memFunc() // 0
- *     // Asynchronous memoization:
- *     let count = 0
- *     const func = async () => count++
- *     const memFunc = memoize(func) satisfies () => Promise<number>
- *     await memFunc() // 0
- *
- * @param definition The function to memoize. It can be synchronous, asynchronous, or return a lazy
- *   primitive.
- * @returns A function that will execute the memoized function and return its result.
- */
-
-export function memoize<T>(definition: 0 extends 1 & T ? any : never): () => any
-export function memoize<T extends Lazy<Promise<any>>>(definition: () => T): () => Lazy.Pulled<T>
-export function memoize<T extends Lazy<any>>(definition: () => T): () => Lazy.Pulled<T>
-export function memoize<T>(definition: () => T): () => T
-export function memoize<T>(definition: (() => T) | Lazy<T>): () => T {
-    if (isLazy(definition)) {
-        return definition.pull as any
-    }
-
-    // Don't double memoize
-    if (ownerInstance in definition) {
-        return definition as any
-    }
-    return lazy(definition).pull as any
 }
 
 export function pull<T>(input: 1 extends 0 & T ? T : never): any
