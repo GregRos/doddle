@@ -14,7 +14,7 @@ const Builders = {
             }
         })
     },
-    of<T>(...items: T[]): ASeq<T> {
+    of<Items extends any[]>(...items: Items): ASeq<Items extends (infer E)[] ? E : never> {
         return aseq(items)
     },
     range(start: number, end: number, size = 1) {

@@ -1,4 +1,10 @@
-import { aseq } from "@lib"
+import { aseq, type ASeq } from "@lib"
+import { declare, type, type_of } from "declare-it"
+declare.it("generalizes to disjunction correctly", expect => {
+    const s = aseq.of(1, "aaa", { hello: "world" })
+    expect(type_of(s)).to_equal(type<ASeq<number | string | { hello: string }>>)
+})
+
 it("gives empty on empty argslist", async () => {
     await expect(aseq.of()._qr).resolves.toEqual([])
 })

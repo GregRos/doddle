@@ -1,4 +1,9 @@
-import { seq } from "@lib"
+import { Seq, seq } from "@lib"
+import { declare, type, type_of } from "declare-it"
+declare.it("generalizes to disjunction correctly", expect => {
+    const s = seq.of(1, "aaa", { hello: "world" })
+    expect(type_of(s)).to_equal(type<Seq<number | string | { hello: string }>>)
+})
 it("gives empty on empty argslist", () => {
     expect(seq.of()._qr).toEqual([])
 })
