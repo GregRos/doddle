@@ -12,7 +12,7 @@ const Builders = {
             }
         })
     },
-    of<Items extends any[]>(...items: Items): Seq<Items extends (infer E)[] ? E : never> {
+    of<const Items extends any[]>(...items: Items): Seq<Items extends (infer E)[] ? E : never> {
         return seq(items)
     },
     range(start: number, end: number, size = 1) {

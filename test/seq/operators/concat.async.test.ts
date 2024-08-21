@@ -32,7 +32,7 @@ describe("type tests", () => {
                     function* () {
                         yield "aaa"
                     },
-                    seq.of(1n),
+                    seq.of(1n as bigint),
                     async function* () {
                         yield null
                     },

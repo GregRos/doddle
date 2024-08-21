@@ -2,7 +2,7 @@ import { aseq, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 declare.it("generalizes to disjunction correctly", expect => {
     const s = aseq.of(1, "aaa", { hello: "world" })
-    expect(type_of(s)).to_equal(type<ASeq<number | string | { hello: string }>>)
+    expect(type_of(s)).to_equal(type<ASeq<1 | "aaa" | { readonly hello: "world" }>>)
 })
 
 it("gives empty on empty argslist", async () => {

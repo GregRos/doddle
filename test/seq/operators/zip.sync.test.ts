@@ -4,15 +4,20 @@ import { lazy, seq } from "@lib"
 
 import type { Seq } from "@lib"
 const _seq = seq
-type SType<T> = Seq<T>
+type _Seq<T> = Seq<T>
 declare.it(
     "when input is tuple, typed as length N tuple with possibly undefined elements",
     expect => {
-        expect(type_of(seq.of(1, 2, 3).zip([["a", "b"]]))).to_equal(
-            type<SType<[number | undefined, string | undefined]>>
+        expect(type_of(_seq.of(1, 2, 3).zip([["a", "b"]]))).to_equal(
+            type<_Seq<[1 | 2 | 3 | undefined, string | undefined]>>
         )
     }
 )
+
+declare.it("using as number once should expand the type", expect => {
+    const s = _seq.of(1 as number, 2, 3).zip([["a", "b"]])
+    expect(type_of(s)).to_equal(type<_Seq<[number | undefined, string | undefined]>>)
+})
 
 declare.it("can't be called using an array input, as it would be ambiguous", () => {
     // @ts-expect-error
@@ -47,19 +52,17 @@ declare.it("when input is 1-∞ length tuple, projection arguments type has leng
 })
 
 declare.it("zip with [[]] gives [X | undefined, undefined] elements", expect => {
-    expect(type_of(_seq([1, 2, 3]).zip([[]]))).to_equal(
-        type<SType<[number | undefined, undefined]>>
-    )
+    expect(type_of(_seq([1, 2, 3]).zip([[]]))).to_equal(type<_Seq<[number | undefined, undefined]>>)
 })
 
 declare.it("zip empty arrays gives type [undefined, undefined]", expect => {
     const s = _seq([]).zip([[]])
-    expect(type_of(s)).to_equal(type<SType<[undefined, undefined]>>)
+    expect(type_of(s)).to_equal(type<_Seq<[undefined, undefined]>>)
 })
 
 declare.it("zip with projection gives projection type", expect => {
     const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => a + b!)
-    expect(type_of(s)).to_equal(type<SType<string>>)
+    expect(type_of(s)).to_equal(type<_Seq<string>>)
 })
 
 it("zip [] with [[]] gives empty", () => {
