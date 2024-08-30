@@ -1,6 +1,6 @@
 import { chk, loadCheckers } from "../errors/error.js"
 import type { Lazy, LazyAsync } from "../lazy/index.js"
-import { lazyFromOperator, pull } from "../lazy/index.js"
+import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
 import {
     Stage,
     _aiter,
@@ -22,6 +22,7 @@ import {
     type getZipValuesType
 } from "./common-types.js"
 import { Seq } from "./seq.class.js"
+import { seq } from "./seq.ctor.js"
 class ThrownErrorMarker {
     constructor(public error: any) {}
 }
@@ -226,21 +227,71 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             return alt
         })
     }
-    groupBy<K>(keyProjection: ASeq.NoIndexIteratee<T, K>) {
+
+    before(action: ASeq.NoInputAction): ASeq<T> {
+        chk(this.before).action(action)
+        return ASeqOperator(this, async function* before(input) {
+            await pull(action())
+            yield* input
+        })
+    }
+
+    groupBy<K>(keyProjection: ASeq.NoIndexIteratee<T, K>): ASeq<ASeq.Group<K, T>> {
         chk(this.groupBy).keyProjection(keyProjection)
-        return lazyFromOperator(this, async function groupBy(input) {
+
+        return ASeqOperator(this, async function* groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
-            for await (const element of input) {
-                const key = (await pull(keyProjection(element))) as K
-                let group = map.get(key)
-                if (!group) {
-                    group = [element]
-                    map.set(key, group)
-                } else {
-                    group.push(element)
+            const keys = [] as K[]
+            const shared = input
+                .map(async v => {
+                    const key = (await pull(keyProjection(v))) as K
+                    const group = map.get(key)
+                    if (group) {
+                        group.push(v)
+                    } else {
+                        keys.push(key)
+                        map.set(key, [v])
+                    }
+                })
+                .share()
+            async function* getGroupIterable(key: K): AsyncIterable<T> {
+                const group = map.get(key)!
+                for (let i = 0; ; i++) {
+                    if (i < group.length) {
+                        yield group[i]
+                        continue
+                    }
+
+                    for await (const _ of shared) {
+                        if (i < group.length) {
+                            break
+                        }
+                    }
+                    if (i >= group.length) {
+                        // must've completed
+                        return
+                    }
+                    i--
                 }
             }
-            return map
+
+            for (let i = 0; ; i++) {
+                if (i < keys.length) {
+                    const key = keys[i]
+                    yield [key, aseq(() => getGroupIterable(key))]
+                    continue
+                }
+                for await (const _ of shared) {
+                    if (i < keys.length) {
+                        break
+                    }
+                }
+                if (i >= keys.length) {
+                    // must've completed
+                    return
+                }
+                i--
+            }
         })
     }
     includes<T extends S, S>(this: ASeq<T>, value: S): LazyAsync<boolean>
@@ -479,6 +530,34 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             return result
         })
     }
+    after(action: ASeq.NoInputAction): ASeq<T> {
+        chk(this.after).action(action)
+        return ASeqOperator(this, async function* after(input) {
+            yield* input
+            await pull(action())
+        })
+    }
+    share(): ASeq<T> {
+        const iter = lazy(() => _aiter(this))
+        let err: Error | undefined = undefined
+        return ASeqOperator(this, async function* share() {
+            if (err) {
+                throw err
+            }
+            try {
+                while (true) {
+                    const { done, value } = await iter.pull().next()
+                    if (done) {
+                        return
+                    }
+                    yield value
+                }
+            } catch (e) {
+                err = e as Error
+                throw e
+            }
+        })
+    }
     toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): LazyAsync<Map<K, V>> {
         return Seq.prototype.toMap.call(this, kvpProjection as any) as any
     }
@@ -567,6 +646,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     if (!iter) {
                         return undefined
                     }
+
                     const result = await iter.next()
                     if (result.done) {
                         iterators[i] = undefined
@@ -581,6 +661,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 yield pull(projection.apply(undefined, results.map(r => r?.value) as any))
             }
         }) as any
+    }
+
+    toSeq(): LazyAsync<Seq<T>> {
+        return lazyFromOperator(this, async function toSeq(input) {
+            const all = await aseq(input).toArray().pull()
+            return seq(all)
+        })
     }
 }
 export const ASeqOperator = function aseq<In, Out>(
@@ -616,9 +703,21 @@ export namespace ASeq {
         | Iterator<E>
     export type FunctionInput<E> = () => Lazy.MaybePromised<IterableOrIterator<E>>
     export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
-    export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E>
-    export type SimpleInput<E> = MaybeLazy<IterableInput<E>> | FunctionInput<E>
+    export type ReadableStreamLike<E> = {
+        getReader(): {
+            read(): Promise<E>
+        }
+    }
+    export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E> | ReadableStreamLike<E>
+
+    export type SimpleInput<E> =
+        | MaybeLazy<IterableInput<E>>
+        | LazyAsync<IterableInput<E>>
+        | FunctionInput<E>
+
     export type Input<E> = SimpleInput<MaybePromise<E>>
+    export type NoInputAction = () => MaybeLazy<MaybePromise<unknown>>
+    export type Group<K, T> = [K, ASeq<T>]
 }
 
 loadCheckers(ASeq.prototype)

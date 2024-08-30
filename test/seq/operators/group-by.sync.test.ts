@@ -1,11 +1,10 @@
 import { declare, type, type_of } from "declare-it"
 
-import type { Lazy } from "@lib"
-import { lazy, seq } from "@lib"
+import { Seq, seq } from "@lib"
 const _seq = seq
-declare.it("returns Lazy<Map<K, [T, ...T[]]>>", expect => {
+declare.it("returns Seq<Seq.Group<K, V>>", expect => {
     const s = _seq([1, 2, 3]).groupBy(() => 1)
-    expect(type_of(s)).to_equal(type<Lazy<Map<number, [number, ...number[]]>>>)
+    expect(type_of(s)).to_equal(type<Seq<Seq.Group<number, number>>>)
 })
 
 declare.it("iteratee has single argument", expect => {
@@ -19,24 +18,39 @@ declare.it("iteratee can't have two arguments", expect => {
     _seq([1, 2, 3]).groupBy((_, __) => 1)
 })
 
-it("returns empty map on empty", () => {
-    const s = _seq([]).groupBy(() => 1)
-    expect(s.pull()).toEqual(new Map())
+declare.it("group has key", expect => {
+    _seq([1, 2, 3])
+        .groupBy(x => x)
+        .map((...args) => {
+            expect(type_of(args)).to_equal(type<[Seq.Group<number, number>, number]>)
+        })
 })
+
+it("returns empty seq on empty", () => {
+    const s = _seq([])
+        .groupBy(() => 1)
+        .toArray()
+        .pull()
+    expect(s).toEqual([])
+})
+
+function toMapRepr<K, V>(s: Seq<Seq.Group<K, V>>) {
+    return s.toMap(group => [group[0], group[1].toArray().pull()]).pull()
+}
 
 it("returns map with singleton on singleton", () => {
     const s = _seq([1]).groupBy(() => 1)
-    expect(s.pull()).toEqual(new Map([[1, [1]]]))
+    expect(toMapRepr(s)).toEqual(new Map([[1, [1]]]))
 })
 
 it("groups all by single key, preserves order", () => {
     const s = _seq([1, 2, 1, 2]).groupBy(_ => 1)
-    expect(s.pull()).toEqual(new Map([[1, [1, 2, 1, 2]]]))
+    expect(toMapRepr(s)).toEqual(new Map([[1, [1, 2, 1, 2]]]))
 })
 
 it("groups into two keys, preserves order", () => {
     const s = _seq([1, 2, 3, 4]).groupBy(x => x % 2)
-    expect(s.pull()).toEqual(
+    expect(toMapRepr(s)).toEqual(
         new Map([
             [1, [1, 3]],
             [0, [2, 4]]
@@ -48,7 +62,7 @@ it("groups by object by reference", () => {
     const obj1 = {}
     const obj2 = {}
     const s = _seq([1, 2, 3]).groupBy(x => (x % 2 ? obj1 : obj2))
-    expect(s.pull()).toEqual(
+    expect(toMapRepr(s)).toEqual(
         new Map([
             [obj1, [1, 3]],
             [obj2, [2]]
@@ -56,42 +70,21 @@ it("groups by object by reference", () => {
     )
 })
 
-it("does not pass index", () => {
-    const iteratee = jest.fn(x => x)
-    _seq([1, 2, 3]).groupBy(iteratee).pull()
-    expect(iteratee).toHaveBeenNthCalledWith(1, 1)
-    expect(iteratee).toHaveBeenNthCalledWith(2, 2)
-    expect(iteratee).toHaveBeenNthCalledWith(3, 3)
-})
-
-it("pulls each item once", () => {
-    const iteratee = jest.fn(x => x)
-    _seq([1, 2, 3]).groupBy(iteratee).pull()
-    expect(iteratee).toHaveBeenCalledTimes(3)
-})
-
-it("no side-effects before pull", () => {
-    const fn = jest.fn(function* () {
-        yield 1
-        yield 2
-        yield 3
-    })
-    const input = _seq(fn)
-    const map = jest.fn(x => x)
-    const result = input.groupBy(map)
-    expect(fn).not.toHaveBeenCalled()
-    expect(map).not.toHaveBeenCalled()
-    result.pull()
-    expect(fn).toHaveBeenCalledTimes(1)
-    expect(map).toHaveBeenCalledTimes(3)
-})
-
-it("works with lazy iteratee", () => {
-    const s = _seq([1, 2, 3]).groupBy(x => lazy(() => x % 2))
-    expect(s.pull()).toEqual(
-        new Map([
-            [0, [2]],
-            [1, [1, 3]]
-        ])
-    )
+it("can iterate each group till the end, while iterating main", () => {
+    const s = _seq([1, 2, 3, 4]).groupBy(x => x % 2)
+    let i = -1
+    for (const [key, group] of s) {
+        i++
+        if (i === 0) {
+            expect(key).toEqual(1)
+            expect(group.toArray().pull()).toEqual([1, 3])
+            continue
+        } else if (i === 1) {
+            expect(key).toEqual(0)
+            expect(group.toArray().pull()).toEqual([2, 4])
+            continue
+        }
+        throw new Error("should not iterate more than twice")
+    }
+    expect(i).toEqual(1)
 })

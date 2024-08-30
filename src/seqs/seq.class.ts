@@ -1,6 +1,6 @@
 import { chk, Doddle, loadCheckers } from "../errors/error.js"
 import type { Lazy } from "../lazy/index.js"
-import { lazyFromOperator, pull } from "../lazy/index.js"
+import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
 import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
 
 import {
@@ -17,6 +17,7 @@ import { seq } from "./seq.ctor.js"
 class ThrownErrorMarker {
     constructor(public error: any) {}
 }
+
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
     get [Symbol.toStringTag]() {
@@ -224,6 +225,37 @@ export abstract class Seq<T> implements Iterable<T> {
             return input.filter(predicate).first(alt).pull() as any
         })
     }
+
+    share(): Seq<T> {
+        const iter = lazy(() => _iter(this))
+        let err: Error | undefined = undefined
+        return SeqOperator(this, function* share() {
+            if (err) {
+                throw err
+            }
+            try {
+                while (true) {
+                    const { done, value } = iter.pull().next()
+                    if (done) {
+                        return
+                    }
+                    yield value
+                }
+            } catch (e) {
+                err = e as Error
+                throw e
+            }
+        })
+    }
+
+    after(action: Seq.NoInputAction): Seq<T> {
+        chk(this.after).action(action)
+        return SeqOperator(this, function* after(input) {
+            yield* input
+            pull(action())
+        })
+    }
+
     first(): Lazy<T | undefined>
     first<const Alt>(alt: Alt): Lazy<T | Alt>
     first<const Alt = undefined>(alt?: Alt): Lazy<any> {
@@ -234,23 +266,75 @@ export abstract class Seq<T> implements Iterable<T> {
             return alt
         })
     }
-    groupBy<K>(keyProjection: Seq.NoIndexIteratee<T, K>) {
-        chk(this.groupBy).keyProjection(keyProjection)
-        return lazyFromOperator(this, function groupBy(input) {
-            const map = new Map<K, [T, ...T[]]>()
-            for (const element of input) {
-                const key = pull(keyProjection(element)) as K
-                let group = map.get(key)
-                if (!group) {
-                    group = [element]
-                    map.set(key, group)
-                } else {
-                    group.push(element)
-                }
-            }
-            return map
+
+    before(action: Seq.NoInputAction): Seq<T> {
+        chk(this.before).action(action)
+        return SeqOperator(this, function* before(input) {
+            pull(action())
+            yield* input
         })
     }
+
+    groupBy<K>(keyProjection: Seq.NoIndexIteratee<T, K>): Seq<Seq.Group<K, T>> {
+        chk(this.groupBy).keyProjection(keyProjection)
+
+        return SeqOperator(this, function* groupBy(input) {
+            const map = new Map<K, [T, ...T[]]>()
+            const keys = [] as K[]
+            const shared = input
+                .map(v => {
+                    const key = pull(keyProjection(v)) as K
+                    const group = map.get(key)
+                    if (group) {
+                        group.push(v)
+                    } else {
+                        keys.push(key)
+                        map.set(key, [v])
+                    }
+                    return undefined
+                })
+                .share()
+            function* getGroupIterable(key: K): Iterable<T> {
+                const group = map.get(key)!
+                for (let i = 0; ; i++) {
+                    if (i < group.length) {
+                        yield group[i]
+                        continue
+                    }
+
+                    for (const _ of shared) {
+                        if (i < group.length) {
+                            break
+                        }
+                    }
+                    if (i >= group.length) {
+                        // must've completed
+                        return
+                    }
+                    i--
+                }
+            }
+
+            for (let i = 0; ; i++) {
+                if (i < keys.length) {
+                    const key = keys[i]
+                    yield [key, seq(() => getGroupIterable(key))]
+                    continue
+                }
+                for (const _ of shared) {
+                    if (i < keys.length) {
+                        break
+                    }
+                }
+                if (i >= keys.length) {
+                    // must've completed
+                    return
+                }
+                i--
+            }
+        })
+    }
+
     includes<T extends S, S>(this: Seq<T>, value: S): Lazy<boolean>
     includes<S extends T>(value: S): Lazy<boolean>
     includes(value: any): Lazy<boolean> {
@@ -649,16 +733,12 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 }
 
-let baseSeq!: Seq<any>
 export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {
-    if (!baseSeq) {
-        baseSeq = new (Seq as any)()
-    }
-    const obj = Object.create(baseSeq)
-    return Object.assign(obj, {
+    const myAbstractSeq = new (Seq as any)()
+    return Object.assign(myAbstractSeq, {
         _operator: impl.name,
         _operand: operand,
         [Symbol.iterator]: function operator() {
@@ -671,8 +751,9 @@ export namespace Seq {
     type MaybeLazy<T> = T | Lazy<T>
     export type IndexIteratee<O> = (index: number) => MaybeLazy<O>
 
+    export type NoInputAction = () => unknown | Lazy<unknown>
     export type Iteratee<E, O> = (element: E, index: number) => MaybeLazy<O>
-    export type NoIndexIteratee<E, O> = (element: E) => O
+    export type NoIndexIteratee<E, O> = (element: E) => MaybeLazy<O>
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
     export type Predicate<E> = Iteratee<E, boolean>
     export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
@@ -684,6 +765,7 @@ export namespace Seq {
     export type ObjectIterable<E> = object & Iterable<E>
     export type Input<E> = MaybeLazy<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
+    export type Group<K, V> = [K, Seq<V>]
 }
 
 loadCheckers(Seq.prototype)
