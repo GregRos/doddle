@@ -650,7 +650,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
 
                     const result = await iter.next()
                     if (result.done) {
-                        iterators[i]?.return?.()
+                        await iterators[i]?.return?.()
                         iterators[i] = undefined
                         return undefined
                     }

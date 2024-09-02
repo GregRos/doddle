@@ -1,7 +1,7 @@
 {
   "name": "doddle",
-  "version": "4.0.0",
-  "description": "Tiny, comprehensive, exhaustively tested toolset for iteration and lazy evaluation.",
+  "version": "4.1.0",
+  "description": "The easiest way to handle iterables.",
   "keywords": [
     "iteration",
     "iterable",
@@ -26,9 +26,7 @@
   "repository": "github:GregRos/doddle",
   "license": "MIT",
   "author": "GregRos",
-  "sideEffects": [
-    "dist/esm/aseq.js"
-  ],
+  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {

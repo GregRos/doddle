@@ -13,7 +13,7 @@ export function aseq<E>(input: ASeq.SimpleInput<E>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): any {
     input = checkASeqInputValue(input)
-    if (isNextable(input)) {
+    if (isNextable(input) || isReadableStream(input)) {
         // readable streams are basically iterators
         return aseq(() => input).cache()
     }
@@ -23,7 +23,7 @@ export function aseq<E>(input: ASeq.Input<E>): any {
 
     return ASeqOperator(input, async function* aseq(input) {
         const result = typeof input === "function" ? input() : input
-        let pulled = await pull(result)
+        const pulled = await pull(result)
 
         if (isAsyncIterable(pulled) || isIterable(pulled)) {
             // This should handle the case where ReadableStream is an async iterable
@@ -38,6 +38,6 @@ export function aseq<E>(input: ASeq.Input<E>): any {
         for (let item = await iterator.next(); !item.done; item = await iterator.next()) {
             yield pull(item.value)
         }
-        iterator.return?.()
+        await iterator.return?.()
     })
 }

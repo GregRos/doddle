@@ -10,6 +10,8 @@
   },
   "rules": {
     "no-invalid-this": "off",
+
+    "block-scoped-var": "off",
     "@typescript-eslint/no-namespace": "off",
     // Used a lot in tests as part of test cases with a title
     "@typescript-eslint/ban-ts-comment": "off",

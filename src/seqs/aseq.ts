@@ -4,7 +4,6 @@ import { pull } from "../lazy/index.js"
 import { getThrownError, isFunction } from "../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { aseq as aseqBase } from "./aseq.ctor.js"
-import { Seq } from "./seq.class.js"
 import { seq } from "./seq.js"
 const Builders = {
     iterate<T>(count: number, projection: ASeq.IndexIteratee<T>): ASeq<T> {
@@ -45,12 +44,3 @@ const Builders = {
 }
 export const aseq = Object.assign(aseqBase, Builders)
 loadCheckers(aseq)
-declare module "./seq.class.js" {
-    interface Seq<T> {
-        aseq(): ASeq<T>
-    }
-}
-
-Seq.prototype.aseq = function () {
-    return aseq(this)
-}
