@@ -135,10 +135,6 @@ it("converts from function returning an async lazy", async () => {
     expect(await iterable._qr).toEqual([1])
 })
 
-it("errors if given iterator directly", async () => {
-    await expect(async () => await _seq(new Dummy._Iterator() as any)._qr).rejects.toThrow(Doddle)
-})
-
 it("errors on iteration when given a function returning something else", async () => {
     const iterable = _seq(() => 1 as any)
     await expect(async () => {

@@ -1,3 +1,4 @@
+import type { DoddleReadableStream } from "./extra-types.js"
 import { pull, type Lazy, type LazyAsync } from "./lazy/index.js"
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
     return input[Symbol.iterator]()
@@ -5,6 +6,10 @@ export function _iter<T>(input: Iterable<T>): Iterator<T> {
 
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
     return input[Symbol.asyncIterator]()
+}
+
+export function _xiter<T>(input: Iterable<T> | AsyncIterable<T>): Iterator<T> | AsyncIterator<T> {
+    return isAsyncIterable(input) ? _aiter(input) : _iter(input)
 }
 
 export function isObject<T>(value: T): value is T & {} {
@@ -48,6 +53,10 @@ export const enum Stage {
 
 export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
     return isObject(value) && isFunction(value[Symbol.asyncIterator])
+}
+
+export function isReadableStream(value: any): value is DoddleReadableStream<unknown> {
+    return isObject(value) && isFunction(value.getReader)
 }
 
 export function isBigInt(value: any): value is bigint {

@@ -1,4 +1,5 @@
 import { chk, loadCheckers } from "../errors/error.js"
+import type { DoddleReadableStream } from "../extra-types.js"
 import type { Lazy, LazyAsync } from "../lazy/index.js"
 import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
 import {
@@ -649,6 +650,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
 
                     const result = await iter.next()
                     if (result.done) {
+                        iterators[i]?.return?.()
                         iterators[i] = undefined
                         return undefined
                     }
@@ -701,14 +703,11 @@ export namespace ASeq {
         | AsyncIterator<E>
         | Seq.ObjectIterable<E>
         | Iterator<E>
+        | DoddleReadableStream<E>
     export type FunctionInput<E> = () => Lazy.MaybePromised<IterableOrIterator<E>>
     export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
-    export type ReadableStreamLike<E> = {
-        getReader(): {
-            read(): Promise<E>
-        }
-    }
-    export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E> | ReadableStreamLike<E>
+
+    export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E> | DoddleReadableStream<E>
 
     export type SimpleInput<E> =
         | MaybeLazy<IterableInput<E>>

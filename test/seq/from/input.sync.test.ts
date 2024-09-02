@@ -114,9 +114,11 @@ it("converts from function returning lazy of iterable", () => {
     const iterable = seq(() => lazy(() => [1]))
     expect(iterable._qr).toEqual([1])
 })
-it("errors if given iterator directly", () => {
-    expect(() => seq(new Dummy._Iterator() as any)).toThrow(Doddle)
+it("converts from iterable of lazies", () => {
+    const iterable = seq([lazy(() => 1)])
+    expect(iterable._qr).toEqual([1])
 })
+
 it("errors if given something else", () => {
     expect(() => seq(1 as any)).toThrow(Doddle)
 })

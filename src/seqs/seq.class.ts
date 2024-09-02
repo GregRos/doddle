@@ -719,6 +719,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     }
                     const result = iter.next()
                     if (result.done) {
+                        iterators[i]?.return?.()
                         iterators[i] = undefined
                         return undefined
                     }
@@ -762,7 +763,7 @@ export namespace Seq {
     export type IterableOrIterator<E> = Iterable<E> | Iterator<E>
     export type FunctionInput<E> = () => MaybeLazy<IterableOrIterator<MaybeLazy<E>>>
 
-    export type ObjectIterable<E> = object & Iterable<E>
+    export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E>)
     export type Input<E> = MaybeLazy<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type Group<K, V> = [K, Seq<V>]
