@@ -1,7 +1,7 @@
 import { chk, Doddle, loadCheckers } from "../errors/error.js"
 import type { Lazy } from "../lazy/index.js"
 import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
-import { _iter, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
+import { _iter, createCompareKey, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
 
 import {
     SkippingMode,
@@ -132,6 +132,27 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
+    exclude(others: Seq.Input<T>): Seq<T> {
+        return SeqOperator(this, function* exclude(input) {
+            yield* input.excludeBy(others, x => x)
+        })
+    }
+    excludeBy<K, S = T>(others: Seq.Input<S>, projection: Seq.NoIndexIteratee<T | S, K>): Seq<T> {
+        chk(this.excludeBy).projection(projection)
+        return SeqOperator(this, function* exclude(input) {
+            const set = seq(others)
+                .map(x => {
+                    return pull(projection(x))
+                })
+                .toSet()
+                .pull()
+            yield* input.filter(x => {
+                const key = pull(projection(x))
+                return !set.has(key)
+            })
+        })
+    }
+
     concatMap<S>(projection: Seq.Iteratee<T, Seq.Input<S>>): Seq<getConcatElementType<T, S>> {
         chk(this.concatMap).projection(projection)
         return SeqOperator(this, function* concatMap(input) {
@@ -397,18 +418,21 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
-    orderBy(projection: Seq.NoIndexIteratee<T, any>, reverse = false): Seq<T> {
+    orderBy<K extends [unknown, ...unknown[]]>(
+        projection: Seq.NoIndexIteratee<T, K>,
+        reverse?: boolean
+    ): Seq<T>
+    orderBy<K>(projection: Seq.NoIndexIteratee<T, K>, reverse?: boolean): Seq<T>
+    orderBy<K>(projection: Seq.NoIndexIteratee<T, K>, reverse = false): Seq<T> {
         chk(this.orderBy).projection(projection)
         chk(this.orderBy).reverse(reverse)
+        const compareKey = createCompareKey(reverse)
         return SeqOperator(this, function* orderBy(input) {
             yield* seq(input)
                 .map(e => returnKvp(e, projection(e), e))
                 .toArray()
                 .map(xs => {
-                    void xs.sort((a: any, b: any) => {
-                        const result = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
-                        return reverse ? -result : result
-                    })
+                    xs.sort(compareKey)
                     return xs.map((x: any) => x.value)
                 })
                 .pull()
@@ -465,34 +489,59 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+
+    seqEqualsBy<K, S = T>(
+        _other: Seq.Input<S>,
+        projection: Seq.NoIndexIteratee<S | T, K>
+    ): Lazy<boolean> {
+        const other = seq(_other)
+        return lazyFromOperator(this, function seqEqualsBy(input) {
+            const otherIterator = _iter(other)
+            try {
+                for (const element of input) {
+                    const otherElement = otherIterator.next()
+                    const keyThis = pull(projection(element as any))
+                    const keyOther = pull(projection(otherElement.value))
+                    if (otherElement.done || keyThis !== keyOther) {
+                        return false
+                    }
+                }
+                return !!otherIterator.next().done
+            } finally {
+                otherIterator.return?.()
+            }
+        })
+    }
+
     seqEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
     seqEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
     seqEquals<S extends T>(_other: Seq.Input<S>) {
-        const other = seq(_other)
-        return lazyFromOperator(this, function seqEquals(input) {
-            const otherIterator = _iter(other)
-            for (const element of input) {
-                const otherElement = otherIterator.next()
-                if (otherElement.done || element !== otherElement.value) {
-                    return false
-                }
-            }
-            return !!otherIterator.next().done
-        })
+        return this.seqEqualsBy(_other, x => x)
     }
-    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
-    setEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
-    setEquals<S extends T>(_other: Seq.Input<S>) {
+
+    setEqualsBy<K, S = T>(
+        _other: Seq.Input<S>,
+        projection: Seq.NoIndexIteratee<S | T, K>
+    ): Lazy<boolean> {
         const other = seq(_other)
-        return lazyFromOperator(this, function setEquals(input) {
-            const set = new Set(other) as Set<any>
+        return lazyFromOperator(this, function setEqualsBy(input) {
+            const set = new Set()
+            for (const element of other) {
+                set.add(pull(projection(element)))
+            }
             for (const element of input) {
-                if (!set.delete(element)) {
+                if (!set.delete(pull(projection(element)))) {
                     return false
                 }
             }
             return set.size === 0
         })
+    }
+
+    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>) {
+        return this.setEqualsBy(_other, x => x)
     }
 
     shuffle() {
@@ -623,6 +672,18 @@ export abstract class Seq<T> implements Iterable<T> {
             return [...input]
         })
     }
+
+    toMapBy<K>(projection: Seq.Iteratee<T, K>) {
+        // ! POLYMORPHIC !
+
+        projection = chk(this.toMapBy).projection(projection)
+
+        return this.toMap((x, i) => {
+            const lz = lazy(() => projection(x, i)).map(k => [k, x]) as Lazy<[K, T]>
+            return lz
+        })
+    }
+
     toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
         // ! POLYMORPHIC !
 
@@ -750,6 +811,7 @@ export const SeqOperator = function seq<In, Out>(
 
 export namespace Seq {
     type MaybeLazy<T> = T | Lazy<T>
+
     export type IndexIteratee<O> = (index: number) => MaybeLazy<O>
 
     export type NoInputAction = () => unknown | Lazy<unknown>
@@ -760,10 +822,9 @@ export namespace Seq {
     export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
 
     export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybeLazy<O>
-    export type IterableOrIterator<E> = Iterable<E> | Iterator<E>
-    export type FunctionInput<E> = () => MaybeLazy<IterableOrIterator<MaybeLazy<E>>>
+    export type FunctionInput<E> = () => MaybeLazy<ObjectIterable<MaybeLazy<E>>>
 
-    export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E>)
+    export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E> | ArrayLike<E>)
     export type Input<E> = MaybeLazy<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type Group<K, V> = [K, Seq<V>]

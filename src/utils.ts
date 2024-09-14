@@ -20,6 +20,10 @@ export function isFunction(value: any): boolean {
     return typeof value === "function"
 }
 
+export function isArrayLike<T>(value: any): value is ArrayLike<T> {
+    return isObject(value) && isInt(value.length)
+}
+
 export function isIterable<T>(value: any): value is Iterable<T> {
     return isObject(value) && isFunction(value[Symbol.iterator])
 }
@@ -179,4 +183,31 @@ export function shuffleArray<T>(array: T[]) {
         array[j] = temp
     }
     return array
+}
+
+function createBaseCompare(desc: boolean) {
+    return (a: any, b: any) => (desc ? -1 : 1) * (a < b ? -1 : a > b ? 1 : 0)
+}
+
+export function createCompare(desc: boolean) {
+    const baseCompare = createBaseCompare(desc)
+    return (a: any, b: any) => {
+        if (Array.isArray(a) && Array.isArray(b)) {
+            for (let i = 0; i < a.length; i++) {
+                const result = baseCompare(a[i], b[i])
+                if (result !== 0) {
+                    return desc ? -result : result
+                }
+            }
+            return 0
+        }
+        return baseCompare(a, b)
+    }
+}
+
+export function createCompareKey(desc: boolean) {
+    const compare = createCompare(desc)
+    return (a: any, b: any) => {
+        return compare(a.key, b.key)
+    }
 }

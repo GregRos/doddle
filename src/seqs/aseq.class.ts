@@ -5,6 +5,7 @@ import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
 import {
     Stage,
     _aiter,
+    createCompareKey,
     parseStage,
     returnKvp,
     shuffleArray,
@@ -177,7 +178,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     count(predicate?: ASeq.Predicate<T>): LazyAsync<number> {
         return Seq.prototype.count.call(this, predicate as any) as any
     }
-    each(action: ASeq.StageIteratee<T, void>, stage: EachCallStage = "before") {
+    each(action: ASeq.StageIteratee<T, unknown>, stage: EachCallStage = "before") {
         chk(this.each).action(action)
         chk(this.each).stage(stage)
         const myStage = parseStage(stage)
@@ -329,18 +330,44 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
         return Seq.prototype.minBy.call(this, projection, alt)
     }
+    exclude(others: ASeq.Input<T>): ASeq<T> {
+        return ASeqOperator(this, async function* exclude(input) {
+            yield* input.excludeBy(others, x => x)
+        })
+    }
+    excludeBy<K, S = T>(
+        others: ASeq.Input<S>,
+        projection: ASeq.NoIndexIteratee<T | S, K>
+    ): ASeq<T> {
+        chk(this.excludeBy).projection(projection)
+        return ASeqOperator(this, async function* exclude(input) {
+            const set = await aseq(others)
+                .map(async x => {
+                    return await pull(projection(x))
+                })
+                .toSet()
+                .pull()
+            yield* input.filter(async x => {
+                const key = await pull(projection(x))
+                return !set.has(key)
+            })
+        })
+    }
+    orderBy<K extends [unknown, ...unknown[]]>(
+        projection: ASeq.NoIndexIteratee<T, K>,
+        reverse?: boolean
+    ): ASeq<T>
+    orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, reverse?: boolean): ASeq<T>
     orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, reverse = false): ASeq<T> {
         chk(this.orderBy).projection(projection)
         chk(this.orderBy).reverse(reverse)
+        const compareKey = createCompareKey(reverse)
         return ASeqOperator(this, async function* orderBy(input) {
             yield* await aseq(input)
                 .map(e => returnKvp(input, projection(e), e))
                 .toArray()
                 .map(async xs => {
-                    xs.sort((a, b) => {
-                        const comp = a.key < b.key ? -1 : a.key > b.key ? 1 : 0
-                        return reverse ? -comp : comp
-                    })
+                    void xs.sort(compareKey)
                     return xs.map(x => x.value)
                 })
                 .pull()
@@ -383,40 +410,60 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         })
     }
-    seqEquals<T extends S, S>(
-        this: AsyncIterable<T>,
-        _other: ASeq.SimpleInput<S>
-    ): LazyAsync<boolean>
-    seqEquals<S extends T>(_other: ASeq.SimpleInput<S>): LazyAsync<boolean>
-    seqEquals(_other: ASeq.SimpleInput<T>) {
+
+    seqEqualsBy<K, S = T>(
+        _other: ASeq.Input<S>,
+        projection: ASeq.NoIndexIteratee<S | T, K>
+    ): LazyAsync<boolean> {
         const other = aseq(_other)
-        return lazyFromOperator(this, async function seqEquals(input) {
+        return lazyFromOperator(this, async function seqEqualsBy(input) {
             const otherIterator = _aiter(other)
-            for await (const element of input) {
-                const otherElement = await otherIterator.next()
-                if (otherElement.done || element !== otherElement.value) {
-                    return false
+            try {
+                for await (const element of input) {
+                    const otherElement = await otherIterator.next()
+                    const keyThis = await pull(projection(element as any))
+                    const keyOther = await pull(projection(otherElement.value))
+                    if (otherElement.done || keyThis !== keyOther) {
+                        return false
+                    }
                 }
+                return !!(await otherIterator.next()).done
+            } finally {
+                await otherIterator.return?.()
             }
-            return !!(await otherIterator.next()).done
         })
     }
-    setEquals<S extends T>(_other: ASeq.Input<S>): LazyAsync<boolean>
-    setEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): LazyAsync<boolean>
-    setEquals<S>(_other: ASeq.SimpleInput<S>) {
+
+    seqEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): LazyAsync<boolean>
+    seqEquals<S extends T>(_other: ASeq.Input<S>): LazyAsync<boolean>
+    seqEquals(_other: ASeq.Input<T>) {
+        return this.seqEqualsBy(_other, x => x)
+    }
+
+    setEqualsBy<K, S = T>(
+        _other: ASeq.Input<S>,
+        projection: ASeq.NoIndexIteratee<S | T, K>
+    ): LazyAsync<boolean> {
         const other = aseq(_other)
-        return lazyFromOperator(this, async function setEquals(input) {
-            const set = new Set<T>() as Set<any>
+        return lazyFromOperator(this, async function setEqualsBy(input) {
+            const set = new Set()
             for await (const element of other) {
-                set.add(element)
+                set.add(await pull(projection(element)))
             }
             for await (const element of input) {
-                if (!set.delete(element)) {
+                if (!set.delete(await pull(projection(element)))) {
                     return false
                 }
             }
             return set.size === 0
         })
+    }
+
+    setEquals<S extends T>(_other: ASeq.Input<S>): LazyAsync<boolean>
+    setEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): LazyAsync<boolean>
+    setEquals<S>(_other: ASeq.SimpleInput<S>) {
+        const other = aseq(_other)
+        return this.setEqualsBy(other, x => x)
     }
     shuffle() {
         return ASeqOperator(this, async function* shuffle(input) {
@@ -559,6 +606,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         })
     }
+
+    toMapBy<K, V>(projection: ASeq.Iteratee<T, K>): LazyAsync<Map<K, V>> {
+        return Seq.prototype.toMapBy.call(this, projection as any) as any
+    }
+
     toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): LazyAsync<Map<K, V>> {
         return Seq.prototype.toMap.call(this, kvpProjection as any) as any
     }
@@ -704,6 +756,7 @@ export namespace ASeq {
         | Seq.ObjectIterable<E>
         | Iterator<E>
         | DoddleReadableStream<E>
+
     export type FunctionInput<E> = () => Lazy.MaybePromised<IterableOrIterator<E>>
     export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
 

@@ -3,6 +3,7 @@ import {
     getValueDesc,
     isAnyIterable,
     isArray,
+    isArrayLike,
     isBool,
     isError,
     isFunction,
@@ -123,20 +124,26 @@ const expectStage = expectation("'before', 'after', 'both', or undefined", isSta
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
     anOrStructure([wIterable, wIterator, wLazy].join(", "), wFunction),
-    x => isIterable(x) || isFunction(x) || isLazy(x) || isNextable(x)
+    x => isIterable(x) || isFunction(x) || isLazy(x) || isNextable(x) || isArrayLike(x)
 )
 const expectAsyncInputValue = expectation(
     anOrStructure([[wAsync, wIterable, wIterator], wLazy].join(", "), wFunction),
-    x => isAnyIterable(x) || isFunction(x) || isLazy(x) || isNextable(x) || isReadableStream(x)
+    x =>
+        isAnyIterable(x) ||
+        isFunction(x) ||
+        isLazy(x) ||
+        isNextable(x) ||
+        isReadableStream(x) ||
+        isArrayLike(x)
 )
 const iterableOrIterator = anOrStructure(wIterable, wIterator)
 const expectSyncIterableOrIterator = expectation(
     anOrStructure(wIterable, wIterator),
-    x => isIterable(x) || isNextable(x) || isLazy(x)
+    x => isIterable(x) || isNextable(x) || isLazy(x) || isArrayLike(x)
 )
 const expectAsyncIterableOrIterator = expectation(
     anOrStructure([wAsync, wIterable], wIterator),
-    x => isAnyIterable(x) || isNextable(x) || isLazy(x) || isReadableStream(x)
+    x => isAnyIterable(x) || isNextable(x) || isLazy(x) || isReadableStream(x) || isArrayLike(x)
 )
 const checkFunctionReturn = (
     thing: Text,

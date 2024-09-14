@@ -1,15 +1,24 @@
 import { checkASeqInputValue } from "../errors/error.js"
 import { pull, type Lazy, type LazyAsync } from "../lazy/index.js"
-import { _xiter, isAsyncIterable, isIterable, isNextable, isReadableStream } from "../utils.js"
+import {
+    _xiter,
+    isArrayLike,
+    isAsyncIterable,
+    isInt,
+    isIterable,
+    isNextable,
+    isReadableStream,
+    type MaybePromise
+} from "../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
 import { DoddleReadableStreamIterator } from "./readable-stream-aiter.js"
 
 export function aseq<E>(input: readonly E[]): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<LazyAsync<E>>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<Promise<LazyAsync<E>>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<LazyAsync<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<Promise<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<Lazy<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<E>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<MaybePromise<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): any {
     input = checkASeqInputValue(input)
@@ -28,6 +37,13 @@ export function aseq<E>(input: ASeq.Input<E>): any {
         if (isAsyncIterable(pulled) || isIterable(pulled)) {
             // This should handle the case where ReadableStream is an async iterable
             var iterator = _xiter(pulled)
+        } else if (isArrayLike(pulled)) {
+            for (const key of Object.keys(pulled)) {
+                if (isInt(+key)) {
+                    yield pull(pulled[+key])
+                }
+            }
+            return
         } else if (isReadableStream(pulled)) {
             iterator = new DoddleReadableStreamIterator(pulled, false)
         } else if (isNextable(pulled)) {
