@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
-import type { Lazy, Seq } from "@lib"
-import { lazy, seq } from "@lib"
+import type { Doddle, Seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("element type the same with id proejction", expect => {
@@ -10,19 +10,19 @@ declare.it("element type the same with id proejction", expect => {
 })
 
 declare.it("lazy result is pulled", expect => {
-    const s = _seq([1, 2, 3]).map(x => lazy(() => x))
+    const s = _seq([1, 2, 3]).map(x => doddle(() => x))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 declare.it("disjunction with lazy is also pulled", expect => {
-    const s = _seq([1, 2, 3]).map(x => lazy(() => x) as number | Lazy<number>)
+    const s = _seq([1, 2, 3]).map(x => doddle(() => x) as number | Doddle<number>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 declare.it("generic - lazy result is pulled", expect => {
-    function _<T>(x: Lazy<T>) {
-        expect(type_of(_seq([1, 2, 3]).map(() => lazy(() => x)))).to_equal(type<_Seq<T>>)
+    function _<T>(x: Doddle<T>) {
+        expect(type_of(_seq([1, 2, 3]).map(() => doddle(() => x)))).to_equal(type<_Seq<T>>)
     }
-    function __<T>(x: T | Lazy<T>) {
-        expect(type_of(_seq([1, 2, 3]).map(() => lazy(() => x)))).to_equal(type<_Seq<T>>)
+    function __<T>(x: T | Doddle<T>) {
+        expect(type_of(_seq([1, 2, 3]).map(() => doddle(() => x)))).to_equal(type<_Seq<T>>)
     }
 })
 
@@ -81,6 +81,6 @@ it("can iterate twice", () => {
 })
 
 it("lazy result is pulled", () => {
-    const s = _seq([1, 2, 3]).map(x => lazy(() => x))
+    const s = _seq([1, 2, 3]).map(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2, 3])
 })

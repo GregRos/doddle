@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
@@ -20,17 +20,17 @@ declare.it("handles async projections", expect => {
 })
 
 declare.it("handles lazy projections", expect => {
-    const s = _aseq([1, 2, 3]).map(() => lazy(() => "1"))
+    const s = _aseq([1, 2, 3]).map(() => doddle(() => "1"))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
 declare.it("handles lazy async projections", expect => {
-    const s = _aseq([1, 2, 3]).map(async x => lazy(async () => x + ""))
+    const s = _aseq([1, 2, 3]).map(async x => doddle(async () => x + ""))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
 declare.it("handles async lazy async projections", expect => {
-    const s = _aseq([1, 2, 3]).map(async x => lazy(async () => x + ""))
+    const s = _aseq([1, 2, 3]).map(async x => doddle(async () => x + ""))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
@@ -90,21 +90,21 @@ it("works for async projections", async () => {
 })
 
 it("allows lazy projection", async () => {
-    const s = _aseq([1, 2, 3]).map(i => lazy(() => i + 1))
+    const s = _aseq([1, 2, 3]).map(i => doddle(() => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
 it("allows lazy async projection", async () => {
-    const s = _aseq([1, 2, 3]).map(i => lazy(async () => i + 1))
+    const s = _aseq([1, 2, 3]).map(i => doddle(async () => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
 it("allows async lazy projection", async () => {
-    const s = _aseq([1, 2, 3]).map(async i => lazy(() => i + 1))
+    const s = _aseq([1, 2, 3]).map(async i => doddle(() => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
 it("allows async lazy async projection", async () => {
-    const s = _aseq([1, 2, 3]).map(async i => lazy(async () => i + 1))
+    const s = _aseq([1, 2, 3]).map(async i => doddle(async () => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })

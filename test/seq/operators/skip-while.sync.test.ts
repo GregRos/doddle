@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 describe("type tests", () => {
@@ -58,6 +58,6 @@ it("calls predicate as many times as needed", () => {
 })
 
 it("works with lazy predicate", () => {
-    const s = _seq([1, 2, 3, 4, 5]).skipWhile(() => lazy(() => false))
+    const s = _seq([1, 2, 3, 4, 5]).skipWhile(() => doddle(() => false))
     expect(s._qr).toEqual([1, 2, 3, 4, 5])
 })

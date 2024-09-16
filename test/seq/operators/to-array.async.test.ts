@@ -1,4 +1,4 @@
-import type { LazyAsync } from "@lib"
+import type { DoddleAsync } from "@lib"
 import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
@@ -6,12 +6,12 @@ const _aseq = aseq
 
 declare.it("is typed correctly", expect => {
     const s = _aseq([1, 2, 3]).toArray()
-    expect(type_of(s)).to_equal(type<LazyAsync<number[]>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<number[]>>)
 })
 
 declare.it("is typed correctly for mixed types", expect => {
     const s = _aseq([1, "two", true]).toArray()
-    expect(type_of(s)).to_equal(type<LazyAsync<(string | number | boolean)[]>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<(string | number | boolean)[]>>)
 })
 it("converts an empty sequence to an empty array", async () => {
     const s = _aseq([])

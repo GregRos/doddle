@@ -2,8 +2,8 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { Doddle } from "@error"
 import { seq } from "@lib"
+import { DoddleError } from "@error"
 
 const _seq = seq
 type SType<T> = Seq<T>
@@ -142,13 +142,13 @@ describe("invalid inputs", () => {
         it("throws conversion TypeError if handler returns random value", () => {
             const throwing = _seq.throws(() => new Error("asdsad"))
             // @ts-expect-error
-            expect(() => [...throwing.catch(() => 1)]).toThrow(Doddle)
+            expect(() => [...throwing.catch(() => 1)]).toThrow(DoddleError)
             expect(() => [
                 // @ts-expect-error
                 ...throwing.catch(() => {
                     return {}
                 })
-            ]).toThrow(Doddle)
+            ]).toThrow(DoddleError)
         })
         it("throws if catch returns a Promise", () => {
             const throwing = _seq.throws(() => new Error("asdsad"))

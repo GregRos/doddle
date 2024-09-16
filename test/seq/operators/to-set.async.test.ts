@@ -1,31 +1,31 @@
-import { aseq, LazyAsync } from "@lib"
+import { aseq, DoddleAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toSet()
-    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
 declare.it("is typed correctly for mixed types", expect => {
     const s = _seq([1, "two", true]).toSet()
-    expect(type_of(s)).to_equal(type<LazyAsync<Set<string | number | boolean>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Set<string | number | boolean>>>)
 })
 
 declare.it("allows lazy iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
-    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
 declare.it("allows lazy async iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
-    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
 declare.it("allows async lazy async iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
-    expect(type_of(s)).to_equal(type<LazyAsync<Set<number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
 it("converts an empty sequence to an empty set", async () => {

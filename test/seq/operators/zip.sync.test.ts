@@ -1,6 +1,6 @@
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 
 import type { Seq } from "@lib"
 const _seq = seq
@@ -178,6 +178,6 @@ it("can iterate twice", () => {
 })
 
 it("works with lazy projection", () => {
-    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => lazy(() => `${a}${b}`))
+    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => doddle(() => `${a}${b}`))
     expect(s._qr).toEqual(["1a", "2b", "3undefined"])
 })

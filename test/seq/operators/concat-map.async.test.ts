@@ -1,4 +1,4 @@
-import { aseq, lazy, type ASeq } from "@lib"
+import { aseq, doddle, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -44,17 +44,17 @@ describe("type tests", () => {
     })
 
     declare.it("allows lazy projection", expect => {
-        const s = s123.concatMap(() => lazy(() => [1]))
+        const s = s123.concatMap(() => doddle(() => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 
     declare.it("allows lazy async projection", expect => {
-        const s = s123.concatMap(() => lazy(async () => [1]))
+        const s = s123.concatMap(() => doddle(async () => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 
     declare.it("allows async lazy async projection", expect => {
-        const s = s123.concatMap(async () => lazy(async () => [1]))
+        const s = s123.concatMap(async () => doddle(async () => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 })
@@ -110,21 +110,21 @@ it("works for async projections", async () => {
 })
 
 it("works for lazy  projections", async () => {
-    const s = _seq([1, 2, 3]).concatMap(x => lazy(() => [x]))
+    const s = _seq([1, 2, 3]).concatMap(x => doddle(() => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("works for lazy async projections", async () => {
-    const s = _seq([1, 2, 3]).concatMap(x => lazy(async () => [x]))
+    const s = _seq([1, 2, 3]).concatMap(x => doddle(async () => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("works for async lazy async projections", async () => {
-    const s = _seq([1, 2, 3]).concatMap(async x => lazy(async () => [x]))
+    const s = _seq([1, 2, 3]).concatMap(async x => doddle(async () => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("works for async lazy projections", async () => {
-    const s = _seq([1, 2, 3]).concatMap(async x => lazy(() => [x]))
+    const s = _seq([1, 2, 3]).concatMap(async x => doddle(() => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

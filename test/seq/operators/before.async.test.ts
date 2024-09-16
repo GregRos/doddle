@@ -1,5 +1,5 @@
-import { Doddle } from "@error"
-import { aseq, lazy } from "@lib"
+import { DoddleError } from "@error"
+import { aseq, doddle } from "@lib"
 import { declare } from "declare-it"
 
 describe("async", () => {
@@ -67,7 +67,7 @@ describe("async", () => {
 
     it("pulls lazy result", async () => {
         const fn = jest.fn(() => 1)
-        const beforeFn = () => lazy(fn)
+        const beforeFn = () => doddle(fn)
         const s = aseq([1, 2, 3]).before(beforeFn)
         await s.toArray().pull()
         expect(fn).toHaveBeenCalledTimes(1)
@@ -87,7 +87,7 @@ describe("async", () => {
     it("waits for async lazy async result", async () => {
         const fn = jest.fn(async () => 1)
         const beforeFn = async () =>
-            lazy(async () => {
+            doddle(async () => {
                 await new Promise(resolve => setTimeout(resolve, 1))
                 return fn()
             })
@@ -98,7 +98,9 @@ describe("async", () => {
 
     describe("invalid input", () => {
         it("throws TypeError if before function is not callable", async () => {
-            await expect(async () => aseq([1, 2, 3]).before(123 as any)).rejects.toThrow(Doddle)
+            await expect(async () => aseq([1, 2, 3]).before(123 as any)).rejects.toThrow(
+                DoddleError
+            )
         })
     })
 })

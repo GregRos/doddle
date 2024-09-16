@@ -1,4 +1,4 @@
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 import { declare } from "declare-it"
 
 declare.it("callable with various returns", () => {
@@ -73,7 +73,7 @@ it("gets called twice if end reached twice", () => {
 
 it("pulls lazy result", () => {
     const fn = jest.fn(() => 1)
-    const afterFn = () => lazy(fn)
+    const afterFn = () => doddle(fn)
     const s = seq([1, 2, 3]).after(afterFn)
     s.toArray().pull()
     expect(fn).toHaveBeenCalledTimes(1)

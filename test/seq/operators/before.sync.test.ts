@@ -1,5 +1,5 @@
-import { Doddle } from "@error"
-import { lazy, seq } from "@lib"
+import { DoddleError } from "@error"
+import { doddle, seq } from "@lib"
 import { declare } from "declare-it"
 
 declare.it("callable with various returns", () => {
@@ -66,7 +66,7 @@ it("doesn't get called if take(0) is used", () => {
 
 it("pulls lazy result", () => {
     const fn = jest.fn(() => 1)
-    const beforeFn = () => lazy(fn)
+    const beforeFn = () => doddle(fn)
     const s = seq([1, 2, 3]).before(beforeFn)
     s.toArray().pull()
     expect(fn).toHaveBeenCalledTimes(1)
@@ -74,6 +74,6 @@ it("pulls lazy result", () => {
 
 describe("invalid input", () => {
     it("throws TypeError if before function is not callable", () => {
-        expect(() => seq([1, 2, 3]).before(123 as any)).toThrow(Doddle)
+        expect(() => seq([1, 2, 3]).before(123 as any)).toThrow(DoddleError)
     })
 })

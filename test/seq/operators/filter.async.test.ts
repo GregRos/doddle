@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -20,17 +20,17 @@ declare.it("element type doesn't change if the predicate is for a supertype", ex
 })
 
 declare.it("allows lazy predicate", expect => {
-    const s = _seq([1, 2, 3]).filter(() => lazy(() => true))
+    const s = _seq([1, 2, 3]).filter(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("allows lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).filter(() => lazy(async () => true))
+    const s = _seq([1, 2, 3]).filter(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("allows async lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).filter(async () => lazy(async () => true))
+    const s = _seq([1, 2, 3]).filter(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
@@ -86,21 +86,21 @@ it("works for async predicates (false)", async () => {
 })
 
 it("allows lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).filter(i => lazy(() => i % 2 === 0))
+    const s = _seq([1, 2, 3]).filter(i => doddle(() => i % 2 === 0))
     expect(await s._qr).toEqual([2])
 })
 
 it("allows lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).filter(i => lazy(async () => i % 2 === 0))
+    const s = _seq([1, 2, 3]).filter(i => doddle(async () => i % 2 === 0))
     expect(await s._qr).toEqual([2])
 })
 
 it("allows async lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).filter(async i => lazy(() => i % 2 === 0))
+    const s = _seq([1, 2, 3]).filter(async i => doddle(() => i % 2 === 0))
     expect(await s._qr).toEqual([2])
 })
 
 it("allows async lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).filter(async i => lazy(async () => i % 2 === 0))
+    const s = _seq([1, 2, 3]).filter(async i => doddle(async () => i % 2 === 0))
     expect(await s._qr).toEqual([2])
 })

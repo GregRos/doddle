@@ -1,7 +1,7 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns seq of same type", expect => {
@@ -84,6 +84,6 @@ it("doesn't throw for incomparable key", () => {
 })
 
 it("works with lazy key selector", () => {
-    const s = _seq([2, 3, 1]).orderBy(x => lazy(() => x))
+    const s = _seq([2, 3, 1]).orderBy(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2, 3])
 })

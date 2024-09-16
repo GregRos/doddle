@@ -1,11 +1,11 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
 declare.test("correctly typed as Lazy and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
-    expect(type_of(s)).to_equal(type<Lazy<number | undefined>>)
+    expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
 
 it("gets first element", () => {

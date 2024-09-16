@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq, type LazyAsync } from "@lib"
+import { aseq, type DoddleAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
@@ -7,19 +7,19 @@ type _Seq<T> = ASeq<T>
 
 declare.it("accepts an input sequence, returns LazyAsync<boolean>", expect => {
     const s = null! as _Seq<number>
-    expect(type_of(s.setEquals(s))).to_equal(type<LazyAsync<boolean>>)
+    expect(type_of(s.setEquals(s))).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of subtype, returns LazyAsync<boolean>", expect => {
     const s1 = null! as _Seq<number>
     const s2 = null! as _Seq<1 | 2 | 3>
-    expect(type_of(s1.setEquals(s2))).to_equal(type<LazyAsync<boolean>>)
+    expect(type_of(s1.setEquals(s2))).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.it("accepts input sequence of supertype, returns LazyAsync<boolean>", expect => {
     const s1 = null! as _Seq<1 | 2 | 3>
     const s2 = null! as _Seq<number>
-    expect(type_of(s1.setEquals(s2))).to_equal(type<LazyAsync<boolean>>)
+    expect(type_of(s1.setEquals(s2))).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.it("doesn't accept non-subtype, non-supertype inputs", expect => {

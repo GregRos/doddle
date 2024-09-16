@@ -1,37 +1,37 @@
-import type { LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 declare.test("should type as LazyAsync<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true))).to_equal(
-        type<LazyAsync<number | undefined>>
+        type<DoddleAsync<number | undefined>>
     )
 })
 declare.test("should type as LazyAsync<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt" as string))).to_equal(
-        type<LazyAsync<number | string>>
+        type<DoddleAsync<number | string>>
     )
 })
 declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt"))).to_equal(
-        type<LazyAsync<number | "alt">>
+        type<DoddleAsync<number | "alt">>
     )
 })
 
 declare.test("allows lazy predicate", expect => {
-    const s = _seq([1, 2, 3]).findLast(() => lazy(() => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).findLast(() => doddle(() => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).findLast(() => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).findLast(() => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows async lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).findLast(async () => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).findLast(async () => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 it("returns undefined for empty", async () => {
@@ -98,21 +98,21 @@ it("works for async predicates (false)", async () => {
 })
 
 it("allows lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).findLast(i => lazy(() => i < 3))
+    const s = _seq([1, 2, 3]).findLast(i => doddle(() => i < 3))
     expect(await s.pull()).toEqual(2)
 })
 
 it("allows lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).findLast(i => lazy(async () => i < 3))
+    const s = _seq([1, 2, 3]).findLast(i => doddle(async () => i < 3))
     expect(await s.pull()).toEqual(2)
 })
 
 it("allows async lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).findLast(async i => lazy(() => i < 3))
+    const s = _seq([1, 2, 3]).findLast(async i => doddle(() => i < 3))
     expect(await s.pull()).toEqual(2)
 })
 
 it("allows async lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).findLast(async i => lazy(async () => i < 3))
+    const s = _seq([1, 2, 3]).findLast(async i => doddle(async () => i < 3))
     expect(await s.pull()).toEqual(2)
 })

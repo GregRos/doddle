@@ -1,10 +1,10 @@
-import type { LazyAsync } from "@lib"
+import type { DoddleAsync } from "@lib"
 import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 declare.test("should type as LazyAsync<boolean>", expect => {
-    expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<LazyAsync<boolean>>)
+    expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<DoddleAsync<boolean>>)
 })
 it("returns false for empty", async () => {
     const s = _seq([]).includes(1)

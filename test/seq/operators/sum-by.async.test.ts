@@ -1,26 +1,26 @@
-import type { LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
 declare.test("should type as LazyAsync<number>", expect => {
-    expect(type_of(_seq([1, 2, 3]).sumBy(() => 1))).to_equal(type<LazyAsync<number>>)
+    expect(type_of(_seq([1, 2, 3]).sumBy(() => 1))).to_equal(type<DoddleAsync<number>>)
 })
 
 declare.test("allows lazy iteratee", expect => {
-    const s = _seq([1, 2, 3]).sumBy(() => lazy(() => 1))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).sumBy(() => doddle(() => 1))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 
 declare.test("allows lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).sumBy(() => lazy(async () => 1))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).sumBy(() => doddle(async () => 1))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 
 declare.test("allows async lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).sumBy(async () => lazy(async () => 1))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).sumBy(async () => doddle(async () => 1))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 
 it("returns 0 for empty", async () => {
@@ -48,21 +48,21 @@ it("works for async iteratee", async () => {
 })
 
 it("works for lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).sumBy(() => lazy(() => 1))
+    const s = _seq([1, 2, 3]).sumBy(() => doddle(() => 1))
     expect(await s.pull()).toEqual(3)
 })
 
 it("works for lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).sumBy(() => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).sumBy(() => doddle(async () => 1))
     expect(await s.pull()).toEqual(3)
 })
 
 it("works for async lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).sumBy(async () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).sumBy(async () => doddle(async () => 1))
     expect(await s.pull()).toEqual(3)
 })
 
 it("works for async lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).sumBy(async () => lazy(() => 1))
+    const s = _seq([1, 2, 3]).sumBy(async () => doddle(() => 1))
     expect(await s.pull()).toEqual(3)
 })

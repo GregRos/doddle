@@ -1,38 +1,40 @@
-import type { LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
 declare.test("should type as LazyAsync<T | undefined>", expect => {
-    expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(type<LazyAsync<number | undefined>>)
+    expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(
+        type<DoddleAsync<number | undefined>>
+    )
 })
 
 declare.test("should type as LazyAsync<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt" as string))).to_equal(
-        type<LazyAsync<number | string>>
+        type<DoddleAsync<number | string>>
     )
 })
 
 declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt"))).to_equal(
-        type<LazyAsync<number | "alt">>
+        type<DoddleAsync<number | "alt">>
     )
 })
 
 declare.test("allows lazy iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(() => lazy(() => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(() => doddle(() => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(() => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(() => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows async lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(async () => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(async () => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 it("returns undefined for empty", async () => {
@@ -117,21 +119,21 @@ it("works with async iteratee", async () => {
 })
 
 it("works for lazy iteratee", async () => {
-    const s = _seq([3, 1, 2]).minBy(i => lazy(() => i))
+    const s = _seq([3, 1, 2]).minBy(i => doddle(() => i))
     expect(await s.pull()).toEqual(1)
 })
 
 it("works for lazy async iteratee", async () => {
-    const s = _seq([3, 1, 2]).minBy(i => lazy(async () => i))
+    const s = _seq([3, 1, 2]).minBy(i => doddle(async () => i))
     expect(await s.pull()).toEqual(1)
 })
 
 it("works for async lazy iteratee", async () => {
-    const s = _seq([3, 1, 2]).minBy(async i => lazy(() => i))
+    const s = _seq([3, 1, 2]).minBy(async i => doddle(() => i))
     expect(await s.pull()).toEqual(1)
 })
 
 it("works for async lazy async iteratee", async () => {
-    const s = _seq([3, 1, 2]).minBy(async i => lazy(async () => i))
+    const s = _seq([3, 1, 2]).minBy(async i => doddle(async () => i))
     expect(await s.pull()).toEqual(1)
 })

@@ -10,28 +10,28 @@ import {
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
-type IsAnyPureAsync<T extends Lazy<any>[], IfTrue, IfFalse> = {
-    [K in keyof T]: T[K] extends LazyAsync<any> ? K : never
+type IsAnyPureAsync<T extends Doddle<any>[], IfTrue, IfFalse> = {
+    [K in keyof T]: T[K] extends DoddleAsync<any> ? K : never
 }[number] extends never
     ? IfFalse
     : IfTrue
 
-type IsAnyMixed<T extends Lazy<any>[], IfTrue, IfFalse> =
-    LazyAsync<any> extends T[number] ? IfTrue : IfFalse
+type IsAnyMixed<T extends Doddle<any>[], IfTrue, IfFalse> =
+    DoddleAsync<any> extends T[number] ? IfTrue : IfFalse
 
-type OnlyIfMixed<Input, LazyType = Lazy<Input>> = Promise<any> extends Input ? LazyType : never
+type OnlyIfMixed<Input, LazyType = Doddle<Input>> = Promise<any> extends Input ? LazyType : never
 /**
  * A TypeScript-first lazy evaluation primitive. An object that will only evaluate its initializer
  * function when the {@link pull} method is called.
  *
- * The initializer can return another {@link Lazy}, which will be chained like a promise.
+ * The initializer can return another {@link Doddle}, which will be chained like a promise.
  */
-export class Lazy<T> {
+export class Doddle<T> {
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _info: InnerInfo
     private _cacheName!: string
-    get info(): Readonly<Lazy.Info> {
+    get info(): Readonly<Doddle.Info> {
         const { stage, syncness, name } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
         const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
@@ -69,40 +69,43 @@ export class Lazy<T> {
         loadCheckers(this)
     }
 
-    static create<T>(f: () => T): Lazy<T> {
-        return new Lazy(f)
+    static create<T>(f: () => T): Doddle<T> {
+        return new Doddle(f)
     }
 
     // When the projection is async, the result is always LazyAsync, no matter
     // what the `this` is.
     map<T, R>(
-        this: Lazy<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<R>
-    ): LazyAsync<R>
+        this: Doddle<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<R>
+    ): DoddleAsync<R>
     // When the input is async, and the projection is mixed, the result is always async.
     map<T, R>(
-        this: OnlyIfMixed<R, LazyAsync<T>>,
-        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
-    ): LazyAsync<Awaited<R>>
+        this: OnlyIfMixed<R, DoddleAsync<T>>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): DoddleAsync<Awaited<R>>
     map<T, R>(
-        this: LazyAsync<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => Lazy<R> | R
-    ): LazyAsync<R>
+        this: DoddleAsync<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => Doddle<R> | R
+    ): DoddleAsync<R>
 
     // When this is mixed, and the projection is also mixed, the result type should stay the same.
     map<T, R>(
-        this: OnlyIfMixed<T> & OnlyIfMixed<R, Lazy<T>>,
-        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
-    ): Lazy<R>
+        this: OnlyIfMixed<T> & OnlyIfMixed<R, Doddle<T>>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R>
     // When `this` is mixed and the projection is sync, the sync result needs to be mixed.
     map<T, R>(
         this: OnlyIfMixed<T>,
-        projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
-    ): Lazy<R | Promise<R>>
-    map<T, R>(this: Lazy<T>, projection: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>): Lazy<R>
-    map(this: Lazy<any>, projection: (a: any) => any): any {
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R | Promise<R>>
+    map<T, R>(
+        this: Doddle<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R>
+    map(this: Doddle<any>, projection: (a: any) => any): any {
         const _projection = chk(this.map).projection(projection)
-        return lazy(() => {
+        return doddle(() => {
             const pulled = this.pull()
             if (isThenable(pulled)) {
                 return pulled.then(_projection)
@@ -113,22 +116,22 @@ export class Lazy<T> {
 
     // async.catch(async) = async
     catch<T, R>(
-        this: LazyAsync<T>,
-        handler: (error: any) => Lazy.SomeAsync<R>
-    ): LazyAsync<T | Awaited<R>>
+        this: DoddleAsync<T>,
+        handler: (error: any) => Doddle.SomeAsync<R>
+    ): DoddleAsync<T | Awaited<R>>
     // async.catch(mixed) = async
     catch<T, R>(
-        this: LazyAsync<T>,
-        handler: (error: any) => R | Lazy<R> | Lazy.SomeAsync<R>
-    ): LazyAsync<T | Awaited<R>>
+        this: DoddleAsync<T>,
+        handler: (error: any) => R | Doddle<R> | Doddle.SomeAsync<R>
+    ): DoddleAsync<T | Awaited<R>>
     // sync.catch(async) = mixed
     // sync.catch(sync) = sync
     // mixed.catch(mixed) = mixed
     // mixed.catch(sync) = mixed
-    catch<R>(handler: (error: any) => R | Lazy<R>): Lazy<T | R>
+    catch<R>(handler: (error: any) => R | Doddle<R>): Doddle<T | R>
     catch(handler: (error: any) => any): any {
         chk(this.catch).handler(handler)
-        return lazy(() => {
+        return doddle(() => {
             try {
                 const pulled = this.pull()
                 if (isThenable(pulled)) {
@@ -144,78 +147,81 @@ export class Lazy<T> {
     // mixed.each(async) = async
     each<T>(
         this: OnlyIfMixed<T>,
-        action: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<void>
-    ): LazyAsync<Awaited<T>>
+        action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
+    ): DoddleAsync<Awaited<T>>
     // async.each(anything) = async
     each<T>(
-        this: LazyAsync<T>,
-        action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void> | Lazy.SomeAsync<void>
-    ): LazyAsync<T>
+        this: DoddleAsync<T>,
+        action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void> | Doddle.SomeAsync<void>
+    ): DoddleAsync<T>
     // mixed.each(mixed | sync) = mixed
     each<T>(
         this: OnlyIfMixed<T>,
-        action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void> | Lazy.SomeAsync<void>
-    ): Lazy<T>
+        action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void> | Doddle.SomeAsync<void>
+    ): Doddle<T>
     // sync.each(async) = async
     each<T>(
-        this: Lazy<T>,
-        action: (value: Lazy.PulledAwaited<T>) => Lazy.SomeAsync<void>
-    ): LazyAsync<T>
+        this: Doddle<T>,
+        action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
+    ): DoddleAsync<T>
     // sync.each(mixed) = mixed
     each<T, R>(
-        this: OnlyIfMixed<R, Lazy<T>>,
-        action: (value: Lazy.PulledAwaited<T>) => R | Lazy<R>
-    ): Lazy<T | Promise<T>>
+        this: OnlyIfMixed<R, Doddle<T>>,
+        action: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<T | Promise<T>>
     // sync.each(sync) = sync
-    each<T>(this: Lazy<T>, action: (value: Lazy.PulledAwaited<T>) => void | Lazy<void>): Lazy<T>
+    each<T>(
+        this: Doddle<T>,
+        action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void>
+    ): Doddle<T>
 
     each(this: any, action: (value: any) => any): any {
         chk(this.each).action(action)
         return this.map((x: any) => {
             const result = action(x)
-            return lazy(() => {
+            return doddle(() => {
                 return result
             }).map(() => x)
         })
     }
 
-    zip<const Others extends readonly [Lazy<any>, ...Lazy<any>[]]>(
+    zip<const Others extends readonly [Doddle<any>, ...Doddle<any>[]]>(
         ...others: Others
     ): IsAnyPureAsync<
-        [Lazy<T>, ...Others],
-        LazyAsync<
+        [Doddle<T>, ...Others],
+        DoddleAsync<
             [
-                Lazy.PulledAwaited<T>,
+                Doddle.PulledAwaited<T>,
                 ...{
-                    [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
+                    [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
                 }
             ]
         >,
         IsAnyMixed<
-            [Lazy<T>, ...Others],
-            Lazy<
+            [Doddle<T>, ...Others],
+            Doddle<
                 MaybePromise<
                     [
-                        Lazy.PulledAwaited<T>,
+                        Doddle.PulledAwaited<T>,
                         ...{
-                            [K in keyof Others]: Lazy.PulledAwaited<Others[K]>
+                            [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
                         }
                     ]
                 >
             >,
-            Lazy<
+            Doddle<
                 [
-                    Lazy.Pulled<T>,
+                    Doddle.Pulled<T>,
                     ...{
-                        [K in keyof Others]: Lazy.Pulled<Others[K]>
+                        [K in keyof Others]: Doddle.Pulled<Others[K]>
                     }
                 ]
             >
         >
     >
 
-    zip(this: Lazy<any>, ...others: Lazy<any>[]): any {
-        return lazy(() => {
+    zip(this: Doddle<any>, ...others: Doddle<any>[]): any {
+        return doddle(() => {
             const values = [this, ...others].map(x => x.pull())
             if (values.some(isThenable)) {
                 return Promise.all(values)
@@ -234,14 +240,14 @@ export class Lazy<T> {
     }
 
     /**
-     * Evaluates this {@link Lazy} instance, flattening any nested {@link Lazy} or {@link Promise}
+     * Evaluates this {@link Doddle} instance, flattening any nested {@link Doddle} or {@link Promise}
      * types.
      *
-     * @returns The value produced by the initializer, after flattening any nested {@link Lazy} or
+     * @returns The value produced by the initializer, after flattening any nested {@link Doddle} or
      *   {@link Promise} instances.
      * @throws The error thrown during initialization, if any.
      */
-    pull(): Lazy.Pulled<T> {
+    pull(): Doddle.Pulled<T> {
         const info = this._info
         if (info.stage === Stage.Threw) {
             throw this._cached
@@ -317,19 +323,19 @@ export class Lazy<T> {
  *   be synchronous or asynchronous and will also handle nested lazy primitives.
  */
 
-export function lazy<X>(initializer: () => Promise<LazyAsync<X>>): LazyAsync<X>
-export function lazy<X>(initializer: () => Promise<Lazy<X>>): LazyAsync<X>
+export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
+export function doddle<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
 
-export function lazy<X>(initializer: () => Promise<X>): LazyAsync<X>
+export function doddle<X>(initializer: () => Promise<X>): DoddleAsync<X>
 
-export function lazy<T>(initializer: () => Lazy<T>): Lazy<T>
+export function doddle<T>(initializer: () => Doddle<T>): Doddle<T>
 
-export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T>
-export function lazy<T>(initializer: () => T | Lazy<T>): Lazy<T> {
+export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T>
+export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
     if (ownerInstance in initializer) {
         return initializer[ownerInstance] as any
     }
-    return Lazy.create(initializer) as any
+    return Doddle.create(initializer) as any
 }
 const enum Stage {
     Untouched = 0,
@@ -347,7 +353,7 @@ interface InnerInfo {
     stage: Stage
     name: string | null
 }
-export namespace Lazy {
+export namespace Doddle {
     export interface Info {
         readonly isReady: boolean
         readonly stage: string
@@ -358,22 +364,26 @@ export namespace Lazy {
     export type Pulled<T> =
         T extends PromiseLike<infer X>
             ? Promise<PulledAwaited<X>>
-            : T extends Lazy<infer X>
+            : T extends Doddle<infer X>
               ? Pulled<X>
               : T
 
     export type PulledAwaited<T> =
-        T extends Lazy<infer R>
+        T extends Doddle<infer R>
             ? PulledAwaited<R>
             : T extends Promise<infer R>
               ? PulledAwaited<R>
               : T
 
-    export type SomeAsync<T> = Promise<T> | LazyAsync<T> | Promise<Lazy<T>> | Promise<LazyAsync<T>>
-    export type MaybePromised<T> = MaybePromise<LazyAsync<T> | MaybeLazy<T>>
+    export type SomeAsync<T> =
+        | Promise<T>
+        | DoddleAsync<T>
+        | Promise<Doddle<T>>
+        | Promise<DoddleAsync<T>>
+    export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeLazy<T>>
 }
 
-export type LazyAsync<T> = Lazy<Promise<T>>
+export type DoddleAsync<T> = Doddle<Promise<T>>
 
 /** The stage of a lazily initialized value. */
 
@@ -384,9 +394,9 @@ export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T
 
 export function lazyFromOperator<In, Out>(
     operand: In,
-    func: (input: In) => Out | Lazy.Pulled<Out>
-): Lazy<Out> {
-    const lz = lazy(() => func.call(operand, operand)) as any
+    func: (input: In) => Out | Doddle.Pulled<Out>
+): Doddle<Out> {
+    const lz = doddle(() => func.call(operand, operand)) as any
     Object.assign(lz, {
         operator: func.name,
         operand
@@ -395,7 +405,7 @@ export function lazyFromOperator<In, Out>(
 }
 
 export function pull<T>(input: 1 extends 0 & T ? T : never): any
-export function pull<T>(input: T): Lazy.Pulled<T>
-export function pull<T>(input: Lazy<T> | T): Lazy.Pulled<T> {
-    return lazy(() => input).pull()
+export function pull<T>(input: T): Doddle.Pulled<T>
+export function pull<T>(input: Doddle<T> | T): Doddle.Pulled<T> {
+    return doddle(() => input).pull()
 }

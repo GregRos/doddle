@@ -1,4 +1,4 @@
-import { Doddle } from "@error"
+import { DoddleError } from "@error"
 import type { Seq } from "@lib"
 import { seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
@@ -37,14 +37,14 @@ it("works when appended to another seq", () => {
 describe("invalid input", () => {
     it("throws TypeError when iterated if given a function returning null", () => {
         const s = seq.throws(() => null as any)
-        expect(() => [...s]).toThrow(Doddle)
+        expect(() => [...s]).toThrow(DoddleError)
     })
 
     it("throws TypeError if given null", () => {
-        expect(() => seq.throws(null as any)).toThrow(Doddle)
+        expect(() => seq.throws(null as any)).toThrow(DoddleError)
     })
 
     it("throws TypeError if given undefined", () => {
-        expect(() => seq.throws(undefined as any)).toThrow(Doddle)
+        expect(() => seq.throws(undefined as any)).toThrow(DoddleError)
     })
 })

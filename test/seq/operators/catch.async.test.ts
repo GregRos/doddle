@@ -2,7 +2,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "@lib"
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 const _seq = aseq
 type _ASeq<T> = ASeq<T>
 
@@ -30,17 +30,17 @@ declare.it("handler explicitly returning undefined is also okay", expect => {
 })
 
 declare.it("allows lazy handler", expect => {
-    const s = _seq([1, 2, 3]).catch(() => lazy(() => [1, 2, 3]))
+    const s = _seq([1, 2, 3]).catch(() => doddle(() => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
 declare.it("allows lazy async handler", expect => {
-    const s = _seq([1, 2, 3]).catch(() => lazy(async () => [1, 2, 3]))
+    const s = _seq([1, 2, 3]).catch(() => doddle(async () => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
 declare.it("allows async lazy async handler", expect => {
-    const s = _seq([1, 2, 3]).catch(async () => lazy(async () => [1, 2, 3]))
+    const s = _seq([1, 2, 3]).catch(async () => doddle(async () => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 it("returns same for no errors", async () => {
@@ -212,7 +212,7 @@ it("allows lazy handler", async () => {
                 throw new Error("test")
             }
         })
-        .catch(() => lazy(() => [1, 2, 3]))
+        .catch(() => doddle(() => [1, 2, 3]))
     expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })
 
@@ -224,7 +224,7 @@ it("allows lazy async handler", async () => {
                 throw new Error("test")
             }
         })
-        .catch(() => lazy(async () => [1, 2, 3]))
+        .catch(() => doddle(async () => [1, 2, 3]))
     expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })
 
@@ -236,6 +236,6 @@ it("allows async lazy async handler", async () => {
                 throw new Error("test")
             }
         })
-        .catch(async () => lazy(async () => [1, 2, 3]))
+        .catch(async () => doddle(async () => [1, 2, 3]))
     expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })

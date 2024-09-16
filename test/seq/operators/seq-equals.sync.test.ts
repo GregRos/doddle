@@ -1,4 +1,4 @@
-import { Lazy } from "@lib"
+import { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
@@ -7,23 +7,23 @@ const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("accepts an input sequence, returns Lazy<boolean>", expect => {
     const s = null! as _Seq<number>
-    expect(type_of(s.seqEquals(s))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(s.seqEquals(s))).to_equal(type<Doddle<boolean>>)
 })
 declare.it("accepts input sequence of subtype, returns Lazy<boolean>", expect => {
     const s1 = null! as _Seq<number>
     const s2 = null! as _Seq<1 | 2 | 3>
-    expect(type_of(s1.seqEquals(s2))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(s1.seqEquals(s2))).to_equal(type<Doddle<boolean>>)
 })
 declare.it("accepts input sequence of supertype, returns Lazy<boolean>", expect => {
     const s1 = null! as _Seq<1 | 2 | 3>
     const s2 = null! as _Seq<number>
-    expect(type_of(s1.seqEquals(s2))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(s1.seqEquals(s2))).to_equal(type<Doddle<boolean>>)
 })
 declare.it("doesn't accept non-subtype, non-supertype inputs", expect => {
     const s1 = null! as _Seq<1 | 2>
     const s2 = null! as _Seq<2 | 3>
     // @ts-expect-error
-    expect(type_of(s1.seqEquals(s2))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(s1.seqEquals(s2))).to_equal(type<Doddle<boolean>>)
 })
 it("returns true for empty sequences", () => {
     const s = _seq([]).seqEquals(_seq([]))

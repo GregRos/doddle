@@ -1,22 +1,22 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { Doddle } from "@error"
-import { lazy, seq } from "@lib"
+import { DoddleError } from "@error"
+import { doddle, seq } from "@lib"
 const _seq = seq
 declare.it("accepts projection to pair", expect => {
     const s = _seq([1, 2, 3]).toMap(x => [x, x])
-    expect(type_of(s)).to_equal(type<Lazy<Map<number, number>>>)
+    expect(type_of(s)).to_equal(type<Doddle<Map<number, number>>>)
 })
 
 declare.it("allows projection to readonly pair", expect => {
     const s = _seq([1, 2, 3]).toMap(x => [x, x] as readonly [number, number])
-    expect(type_of(s)).to_equal(type<Lazy<Map<number, number>>>)
+    expect(type_of(s)).to_equal(type<Doddle<Map<number, number>>>)
 })
 
 declare.it("accepts projection to pair with different types", expect => {
     const s = _seq([1, 2, 3]).toMap(x => [x, x.toString()])
-    expect(type_of(s)).to_equal(type<Lazy<Map<number, string>>>)
+    expect(type_of(s)).to_equal(type<Doddle<Map<number, string>>>)
 })
 
 declare.it("doesn't accept projection to other", expect => {
@@ -47,7 +47,7 @@ declare.it("doesn't accept projection to union with undefined", expect => {
 declare.it("is typed correctly for mixed types", expect => {
     const s = _seq([1, "two", true]).toMap(x => [x, x])
     expect(type_of(s)).to_equal(
-        type<Lazy<Map<string | number | boolean, string | number | boolean>>>
+        type<Doddle<Map<string | number | boolean, string | number | boolean>>>
     )
 })
 
@@ -138,7 +138,7 @@ it("calls projection with index", () => {
 })
 
 it("works with lazy projection", () => {
-    const s = _seq([1, 2, 3]).toMap(x => lazy(() => [x, x] as const))
+    const s = _seq([1, 2, 3]).toMap(x => doddle(() => [x, x] as const))
     expect(s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -155,7 +155,7 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(() => [1])
                 .pull()
-        ).toThrow(Doddle)
+        ).toThrow(DoddleError)
     })
 
     it("doesn't accept projection to triple", () => {
@@ -164,6 +164,6 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(x => [x, x, x])
                 .pull()
-        ).toThrow(Doddle)
+        ).toThrow(DoddleError)
     })
 })

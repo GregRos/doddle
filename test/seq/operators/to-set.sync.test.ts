@@ -1,16 +1,16 @@
-import { type Lazy } from "@lib"
+import { type Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toSet()
-    expect(type_of(s)).to_equal(type<Lazy<Set<number>>>)
+    expect(type_of(s)).to_equal(type<Doddle<Set<number>>>)
 })
 
 declare.it("is typed correctly for mixed types", expect => {
     const s = _seq([1, "two", true]).toSet()
-    expect(type_of(s)).to_equal(type<Lazy<Set<string | number | boolean>>>)
+    expect(type_of(s)).to_equal(type<Doddle<Set<string | number | boolean>>>)
 })
 
 it("converts to set", () => {

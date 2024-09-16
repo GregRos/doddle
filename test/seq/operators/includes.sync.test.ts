@@ -1,10 +1,10 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<boolean>", expect => {
-    expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<Doddle<boolean>>)
 })
 it("returns false for empty", () => {
     const s = _seq([]).includes(1)

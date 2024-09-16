@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("element type is Acc", expect => {
@@ -116,6 +116,6 @@ it("has no side-effects before pull", () => {
 })
 
 it("works with lazy reducer", () => {
-    const s = _seq([0, 1, 2]).scan((acc, x) => lazy(() => acc + x), 0)
+    const s = _seq([0, 1, 2]).scan((acc, x) => doddle(() => acc + x), 0)
     expect(s._qr).toEqual([0, 0, 1, 3])
 })

@@ -19,15 +19,15 @@ import {
     isThenable
 } from "../utils.js"
 
-export class Doddle extends Error {
+export class DoddleError extends Error {
     constructor(message: Text) {
         super(splat(!Array.isArray(message) ? [message] : message))
     }
 }
 
 export function cannotRecurseSync() {
-    return new Doddle(
-        `Tried to call 'Lazy.pull' recursively in a sync context, which would not terminate.`
+    return new DoddleError(
+        `Tried to call 'Doddle.pull' recursively in a sync context, which would not terminate.`
     )
 }
 /*
@@ -89,7 +89,7 @@ export function checkNumberArgs(context: string) {
     return (min: number, max: number = min) => {
         return (args: any[]) => {
             if (args.length < min || args.length > max) {
-                throw new Doddle([
+                throw new DoddleError([
                     getSubject(wCalledWith, [context], wBe),
                     min === max ? min : [min, "to", max],
                     wArguments,
@@ -104,7 +104,7 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
     return (start: Text) => (x: any) => {
         if (!check(x)) {
             const msg = [start, expectation, getButGot(x)]
-            throw new Doddle(msg)
+            throw new DoddleError(msg)
         }
         return x
     }
@@ -248,7 +248,7 @@ export const checkASeqInputValue = <T>(input: T) => {
 }
 
 export const gotAsyncIteratorInSyncContext = () => {
-    throw new Doddle([
+    throw new DoddleError([
         getSubject(wInput, [wConversion, wAseq], wBe),
         iterableOrIterator,
         [wButGot, "an async", wIterator]

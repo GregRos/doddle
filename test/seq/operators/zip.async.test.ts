@@ -1,7 +1,7 @@
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "@lib"
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 const _seq = aseq
 type _Seq<T> = ASeq<T>
 
@@ -25,17 +25,17 @@ declare.it("returns ASeq of same type", expect => {
 })
 
 declare.it("allows lazy projection", expect => {
-    const s = _seq([1, 2, 3]).zip([[]], () => lazy(() => 1))
+    const s = _seq([1, 2, 3]).zip([[]], () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("allows lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).zip([[]], () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).zip([[]], () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("allows async lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).zip([[]], async () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).zip([[]], async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
@@ -140,21 +140,21 @@ it("works for async projections", async () => {
 })
 
 it("allows lazy projection", async () => {
-    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => lazy(() => `${a}${b}`))
+    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => doddle(() => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
 it("allows lazy async projection", async () => {
-    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => lazy(async () => `${a}${b}`))
+    const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => doddle(async () => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
 it("allows async lazy async projection", async () => {
-    const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => lazy(async () => `${a}${b}`))
+    const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => doddle(async () => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
 it("allows async lazy projections", async () => {
-    const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => lazy(() => `${a}${b}`))
+    const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => doddle(() => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })

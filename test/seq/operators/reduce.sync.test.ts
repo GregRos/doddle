@@ -1,16 +1,16 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 declare.test("can be called with initial, type changes to match", expect => {
     const s = _seq([1, 2, 3]).reduce((acc, x) => `${acc}${x}`, "")
-    expect(type_of(s)).to_equal(type<Lazy<string>>)
+    expect(type_of(s)).to_equal(type<Doddle<string>>)
 })
 
 declare.test("can be called with no initial, type is T", expect => {
     const s = _seq([1, 2, 3])
-    expect(type_of(s.reduce((acc, x) => acc + x))).to_equal(type<Lazy<number>>)
+    expect(type_of(s.reduce((acc, x) => acc + x))).to_equal(type<Doddle<number>>)
     // @ts-expect-error does not allow a different type
     s.reduce((acc, x) => `${acc}${x}`)
 })
@@ -76,6 +76,6 @@ it("has no side-effects before pull", () => {
 })
 
 it("works with lazy reducer", () => {
-    const s = _seq([1, 2, 3]).reduce((acc, cur) => lazy(() => acc + cur), 0)
+    const s = _seq([1, 2, 3]).reduce((acc, cur) => doddle(() => acc + cur), 0)
     expect(s.pull()).toEqual(6)
 })

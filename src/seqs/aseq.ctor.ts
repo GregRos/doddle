@@ -1,5 +1,5 @@
 import { checkASeqInputValue } from "../errors/error.js"
-import { pull, type Lazy, type LazyAsync } from "../lazy/index.js"
+import { pull, type Doddle, type DoddleAsync } from "../lazy/index.js"
 import {
     _xiter,
     isArrayLike,
@@ -14,10 +14,10 @@ import { ASeqOperator, type ASeq } from "./aseq.class.js"
 import { DoddleReadableStreamIterator } from "./readable-stream-aiter.js"
 
 export function aseq<E>(input: readonly E[]): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Promise<LazyAsync<E>>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<LazyAsync<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<DoddleAsync<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<Promise<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Lazy<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<Doddle<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<MaybePromise<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): any {

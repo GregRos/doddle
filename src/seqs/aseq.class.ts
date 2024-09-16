@@ -1,7 +1,7 @@
 import { chk, loadCheckers } from "../errors/error.js"
 import type { DoddleReadableStream } from "../extra-types.js"
-import type { Lazy, LazyAsync } from "../lazy/index.js"
-import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
+import type { Doddle, DoddleAsync } from "../lazy/index.js"
+import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
 import {
     Stage,
     _aiter,
@@ -41,7 +41,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             yield* aseq(input).concat(items)
         })
     }
-    at(index: number): LazyAsync<T | undefined> {
+    at(index: number): DoddleAsync<T | undefined> {
         return Seq.prototype.at.call(this, index)
     }
     cache(): ASeq<T> {
@@ -120,7 +120,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     chunk<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
+        projection: (...window: getWindowArgsType<T, L>) => Doddle.MaybePromised<S>
     ): ASeq<S>
     chunk<L extends number>(size: L): ASeq<getWindowOutputType<T, L>>
     chunk<L extends number, S>(
@@ -173,9 +173,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
-    count(): LazyAsync<number>
-    count(predicate: ASeq.Predicate<T>): LazyAsync<number>
-    count(predicate?: ASeq.Predicate<T>): LazyAsync<number> {
+    count(): DoddleAsync<number>
+    count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
+    count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
         return Seq.prototype.count.call(this, predicate as any) as any
     }
     each(action: ASeq.StageIteratee<T, unknown>, stage: EachCallStage = "before") {
@@ -196,7 +196,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         })
     }
-    every(predicate: ASeq.Predicate<T>): LazyAsync<boolean> {
+    every(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
         return Seq.prototype.every.call(this, predicate as any) as any
     }
     filter<S extends T>(predicate: Seq.TypePredicate<T, S>): ASeq<S>
@@ -209,18 +209,18 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             )
         })
     }
-    findLast(predicate: ASeq.Predicate<T>): LazyAsync<T | undefined>
-    findLast<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): LazyAsync<T | Alt>
+    findLast(predicate: ASeq.Predicate<T>): DoddleAsync<T | undefined>
+    findLast<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): DoddleAsync<T | Alt>
     findLast<Alt = T>(predicate: ASeq.Predicate<T>, alt?: Alt) {
         return Seq.prototype.findLast.call(this, predicate as any, alt)
     }
-    find(predicate: ASeq.Predicate<T>): LazyAsync<T | undefined>
-    find<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): LazyAsync<T | Alt>
+    find(predicate: ASeq.Predicate<T>): DoddleAsync<T | undefined>
+    find<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): DoddleAsync<T | Alt>
     find<Alt = T>(predicate: ASeq.Predicate<T>, alt?: Alt) {
         return Seq.prototype.find.call(this, predicate as any, alt)
     }
-    first(): LazyAsync<T | undefined>
-    first<const Alt>(alt: Alt): LazyAsync<T | Alt>
+    first(): DoddleAsync<T | undefined>
+    first<const Alt>(alt: Alt): DoddleAsync<T | Alt>
     first<const Alt = undefined>(alt?: Alt) {
         return lazyFromOperator(this, async function first(input) {
             for await (const element of input) {
@@ -296,13 +296,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         })
     }
-    includes<T extends S, S>(this: ASeq<T>, value: S): LazyAsync<boolean>
-    includes<S extends T>(value: S): LazyAsync<boolean>
-    includes<S extends T>(value: S): LazyAsync<boolean> {
+    includes<T extends S, S>(this: ASeq<T>, value: S): DoddleAsync<boolean>
+    includes<S extends T>(value: S): DoddleAsync<boolean>
+    includes<S extends T>(value: S): DoddleAsync<boolean> {
         return Seq.prototype.includes.call(this, value) as any
     }
-    last(): LazyAsync<T | undefined>
-    last<const Alt>(alt: Alt): LazyAsync<T | Alt>
+    last(): DoddleAsync<T | undefined>
+    last<const Alt>(alt: Alt): DoddleAsync<T | Alt>
     last<Alt = undefined>(alt?: Alt) {
         return lazyFromOperator(this, async function last(input) {
             let last: T | Alt = alt as Alt
@@ -320,13 +320,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             ])
         })
     }
-    maxBy<K>(projection: ASeq.Iteratee<T, K>): LazyAsync<T | undefined>
-    maxBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): LazyAsync<T | Alt>
+    maxBy<K>(projection: ASeq.Iteratee<T, K>): DoddleAsync<T | undefined>
+    maxBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
     maxBy<R>(projection: ASeq.Iteratee<T, R>, alt?: any) {
         return Seq.prototype.maxBy.call(this, projection, alt)
     }
-    minBy<K>(projection: ASeq.Iteratee<T, K>): LazyAsync<T | undefined>
-    minBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): LazyAsync<T | Alt>
+    minBy<K>(projection: ASeq.Iteratee<T, K>): DoddleAsync<T | undefined>
+    minBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
         return Seq.prototype.minBy.call(this, projection, alt)
     }
@@ -373,8 +373,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 .pull()
         })
     }
-    reduce(reducer: ASeq.Reducer<T, T>): LazyAsync<T>
-    reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): LazyAsync<Acc>
+    reduce(reducer: ASeq.Reducer<T, T>): DoddleAsync<T>
+    reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): DoddleAsync<Acc>
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc): any {
         return Seq.prototype.reduce.call(this, reducer as any, initial)
     }
@@ -414,7 +414,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     seqEqualsBy<K, S = T>(
         _other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>
-    ): LazyAsync<boolean> {
+    ): DoddleAsync<boolean> {
         const other = aseq(_other)
         return lazyFromOperator(this, async function seqEqualsBy(input) {
             const otherIterator = _aiter(other)
@@ -434,8 +434,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 
-    seqEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): LazyAsync<boolean>
-    seqEquals<S extends T>(_other: ASeq.Input<S>): LazyAsync<boolean>
+    seqEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): DoddleAsync<boolean>
+    seqEquals<S extends T>(_other: ASeq.Input<S>): DoddleAsync<boolean>
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
@@ -443,7 +443,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     setEqualsBy<K, S = T>(
         _other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>
-    ): LazyAsync<boolean> {
+    ): DoddleAsync<boolean> {
         const other = aseq(_other)
         return lazyFromOperator(this, async function setEqualsBy(input) {
             const set = new Set()
@@ -459,8 +459,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 
-    setEquals<S extends T>(_other: ASeq.Input<S>): LazyAsync<boolean>
-    setEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): LazyAsync<boolean>
+    setEquals<S extends T>(_other: ASeq.Input<S>): DoddleAsync<boolean>
+    setEquals<T extends S, S>(this: AsyncIterable<T>, _other: ASeq.Input<S>): DoddleAsync<boolean>
     setEquals<S>(_other: ASeq.SimpleInput<S>) {
         const other = aseq(_other)
         return this.setEqualsBy(other, x => x)
@@ -516,10 +516,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
-    some(predicate: ASeq.Predicate<T>): LazyAsync<boolean> {
+    some(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
         return Seq.prototype.some.call(this, predicate as any) as any
     }
-    sumBy(projection: ASeq.Iteratee<T, number>): LazyAsync<number> {
+    sumBy(projection: ASeq.Iteratee<T, number>): DoddleAsync<number> {
         return Seq.prototype.sumBy.call(this, projection as any) as any
     }
     takeWhile(predicate: ASeq.Predicate<T>, specifier?: TakeWhileSpecifier): ASeq<T> {
@@ -586,7 +586,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
     share(): ASeq<T> {
-        const iter = lazy(() => _aiter(this))
+        const iter = doddle(() => _aiter(this))
         let err: Error | undefined = undefined
         return ASeqOperator(this, async function* share() {
             if (err) {
@@ -607,11 +607,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 
-    toMapBy<K, V>(projection: ASeq.Iteratee<T, K>): LazyAsync<Map<K, V>> {
+    toMapBy<K, V>(projection: ASeq.Iteratee<T, K>): DoddleAsync<Map<K, V>> {
         return Seq.prototype.toMapBy.call(this, projection as any) as any
     }
 
-    toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): LazyAsync<Map<K, V>> {
+    toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): DoddleAsync<Map<K, V>> {
         return Seq.prototype.toMap.call(this, kvpProjection as any) as any
     }
     toSet() {
@@ -643,12 +643,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     window<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
+        projection: (...window: getWindowArgsType<T, L>) => Doddle.MaybePromised<S>
     ): ASeq<S>
     window<L extends number>(size: L): ASeq<getWindowOutputType<T, L>>
     window<L extends number, S>(
         size: L,
-        projection?: (...window: getWindowArgsType<T, L>) => Lazy.MaybePromised<S>
+        projection?: (...window: getWindowArgsType<T, L>) => Doddle.MaybePromised<S>
     ): ASeq<any> {
         chk(this.window).size(size)
         projection ??= (...window: any) => window as any
@@ -681,13 +681,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         _others: {
             [K in keyof Xs]: ASeq.Input<Xs[K]>
         },
-        projection: (...args: getZipValuesType<[T, ...Xs]>) => Lazy.MaybePromised<R>
+        projection: (...args: getZipValuesType<[T, ...Xs]>) => Doddle.MaybePromised<R>
     ): ASeq<R>
     zip<Xs extends [any, ...any[]], R>(
         _others: {
             [K in keyof Xs]: ASeq.Input<Xs[K]>
         },
-        projection?: (...args: getZipValuesType<[T, ...Xs]>) => Lazy.MaybePromised<R>
+        projection?: (...args: getZipValuesType<[T, ...Xs]>) => Doddle.MaybePromised<R>
     ): ASeq<any> {
         const others = _others.map(aseq)
         projection ??= (...args: any[]) => args as any
@@ -717,7 +717,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         }) as any
     }
 
-    toSeq(): LazyAsync<Seq<T>> {
+    toSeq(): DoddleAsync<Seq<T>> {
         return lazyFromOperator(this, async function toSeq(input) {
             const all = await aseq(input).toArray().pull()
             return seq(all)
@@ -739,16 +739,16 @@ export const ASeqOperator = function aseq<In, Out>(
 }
 
 export namespace ASeq {
-    export type IndexIteratee<O> = (index: number) => Lazy.MaybePromised<O>
-    export type Iteratee<E, O> = (element: E, index: number) => Lazy.MaybePromised<O>
-    export type NoIndexIteratee<E, O> = (element: E) => Lazy.MaybePromised<O>
+    export type IndexIteratee<O> = (index: number) => Doddle.MaybePromised<O>
+    export type Iteratee<E, O> = (element: E, index: number) => Doddle.MaybePromised<O>
+    export type NoIndexIteratee<E, O> = (element: E) => Doddle.MaybePromised<O>
     export type StageIteratee<E, O> = (
         element: E,
         index: number,
         stage: "before" | "after"
-    ) => Lazy.MaybePromised<O>
+    ) => Doddle.MaybePromised<O>
     export type Predicate<E> = Iteratee<E, boolean>
-    export type Reducer<E, O> = (acc: O, element: E, index: number) => Lazy.MaybePromised<O>
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => Doddle.MaybePromised<O>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type IterableOrIterator<E> =
         | AsyncIterable<E>
@@ -757,14 +757,14 @@ export namespace ASeq {
         | Iterator<E>
         | DoddleReadableStream<E>
 
-    export type FunctionInput<E> = () => Lazy.MaybePromised<IterableOrIterator<E>>
+    export type FunctionInput<E> = () => Doddle.MaybePromised<IterableOrIterator<E>>
     export type DesyncedInput<E> = Seq.ObjectIterable<MaybePromise<E>>
 
     export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E> | DoddleReadableStream<E>
 
     export type SimpleInput<E> =
         | MaybeLazy<IterableInput<E>>
-        | LazyAsync<IterableInput<E>>
+        | DoddleAsync<IterableInput<E>>
         | FunctionInput<E>
 
     export type Input<E> = SimpleInput<MaybePromise<E>>

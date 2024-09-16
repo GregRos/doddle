@@ -1,4 +1,4 @@
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare } from "declare-it"
 
 describe("async", () => {
@@ -87,7 +87,7 @@ describe("async", () => {
         const testFn = jest.fn(async () => 1)
         const afterFn = async () => {
             await new Promise(resolve => setTimeout(resolve, 10))
-            return lazy(testFn)
+            return doddle(testFn)
         }
         const s = aseq([1, 2, 3]).after(afterFn)
         await s.toArray().pull()

@@ -1,5 +1,5 @@
 import type { DoddleReadableStream } from "./extra-types.js"
-import { pull, type Lazy, type LazyAsync } from "./lazy/index.js"
+import { pull, type Doddle, type DoddleAsync } from "./lazy/index.js"
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
     return input[Symbol.iterator]()
 }
@@ -151,7 +151,7 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
     return isObject(what) && isFunction((what as any).then)
 }
 
-export function isLazy<T>(value: any): value is Lazy<T> {
+export function isLazy<T>(value: any): value is Doddle<T> {
     return isObject(value) && typeof value.pull === "function" && typeof value.map === "function"
 }
 
@@ -171,7 +171,7 @@ export function returnKvp(input: any, key: any, value: any) {
     }
 }
 export type MaybePromise<T> = T | Promise<T>
-export type MaybeLazy<T> = T | Lazy<T> | LazyAsync<T>
+export type MaybeLazy<T> = T | Doddle<T> | DoddleAsync<T>
 export function getThrownError(thrown: unknown) {
     return thrown instanceof Error ? thrown : new Error(String(thrown))
 }

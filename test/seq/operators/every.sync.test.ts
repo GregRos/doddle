@@ -1,10 +1,10 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<boolean>", expect => {
-    expect(type_of(_seq([1, 2, 3]).every(() => true))).to_equal(type<Lazy<boolean>>)
+    expect(type_of(_seq([1, 2, 3]).every(() => true))).to_equal(type<Doddle<boolean>>)
 })
 it("returns true for empty", () => {
     const s = _seq([]).every(() => false)
@@ -55,6 +55,6 @@ it("calls predicate as many times as needed when false", () => {
 })
 
 it("works with lazy predicate", () => {
-    const s = _seq([1, 2, 3]).every(x => lazy(() => x % 2 === 0))
+    const s = _seq([1, 2, 3]).every(x => doddle(() => x % 2 === 0))
     expect(s.pull()).toEqual(false)
 })

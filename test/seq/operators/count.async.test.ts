@@ -1,24 +1,24 @@
-import type { LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 const _seq = aseq
 declare.test("should type as Lazy<number>", expect => {
-    expect(type_of(_seq([1, 2, 3]).count(() => true))).to_equal(type<LazyAsync<number>>)
-    expect(type_of(_seq([1, 2, 3]).count())).to_equal(type<LazyAsync<number>>)
+    expect(type_of(_seq([1, 2, 3]).count(() => true))).to_equal(type<DoddleAsync<number>>)
+    expect(type_of(_seq([1, 2, 3]).count())).to_equal(type<DoddleAsync<number>>)
 })
 declare.test("allows lazy predicate", expect => {
-    const s = _seq([1, 2, 3]).count(() => lazy(() => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).count(() => doddle(() => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 
 declare.test("allows lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).count(() => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).count(() => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 
 declare.test("allows async lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).count(async () => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number>>)
+    const s = _seq([1, 2, 3]).count(async () => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number>>)
 })
 it("returns 0 for empty", async () => {
     const s = _seq([]).count(() => true)
@@ -62,21 +62,21 @@ it("works with async predicate", async () => {
 })
 
 it("works for lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).count(i => lazy(() => i % 2 === 0))
+    const s = _seq([1, 2, 3]).count(i => doddle(() => i % 2 === 0))
     await expect(s.pull()).resolves.toEqual(1)
 })
 
 it("works for lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).count(i => lazy(async () => i % 2 === 0))
+    const s = _seq([1, 2, 3]).count(i => doddle(async () => i % 2 === 0))
     await expect(s.pull()).resolves.toEqual(1)
 })
 
 it("works for async lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).count(async i => lazy(() => i % 2 === 0))
+    const s = _seq([1, 2, 3]).count(async i => doddle(() => i % 2 === 0))
     await expect(s.pull()).resolves.toEqual(1)
 })
 
 it("works for async lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).count(async i => lazy(async () => i % 2 === 0))
+    const s = _seq([1, 2, 3]).count(async i => doddle(async () => i % 2 === 0))
     await expect(s.pull()).resolves.toEqual(1)
 })

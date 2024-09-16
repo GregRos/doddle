@@ -1,4 +1,4 @@
-import type { LazyAsync } from "@lib"
+import type { DoddleAsync } from "@lib"
 import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
@@ -6,17 +6,17 @@ const _seq = aseq
 
 declare.it("correctly typed as LazyAsync and disjunction with undefined if no alt", expect => {
     const s = _seq([1, 2, 3]).first()
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.it("disjunction with alt if it's given", expect => {
     const s = _seq([1, 2, 3]).first("alt" as string)
-    expect(type_of(s)).to_equal(type<LazyAsync<number | string>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | string>>)
 })
 
 declare.it("Alt type is const", expect => {
     const s = _seq([1, 2, 3]).first("alt")
-    expect(type_of(s)).to_equal(type<LazyAsync<number | "alt">>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | "alt">>)
 })
 
 it("gets first element", async () => {

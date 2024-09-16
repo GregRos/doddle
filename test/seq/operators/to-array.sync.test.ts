@@ -1,16 +1,16 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toArray()
-    expect(type_of(s)).to_equal(type<Lazy<number[]>>)
+    expect(type_of(s)).to_equal(type<Doddle<number[]>>)
 })
 
 declare.it("is typed correctly for mixed types", expect => {
     const s = _seq([1, "two", true]).toArray()
-    expect(type_of(s)).to_equal(type<Lazy<(string | number | boolean)[]>>)
+    expect(type_of(s)).to_equal(type<Doddle<(string | number | boolean)[]>>)
 })
 it("converts to array", () => {
     const s = _seq([1, 2, 3]).toArray()

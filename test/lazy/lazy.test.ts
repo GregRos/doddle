@@ -1,13 +1,13 @@
-import { lazy, Lazy } from "@lib"
+import { doddle, Doddle } from "@lib"
 import { declare, type } from "declare-it"
 
 it("no name normalizes to null", () => {
-    const lz = lazy(() => 1)
+    const lz = doddle(() => 1)
     expect(lz.info.name).toEqual(null)
 })
 
 it("name is recovered", () => {
-    const lz = lazy(function foo() {
+    const lz = doddle(function foo() {
         return 1
     })
     expect(lz.info.name).toEqual("foo")
@@ -15,12 +15,12 @@ it("name is recovered", () => {
 })
 
 it("toString() is equal to Symbol.toStringTag", () => {
-    const lz = lazy(() => 1)
+    const lz = doddle(() => 1)
     expect(lz.toString()).toEqual(lz[Symbol.toStringTag])
 })
 
 it("starts out untouched", () => {
-    const lz = lazy(() => 1)
+    const lz = doddle(() => 1)
     expect(lz.info).toEqual({
         desc: expect.any(String),
         isReady: false,
@@ -30,15 +30,15 @@ it("starts out untouched", () => {
     })
 })
 declare.it("If S ⊆ T then Lazy<S> ⊆ Lazy<T>", expect => {
-    expect(type<Lazy<1>>).to_subtype(type<Lazy<number>>)
-    const _: Lazy<number> = lazy(() => 1 as const)
+    expect(type<Doddle<1>>).to_subtype(type<Doddle<number>>)
+    const _: Doddle<number> = doddle(() => 1 as const)
     function __<T, S extends T>() {
-        const _: Lazy<T> = null! as Lazy<S>
+        const _: Doddle<T> = null! as Doddle<S>
     }
 })
 
 it("pulling changes stage (in sync)", () => {
-    const lz = lazy(() => {
+    const lz = doddle(() => {
         expect(lz.info.stage).toEqual("executing")
     })
     lz.pull()
@@ -46,7 +46,7 @@ it("pulling changes stage (in sync)", () => {
 })
 
 it("pulling changes stage (in async)", async () => {
-    const lz = lazy(async () => {
+    const lz = doddle(async () => {
         expect(lz.info.stage).toEqual("executing")
         expect(lz.toString()).toEqual("lazy <executing>")
         return 5
@@ -59,7 +59,7 @@ it("pulling changes stage (in async)", async () => {
 })
 
 it("pulling changes syncness (in sync)", () => {
-    const lz = lazy(() => {
+    const lz = doddle(() => {
         expect(lz.info.syncness).toEqual("untouched")
     })
     lz.pull()
@@ -68,7 +68,7 @@ it("pulling changes syncness (in sync)", () => {
 })
 
 it("pulling changes syncness (in async)", async () => {
-    const lz = lazy(async () => {
+    const lz = doddle(async () => {
         expect(lz.info.syncness).toEqual("untouched")
         expect(lz.toString()).toEqual("lazy <executing>")
     })
@@ -83,7 +83,7 @@ it("(re)throws error on pull, only calls init once", () => {
     const init = jest.fn(() => {
         throw new Error("test")
     })
-    const lz = lazy(init)
+    const lz = doddle(init)
     expect(() => lz.pull()).toThrow("test")
     expect(() => lz.pull()).toThrow("test")
     expect(init).toHaveBeenCalledTimes(1)
@@ -93,21 +93,21 @@ it("async (re)throws error on pull, only calls init once", async () => {
     const init = jest.fn(async () => {
         throw new Error("test")
     })
-    const lz = lazy(init)
+    const lz = doddle(init)
     await expect(lz.pull()).rejects.toThrow("test")
     await expect(lz.pull()).rejects.toThrow("test")
     expect(init).toHaveBeenCalledTimes(1)
 })
 
 it("trying to pull in sync context as part of init throws", () => {
-    const lz = lazy(() => {
+    const lz = doddle(() => {
         lz.pull()
     })
     expect(() => lz.pull()).toThrow("pull")
 })
 
 it("pulling multiple times while init is happening in async context returns same promise", async () => {
-    const lz = lazy(async () => {
+    const lz = doddle(async () => {
         await new Promise(resolve => setTimeout(resolve, 100))
         return 1
     })

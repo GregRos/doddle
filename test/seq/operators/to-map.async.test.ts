@@ -1,24 +1,24 @@
-import type { LazyAsync } from "@lib"
+import type { DoddleAsync } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { Doddle } from "@error"
-import { aseq, lazy } from "@lib"
+import { DoddleError } from "@error"
+import { aseq, doddle } from "@lib"
 
 const _aseq = aseq
 
 declare.it("accepts projection to pair", expect => {
     const s = _aseq([1, 2, 3]).toMap(x => [x, x])
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<number, number>>>)
 })
 
 declare.it("allows projection to readonly pair", expect => {
     const s = _aseq([1, 2, 3]).toMap(x => [x, x] as readonly [number, number])
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, number>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<number, number>>>)
 })
 
 declare.it("accepts projection to pair with different types", expect => {
     const s = _aseq([1, 2, 3]).toMap(x => [x, x.toString()])
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<number, string>>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<number, string>>>)
 })
 
 declare.it("doesn't accept projection to other", () => {
@@ -48,18 +48,18 @@ declare.it("doesn't accept projection to union with undefined", () => {
 })
 
 declare.it("allows lazy projection", expect => {
-    const s = _aseq([1, 2, 3]).toMap(() => lazy(() => [1, 1] as const))
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
+    const s = _aseq([1, 2, 3]).toMap(() => doddle(() => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
 
 declare.it("allows lazy async projection", expect => {
-    const s = _aseq([1, 2, 3]).toMap(() => lazy(async () => [1, 1] as const))
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
+    const s = _aseq([1, 2, 3]).toMap(() => doddle(async () => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
 
 declare.it("allows async lazy async projection", expect => {
-    const s = _aseq([1, 2, 3]).toMap(async () => lazy(async () => [1, 1] as const))
-    expect(type_of(s)).to_equal(type<LazyAsync<Map<1, 1>>>)
+    const s = _aseq([1, 2, 3]).toMap(async () => doddle(async () => [1, 1] as const))
+    expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
 
 it("converts empty to empty", async () => {
@@ -149,7 +149,7 @@ it("works for async projections", async () => {
 })
 
 it("works for lazy projections", async () => {
-    const s = _aseq([1, 2, 3]).toMap(x => lazy(() => [x, x] as const))
+    const s = _aseq([1, 2, 3]).toMap(x => doddle(() => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -160,7 +160,7 @@ it("works for lazy projections", async () => {
 })
 
 it("works for async lazy projections", async () => {
-    const s = _aseq([1, 2, 3]).toMap(async x => lazy(() => [x, x] as const))
+    const s = _aseq([1, 2, 3]).toMap(async x => doddle(() => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -171,7 +171,7 @@ it("works for async lazy projections", async () => {
 })
 
 it("works for lazy async projections", async () => {
-    const s = _aseq([1, 2, 3]).toMap(x => lazy(async () => [x, x] as const))
+    const s = _aseq([1, 2, 3]).toMap(x => doddle(async () => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -182,7 +182,7 @@ it("works for lazy async projections", async () => {
 })
 
 it("works for async lazy async projections", async () => {
-    const s = _aseq([1, 2, 3]).toMap(async x => lazy(async () => [x, x] as const))
+    const s = _aseq([1, 2, 3]).toMap(async x => doddle(async () => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
             [1, 1],
@@ -200,7 +200,7 @@ describe("invalid inputs", () => {
 
                 .toMap(() => [1])
                 .pull()
-        ).rejects.toThrow(Doddle)
+        ).rejects.toThrow(DoddleError)
     })
 
     it("doesn't accept projection to triple", async () => {
@@ -209,6 +209,6 @@ describe("invalid inputs", () => {
                 // @ts-expect-error
                 .toMap(x => [x, x, x])
                 .pull()
-        ).rejects.toThrow(Doddle)
+        ).rejects.toThrow(DoddleError)
     })
 })

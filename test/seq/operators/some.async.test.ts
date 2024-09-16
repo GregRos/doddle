@@ -1,26 +1,26 @@
-import type { LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
 declare.test("should type as LazyAsync<boolean>", expect => {
-    expect(type_of(_seq([1, 2, 3]).some(() => true))).to_equal(type<LazyAsync<boolean>>)
+    expect(type_of(_seq([1, 2, 3]).some(() => true))).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.test("allows lazy predicate", expect => {
-    const s = _seq([1, 2, 3]).some(() => lazy(() => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+    const s = _seq([1, 2, 3]).some(() => doddle(() => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.test("allows lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).some(() => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+    const s = _seq([1, 2, 3]).some(() => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
 
 declare.test("allows async lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).some(async () => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<boolean>>)
+    const s = _seq([1, 2, 3]).some(async () => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
 
 it("returns false for empty", async () => {
@@ -85,21 +85,21 @@ it("works with async predicate (false)", async () => {
 })
 
 it("allows lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).some(i => lazy(() => i === 2))
+    const s = _seq([1, 2, 3]).some(i => doddle(() => i === 2))
     expect(await s.pull()).toEqual(true)
 })
 
 it("allows lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).some(i => lazy(async () => i === 2))
+    const s = _seq([1, 2, 3]).some(i => doddle(async () => i === 2))
     expect(await s.pull()).toEqual(true)
 })
 
 it("allows async lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).some(async i => lazy(() => i === 2))
+    const s = _seq([1, 2, 3]).some(async i => doddle(() => i === 2))
     expect(await s.pull()).toEqual(true)
 })
 
 it("allows async lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).some(async i => lazy(async () => i === 2))
+    const s = _seq([1, 2, 3]).some(async i => doddle(async () => i === 2))
     expect(await s.pull()).toEqual(true)
 })

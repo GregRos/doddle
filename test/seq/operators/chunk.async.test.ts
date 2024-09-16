@@ -1,4 +1,4 @@
-import { aseq, lazy, type ASeq } from "@lib"
+import { aseq, doddle, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -31,17 +31,17 @@ declare.it("accepts projection with N parameters", expect => {
 })
 
 declare.it("allows lazy projection", expect => {
-    const s = _seq([1, 2, 3]).chunk(2, () => lazy(() => 1))
+    const s = _seq([1, 2, 3]).chunk(2, () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
 declare.it("allows lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).chunk(2, () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).chunk(2, () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
 declare.it("allows async lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).chunk(2, async () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).chunk(2, async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
@@ -114,21 +114,21 @@ it("accepts async projection", async () => {
 })
 
 it("allows lazy projection", async () => {
-    const s = _seq([1, 2, 3]).chunk(1, x => lazy(() => x))
+    const s = _seq([1, 2, 3]).chunk(1, x => doddle(() => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("allows lazy async projection", async () => {
-    const s = _seq([1, 2, 3]).chunk(1, x => lazy(async () => x))
+    const s = _seq([1, 2, 3]).chunk(1, x => doddle(async () => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("allows async lazy async projection", async () => {
-    const s = _seq([1, 2, 3]).chunk(1, async x => lazy(async () => x))
+    const s = _seq([1, 2, 3]).chunk(1, async x => doddle(async () => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
 it("allows async lazy projection", async () => {
-    const s = _seq([1, 2, 3]).chunk(1, async x => lazy(() => x))
+    const s = _seq([1, 2, 3]).chunk(1, async x => doddle(() => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

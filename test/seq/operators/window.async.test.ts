@@ -1,4 +1,4 @@
-import { aseq, lazy, type ASeq } from "@lib"
+import { aseq, doddle, type ASeq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -11,17 +11,17 @@ declare.it("typed as 1-N length tuple", expect => {
 })
 
 declare.it("allows lazy projection", expect => {
-    const s = _seq([1, 2, 3]).window(2, () => lazy(() => 1))
+    const s = _seq([1, 2, 3]).window(2, () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
 declare.it("allows lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).window(2, () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).window(2, () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
 declare.it("allows async lazy async projection", expect => {
-    const s = _seq([1, 2, 3]).window(2, async () => lazy(async () => 1))
+    const s = _seq([1, 2, 3]).window(2, async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
@@ -159,21 +159,21 @@ it("works for async iteratee", async () => {
 })
 
 it("works for lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).window(2, (a, b) => lazy(() => a + b!))
+    const s = _seq([1, 2, 3]).window(2, (a, b) => doddle(() => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
 it("works for async lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).window(2, async (a, b) => lazy(() => a + b!))
+    const s = _seq([1, 2, 3]).window(2, async (a, b) => doddle(() => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
 it("works for async lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).window(2, async (a, b) => lazy(async () => a + b!))
+    const s = _seq([1, 2, 3]).window(2, async (a, b) => doddle(async () => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
 it("works for lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).window(2, (a, b) => lazy(async () => a + b!))
+    const s = _seq([1, 2, 3]).window(2, (a, b) => doddle(async () => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })

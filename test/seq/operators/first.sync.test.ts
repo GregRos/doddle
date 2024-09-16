@@ -1,4 +1,4 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
@@ -6,17 +6,17 @@ const _seq = seq
 
 declare.it("correctly typed as Lazy and disjunction with undefined if no alt", expect => {
     const s = _seq([1, 2, 3]).first()
-    expect(type_of(s)).to_equal(type<Lazy<number | undefined>>)
+    expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
 
 declare.it("disjunction with alt if it's given", expect => {
     const s = _seq([1, 2, 3]).first("alt" as string)
-    expect(type_of(s)).to_equal(type<Lazy<number | string>>)
+    expect(type_of(s)).to_equal(type<Doddle<number | string>>)
 })
 
 declare.it("Alt type is const", expect => {
     const s = _seq([1, 2, 3]).first("alt")
-    expect(type_of(s)).to_equal(type<Lazy<number | "alt">>)
+    expect(type_of(s)).to_equal(type<Doddle<number | "alt">>)
 })
 
 it("gets first element", () => {

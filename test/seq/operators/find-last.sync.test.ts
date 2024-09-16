@@ -1,19 +1,19 @@
-import type { Lazy } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 declare.test("should type as Lazy<T | undefined>", expect => {
-    expect(type_of(_seq([1, 2, 3]).findLast(() => true))).to_equal(type<Lazy<number | undefined>>)
+    expect(type_of(_seq([1, 2, 3]).findLast(() => true))).to_equal(type<Doddle<number | undefined>>)
 })
 declare.test("should type as Lazy<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt" as string))).to_equal(
-        type<Lazy<number | string>>
+        type<Doddle<number | string>>
     )
 })
 declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt"))).to_equal(
-        type<Lazy<number | "alt">>
+        type<Doddle<number | "alt">>
     )
 })
 
@@ -71,6 +71,6 @@ it("calls predicate as many times as needed", () => {
 })
 
 it("works with lazy predicate", () => {
-    const s = _seq([1, 2, 3]).findLast(x => lazy(() => x % 2 === 0))
+    const s = _seq([1, 2, 3]).findLast(x => doddle(() => x % 2 === 0))
     expect(s.pull()).toEqual(2)
 })

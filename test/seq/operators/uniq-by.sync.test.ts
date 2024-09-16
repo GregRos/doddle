@@ -1,7 +1,7 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns seq of same type", expect => {
@@ -72,6 +72,6 @@ it("pulls, calls iteratee as many as needed", () => {
 })
 
 it("works with lazy iteratee", () => {
-    const s = _seq([1, 2, 1, 2]).uniqBy(x => lazy(() => x))
+    const s = _seq([1, 2, 1, 2]).uniqBy(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2])
 })

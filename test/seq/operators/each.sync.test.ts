@@ -1,7 +1,7 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { lazy, seq } from "@lib"
+import { doddle, seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("should type as _Seq<T>", expect => {
@@ -102,7 +102,7 @@ it("can iterate twice", () => {
 it("auto-pulls lazy as part of iteration", () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(() => {
-        return lazy(fn)
+        return doddle(fn)
     })
     expect(fn).not.toHaveBeenCalled()
     let i = 0

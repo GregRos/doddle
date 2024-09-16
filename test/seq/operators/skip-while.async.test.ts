@@ -1,5 +1,5 @@
 import type { ASeq } from "@lib"
-import { aseq, lazy } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -9,15 +9,15 @@ declare.test("should type as Lazy<number>", expect => {
     expect(type_of(_seq([1, 2, 3]).skipWhile(() => true))).to_equal(type<_Seq<number>>)
 })
 declare.test("allows lazy predicate", expect => {
-    const s = _seq([1, 2, 3]).skipWhile(() => lazy(() => true))
+    const s = _seq([1, 2, 3]).skipWhile(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 declare.test("allows lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).skipWhile(() => lazy(async () => true))
+    const s = _seq([1, 2, 3]).skipWhile(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 declare.test("allows async lazy async predicate", expect => {
-    const s = _seq([1, 2, 3]).skipWhile(async () => lazy(async () => true))
+    const s = _seq([1, 2, 3]).skipWhile(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 it("returns empty for constant true", async () => {
@@ -78,21 +78,21 @@ it("works with async predicate", async () => {
 })
 
 it("allows lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).skipWhile(i => lazy(() => i < 2))
+    const s = _seq([1, 2, 3]).skipWhile(i => doddle(() => i < 2))
     expect(await s._qr).toEqual([2, 3])
 })
 
 it("allows lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).skipWhile(i => lazy(async () => i < 2))
+    const s = _seq([1, 2, 3]).skipWhile(i => doddle(async () => i < 2))
     expect(await s._qr).toEqual([2, 3])
 })
 
 it("allows async lazy predicate", async () => {
-    const s = _seq([1, 2, 3]).skipWhile(async i => lazy(() => i < 2))
+    const s = _seq([1, 2, 3]).skipWhile(async i => doddle(() => i < 2))
     expect(await s._qr).toEqual([2, 3])
 })
 
 it("allows async lazy async predicate", async () => {
-    const s = _seq([1, 2, 3]).skipWhile(async i => lazy(async () => i < 2))
+    const s = _seq([1, 2, 3]).skipWhile(async i => doddle(async () => i < 2))
     expect(await s._qr).toEqual([2, 3])
 })

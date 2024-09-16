@@ -1,6 +1,6 @@
-import { Doddle } from "@error"
-import type { Seq } from "@lib"
-import { lazy, seq, type Lazy } from "@lib"
+import { DoddleError } from "@error"
+import type { Doddle, Seq } from "@lib"
+import { doddle, seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 import { Dummy } from "./input.utils.helper"
 const _seq = seq
@@ -53,17 +53,17 @@ declare.it("cannot be called using function returning async iterator", () => {
     _seq(() => new Dummy._AsyncIterator())
 })
 declare.it("element type same as lazy's value type", expect => {
-    const s = _seq(lazy(() => [1]))
+    const s = _seq(doddle(() => [1]))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("element type is lazy value type for iterable of lazy", expect => {
-    const s = _seq(null! as Iterable<Lazy<number>>)
+    const s = _seq(null! as Iterable<Doddle<number>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 declare.it("element type is promise type for iterable of lazy async", expect => {
-    const s = _seq(null! as Iterable<Lazy<Promise<number>>>)
+    const s = _seq(null! as Iterable<Doddle<Promise<number>>>)
     expect(type_of(s)).to_equal(type<_Seq<Promise<number>>>)
 })
 
@@ -78,7 +78,7 @@ declare.it("works for generic iterable", expect => {
     }
 })
 it("throws immediately if given a string", () => {
-    expect(() => _seq("a" as any)).toThrow(Doddle)
+    expect(() => _seq("a" as any)).toThrow(DoddleError)
 })
 
 it("throws on iteration if given a function returning a string", () => {
@@ -86,7 +86,7 @@ it("throws on iteration if given a function returning a string", () => {
     expect(() => {
         for (const _ of iterable) {
         }
-    }).toThrow(Doddle)
+    }).toThrow(DoddleError)
 })
 it("empty argslist gives empty seq", () => {
     expect(_seq.empty()._qr).toEqual([])
@@ -107,27 +107,27 @@ it("converts from function returning iterator", () => {
     expect(iterable._qr).toEqual([0, 1, 2])
 })
 it("converts from lazy of iterable", () => {
-    const iterable = seq(lazy(() => [1]))
+    const iterable = seq(doddle(() => [1]))
     expect(iterable._qr).toEqual([1])
 })
 it("converts from function returning lazy of iterable", () => {
-    const iterable = seq(() => lazy(() => [1]))
+    const iterable = seq(() => doddle(() => [1]))
     expect(iterable._qr).toEqual([1])
 })
 it("converts from iterable of lazies", () => {
-    const iterable = seq([lazy(() => 1)])
+    const iterable = seq([doddle(() => 1)])
     expect(iterable._qr).toEqual([1])
 })
 
 it("errors if given something else", () => {
-    expect(() => seq(1 as any)).toThrow(Doddle)
+    expect(() => seq(1 as any)).toThrow(DoddleError)
 })
 it("errors if given an async iterable", () => {
-    expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow(Doddle)
+    expect(() => seq(new Dummy._AsyncIterable() as any)).toThrow(DoddleError)
 })
 it("errors when iterated when given a function returning something else", () => {
     const iterable = seq(() => 1 as any)
-    expect(() => [...iterable]).toThrow(Doddle)
+    expect(() => [...iterable]).toThrow(DoddleError)
 })
 it("errors when iterated when given a function returning async iterable", () => {
     const iterable = seq(() => new Dummy._AsyncIterable() as any)

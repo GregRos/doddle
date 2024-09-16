@@ -1,6 +1,6 @@
-import { chk, Doddle, loadCheckers } from "../errors/error.js"
-import type { Lazy } from "../lazy/index.js"
-import { lazy, lazyFromOperator, pull } from "../lazy/index.js"
+import { chk, DoddleError, loadCheckers } from "../errors/error.js"
+import type { Doddle } from "../lazy/index.js"
+import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
 import { _iter, createCompareKey, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
 
 import {
@@ -31,7 +31,7 @@ export abstract class Seq<T> implements Iterable<T> {
             yield* seq(input).concat(items)
         })
     }
-    at(index: number): Lazy<T | undefined> {
+    at(index: number): Doddle<T | undefined> {
         chk(this.at).index(index)
         return lazyFromOperator(this, function at(input) {
             if (index < 0) {
@@ -107,7 +107,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     chunk<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S | Lazy<S>
+        projection: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
     ): Seq<S>
     chunk<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
     chunk<L extends number>(
@@ -175,9 +175,9 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
-    count(): Lazy<number>
-    count(predicate: Seq.Predicate<T>): Lazy<number>
-    count(predicate?: Seq.Predicate<T>): Lazy<number> {
+    count(): Doddle<number>
+    count(predicate: Seq.Predicate<T>): Doddle<number>
+    count(predicate?: Seq.Predicate<T>): Doddle<number> {
         // ! POLYMORPHIC !
         predicate ??= () => true
         predicate = chk(this.count).predicate(predicate)
@@ -206,7 +206,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-    every(predicate: Seq.Predicate<T>): Lazy<boolean> {
+    every(predicate: Seq.Predicate<T>): Doddle<boolean> {
         // ! POLYMORPHIC !
         predicate = chk(this.every).predicate(predicate)
         return lazyFromOperator(this, function every(input) {
@@ -226,8 +226,8 @@ export abstract class Seq<T> implements Iterable<T> {
             )
         })
     }
-    findLast(predicate: Seq.Predicate<T>): Lazy<T | undefined>
-    findLast<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Lazy<T | Alt>
+    findLast(predicate: Seq.Predicate<T>): Doddle<T | undefined>
+    findLast<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Doddle<T | Alt>
     findLast<Alt = undefined>(predicate: Seq.Predicate<T>, alt?: Alt) {
         // ! POLYMORPHIC !
 
@@ -236,8 +236,8 @@ export abstract class Seq<T> implements Iterable<T> {
             return input.filter(predicate).last(alt).pull() as any
         })
     }
-    find(predicate: Seq.Predicate<T>): Lazy<T | undefined>
-    find<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Lazy<T | Alt>
+    find(predicate: Seq.Predicate<T>): Doddle<T | undefined>
+    find<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Doddle<T | Alt>
     find<Alt = T>(predicate: Seq.Predicate<T>, alt?: Alt) {
         // ! POLYMORPHIC !
 
@@ -248,7 +248,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     share(): Seq<T> {
-        const iter = lazy(() => _iter(this))
+        const iter = doddle(() => _iter(this))
         let err: Error | undefined = undefined
         return SeqOperator(this, function* share() {
             if (err) {
@@ -277,9 +277,9 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    first(): Lazy<T | undefined>
-    first<const Alt>(alt: Alt): Lazy<T | Alt>
-    first<const Alt = undefined>(alt?: Alt): Lazy<any> {
+    first(): Doddle<T | undefined>
+    first<const Alt>(alt: Alt): Doddle<T | Alt>
+    first<const Alt = undefined>(alt?: Alt): Doddle<any> {
         return lazyFromOperator(this, function first(input) {
             for (const element of input) {
                 return element
@@ -356,16 +356,16 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    includes<T extends S, S>(this: Seq<T>, value: S): Lazy<boolean>
-    includes<S extends T>(value: S): Lazy<boolean>
-    includes(value: any): Lazy<boolean> {
+    includes<T extends S, S>(this: Seq<T>, value: S): Doddle<boolean>
+    includes<S extends T>(value: S): Doddle<boolean>
+    includes(value: any): Doddle<boolean> {
         // ! POLYMORPHIC !
         return lazyFromOperator(this, function includes(input) {
             return input.some(element => element === value).pull()
         })
     }
-    last(): Lazy<T | undefined>
-    last<const Alt>(alt: Alt): Lazy<T | Alt>
+    last(): Doddle<T | undefined>
+    last<const Alt>(alt: Alt): Doddle<T | Alt>
     last<Alt = undefined>(alt?: Alt) {
         return lazyFromOperator(this, function last(input) {
             let last: T | Alt = alt as Alt
@@ -382,9 +382,9 @@ export abstract class Seq<T> implements Iterable<T> {
             yield* seq(input).concatMap((element, index) => [pull(projection(element, index)) as S])
         })
     }
-    maxBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
-    maxBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Lazy<T | Alt>
-    maxBy<K, Alt>(projection: Seq.Iteratee<T, K>, alt?: Alt): Lazy<T | Alt> {
+    maxBy<K>(projection: Seq.Iteratee<T, K>): Doddle<T | undefined>
+    maxBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Doddle<T | Alt>
+    maxBy<K, Alt>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
         const EMPTY = Symbol("EMPTY_SEQ")
         // ! POLYMORPHIC !
         chk(this.maxBy).projection(projection)
@@ -400,8 +400,8 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
-    minBy<K>(projection: Seq.Iteratee<T, K>): Lazy<T | undefined>
-    minBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Lazy<T | Alt>
+    minBy<K>(projection: Seq.Iteratee<T, K>): Doddle<T | undefined>
+    minBy<K, const Alt>(projection: Seq.Iteratee<T, K>, alt: Alt): Doddle<T | Alt>
     minBy<K>(projection: Seq.Iteratee<T, K>, alt?: any) {
         const EMPTY = Symbol("EMPTY_SEQ")
         // ! POLYMORPHIC !
@@ -438,9 +438,9 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
-    reduce(reducer: Seq.Reducer<T, T>): Lazy<T>
-    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial: Acc): Lazy<Acc>
-    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial?: Acc): Lazy<any> {
+    reduce(reducer: Seq.Reducer<T, T>): Doddle<T>
+    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial: Acc): Doddle<Acc>
+    reduce<Acc>(reducer: Seq.Reducer<T, Acc>, initial?: Acc): Doddle<any> {
         // ! POLYMORPHIC !
         const NO_INITIAL = Symbol("NO_INITIAL")
         chk(this.reduce).reducer(reducer)
@@ -450,7 +450,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 .last(NO_INITIAL)
                 .map(x => {
                     if (x === NO_INITIAL) {
-                        throw new Doddle("Cannot reduce empty sequence with no initial value")
+                        throw new DoddleError("Cannot reduce empty sequence with no initial value")
                     }
                     return x
                 })
@@ -493,7 +493,7 @@ export abstract class Seq<T> implements Iterable<T> {
     seqEqualsBy<K, S = T>(
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
-    ): Lazy<boolean> {
+    ): Doddle<boolean> {
         const other = seq(_other)
         return lazyFromOperator(this, function seqEqualsBy(input) {
             const otherIterator = _iter(other)
@@ -513,8 +513,8 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    seqEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
-    seqEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
+    seqEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    seqEquals<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
     seqEquals<S extends T>(_other: Seq.Input<S>) {
         return this.seqEqualsBy(_other, x => x)
     }
@@ -522,7 +522,7 @@ export abstract class Seq<T> implements Iterable<T> {
     setEqualsBy<K, S = T>(
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
-    ): Lazy<boolean> {
+    ): Doddle<boolean> {
         const other = seq(_other)
         return lazyFromOperator(this, function setEqualsBy(input) {
             const set = new Set()
@@ -538,8 +538,8 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Lazy<boolean>
-    setEquals<S extends T>(_other: Seq.Input<S>): Lazy<boolean>
+    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
     setEquals<S extends T>(_other: Seq.Input<S>) {
         return this.setEqualsBy(_other, x => x)
     }
@@ -595,7 +595,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
-    some(predicate: Seq.Predicate<T>): Lazy<boolean> {
+    some(predicate: Seq.Predicate<T>): Doddle<boolean> {
         // ! POLYMORPHIC !
 
         const NO_MATCH = Symbol("NO_MATCH")
@@ -679,7 +679,7 @@ export abstract class Seq<T> implements Iterable<T> {
         projection = chk(this.toMapBy).projection(projection)
 
         return this.toMap((x, i) => {
-            const lz = lazy(() => projection(x, i)).map(k => [k, x]) as Lazy<[K, T]>
+            const lz = doddle(() => projection(x, i)).map(k => [k, x]) as Doddle<[K, T]>
             return lz
         })
     }
@@ -723,7 +723,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     window<L extends number, S>(
         size: L,
-        projection: (...window: getWindowArgsType<T, L>) => S | Lazy<S>
+        projection: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
     ): Seq<S>
     window<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
     window<L extends number, S>(
@@ -810,11 +810,11 @@ export const SeqOperator = function seq<In, Out>(
 }
 
 export namespace Seq {
-    type MaybeLazy<T> = T | Lazy<T>
+    type MaybeLazy<T> = T | Doddle<T>
 
     export type IndexIteratee<O> = (index: number) => MaybeLazy<O>
 
-    export type NoInputAction = () => unknown | Lazy<unknown>
+    export type NoInputAction = () => unknown | Doddle<unknown>
     export type Iteratee<E, O> = (element: E, index: number) => MaybeLazy<O>
     export type NoIndexIteratee<E, O> = (element: E) => MaybeLazy<O>
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O

@@ -1,11 +1,11 @@
-import type { LazyAsync } from "@lib"
+import type { DoddleAsync } from "@lib"
 import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 declare.test("correctly typed as LazyAsync and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 it("gets first element", async () => {

@@ -1,5 +1,5 @@
-import type { ASeq, LazyAsync } from "@lib"
-import { aseq, lazy } from "@lib"
+import type { ASeq, DoddleAsync } from "@lib"
+import { aseq, doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
@@ -10,18 +10,18 @@ declare.it("returns aseq of same type", expect => {
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 declare.test("allows lazy iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(() => lazy(() => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(() => doddle(() => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(() => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(() => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
 declare.test("allows async lazy async iteratee", expect => {
-    const s = _seq([1, 2, 3]).minBy(async () => lazy(async () => true))
-    expect(type_of(s)).to_equal(type<LazyAsync<number | undefined>>)
+    const s = _seq([1, 2, 3]).minBy(async () => doddle(async () => true))
+    expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 it("returns empty on empty", async () => {
     const s = _seq([]).orderBy(() => 1)
@@ -96,7 +96,7 @@ it("doesn't throw for incomparable key", async () => {
 })
 
 it("allows lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).orderBy(i => lazy(() => i % 2))
+    const s = _seq([1, 2, 3]).orderBy(i => doddle(() => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
@@ -106,16 +106,16 @@ it("allows async iteratee", async () => {
 })
 
 it("allows lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).orderBy(i => lazy(async () => i % 2))
+    const s = _seq([1, 2, 3]).orderBy(i => doddle(async () => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
 it("allows async lazy iteratee", async () => {
-    const s = _seq([1, 2, 3]).orderBy(async i => lazy(() => i % 2))
+    const s = _seq([1, 2, 3]).orderBy(async i => doddle(() => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
 it("allows async lazy async iteratee", async () => {
-    const s = _seq([1, 2, 3]).orderBy(async i => lazy(async () => i % 2))
+    const s = _seq([1, 2, 3]).orderBy(async i => doddle(async () => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })

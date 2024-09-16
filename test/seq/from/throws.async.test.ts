@@ -1,4 +1,4 @@
-import { Doddle } from "@error"
+import { DoddleError } from "@error"
 import type { ASeq } from "@lib"
 import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
@@ -50,14 +50,14 @@ describe("invalid input", () => {
             for await (const _ of s) {
                 /* iteration */
             }
-        }).rejects.toThrow(Doddle)
+        }).rejects.toThrow(DoddleError)
     })
 
     it("throws TypeError if given null", async () => {
-        await expect(async () => aseq.throws(null as any)).rejects.toThrow(Doddle)
+        await expect(async () => aseq.throws(null as any)).rejects.toThrow(DoddleError)
     })
 
     it("throws TypeError if given undefined", async () => {
-        await expect(async () => aseq.throws(undefined as any)).rejects.toThrow(Doddle)
+        await expect(async () => aseq.throws(undefined as any)).rejects.toThrow(DoddleError)
     })
 })
