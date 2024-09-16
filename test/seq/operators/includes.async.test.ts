@@ -3,7 +3,7 @@ import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
-declare.test("should type as LazyAsync<boolean>", expect => {
+declare.test("should type as DoddleAsync<boolean>", expect => {
     expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<DoddleAsync<boolean>>)
 })
 it("returns false for empty", async () => {
@@ -23,9 +23,9 @@ it("returns true for match", async () => {
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(async function* () {})
     const s = _seq(fn)
-    const lazy = s.includes(1)
+    const doddle = s.includes(1)
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

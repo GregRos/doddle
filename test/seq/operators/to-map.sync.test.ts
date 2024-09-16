@@ -115,9 +115,9 @@ it("produces map twice", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.toMap(x => [x, x])
+    const doddle = s.toMap(x => [x, x])
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -137,7 +137,7 @@ it("calls projection with index", () => {
     expect(fn).toHaveBeenCalledWith(3, 2)
 })
 
-it("works with lazy projection", () => {
+it("works with doddle projection", () => {
     const s = _seq([1, 2, 3]).toMap(x => doddle(() => [x, x] as const))
     expect(s.pull()).toEqual(
         new Map([

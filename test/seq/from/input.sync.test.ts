@@ -52,17 +52,17 @@ declare.it("cannot be called using function returning async iterator", () => {
     // @ts-expect-error
     _seq(() => new Dummy._AsyncIterator())
 })
-declare.it("element type same as lazy's value type", expect => {
+declare.it("element type same as doddle's value type", expect => {
     const s = _seq(doddle(() => [1]))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("element type is lazy value type for iterable of lazy", expect => {
+declare.it("element type is doddle value type for iterable of doddle", expect => {
     const s = _seq(null! as Iterable<Doddle<number>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("element type is promise type for iterable of lazy async", expect => {
+declare.it("element type is promise type for iterable of doddle async", expect => {
     const s = _seq(null! as Iterable<Doddle<Promise<number>>>)
     expect(type_of(s)).to_equal(type<_Seq<Promise<number>>>)
 })
@@ -106,11 +106,11 @@ it("converts from function returning iterator", () => {
     const iterable = seq(() => new Dummy._Iterator())
     expect(iterable._qr).toEqual([0, 1, 2])
 })
-it("converts from lazy of iterable", () => {
+it("converts from doddle of iterable", () => {
     const iterable = seq(doddle(() => [1]))
     expect(iterable._qr).toEqual([1])
 })
-it("converts from function returning lazy of iterable", () => {
+it("converts from function returning doddle of iterable", () => {
     const iterable = seq(() => doddle(() => [1]))
     expect(iterable._qr).toEqual([1])
 })

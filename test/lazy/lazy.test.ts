@@ -11,7 +11,7 @@ it("name is recovered", () => {
         return 1
     })
     expect(lz.info.name).toEqual("foo")
-    expect(lz.toString()).toEqual("lazy(foo) <untouched>")
+    expect(lz.toString()).toEqual("doddle(foo) <untouched>")
 })
 
 it("toString() is equal to Symbol.toStringTag", () => {
@@ -29,7 +29,7 @@ it("starts out untouched", () => {
         syncness: "untouched"
     })
 })
-declare.it("If S ⊆ T then Lazy<S> ⊆ Lazy<T>", expect => {
+declare.it("If S ⊆ T then Doddle<S> ⊆ Doddle<T>", expect => {
     expect(type<Doddle<1>>).to_subtype(type<Doddle<number>>)
     const _: Doddle<number> = doddle(() => 1 as const)
     function __<T, S extends T>() {
@@ -48,14 +48,14 @@ it("pulling changes stage (in sync)", () => {
 it("pulling changes stage (in async)", async () => {
     const lz = doddle(async () => {
         expect(lz.info.stage).toEqual("executing")
-        expect(lz.toString()).toEqual("lazy <executing>")
+        expect(lz.toString()).toEqual("doddle <executing>")
         return 5
     })
     const p = lz.pull()
     expect(lz.info.stage).toEqual("executing")
     await p
     expect(lz.info.stage).toEqual("done")
-    expect(lz.toString()).toEqual("lazy async number")
+    expect(lz.toString()).toEqual("doddle async number")
 })
 
 it("pulling changes syncness (in sync)", () => {
@@ -63,18 +63,18 @@ it("pulling changes syncness (in sync)", () => {
         expect(lz.info.syncness).toEqual("untouched")
     })
     lz.pull()
-    expect(lz.toString()).toEqual("lazy sync undefined")
+    expect(lz.toString()).toEqual("doddle sync undefined")
     expect(lz.info.syncness).toEqual("sync")
 })
 
 it("pulling changes syncness (in async)", async () => {
     const lz = doddle(async () => {
         expect(lz.info.syncness).toEqual("untouched")
-        expect(lz.toString()).toEqual("lazy <executing>")
+        expect(lz.toString()).toEqual("doddle <executing>")
     })
     const p = lz.pull()
     expect(lz.info.syncness).toEqual("async")
-    expect(lz.toString()).toEqual("lazy async <executing>")
+    expect(lz.toString()).toEqual("doddle async <executing>")
     await p
     expect(lz.info.syncness).toEqual("async")
 })

@@ -16,17 +16,17 @@ declare.it("can be called with no initial value but the type is T", expect => {
     // @ts-expect-error does not allow a different type
     s.scan(() => 1)
 })
-declare.test("allows lazy reducer", expect => {
+declare.test("allows doddle reducer", expect => {
     const s = _seq([1, 2, 3]).scan(() => doddle(() => true), false)
     expect(type_of(s)).to_equal(type<ASeq<boolean>>)
 })
 
-declare.test("allows lazy async reducer", expect => {
+declare.test("allows doddle async reducer", expect => {
     const s = _seq([1, 2, 3]).scan(() => doddle(async () => true), false)
     expect(type_of(s)).to_equal(type<ASeq<boolean>>)
 })
 
-declare.test("allows async lazy async reducer", expect => {
+declare.test("allows async doddle async reducer", expect => {
     const s = _seq([1, 2, 3]).scan(async () => doddle(async () => true), false)
     expect(type_of(s)).to_equal(type<ASeq<boolean>>)
 })
@@ -124,9 +124,9 @@ it("has no side-effects before pull", async () => {
         yield 1
     })
     const s = _seq(fn)
-    const lazy = s.scan(() => 1)
+    const doddle = s.scan(() => 1)
     expect(fn).not.toHaveBeenCalled()
-    for await (const _ of lazy) {
+    for await (const _ of doddle) {
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })
@@ -147,22 +147,22 @@ it("works for async reducers", async () => {
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })
 
-it("allows lazy reducer", async () => {
+it("allows doddle reducer", async () => {
     const s = _seq([1, 2, 3]).scan((a, b) => doddle(() => a + b), 0)
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })
 
-it("allows lazy async reducer", async () => {
+it("allows doddle async reducer", async () => {
     const s = _seq([1, 2, 3]).scan((a, b) => doddle(async () => a + b), 0)
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })
 
-it("allows async lazy reducer", async () => {
+it("allows async doddle reducer", async () => {
     const s = _seq([1, 2, 3]).scan(async (a, b) => doddle(() => a + b), 0)
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })
 
-it("allows async lazy async reducer", async () => {
+it("allows async doddle async reducer", async () => {
     const s = _seq([1, 2, 3]).scan(async (a, b) => doddle(async () => a + b), 0)
     expect(await s._qr).toEqual([0, 1, 3, 6])
 })

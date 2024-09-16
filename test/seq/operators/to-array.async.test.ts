@@ -31,9 +31,9 @@ it("handles sequences with different types", async () => {
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(function* () {})
     const s = _aseq(fn)
-    const lazy = s.toArray()
+    const doddle = s.toArray()
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

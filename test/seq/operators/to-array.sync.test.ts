@@ -25,9 +25,9 @@ it("converts empty to empty", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.toArray()
+    const doddle = s.toArray()
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

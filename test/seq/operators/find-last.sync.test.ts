@@ -3,15 +3,15 @@ import { declare, type, type_of } from "declare-it"
 
 import { doddle, seq } from "@lib"
 const _seq = seq
-declare.test("should type as Lazy<T | undefined>", expect => {
+declare.test("should type as Doddle<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true))).to_equal(type<Doddle<number | undefined>>)
 })
-declare.test("should type as Lazy<T | string> with alt", expect => {
+declare.test("should type as Doddle<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt" as string))).to_equal(
         type<Doddle<number | string>>
     )
 })
-declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
+declare.test("should type as Doddle<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).findLast(() => true, "alt"))).to_equal(
         type<Doddle<number | "alt">>
     )
@@ -45,9 +45,9 @@ it("returns last match even with alt", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.findLast(() => true)
+    const doddle = s.findLast(() => true)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -70,7 +70,7 @@ it("calls predicate as many times as needed", () => {
     expect(fn).toHaveBeenCalledTimes(5)
 })
 
-it("works with lazy predicate", () => {
+it("works with doddle predicate", () => {
     const s = _seq([1, 2, 3]).findLast(x => doddle(() => x % 2 === 0))
     expect(s.pull()).toEqual(2)
 })

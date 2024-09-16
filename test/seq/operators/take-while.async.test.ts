@@ -8,17 +8,17 @@ declare.it("keeps same type as input", expect => {
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows lazy predicate", expect => {
+declare.it("allows doddle predicate", expect => {
     const s = _seq([1, 2, 3]).takeWhile(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows lazy async predicate", expect => {
+declare.it("allows doddle async predicate", expect => {
     const s = _seq([1, 2, 3]).takeWhile(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows async lazy async predicate", expect => {
+declare.it("allows async doddle async predicate", expect => {
     const s = _seq([1, 2, 3]).takeWhile(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
@@ -69,22 +69,22 @@ it("works with async predicate", async () => {
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("works for lazy predicate", async () => {
+it("works for doddle predicate", async () => {
     const s = _seq([1, 2, 3]).takeWhile(i => doddle(() => i < 3))
     await expect(s._qr).resolves.toEqual([1, 2])
 })
 
-it("works for lazy async predicate", async () => {
+it("works for doddle async predicate", async () => {
     const s = _seq([1, 2, 3]).takeWhile(i => doddle(async () => i < 3))
     await expect(s._qr).resolves.toEqual([1, 2])
 })
 
-it("works for async lazy predicate", async () => {
+it("works for async doddle predicate", async () => {
     const s = _seq([1, 2, 3]).takeWhile(async i => doddle(() => i < 3))
     await expect(s._qr).resolves.toEqual([1, 2])
 })
 
-it("works for async lazy async predicate", async () => {
+it("works for async doddle async predicate", async () => {
     const s = _seq([1, 2, 3]).takeWhile(async i => doddle(async () => i < 3))
     await expect(s._qr).resolves.toEqual([1, 2])
 })

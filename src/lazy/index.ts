@@ -2,9 +2,9 @@ import { cannotRecurseSync, chk, loadCheckers } from "../errors/error.js"
 import {
     getClassName,
     getFunctionName,
-    isLazy,
+    isDoddle,
     isThenable,
-    type MaybeLazy,
+    type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
 export const methodName = Symbol("methodName")
@@ -19,9 +19,10 @@ type IsAnyPureAsync<T extends Doddle<any>[], IfTrue, IfFalse> = {
 type IsAnyMixed<T extends Doddle<any>[], IfTrue, IfFalse> =
     DoddleAsync<any> extends T[number] ? IfTrue : IfFalse
 
-type OnlyIfMixed<Input, LazyType = Doddle<Input>> = Promise<any> extends Input ? LazyType : never
+type OnlyIfMixed<Input, DoddleType = Doddle<Input>> =
+    Promise<any> extends Input ? DoddleType : never
 /**
- * A TypeScript-first lazy evaluation primitive. An object that will only evaluate its initializer
+ * A TypeScript-first doddle evaluation primitive. An object that will only evaluate its initializer
  * function when the {@link pull} method is called.
  *
  * The initializer can return another {@link Doddle}, which will be chained like a promise.
@@ -37,7 +38,7 @@ export class Doddle<T> {
         const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
         const stageWord = ["untouched", "executing", "done", "threw"][stage]
         const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
-        const namePart = name ? `lazy(${name})` : "lazy"
+        const namePart = name ? `doddle(${name})` : "doddle"
 
         return {
             isReady: stage >= Stage.Done,
@@ -73,7 +74,7 @@ export class Doddle<T> {
         return new Doddle(f)
     }
 
-    // When the projection is async, the result is always LazyAsync, no matter
+    // When the projection is async, the result is always DoddleAsync, no matter
     // what the `this` is.
     map<T, R>(
         this: Doddle<T>,
@@ -230,7 +231,7 @@ export class Doddle<T> {
         })
     }
 
-    /** Returns a short description of the Lazy value and its state. */
+    /** Returns a short description of the Doddle value and its state. */
     toString() {
         return this.info.desc
     }
@@ -266,7 +267,7 @@ export class Doddle<T> {
         let resource: any
         try {
             const result = this._init!()
-            resource = isLazy(result) ? result.pull() : result
+            resource = isDoddle(result) ? result.pull() : result
         } catch (e) {
             this._cached = e
             info.stage = Stage.Threw
@@ -278,7 +279,7 @@ export class Doddle<T> {
         if (isThenable(resource)) {
             info.syncness = Syncness.Async
             resource = resource.then(value => {
-                if (isLazy(value)) {
+                if (isDoddle(value)) {
                     value = value.pull()
                 }
                 info.stage = Stage.Done
@@ -300,27 +301,29 @@ export class Doddle<T> {
     }
 }
 /**
- * Creates a lazy primitive around the given function, making sure it's only executed once. Works
+ * Creates a doddle primitive around the given function, making sure it's only executed once. Works
  * for both synchronous and asynchronous evaluation.
  *
  * @example
  *     // Simple initializer:
- *     const regular = lazy(() => 1) satisfies Lazy<number>
+ *     const regular = doddle(() => 1) satisfies Doddle<number>
  *
  *     // Initializer returning another lazily primitive is flattened:
- *     const lazyNested = lazy(() => lazy(() => 1)) satisfies Lazy<number>
+ *     const lazyNested = doddle(() => doddle(() => 1)) satisfies Doddle<number>
  *
- *     // Async initializer gives a `LazyAsync` instance:
- *     const lazyAsync = lazy(async () => 1) satisfies LazyAsync<number>
+ *     // Async initializer gives a `DoddleAsync` instance:
+ *     const lazyAsync = doddle(async () => 1) satisfies DoddleAsync<number>
  *
  *     // Async initializer returning another lazily primitive is flattened:
- *     const asyncLazy = lazy(async () => lazy(() => 1)) satisfies LazyAsync<number>
+ *     const asyncDoddle = doddle(async () => doddle(() => 1)) satisfies DoddleAsync<number>
  *
  *     // Async initializer returning another lazily async primitive is flattened:
- *     const asyncLazyAsync = lazy(async () => lazy(async () => 1)) satisfies LazyAsync<number>
+ *     const asyncDoddleAsync = doddle(async () =>
+ *         doddle(async () => 1)
+ *     ) satisfies DoddleAsync<number>
  *
  * @param initializer An initializer function that will be executed once to produce the value. Can
- *   be synchronous or asynchronous and will also handle nested lazy primitives.
+ *   be synchronous or asynchronous and will also handle nested doddle primitives.
  */
 
 export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
@@ -380,7 +383,7 @@ export namespace Doddle {
         | DoddleAsync<T>
         | Promise<Doddle<T>>
         | Promise<DoddleAsync<T>>
-    export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeLazy<T>>
+    export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddle<T>>
 }
 
 export type DoddleAsync<T> = Doddle<Promise<T>>

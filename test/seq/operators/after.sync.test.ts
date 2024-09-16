@@ -71,7 +71,7 @@ it("gets called twice if end reached twice", () => {
     expect(afterFn).toHaveBeenCalledTimes(2)
 })
 
-it("pulls lazy result", () => {
+it("pulls doddle result", () => {
     const fn = jest.fn(() => 1)
     const afterFn = () => doddle(fn)
     const s = seq([1, 2, 3]).after(afterFn)

@@ -100,7 +100,7 @@ it("can iterate twice", () => {
     expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
 })
 
-it("projects correctly with lazy projection", () => {
+it("projects correctly with doddle projection", () => {
     const s = _seq([1, 2, 3]).concatMap(x => doddle(() => [x, `${x}`]))
     expect(s._qr).toEqual([1, "1", 2, "2", 3, "3"])
 })

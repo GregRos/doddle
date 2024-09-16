@@ -107,7 +107,7 @@ it("can iterate twice", () => {
     ])
 })
 
-it("works with lazy projection", () => {
+it("works with doddle projection", () => {
     const s = _seq([1, 2, 3]).window(2, (a, b) => doddle(() => a + b!))
     expect(s._qr).toEqual([3, 5])
 })

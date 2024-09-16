@@ -4,35 +4,35 @@ import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
-declare.test("should type as LazyAsync<T | undefined>", expect => {
+declare.test("should type as DoddleAsync<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(
         type<DoddleAsync<number | undefined>>
     )
 })
 
-declare.test("should type as LazyAsync<T | string> with alt", expect => {
+declare.test("should type as DoddleAsync<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt" as string))).to_equal(
         type<DoddleAsync<number | string>>
     )
 })
 
-declare.test("should type as LazyAsync<T | 'alt'> with alt", expect => {
+declare.test("should type as DoddleAsync<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt"))).to_equal(
         type<DoddleAsync<number | "alt">>
     )
 })
 
-declare.test("allows lazy iteratee", expect => {
+declare.test("allows doddle iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
-declare.test("allows lazy async iteratee", expect => {
+declare.test("allows doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
-declare.test("allows async lazy async iteratee", expect => {
+declare.test("allows async doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
@@ -72,9 +72,9 @@ it("no side-effects before pull", async () => {
         yield 1
     })
     const s = _seq(fn)
-    const lazy = s.minBy(() => true)
+    const doddle = s.minBy(() => true)
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -118,22 +118,22 @@ it("works with async iteratee", async () => {
     expect(await s.pull()).toEqual(1)
 })
 
-it("works for lazy iteratee", async () => {
+it("works for doddle iteratee", async () => {
     const s = _seq([3, 1, 2]).minBy(i => doddle(() => i))
     expect(await s.pull()).toEqual(1)
 })
 
-it("works for lazy async iteratee", async () => {
+it("works for doddle async iteratee", async () => {
     const s = _seq([3, 1, 2]).minBy(i => doddle(async () => i))
     expect(await s.pull()).toEqual(1)
 })
 
-it("works for async lazy iteratee", async () => {
+it("works for async doddle iteratee", async () => {
     const s = _seq([3, 1, 2]).minBy(async i => doddle(() => i))
     expect(await s.pull()).toEqual(1)
 })
 
-it("works for async lazy async iteratee", async () => {
+it("works for async doddle async iteratee", async () => {
     const s = _seq([3, 1, 2]).minBy(async i => doddle(async () => i))
     expect(await s.pull()).toEqual(1)
 })

@@ -13,17 +13,17 @@ declare.it("is typed correctly for mixed types", expect => {
     expect(type_of(s)).to_equal(type<DoddleAsync<Set<string | number | boolean>>>)
 })
 
-declare.it("allows lazy iteratee", expect => {
+declare.it("allows doddle iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
     expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
-declare.it("allows lazy async iteratee", expect => {
+declare.it("allows doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
     expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })
 
-declare.it("allows async lazy async iteratee", expect => {
+declare.it("allows async doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).toSet()
     expect(type_of(s)).to_equal(type<DoddleAsync<Set<number>>>)
 })

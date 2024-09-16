@@ -2,7 +2,7 @@ import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { doddle, seq } from "@lib"
-declare.it("should type as Lazy<boolean>", expect => {
+declare.it("should type as Doddle<boolean>", expect => {
     expect(type_of(seq([1, 2, 3]).some(() => true))).to_equal(type<Doddle<boolean>>)
 })
 
@@ -24,13 +24,13 @@ it("returns true for any matches", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = seq(fn)
-    const lazy = s.some(() => true)
+    const doddle = s.some(() => true)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
-it("works with lazy predicate", () => {
+it("works with doddle predicate", () => {
     const s = seq([1, 2, 3]).some(() => doddle(() => true))
     expect(s.pull()).toEqual(true)
 })

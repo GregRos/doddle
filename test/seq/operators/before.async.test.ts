@@ -65,7 +65,7 @@ describe("async", () => {
         expect(beforeFn).toHaveBeenCalledTimes(0)
     })
 
-    it("pulls lazy result", async () => {
+    it("pulls doddle result", async () => {
         const fn = jest.fn(() => 1)
         const beforeFn = () => doddle(fn)
         const s = aseq([1, 2, 3]).before(beforeFn)
@@ -84,7 +84,7 @@ describe("async", () => {
         expect(fn).toHaveBeenCalledTimes(1)
     })
 
-    it("waits for async lazy async result", async () => {
+    it("waits for async doddle async result", async () => {
         const fn = jest.fn(async () => 1)
         const beforeFn = async () =>
             doddle(async () => {

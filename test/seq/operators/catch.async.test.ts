@@ -29,17 +29,17 @@ declare.it("handler explicitly returning undefined is also okay", expect => {
     expect(type_of(s.catch(() => undefined))).to_equal(type<_ASeq<number>>)
 })
 
-declare.it("allows lazy handler", expect => {
+declare.it("allows doddle handler", expect => {
     const s = _seq([1, 2, 3]).catch(() => doddle(() => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
-declare.it("allows lazy async handler", expect => {
+declare.it("allows doddle async handler", expect => {
     const s = _seq([1, 2, 3]).catch(() => doddle(async () => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
-declare.it("allows async lazy async handler", expect => {
+declare.it("allows async doddle async handler", expect => {
     const s = _seq([1, 2, 3]).catch(async () => doddle(async () => [1, 2, 3]))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
@@ -204,7 +204,7 @@ it("catches non-error and turns it into error", async () => {
     expect(handler).toHaveBeenCalledWith("test", 2)
 })
 
-it("allows lazy handler", async () => {
+it("allows doddle handler", async () => {
     const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {
@@ -216,7 +216,7 @@ it("allows lazy handler", async () => {
     expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })
 
-it("allows lazy async handler", async () => {
+it("allows doddle async handler", async () => {
     const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {
@@ -228,7 +228,7 @@ it("allows lazy async handler", async () => {
     expect(await s._qr).toEqual([1, 2, 1, 2, 3])
 })
 
-it("allows async lazy async handler", async () => {
+it("allows async doddle async handler", async () => {
     const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {

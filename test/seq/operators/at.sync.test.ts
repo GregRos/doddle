@@ -3,7 +3,7 @@ import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
-declare.test("correctly typed as Lazy and disjunction with undefined", expect => {
+declare.test("correctly typed as Doddle and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
     expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
@@ -36,9 +36,9 @@ it("gets first item for negative index", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.at(0)
+    const doddle = s.at(0)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

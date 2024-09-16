@@ -43,17 +43,17 @@ describe("type tests", () => {
         )
     })
 
-    declare.it("allows lazy projection", expect => {
+    declare.it("allows doddle projection", expect => {
         const s = s123.concatMap(() => doddle(() => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 
-    declare.it("allows lazy async projection", expect => {
+    declare.it("allows doddle async projection", expect => {
         const s = s123.concatMap(() => doddle(async () => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
 
-    declare.it("allows async lazy async projection", expect => {
+    declare.it("allows async doddle async projection", expect => {
         const s = s123.concatMap(async () => doddle(async () => [1]))
         expect(type_of(s)).to_equal(type<_Seq<number>>)
     })
@@ -109,22 +109,22 @@ it("works for async projections", async () => {
     await expect(s._qr).resolves.toEqual([1, "1", 2, "2", 3, "3"])
 })
 
-it("works for lazy  projections", async () => {
+it("works for doddle  projections", async () => {
     const s = _seq([1, 2, 3]).concatMap(x => doddle(() => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("works for lazy async projections", async () => {
+it("works for doddle async projections", async () => {
     const s = _seq([1, 2, 3]).concatMap(x => doddle(async () => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("works for async lazy async projections", async () => {
+it("works for async doddle async projections", async () => {
     const s = _seq([1, 2, 3]).concatMap(async x => doddle(async () => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("works for async lazy projections", async () => {
+it("works for async doddle projections", async () => {
     const s = _seq([1, 2, 3]).concatMap(async x => doddle(() => [x]))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

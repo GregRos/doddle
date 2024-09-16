@@ -71,7 +71,7 @@ it("pulls, calls iteratee as many as needed", () => {
     expect(sq).toHaveBeenCalledTimes(1)
 })
 
-it("works with lazy iteratee", () => {
+it("works with doddle iteratee", () => {
     const s = _seq([1, 2, 1, 2]).uniqBy(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2])
 })

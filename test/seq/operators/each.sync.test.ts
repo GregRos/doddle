@@ -99,7 +99,7 @@ it("can iterate twice", () => {
     }
 })
 
-it("auto-pulls lazy as part of iteration", () => {
+it("auto-pulls doddle as part of iteration", () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(() => {
         return doddle(fn)

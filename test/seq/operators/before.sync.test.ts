@@ -64,7 +64,7 @@ it("doesn't get called if take(0) is used", () => {
     expect(beforeFn).toHaveBeenCalledTimes(0)
 })
 
-it("pulls lazy result", () => {
+it("pulls doddle result", () => {
     const fn = jest.fn(() => 1)
     const beforeFn = () => doddle(fn)
     const s = seq([1, 2, 3]).before(beforeFn)

@@ -9,17 +9,17 @@ declare.it("returns aseq of same type", expect => {
     const s = _seq([1, 2, 3]).orderBy(() => 1)
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
-declare.test("allows lazy iteratee", expect => {
+declare.test("allows doddle iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
-declare.test("allows lazy async iteratee", expect => {
+declare.test("allows doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
 
-declare.test("allows async lazy async iteratee", expect => {
+declare.test("allows async doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).minBy(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
@@ -95,7 +95,7 @@ it("doesn't throw for incomparable key", async () => {
     ).resolves.not.toThrow()
 })
 
-it("allows lazy iteratee", async () => {
+it("allows doddle iteratee", async () => {
     const s = _seq([1, 2, 3]).orderBy(i => doddle(() => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
@@ -105,17 +105,17 @@ it("allows async iteratee", async () => {
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
-it("allows lazy async iteratee", async () => {
+it("allows doddle async iteratee", async () => {
     const s = _seq([1, 2, 3]).orderBy(i => doddle(async () => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
-it("allows async lazy iteratee", async () => {
+it("allows async doddle iteratee", async () => {
     const s = _seq([1, 2, 3]).orderBy(async i => doddle(() => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
 
-it("allows async lazy async iteratee", async () => {
+it("allows async doddle async iteratee", async () => {
     const s = _seq([1, 2, 3]).orderBy(async i => doddle(async () => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })

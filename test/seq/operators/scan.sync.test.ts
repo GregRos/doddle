@@ -108,14 +108,14 @@ it("has no side-effects before pull", () => {
         yield 1
     })
     const s = _seq(fn)
-    const lazy = s.scan(() => 1)
+    const doddle = s.scan(() => 1)
     expect(fn).not.toHaveBeenCalled()
-    for (const _ of lazy) {
+    for (const _ of doddle) {
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
-it("works with lazy reducer", () => {
+it("works with doddle reducer", () => {
     const s = _seq([0, 1, 2]).scan((acc, x) => doddle(() => acc + x), 0)
     expect(s._qr).toEqual([0, 0, 1, 3])
 })

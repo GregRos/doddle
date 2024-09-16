@@ -9,15 +9,15 @@ declare.it("element type the same with id proejction", expect => {
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("lazy result is pulled", expect => {
+declare.it("doddle result is pulled", expect => {
     const s = _seq([1, 2, 3]).map(x => doddle(() => x))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
-declare.it("disjunction with lazy is also pulled", expect => {
+declare.it("disjunction with doddle is also pulled", expect => {
     const s = _seq([1, 2, 3]).map(x => doddle(() => x) as number | Doddle<number>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
-declare.it("generic - lazy result is pulled", expect => {
+declare.it("generic - doddle result is pulled", expect => {
     function _<T>(x: Doddle<T>) {
         expect(type_of(_seq([1, 2, 3]).map(() => doddle(() => x)))).to_equal(type<_Seq<T>>)
     }
@@ -80,7 +80,7 @@ it("can iterate twice", () => {
     expect(s._qr).toEqual([2, 3, 4])
 })
 
-it("lazy result is pulled", () => {
+it("doddle result is pulled", () => {
     const s = _seq([1, 2, 3]).map(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2, 3])
 })

@@ -9,7 +9,7 @@ import {
     parseStage,
     returnKvp,
     shuffleArray,
-    type MaybeLazy,
+    type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
 import { aseq } from "./aseq.ctor.js"
@@ -763,12 +763,12 @@ export namespace ASeq {
     export type IterableInput<E> = DesyncedInput<E> | AsyncIterable<E> | DoddleReadableStream<E>
 
     export type SimpleInput<E> =
-        | MaybeLazy<IterableInput<E>>
+        | MaybeDoddle<IterableInput<E>>
         | DoddleAsync<IterableInput<E>>
         | FunctionInput<E>
 
     export type Input<E> = SimpleInput<MaybePromise<E>>
-    export type NoInputAction = () => MaybeLazy<MaybePromise<unknown>>
+    export type NoInputAction = () => MaybeDoddle<MaybePromise<unknown>>
     export type Group<K, T> = [K, ASeq<T>]
 }
 

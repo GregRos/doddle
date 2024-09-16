@@ -47,17 +47,17 @@ declare.it("doesn't accept projection to union with undefined", () => {
     _aseq([1, 2, 3]).toMap(x => [x, x] as [number, number] | undefined)
 })
 
-declare.it("allows lazy projection", expect => {
+declare.it("allows doddle projection", expect => {
     const s = _aseq([1, 2, 3]).toMap(() => doddle(() => [1, 1] as const))
     expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
 
-declare.it("allows lazy async projection", expect => {
+declare.it("allows doddle async projection", expect => {
     const s = _aseq([1, 2, 3]).toMap(() => doddle(async () => [1, 1] as const))
     expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
 
-declare.it("allows async lazy async projection", expect => {
+declare.it("allows async doddle async projection", expect => {
     const s = _aseq([1, 2, 3]).toMap(async () => doddle(async () => [1, 1] as const))
     expect(type_of(s)).to_equal(type<DoddleAsync<Map<1, 1>>>)
 })
@@ -115,9 +115,9 @@ it("produces map twice", async () => {
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(async function* () {})
     const s = _aseq(fn)
-    const lazy = s.toMap(x => [x, x])
+    const doddle = s.toMap(x => [x, x])
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -148,7 +148,7 @@ it("works for async projections", async () => {
     )
 })
 
-it("works for lazy projections", async () => {
+it("works for doddle projections", async () => {
     const s = _aseq([1, 2, 3]).toMap(x => doddle(() => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
@@ -159,7 +159,7 @@ it("works for lazy projections", async () => {
     )
 })
 
-it("works for async lazy projections", async () => {
+it("works for async doddle projections", async () => {
     const s = _aseq([1, 2, 3]).toMap(async x => doddle(() => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
@@ -170,7 +170,7 @@ it("works for async lazy projections", async () => {
     )
 })
 
-it("works for lazy async projections", async () => {
+it("works for doddle async projections", async () => {
     const s = _aseq([1, 2, 3]).toMap(x => doddle(async () => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([
@@ -181,7 +181,7 @@ it("works for lazy async projections", async () => {
     )
 })
 
-it("works for async lazy async projections", async () => {
+it("works for async doddle async projections", async () => {
     const s = _aseq([1, 2, 3]).toMap(async x => doddle(async () => [x, x] as const))
     expect(await s.pull()).toEqual(
         new Map([

@@ -83,7 +83,7 @@ describe("async", () => {
         expect(testFn).toHaveBeenCalledTimes(1)
     })
 
-    it("awaits async lazy async result", async () => {
+    it("awaits async doddle async result", async () => {
         const testFn = jest.fn(async () => 1)
         const afterFn = async () => {
             await new Promise(resolve => setTimeout(resolve, 10))

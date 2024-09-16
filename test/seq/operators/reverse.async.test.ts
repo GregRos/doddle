@@ -4,7 +4,7 @@ import { declare, type, type_of } from "declare-it"
 
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
-declare.it("should type as Lazy<T>", expect => {
+declare.it("should type as Doddle<T>", expect => {
     expect(type_of(_aseq([1, 2, 3]).reverse())).to_equal(type<_ASeq<number>>)
 })
 

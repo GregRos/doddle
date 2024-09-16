@@ -3,7 +3,7 @@ import { aseq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
-declare.test("correctly typed as LazyAsync and disjunction with undefined", expect => {
+declare.test("correctly typed as DoddleAsync and disjunction with undefined", expect => {
     const s = _seq([1, 2, 3]).at(0)
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
@@ -36,9 +36,9 @@ it("gets first item for negative index", async () => {
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(async function* () {})
     const s = _seq(fn)
-    const lazy = s.at(0)
+    const doddle = s.at(0)
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

@@ -3,7 +3,7 @@ import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
-declare.test("should type as Lazy<boolean>", expect => {
+declare.test("should type as Doddle<boolean>", expect => {
     expect(type_of(_seq([1, 2, 3]).includes(1))).to_equal(type<Doddle<boolean>>)
 })
 it("returns false for empty", () => {
@@ -23,9 +23,9 @@ it("returns true for match", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.includes(1)
+    const doddle = s.includes(1)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

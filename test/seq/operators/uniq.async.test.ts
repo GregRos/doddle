@@ -4,7 +4,7 @@ import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 type _Seq<T> = ASeq<T>
-declare.it("should type as Lazy<T>", expect => {
+declare.it("should type as Doddle<T>", expect => {
     expect(type_of(_seq([1, 2, 3]).uniq())).to_equal(type<_Seq<number>>)
 })
 

@@ -16,17 +16,17 @@ declare.test("can be called with no initial, type is T", expect => {
     s.reduce((acc, x) => `${acc}${x}`)
 })
 
-declare.test("allows lazy reducer", expect => {
+declare.test("allows doddle reducer", expect => {
     const s = _seq([1, 2, 3]).reduce(() => doddle(() => true), false)
     expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
 
-declare.test("allows lazy async reducer", expect => {
+declare.test("allows doddle async reducer", expect => {
     const s = _seq([1, 2, 3]).reduce(() => doddle(async () => true), false)
     expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
 
-declare.test("allows async lazy async reducer", expect => {
+declare.test("allows async doddle async reducer", expect => {
     const s = _seq([1, 2, 3]).reduce(async () => doddle(async () => true), false)
     expect(type_of(s)).to_equal(type<DoddleAsync<boolean>>)
 })
@@ -95,22 +95,22 @@ it("works for async reducers", async () => {
     expect(await s.pull()).toEqual(7)
 })
 
-it("works for lazy reducers", async () => {
+it("works for doddle reducers", async () => {
     const s = _seq([1, 2, 3]).reduce((a, b) => doddle(() => a + b), 1)
     expect(await s.pull()).toEqual(7)
 })
 
-it("works for lazy async reducers", async () => {
+it("works for doddle async reducers", async () => {
     const s = _seq([1, 2, 3]).reduce((a, b) => doddle(async () => a + b), 1)
     expect(await s.pull()).toEqual(7)
 })
 
-it("works for async lazy reducers", async () => {
+it("works for async doddle reducers", async () => {
     const s = _seq([1, 2, 3]).reduce(async (a, b) => doddle(() => a + b), 1)
     expect(await s.pull()).toEqual(7)
 })
 
-it("works for async lazy async reducers", async () => {
+it("works for async doddle async reducers", async () => {
     const s = _seq([1, 2, 3]).reduce(async (a, b) => doddle(async () => a + b), 1)
     expect(await s.pull()).toEqual(7)
 })

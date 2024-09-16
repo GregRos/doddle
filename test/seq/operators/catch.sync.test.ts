@@ -2,8 +2,8 @@
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
-import { seq } from "@lib"
 import { DoddleError } from "@error"
+import { seq } from "@lib"
 
 const _seq = seq
 type SType<T> = Seq<T>
@@ -113,7 +113,7 @@ it("catches non-error and turns it into error", () => {
     expect(handler).toHaveBeenCalledWith("test", 2)
 })
 
-it("works with lazy handler", () => {
+it("works with doddle handler", () => {
     const handler = jest.fn(() => [1, 2, 3])
     const s = _seq([1, 2, 3])
         .each(x => {

@@ -68,7 +68,7 @@ it("can iterate twice", () => {
     expect(s._qr).toEqual([2, 3])
 })
 
-it("works with lazy predicate", () => {
+it("works with doddle predicate", () => {
     const s = _seq([1, 2, 3]).filter(x => doddle(() => x > 1))
     expect(s._qr).toEqual([2, 3])
 })

@@ -83,7 +83,7 @@ it("doesn't throw for incomparable key", () => {
     ).not.toThrow()
 })
 
-it("works with lazy key selector", () => {
+it("works with doddle key selector", () => {
     const s = _seq([2, 3, 1]).orderBy(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2, 3])
 })

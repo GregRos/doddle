@@ -810,22 +810,22 @@ export const SeqOperator = function seq<In, Out>(
 }
 
 export namespace Seq {
-    type MaybeLazy<T> = T | Doddle<T>
+    type MaybeDoddle<T> = T | Doddle<T>
 
-    export type IndexIteratee<O> = (index: number) => MaybeLazy<O>
+    export type IndexIteratee<O> = (index: number) => MaybeDoddle<O>
 
     export type NoInputAction = () => unknown | Doddle<unknown>
-    export type Iteratee<E, O> = (element: E, index: number) => MaybeLazy<O>
-    export type NoIndexIteratee<E, O> = (element: E) => MaybeLazy<O>
+    export type Iteratee<E, O> = (element: E, index: number) => MaybeDoddle<O>
+    export type NoIndexIteratee<E, O> = (element: E) => MaybeDoddle<O>
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
     export type Predicate<E> = Iteratee<E, boolean>
     export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
 
-    export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybeLazy<O>
-    export type FunctionInput<E> = () => MaybeLazy<ObjectIterable<MaybeLazy<E>>>
+    export type Reducer<E, O> = (acc: O, element: E, index: number) => MaybeDoddle<O>
+    export type FunctionInput<E> = () => MaybeDoddle<ObjectIterable<MaybeDoddle<E>>>
 
     export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E> | ArrayLike<E>)
-    export type Input<E> = MaybeLazy<ObjectIterable<E>> | FunctionInput<E>
+    export type Input<E> = MaybeDoddle<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type Group<K, V> = [K, Seq<V>]
 }

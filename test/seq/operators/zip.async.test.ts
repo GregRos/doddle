@@ -24,17 +24,17 @@ declare.it("returns ASeq of same type", expect => {
     expect(type_of(s)).to_equal(type<_Seq<[number | undefined, string | undefined]>>)
 })
 
-declare.it("allows lazy projection", expect => {
+declare.it("allows doddle projection", expect => {
     const s = _seq([1, 2, 3]).zip([[]], () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows lazy async projection", expect => {
+declare.it("allows doddle async projection", expect => {
     const s = _seq([1, 2, 3]).zip([[]], () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows async lazy async projection", expect => {
+declare.it("allows async doddle async projection", expect => {
     const s = _seq([1, 2, 3]).zip([[]], async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
@@ -139,22 +139,22 @@ it("works for async projections", async () => {
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
-it("allows lazy projection", async () => {
+it("allows doddle projection", async () => {
     const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => doddle(() => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
-it("allows lazy async projection", async () => {
+it("allows doddle async projection", async () => {
     const s = _seq([1, 2, 3]).zip([["a", "b"]], (a, b) => doddle(async () => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
-it("allows async lazy async projection", async () => {
+it("allows async doddle async projection", async () => {
     const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => doddle(async () => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })
 
-it("allows async lazy projections", async () => {
+it("allows async doddle projections", async () => {
     const s = _seq([1, 2, 3]).zip([["a", "b"]], async (a, b) => doddle(() => `${a}${b}`))
     expect(await s._qr).toEqual(["1a", "2b", "3undefined"])
 })

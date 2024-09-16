@@ -30,17 +30,17 @@ declare.it("accepts projection with N parameters", expect => {
     })
 })
 
-declare.it("allows lazy projection", expect => {
+declare.it("allows doddle projection", expect => {
     const s = _seq([1, 2, 3]).chunk(2, () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
-declare.it("allows lazy async projection", expect => {
+declare.it("allows doddle async projection", expect => {
     const s = _seq([1, 2, 3]).chunk(2, () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
-declare.it("allows async lazy async projection", expect => {
+declare.it("allows async doddle async projection", expect => {
     const s = _seq([1, 2, 3]).chunk(2, async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
@@ -113,22 +113,22 @@ it("accepts async projection", async () => {
     await expect(s._qr).resolves.toEqual([3, 7])
 })
 
-it("allows lazy projection", async () => {
+it("allows doddle projection", async () => {
     const s = _seq([1, 2, 3]).chunk(1, x => doddle(() => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("allows lazy async projection", async () => {
+it("allows doddle async projection", async () => {
     const s = _seq([1, 2, 3]).chunk(1, x => doddle(async () => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("allows async lazy async projection", async () => {
+it("allows async doddle async projection", async () => {
     const s = _seq([1, 2, 3]).chunk(1, async x => doddle(async () => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })
 
-it("allows async lazy projection", async () => {
+it("allows async doddle projection", async () => {
     const s = _seq([1, 2, 3]).chunk(1, async x => doddle(() => x))
     await expect(s._qr).resolves.toEqual([1, 2, 3])
 })

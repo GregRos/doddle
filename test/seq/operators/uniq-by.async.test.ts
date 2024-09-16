@@ -4,7 +4,7 @@ import { declare, type, type_of } from "declare-it"
 import { aseq, doddle } from "@lib"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
-declare.it("should type as Lazy<T>", expect => {
+declare.it("should type as Doddle<T>", expect => {
     expect(type_of(_aseq([1, 2, 3]).uniqBy(() => 1))).to_equal(type<_ASeq<number>>)
 })
 declare.it("should not accept iteratee with 2 arguments", expect => {
@@ -12,27 +12,27 @@ declare.it("should not accept iteratee with 2 arguments", expect => {
     _aseq([1, 2, 3]).uniqBy((x, _) => x)
 })
 
-declare.it("allows lazy iteratee", expect => {
+declare.it("allows doddle iteratee", expect => {
     const s = _aseq([1, 2, 3]).uniqBy(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
-declare.it("allows lazy async iteratee", expect => {
+declare.it("allows doddle async iteratee", expect => {
     const s = _aseq([1, 2, 3]).uniqBy(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
-declare.it("allows async lazy async iteratee", expect => {
+declare.it("allows async doddle async iteratee", expect => {
     const s = _aseq([1, 2, 3]).uniqBy(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
-it("allows lazy iteratee", async () => {
+it("allows doddle iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(() => 1)
     expect(await s._qr).toEqual([1])
 })
 
-it("allows lazy async iteratee", async () => {
+it("allows doddle async iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(() => 1)
     expect(await s._qr).toEqual([1])
 })
@@ -111,22 +111,22 @@ it("works for async iteratee", async () => {
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
-it("works for lazy iteratee", async () => {
+it("works for doddle iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(x => doddle(() => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
-it("works for async lazy iteratee", async () => {
+it("works for async doddle iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(async x => doddle(() => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
-it("works for async lazy async iteratee", async () => {
+it("works for async doddle async iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(async x => doddle(async () => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
-it("works for lazy async iteratee", async () => {
+it("works for doddle async iteratee", async () => {
     const s = _aseq([1, 2, 3]).uniqBy(x => doddle(async () => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })

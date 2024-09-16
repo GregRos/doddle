@@ -4,7 +4,7 @@ import { declare, type, type_of } from "declare-it"
 
 const _seq = aseq
 
-declare.it("correctly typed as LazyAsync and disjunction with undefined if no alt", expect => {
+declare.it("correctly typed as DoddleAsync and disjunction with undefined if no alt", expect => {
     const s = _seq([1, 2, 3]).last()
     expect(type_of(s)).to_equal(type<DoddleAsync<number | undefined>>)
 })
@@ -42,9 +42,9 @@ it("alt doesn't affect non-empty", async () => {
 it("has no side-effects before pull", async () => {
     const fn = jest.fn(async function* () {})
     const s = _seq(fn)
-    const lazy = s.last()
+    const doddle = s.last()
     expect(fn).not.toHaveBeenCalled()
-    await lazy.pull()
+    await doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 

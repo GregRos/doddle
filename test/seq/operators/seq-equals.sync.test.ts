@@ -5,16 +5,16 @@ import type { Seq } from "@lib"
 import { seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
-declare.it("accepts an input sequence, returns Lazy<boolean>", expect => {
+declare.it("accepts an input sequence, returns Doddle<boolean>", expect => {
     const s = null! as _Seq<number>
     expect(type_of(s.seqEquals(s))).to_equal(type<Doddle<boolean>>)
 })
-declare.it("accepts input sequence of subtype, returns Lazy<boolean>", expect => {
+declare.it("accepts input sequence of subtype, returns Doddle<boolean>", expect => {
     const s1 = null! as _Seq<number>
     const s2 = null! as _Seq<1 | 2 | 3>
     expect(type_of(s1.seqEquals(s2))).to_equal(type<Doddle<boolean>>)
 })
-declare.it("accepts input sequence of supertype, returns Lazy<boolean>", expect => {
+declare.it("accepts input sequence of supertype, returns Doddle<boolean>", expect => {
     const s1 = null! as _Seq<1 | 2 | 3>
     const s2 = null! as _Seq<number>
     expect(type_of(s1.seqEquals(s2))).to_equal(type<Doddle<boolean>>)
@@ -57,9 +57,9 @@ it("returns false for different elements", () => {
 it("has no side-effects before pull", () => {
     const fn = jest.fn(function* () {})
     const s = _seq(fn)
-    const lazy = s.seqEquals(s)
+    const doddle = s.seqEquals(s)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(2)
 })
 

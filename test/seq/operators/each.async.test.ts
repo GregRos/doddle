@@ -27,7 +27,7 @@ declare.it("can't be called with other strings", expect => {
     _seq([1, 2, 3]).each(() => {}, "other")
 })
 
-declare.it("allows lazy iteratee", expect => {
+declare.it("allows doddle iteratee", expect => {
     const s = _seq([1, 2, 3]).each(() => doddle(() => {}))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
@@ -37,12 +37,12 @@ declare.it("allows async iteratee", expect => {
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows lazy async iteratee", expect => {
+declare.it("allows doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).each(() => doddle(async () => {}))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("allows async lazy async iteratee", expect => {
+declare.it("allows async doddle async iteratee", expect => {
     const s = _seq([1, 2, 3]).each(async () => doddle(async () => {}))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
@@ -162,7 +162,7 @@ it("works with async iteratee -- both", async () => {
     }
 })
 
-it("allows lazy iteratee", async () => {
+it("allows doddle iteratee", async () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(() => {
         return doddle(fn)
@@ -175,7 +175,7 @@ it("allows lazy iteratee", async () => {
     expect(fn).toHaveBeenCalledTimes(3)
 })
 
-it("allows lazy async iteratee", async () => {
+it("allows doddle async iteratee", async () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(() => {
         return doddle(async () => {
@@ -190,7 +190,7 @@ it("allows lazy async iteratee", async () => {
     expect(fn).toHaveBeenCalledTimes(3)
 })
 
-it("allows async lazy iteratee", async () => {
+it("allows async doddle iteratee", async () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(async () => {
         return doddle(() => {
@@ -205,7 +205,7 @@ it("allows async lazy iteratee", async () => {
     expect(fn).toHaveBeenCalledTimes(3)
 })
 
-it("works for async lazy async iteratee", async () => {
+it("works for async doddle async iteratee", async () => {
     const fn = jest.fn()
     const e = _seq([1, 2, 3]).each(async () => {
         return doddle(async () => {

@@ -75,7 +75,7 @@ it("has no side-effects before pull", () => {
     expect(fn).toHaveBeenCalledTimes(3)
 })
 
-it("works with lazy reducer", () => {
+it("works with doddle reducer", () => {
     const s = _seq([1, 2, 3]).reduce((acc, cur) => doddle(() => acc + cur), 0)
     expect(s.pull()).toEqual(6)
 })

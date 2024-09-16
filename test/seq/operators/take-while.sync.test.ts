@@ -53,7 +53,7 @@ it("calls predicate as many times as needed", () => {
     expect(f).toHaveBeenCalledTimes(2)
 })
 
-it("works with lazy predicate", () => {
+it("works with doddle predicate", () => {
     const s = _seq([1, 2, 3, 4, 5]).takeWhile(i => doddle(() => i < 2))
     expect(s._qr).toEqual([1])
 })

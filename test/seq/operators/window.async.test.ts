@@ -10,17 +10,17 @@ declare.it("typed as 1-N length tuple", expect => {
     expect(type_of(_seq([1, 2, 3]).window(1))).to_equal(type<SType<[number]>>)
 })
 
-declare.it("allows lazy projection", expect => {
+declare.it("allows doddle projection", expect => {
     const s = _seq([1, 2, 3]).window(2, () => doddle(() => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
-declare.it("allows lazy async projection", expect => {
+declare.it("allows doddle async projection", expect => {
     const s = _seq([1, 2, 3]).window(2, () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
 
-declare.it("allows async lazy async projection", expect => {
+declare.it("allows async doddle async projection", expect => {
     const s = _seq([1, 2, 3]).window(2, async () => doddle(async () => 1))
     expect(type_of(s)).to_equal(type<SType<number>>)
 })
@@ -158,22 +158,22 @@ it("works for async iteratee", async () => {
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
-it("works for lazy iteratee", async () => {
+it("works for doddle iteratee", async () => {
     const s = _seq([1, 2, 3]).window(2, (a, b) => doddle(() => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
-it("works for async lazy iteratee", async () => {
+it("works for async doddle iteratee", async () => {
     const s = _seq([1, 2, 3]).window(2, async (a, b) => doddle(() => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
-it("works for async lazy async iteratee", async () => {
+it("works for async doddle async iteratee", async () => {
     const s = _seq([1, 2, 3]).window(2, async (a, b) => doddle(async () => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })
 
-it("works for lazy async iteratee", async () => {
+it("works for doddle async iteratee", async () => {
     const s = _seq([1, 2, 3]).window(2, (a, b) => doddle(async () => a + b!))
     await expect(s._qr).resolves.toEqual([3, 5])
 })

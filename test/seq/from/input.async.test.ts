@@ -35,22 +35,22 @@ declare.it("element type same as promised value for async iterable of promises",
     expect(type_of(s)).to_equal(type<_Seq<string>>)
 })
 
-declare.it("element type same as lazy's value type", expect => {
+declare.it("element type same as doddle's value type", expect => {
     const s = _seq(doddle(() => [1]))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("element type is lazy value type for lazy async", expect => {
+declare.it("element type is doddle value type for doddle async", expect => {
     const s = _seq(doddle(async () => [1]))
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("element type is lazy value type for iterable of lazy", expect => {
+declare.it("element type is doddle value type for iterable of doddle", expect => {
     const s = _seq(null! as Iterable<Doddle<number>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
-declare.it("element type ivalue type for iterable of lazy async", expect => {
+declare.it("element type ivalue type for iterable of doddle async", expect => {
     const s = _seq(null! as Iterable<Doddle<Promise<number>>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
@@ -105,12 +105,12 @@ it("converts from function returning iterator", async () => {
     expect(await iterable._qr).toEqual([0, 1, 2])
 })
 
-it("converts from lazy of array", async () => {
+it("converts from doddle of array", async () => {
     const iterable = _seq(doddle(() => [1]))
     expect(await iterable._qr).toEqual([1])
 })
 
-it("converts from function returning lazy", async () => {
+it("converts from function returning doddle", async () => {
     const iterable = _seq(() => doddle(() => [1]))
     expect(await iterable._qr).toEqual([1])
 })
@@ -130,7 +130,7 @@ it("converts from function returning async iterator", async () => {
     expect(await iterable._qr).toEqual([0, 1, 2])
 })
 
-it("converts from function returning an async lazy", async () => {
+it("converts from function returning an async doddle", async () => {
     const iterable = _seq(() => doddle(async () => [1]))
     expect(await iterable._qr).toEqual([1])
 })

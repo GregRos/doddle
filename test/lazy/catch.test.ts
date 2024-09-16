@@ -29,150 +29,150 @@ const handlers = {
     }
 }
 declare.it("sync.catch(sync) = sync", expect => {
-    const myLazy = lazies.sync().catch(handlers.sync())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2>>)
+    const myDoddle = lazies.sync().catch(handlers.sync())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2>>)
 })
 
 declare.it("sync.catch(async) = mixed", expect => {
-    const myLazy = lazies.sync().catch(handlers.async())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | Promise<2>>>)
+    const myDoddle = lazies.sync().catch(handlers.async())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<2>>>)
 })
 
 declare.it("sync.catch(mixed) = mixed", expect => {
-    const myLazy = lazies.sync().catch(handlers.mixed())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
+    const myDoddle = lazies.sync().catch(handlers.mixed())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
 })
 
 declare.it("sync.catch(any) = any", expect => {
-    const myLazy = lazies.sync().catch(handlers.any())
-    expect(type_of(myLazy)).to_equal(type<Doddle<any>>)
+    const myDoddle = lazies.sync().catch(handlers.any())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<any>>)
 })
 
-declare.it("sync.catch(lazy sync) = sync", expect => {
-    const myLazy = lazies.sync().catch(handlers.lazy_sync())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2>>)
+declare.it("sync.catch(doddle sync) = sync", expect => {
+    const myDoddle = lazies.sync().catch(handlers.lazy_sync())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2>>)
 })
 
-declare.it("sync.catch(lazy async) = mixed", expect => {
-    const myLazy = lazies.sync().catch(handlers.lazy_async())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | Promise<2>>>)
+declare.it("sync.catch(doddle async) = mixed", expect => {
+    const myDoddle = lazies.sync().catch(handlers.lazy_async())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<2>>>)
 })
 
-declare.it("sync.catch(lazy mixed) = mixed", expect => {
-    const myLazy = lazies.sync().catch(handlers.lazy_mixed())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
+declare.it("sync.catch(doddle mixed) = mixed", expect => {
+    const myDoddle = lazies.sync().catch(handlers.lazy_mixed())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
 })
 
-declare.it("sync.catch(lazy any) = any", expect => {
-    const myLazy = lazies.sync().catch(handlers.lazy_any())
-    expect(type_of(myLazy)).to_equal(type<Doddle<any>>)
+declare.it("sync.catch(doddle any) = any", expect => {
+    const myDoddle = lazies.sync().catch(handlers.lazy_any())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<any>>)
 })
 
 declare.it("async.catch(sync) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.sync())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+    const myDoddle = lazies.async().catch(handlers.sync())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
 declare.it("async.catch(async) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.async())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+    const myDoddle = lazies.async().catch(handlers.async())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
 declare.it("async.catch(mixed) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.mixed())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+    const myDoddle = lazies.async().catch(handlers.mixed())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
 declare.it("async.catch(any) = any", expect => {
-    const myLazy = lazies.async().catch(handlers.any())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<any>>)
+    const myDoddle = lazies.async().catch(handlers.any())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<any>>)
 })
 
-declare.it("async.catch(lazy sync) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.lazy_sync())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+declare.it("async.catch(doddle sync) = async", expect => {
+    const myDoddle = lazies.async().catch(handlers.lazy_sync())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
-declare.it("async.catch(lazy async) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.lazy_async())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+declare.it("async.catch(doddle async) = async", expect => {
+    const myDoddle = lazies.async().catch(handlers.lazy_async())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
-declare.it("async.catch(lazy mixed) = async", expect => {
-    const myLazy = lazies.async().catch(handlers.lazy_mixed())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<1 | 2>>)
+declare.it("async.catch(doddle mixed) = async", expect => {
+    const myDoddle = lazies.async().catch(handlers.lazy_mixed())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1 | 2>>)
 })
 
-declare.it("async.catch(lazy any) = any", expect => {
-    const myLazy = lazies.async().catch(handlers.lazy_any())
-    expect(type_of(myLazy)).to_equal(type<DoddleAsync<any>>)
+declare.it("async.catch(doddle any) = any", expect => {
+    const myDoddle = lazies.async().catch(handlers.lazy_any())
+    expect(type_of(myDoddle)).to_equal(type<DoddleAsync<any>>)
 })
 
 declare.it("mixed.catch(sync) = mixed", expect => {
-    const myLazy = lazies.mixed().catch(handlers.sync())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2 | Promise<1>>>)
+    const myDoddle = lazies.mixed().catch(handlers.sync())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<1>>>)
 })
 
 declare.it("mixed.catch(async) = mixed", expect => {
-    const myLazy = lazies.mixed().catch(handlers.async())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | Promise<1> | Promise<2>>>)
+    const myDoddle = lazies.mixed().catch(handlers.async())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<1> | Promise<2>>>)
 })
 
 declare.it("mixed.catch(mixed) = mixed", expect => {
-    const myLazy = lazies.mixed().catch(handlers.mixed())
-    expect(type_of(myLazy)).to_equal(type<Doddle<1 | 2 | Promise<1> | Promise<2>>>)
+    const myDoddle = lazies.mixed().catch(handlers.mixed())
+    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<1> | Promise<2>>>)
 })
 
 it("sync.catch(sync) - no error", () => {
     const handler = handlers.sync()
-    const myLazy = doddle(() => 1).catch(handler)
-    expect(myLazy.pull()).toBe(1)
+    const myDoddle = doddle(() => 1).catch(handler)
+    expect(myDoddle.pull()).toBe(1)
     expect(handler).not.toHaveBeenCalled()
 })
 
 it("no error async", async () => {
     const handler = handlers.async()
-    const myLazy = doddle(async () => 1).catch(handler)
-    await expect(myLazy.pull()).resolves.toBe(1)
+    const myDoddle = doddle(async () => 1).catch(handler)
+    await expect(myDoddle.pull()).resolves.toBe(1)
     expect(handler).not.toHaveBeenCalled()
 })
 
 it("sync error caught sync", () => {
     const fn = handlers.sync()
-    const myLazy = doddle(() => {
+    const myDoddle = doddle(() => {
         throw "test"
     }).catch(fn)
-    expect(myLazy.pull()).toBe(2)
+    expect(myDoddle.pull()).toBe(2)
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith("test")
 })
 
 it("async error caught async", async () => {
     const fn = handlers.async()
-    const myLazy = doddle(async () => {
+    const myDoddle = doddle(async () => {
         throw "test"
     }).catch(fn)
-    await expect(myLazy.pull()).resolves.toBe(2)
+    await expect(myDoddle.pull()).resolves.toBe(2)
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith("test")
 })
 
 it("sync error caught async", async () => {
     const fn = handlers.async()
-    const myLazy = doddle(() => {
+    const myDoddle = doddle(() => {
         throw "test"
     }).catch(fn)
-    await expect(myLazy.pull()).resolves.toBe(2)
+    await expect(myDoddle.pull()).resolves.toBe(2)
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith("test")
 })
 
 it("async error caught sync gives async", async () => {
     const fn = handlers.sync()
-    const myLazy = doddle(async () => {
+    const myDoddle = doddle(async () => {
         throw "test"
     }).catch(fn)
-    await expect(myLazy.pull()).resolves.toBe(2)
+    await expect(myDoddle.pull()).resolves.toBe(2)
     expect(fn).toHaveBeenCalledTimes(1)
     expect(fn).toHaveBeenCalledWith("test")
 })

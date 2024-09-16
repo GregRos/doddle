@@ -95,7 +95,7 @@ it("projects pairs", () => {
     expect(s._qr).toEqual([3, 7])
 })
 
-it("works with lazy projection", () => {
+it("works with doddle projection", () => {
     const s = _seq([1, 2, 3]).chunk(2, (a, b) => doddle(() => a! + (b ?? 0)))
     expect(s._qr).toEqual([3, 3])
 })

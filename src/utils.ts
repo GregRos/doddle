@@ -96,7 +96,7 @@ export function getSymbolDescription(symbol: symbol) {
 }
 
 export function getObjDesc(object: any) {
-    if (isLazy(object)) {
+    if (isDoddle(object)) {
         return object.toString()
     }
     if (isIterable(object)) {
@@ -105,7 +105,7 @@ export function getObjDesc(object: any) {
         return `async iterable ${getClassName(object)}`
     } else if (isNextable(object)) {
         return `iterator ${getClassName(object)}`
-    } else if (isLazy(object)) {
+    } else if (isDoddle(object)) {
         return object.toString()
     } else if (isThenable(object)) {
         return `a Promise`
@@ -151,7 +151,7 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
     return isObject(what) && isFunction((what as any).then)
 }
 
-export function isLazy<T>(value: any): value is Doddle<T> {
+export function isDoddle<T>(value: any): value is Doddle<T> {
     return isObject(value) && typeof value.pull === "function" && typeof value.map === "function"
 }
 
@@ -171,7 +171,7 @@ export function returnKvp(input: any, key: any, value: any) {
     }
 }
 export type MaybePromise<T> = T | Promise<T>
-export type MaybeLazy<T> = T | Doddle<T> | DoddleAsync<T>
+export type MaybeDoddle<T> = T | Doddle<T> | DoddleAsync<T>
 export function getThrownError(thrown: unknown) {
     return thrown instanceof Error ? thrown : new Error(String(thrown))
 }

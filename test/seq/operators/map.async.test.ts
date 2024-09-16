@@ -19,17 +19,17 @@ declare.it("handles async projections", expect => {
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
-declare.it("handles lazy projections", expect => {
+declare.it("handles doddle projections", expect => {
     const s = _aseq([1, 2, 3]).map(() => doddle(() => "1"))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
-declare.it("handles lazy async projections", expect => {
+declare.it("handles doddle async projections", expect => {
     const s = _aseq([1, 2, 3]).map(async x => doddle(async () => x + ""))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
 
-declare.it("handles async lazy async projections", expect => {
+declare.it("handles async doddle async projections", expect => {
     const s = _aseq([1, 2, 3]).map(async x => doddle(async () => x + ""))
     expect(type_of(s)).to_equal(type<_ASeq<string>>)
 })
@@ -89,22 +89,22 @@ it("works for async projections", async () => {
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
-it("allows lazy projection", async () => {
+it("allows doddle projection", async () => {
     const s = _aseq([1, 2, 3]).map(i => doddle(() => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
-it("allows lazy async projection", async () => {
+it("allows doddle async projection", async () => {
     const s = _aseq([1, 2, 3]).map(i => doddle(async () => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
-it("allows async lazy projection", async () => {
+it("allows async doddle projection", async () => {
     const s = _aseq([1, 2, 3]).map(async i => doddle(() => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })
 
-it("allows async lazy async projection", async () => {
+it("allows async doddle async projection", async () => {
     const s = _aseq([1, 2, 3]).map(async i => doddle(async () => i + 1))
     expect(await s._qr).toEqual([2, 3, 4])
 })

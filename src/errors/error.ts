@@ -5,11 +5,11 @@ import {
     isArray,
     isArrayLike,
     isBool,
+    isDoddle,
     isError,
     isFunction,
     isInt,
     isIterable,
-    isLazy,
     isNatOrInfinity,
     isNextable,
     isPair,
@@ -77,7 +77,7 @@ const wButGot = "but got"
 const wBe = "be"
 const wCalledWith = "called with"
 const wArguments = "arguments"
-const wLazy = "lazy"
+const wDoddle = "doddle"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
@@ -123,15 +123,15 @@ const expectPair = expectation("an array of length 2", isPair)
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
-    anOrStructure([wIterable, wIterator, wLazy].join(", "), wFunction),
-    x => isIterable(x) || isFunction(x) || isLazy(x) || isNextable(x) || isArrayLike(x)
+    anOrStructure([wIterable, wIterator, wDoddle].join(", "), wFunction),
+    x => isIterable(x) || isFunction(x) || isDoddle(x) || isNextable(x) || isArrayLike(x)
 )
 const expectAsyncInputValue = expectation(
-    anOrStructure([[wAsync, wIterable, wIterator], wLazy].join(", "), wFunction),
+    anOrStructure([[wAsync, wIterable, wIterator], wDoddle].join(", "), wFunction),
     x =>
         isAnyIterable(x) ||
         isFunction(x) ||
-        isLazy(x) ||
+        isDoddle(x) ||
         isNextable(x) ||
         isReadableStream(x) ||
         isArrayLike(x)
@@ -139,11 +139,11 @@ const expectAsyncInputValue = expectation(
 const iterableOrIterator = anOrStructure(wIterable, wIterator)
 const expectSyncIterableOrIterator = expectation(
     anOrStructure(wIterable, wIterator),
-    x => isIterable(x) || isNextable(x) || isLazy(x) || isArrayLike(x)
+    x => isIterable(x) || isNextable(x) || isDoddle(x) || isArrayLike(x)
 )
 const expectAsyncIterableOrIterator = expectation(
     anOrStructure([wAsync, wIterable], wIterator),
-    x => isAnyIterable(x) || isNextable(x) || isLazy(x) || isReadableStream(x) || isArrayLike(x)
+    x => isAnyIterable(x) || isNextable(x) || isDoddle(x) || isReadableStream(x) || isArrayLike(x)
 )
 const checkFunctionReturn = (
     thing: Text,
@@ -158,13 +158,13 @@ const checkFunctionReturn = (
             const resultChecker = expectReturn(getSubject([wFunction, thing], context, wReturn))
             if (isThenable(result) && allowAsync) {
                 return result.then(x => {
-                    if (isLazy(x)) {
+                    if (isDoddle(x)) {
                         return x.map(resultChecker)
                     }
                     return resultChecker(x)
                 })
             }
-            if (isLazy(result)) {
+            if (isDoddle(result)) {
                 return result.map(resultChecker)
             }
 

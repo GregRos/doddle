@@ -3,22 +3,22 @@ import { declare, type, type_of } from "declare-it"
 
 import { doddle, seq } from "@lib"
 const _seq = seq
-declare.test("should type as Lazy<T | undefined>", expect => {
+declare.test("should type as Doddle<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true))).to_equal(type<Doddle<number | undefined>>)
 })
-declare.test("should type as Lazy<T | string> with alt", expect => {
+declare.test("should type as Doddle<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true, "alt" as string))).to_equal(
         type<Doddle<number | string>>
     )
 })
-declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
+declare.test("should type as Doddle<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).maxBy(() => true, "alt"))).to_equal(type<Doddle<number | "alt">>)
 })
-declare.test("works when projection is Lazy<number>", expect => {
+declare.test("works when projection is Doddle<number>", expect => {
     const s = _seq([1, 2, 3]).maxBy(() => doddle(() => 1))
     expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
-declare.test("works when projection is disjunction with lazy", expect => {
+declare.test("works when projection is disjunction with doddle", expect => {
     const s = _seq([1, 2, 3]).maxBy(() => doddle(() => "1") as string | Doddle<string>)
     expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
@@ -57,9 +57,9 @@ it("no side-effects before pull", () => {
         yield 1
     })
     const s = _seq(fn)
-    const lazy = s.maxBy(() => true)
+    const doddle = s.maxBy(() => true)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -100,7 +100,7 @@ it("iteratee receives index", () => {
     expect(s.pull()).toEqual(3)
 })
 
-it("lazy key is pulled", () => {
+it("doddle key is pulled", () => {
     const s = _seq([0, 1, 2]).maxBy(x => doddle(() => x))
     expect(s.pull()).toEqual(2)
 })

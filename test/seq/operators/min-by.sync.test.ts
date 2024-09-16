@@ -4,15 +4,15 @@ import { declare, type, type_of } from "declare-it"
 import { doddle, seq } from "@lib"
 const _seq = seq
 
-declare.test("should type as Lazy<T | undefined>", expect => {
+declare.test("should type as Doddle<T | undefined>", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true))).to_equal(type<Doddle<number | undefined>>)
 })
-declare.test("should type as Lazy<T | string> with alt", expect => {
+declare.test("should type as Doddle<T | string> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt" as string))).to_equal(
         type<Doddle<number | string>>
     )
 })
-declare.test("should type as Lazy<T | 'alt'> with alt", expect => {
+declare.test("should type as Doddle<T | 'alt'> with alt", expect => {
     expect(type_of(_seq([1, 2, 3]).minBy(() => true, "alt"))).to_equal(type<Doddle<number | "alt">>)
 })
 
@@ -51,9 +51,9 @@ it("no side-effects before pull", () => {
         yield 1
     })
     const s = _seq(fn)
-    const lazy = s.minBy(() => true)
+    const doddle = s.minBy(() => true)
     expect(fn).not.toHaveBeenCalled()
-    lazy.pull()
+    doddle.pull()
     expect(fn).toHaveBeenCalledTimes(1)
 })
 
@@ -94,7 +94,7 @@ it("iteratee receives index", () => {
     expect(s.pull()).toEqual(1)
 })
 
-it("lazy result is pulled", () => {
+it("doddle result is pulled", () => {
     const s = _seq([2, 1, 3]).minBy(x => doddle(() => x))
     expect(s.pull()).toEqual(1)
 })
