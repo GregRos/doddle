@@ -157,3 +157,10 @@ it("converts from function returning iterable", () => {
     const iterable = seq(() => [1, 2])
     expect(iterable._qr).toEqual([1, 2])
 })
+
+it("caches iterator returning function", async () => {
+    const iterable = _seq(() => new Dummy._Iterator())
+    const a = iterable._qr
+    const b = iterable._qr
+    expect(a).toEqual(b)
+})

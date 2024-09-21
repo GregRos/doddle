@@ -2,6 +2,7 @@ import { cannotRecurseSync, chk, loadCheckers } from "../errors/error.js"
 import {
     getClassName,
     getFunctionName,
+    getValueDesc,
     isDoddle,
     isThenable,
     type MaybeDoddle,
@@ -335,6 +336,9 @@ export function doddle<T>(initializer: () => Doddle<T>): Doddle<T>
 
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T>
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
+    if (!initializer) {
+        throw new Error(`Initializer must be a function, but got ${getValueDesc(initializer)}`)
+    }
     if (ownerInstance in initializer) {
         return initializer[ownerInstance] as any
     }

@@ -105,6 +105,22 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+    prepend<Ts extends any[]>(...items: Ts): Seq<Ts[number] | T> {
+        return SeqOperator(this, function* prepend(input) {
+            yield* seq(items)
+            yield* input
+        })
+    }
+
+    join(separator: string): Doddle<string> {
+        chk(this.join).separator(separator)
+        return lazyFromOperator(this, function join(input) {
+            return input
+                .toArray()
+                .map(x => x.join(separator))
+                .pull()
+        })
+    }
     chunk<L extends number, S>(
         size: L,
         projection: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
@@ -678,9 +694,35 @@ export abstract class Seq<T> implements Iterable<T> {
 
         projection = chk(this.toMapBy).projection(projection)
 
-        return this.toMap((x, i) => {
-            const lz = doddle(() => projection(x, i)).map(k => [k, x]) as Doddle<[K, T]>
-            return lz
+        return lazyFromOperator(this, function toMapBy(input) {
+            return input.toMap((x, i) => doddle(() => projection(x, i)).map(k => [k, x] as const))
+        })
+    }
+
+    toRecord<Key extends PropertyKey>(
+        kvpProjection: Seq.Iteratee<T, readonly [PropertyKey, any]>
+    ): Doddle<Record<Key, T>> {
+        chk(this.toRecord).kvpProjection(kvpProjection)
+        return lazyFromOperator(this, function toObject(input) {
+            return input
+                .map(kvpProjection)
+                .toArray()
+                .map(x => Object.fromEntries(x))
+                .pull() as any
+        })
+    }
+
+    as<S>() {
+        return this as any as Seq<S>
+    }
+
+    toRecordBy<K extends PropertyKey>(projection: Seq.Iteratee<T, K>): Doddle<Record<K, T>> {
+        // ! POLYMORPHIC !
+        projection = chk(this.toRecordBy).projection(projection)
+        return lazyFromOperator(this, function toRecordBy(input) {
+            return input
+                .toRecord((x, i) => doddle(() => projection(x, i)).map(k => [k as K, x] as const))
+                .pull()
         })
     }
 

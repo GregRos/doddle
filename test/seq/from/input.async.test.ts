@@ -105,6 +105,20 @@ it("converts from function returning iterator", async () => {
     expect(await iterable._qr).toEqual([0, 1, 2])
 })
 
+it("caches iterator returning function", async () => {
+    const iterable = _seq(() => new Dummy._AsyncIterator())
+    const a = await iterable._qr
+    const b = await iterable._qr
+    expect(a).toEqual(b)
+})
+
+it("caches lazy iterator returning function", async () => {
+    const iterable = _seq(() => doddle(() => new Dummy._AsyncIterator()))
+    const a = await iterable._qr
+    const b = await iterable._qr
+    expect(a).toEqual(b)
+})
+
 it("converts from doddle of array", async () => {
     const iterable = _seq(doddle(() => [1]))
     expect(await iterable._qr).toEqual([1])

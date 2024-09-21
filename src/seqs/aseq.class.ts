@@ -158,6 +158,15 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
+    prepend<Ts extends any[]>(...items: Ts): ASeq<Ts[number] | T> {
+        return ASeqOperator(this, async function* prepend(input) {
+            yield* items
+            yield* input
+        })
+    }
+    join(separator = ","): DoddleAsync<string> {
+        return Seq.prototype.join.call(this, separator) as any
+    }
     concat<ASeqs extends ASeq.SimpleInput<any>[]>(
         ..._otherInputs: ASeqs
     ): ASeq<T | ASeq.ElementOfInput<ASeqs[number]>> {
@@ -236,6 +245,20 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             await pull(action())
             yield* input
         })
+    }
+
+    toRecord<Key extends PropertyKey>(
+        projection: ASeq.Iteratee<T, readonly [PropertyKey, any]>
+    ): DoddleAsync<Record<Key, T>> {
+        return Seq.prototype.toRecord.call(this, projection as any) as any
+    }
+
+    toRecordBy<K extends PropertyKey>(projection: ASeq.Iteratee<T, K>): DoddleAsync<Record<K, T>> {
+        return Seq.prototype.toRecordBy.call(this, projection as any) as any
+    }
+
+    as<S>() {
+        return this as any as ASeq<S>
     }
 
     groupBy<K>(keyProjection: ASeq.NoIndexIteratee<T, K>): ASeq<ASeq.Group<K, T>> {
@@ -607,7 +630,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 
-    toMapBy<K, V>(projection: ASeq.Iteratee<T, K>): DoddleAsync<Map<K, V>> {
+    toMapBy<K>(projection: ASeq.Iteratee<T, K>): DoddleAsync<Map<K, T>> {
         return Seq.prototype.toMapBy.call(this, projection as any) as any
     }
 

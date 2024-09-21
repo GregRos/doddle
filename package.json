@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.0.0-beta.0",
+  "version": "5.0.0-beta.1",
   "description": "The easiest way to handle iterables.",
   "keywords": [
     "iteration",
@@ -93,5 +93,5 @@
     "ts-jest": "^29.2.4",
     "typescript": "^5.5.4"
   },
-  "packageManager": "yarn@4.4.0"
+  "packageManager": "yarn@4.5.0"
 }

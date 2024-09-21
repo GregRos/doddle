@@ -110,6 +110,7 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
     }
 }
 const expectInt = expectation(`a ${wInteger}`, isInt)
+const expectString = expectation("a string", x => typeof x === "string")
 const expectIntOrInfinity = expectation(
     `an ${wInteger} or Infinity`,
     x => isInt(x) || x === Infinity
@@ -200,6 +201,7 @@ export const forOperator = (operator: string) => {
         checkValue("projection", expectFunc),
         checkValue("action", expectFunc),
         checkValue("handler", expectFunc),
+        checkValue("separator", expectString),
         checkValue("reverse", expectBool),
         checkValue("reducer", expectFunc),
         checkValue("stage", expectStage),
