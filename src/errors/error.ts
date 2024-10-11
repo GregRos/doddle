@@ -205,6 +205,7 @@ export const forOperator = (operator: string) => {
         checkValue("reverse", expectBool),
         checkValue("reducer", expectFunc),
         checkValue("stage", expectStage),
+        checkValue("skipCount", expectPosInt),
         checkValue("keyProjection", expectFunc),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),

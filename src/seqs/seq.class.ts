@@ -716,6 +716,29 @@ export abstract class Seq<T> implements Iterable<T> {
         return this as any as Seq<S>
     }
 
+    splice<S>(start: number, skipCount?: number, insert?: Seq.Input<S>): Seq<S | T> {
+        chk(this.splice).start(start)
+        skipCount ??= 0
+        const insertConverted = seq(insert ?? [])
+        return SeqOperator(this, function* splice(input) {
+            let i = 0
+            for (const item of input) {
+                if (i >= start && i < start + skipCount) {
+                    i++
+
+                    continue
+                }
+                if (i === start + skipCount && insert) {
+                    for (const item of insertConverted) {
+                        yield item
+                    }
+                }
+                yield item
+                i++
+            }
+        })
+    }
+
     toRecordBy<K extends PropertyKey>(projection: Seq.Iteratee<T, K>): Doddle<Record<K, T>> {
         // ! POLYMORPHIC !
         projection = chk(this.toRecordBy).projection(projection)
