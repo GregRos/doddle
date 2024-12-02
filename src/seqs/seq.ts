@@ -1,5 +1,5 @@
 import { chk, loadCheckers } from "../errors/error.js"
-import { getThrownError, isFunction } from "../utils.js"
+import { getThrownError, isFunction, isObject } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 import { seq as seqBase } from "./seq.ctor.js"
 const Builders = {
@@ -37,7 +37,7 @@ const Builders = {
         return seq([])
     },
     is<T = unknown>(input: any): input is Seq<T> {
-        return input[Symbol.toStringTag] === "Seq" && isFunction(input.map)
+        return isObject(input) && input[Symbol.toStringTag] === "Seq" && isFunction(input.map)
     },
     throws<T = never>(thrower: () => Error): Seq<T> {
         thrower = chk(this.throws).thrower(thrower)

@@ -6,7 +6,10 @@
       "type": "shell",
       "command": "yarn",
       "args": ["watch"],
-      "problemMatcher": "$tsc-watch"
+      "problemMatcher": "$tsc-watch",
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
     }
   ]
 }

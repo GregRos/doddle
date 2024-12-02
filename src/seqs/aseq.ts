@@ -1,7 +1,7 @@
 import "doddle"
 import { chk, loadCheckers } from "../errors/error.js"
 import { pull } from "../lazy/index.js"
-import { getThrownError, isFunction } from "../utils.js"
+import { getThrownError, isFunction, isObject } from "../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { aseq as aseqBase } from "./aseq.ctor.js"
 import { seq } from "./seq.js"
@@ -32,7 +32,7 @@ const Builders = {
         return aseq(seq.repeat(times, value))
     },
     is<T = unknown>(input: any): input is ASeq<T> {
-        return input[Symbol.toStringTag] === "ASeq" && isFunction(input.map)
+        return isObject(input) && input[Symbol.toStringTag] === "ASeq" && isFunction(input.map)
     },
     throws<T = never>(thrower: () => Error): ASeq<T> {
         thrower = chk(this.throws).thrower(thrower)
