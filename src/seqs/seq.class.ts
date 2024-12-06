@@ -456,7 +456,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 .map(e => returnKvp(e, projection(e), e))
                 .toArray()
                 .map(xs => {
-                    xs.sort(compareKey)
+                    void xs.sort(compareKey)
                     return xs.map((x: any) => x.value)
                 })
                 .pull()
