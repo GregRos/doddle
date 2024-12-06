@@ -8,6 +8,7 @@ import {
     createCompareKey,
     parseStage,
     returnKvp,
+    setClassName,
     shuffleArray,
     type MaybeDoddle,
     type MaybePromise
@@ -792,7 +793,9 @@ export namespace ASeq {
 
     export type Input<E> = SimpleInput<MaybePromise<E>>
     export type NoInputAction = () => MaybeDoddle<MaybePromise<unknown>>
-    export type Group<K, T> = [K, ASeq<T>]
+    export type Group<K, T> = readonly [K, ASeq<T>]
 }
-
+// Class name is used for various checks
+// Need to make sure it's accessible even while minified
+setClassName(ASeq, "ASeq")
 loadCheckers(ASeq.prototype)

@@ -5,6 +5,7 @@ import {
     getValueDesc,
     isDoddle,
     isThenable,
+    setClassName,
     type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
@@ -416,3 +417,7 @@ export function pull<T>(input: T): Doddle.Pulled<T>
 export function pull<T>(input: Doddle<T> | T): Doddle.Pulled<T> {
     return doddle(() => input).pull()
 }
+
+// Class name is used for various checks
+// Need to make sure it's accessible even while minified
+setClassName(Doddle, "Doddle")

@@ -211,3 +211,9 @@ export function createCompareKey(desc: boolean) {
         return compare(a.key, b.key)
     }
 }
+
+export function setClassName(cls: any, name: string) {
+    Object.defineProperty(cls, "name", {
+        value: name
+    })
+}

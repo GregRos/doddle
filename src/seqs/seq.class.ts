@@ -1,7 +1,15 @@
 import { chk, DoddleError, loadCheckers } from "../errors/error.js"
 import type { Doddle } from "../lazy/index.js"
 import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
-import { _iter, createCompareKey, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
+import {
+    _iter,
+    createCompareKey,
+    parseStage,
+    returnKvp,
+    setClassName,
+    shuffleArray,
+    Stage
+} from "../utils.js"
 
 import {
     SkippingMode,
@@ -892,7 +900,9 @@ export namespace Seq {
     export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E> | ArrayLike<E>)
     export type Input<E> = MaybeDoddle<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
-    export type Group<K, V> = [K, Seq<V>]
+    export type Group<K, V> = readonly [K, Seq<V>]
 }
-
+// Class name is used for various checks
+// Need to make sure it's accessible even while minified
+setClassName(Seq, "Seq")
 loadCheckers(Seq.prototype)
