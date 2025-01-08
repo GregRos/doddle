@@ -242,8 +242,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     before(action: ASeq.NoInputAction): ASeq<T> {
-        function a() {}
-        let b = a()
         chk(this.before).action(action)
         return ASeqOperator(this, async function* before(input) {
             await pull(action())
