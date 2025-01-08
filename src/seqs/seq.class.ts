@@ -595,6 +595,28 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
+    findIndex(predicate: Seq.Predicate<T>): Doddle<number> {
+        // ! POLYMORPHIC !
+        predicate = chk(this.findIndex).predicate(predicate)
+        return lazyFromOperator(this, function findIndex(input) {
+            return input
+                .map((x, i) => [x, i] as const)
+                .find(([x, i]) => pull(predicate(x, i)))
+                .map(x => x?.[1] ?? -1)
+                .pull()
+        })
+    }
+    findLastIndex(predicate: Seq.Predicate<T>): Doddle<number> {
+        // ! POLYMORPHIC !
+        predicate = chk(this.findLastIndex).predicate(predicate)
+        return lazyFromOperator(this, function findLastIndex(input) {
+            return input
+                .map((x, i) => [x, i] as const)
+                .findLast(([x, i]) => pull(predicate(x, i)))
+                .map(x => x?.[1] ?? -1)
+                .pull()
+        })
+    }
     skip(count: number): Seq<T> {
         const SKIP = Symbol("SKIP")
         chk(this.skip).count(count)
@@ -707,9 +729,9 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    toRecord<Key extends PropertyKey>(
-        kvpProjection: Seq.Iteratee<T, readonly [PropertyKey, any]>
-    ): Doddle<Record<Key, T>> {
+    toRecord<Key extends PropertyKey, Value>(
+        kvpProjection: Seq.Iteratee<T, readonly [Key, Value]>
+    ): Doddle<Record<Key, Value>> {
         chk(this.toRecord).kvpProjection(kvpProjection)
         return lazyFromOperator(this, function toObject(input) {
             return input

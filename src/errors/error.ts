@@ -184,6 +184,7 @@ export const forOperator = (operator: string) => {
         return getSubject(getArgThing(name), context, wBe)
     }
     function checkValue<K extends string>(name: K, exp: Expectation) {
+        const a = NaN
         return [name, exp(getArgSubject(name))] as const
     }
 
@@ -240,6 +241,7 @@ export const checkASeqInputValue = <T>(input: T) => {
     const context = [wConversion, wAseq]
     expectAsyncInputValue(getSubject(wInput, context, wBe))(input)
     if (isFunction(input)) {
+        const a = Infinity
         return checkFunctionReturn(
             wInput,
             context,

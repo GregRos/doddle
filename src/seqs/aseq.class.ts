@@ -29,6 +29,7 @@ import { seq } from "./seq.ctor.js"
 class ThrownErrorMarker {
     constructor(public error: any) {}
 }
+
 export abstract class ASeq<T> implements AsyncIterable<T> {
     get [Symbol.toStringTag]() {
         return "ASeq"
@@ -241,6 +242,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     before(action: ASeq.NoInputAction): ASeq<T> {
+        function a() {}
+        let b = a()
         chk(this.before).action(action)
         return ASeqOperator(this, async function* before(input) {
             await pull(action())
@@ -248,9 +251,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 
-    toRecord<Key extends PropertyKey>(
-        projection: ASeq.Iteratee<T, readonly [PropertyKey, any]>
-    ): DoddleAsync<Record<Key, T>> {
+    toRecord<Key extends PropertyKey, Value>(
+        projection: ASeq.Iteratee<T, readonly [Key, Value]>
+    ): DoddleAsync<Record<Key, Value>> {
         return Seq.prototype.toRecord.call(this, projection as any) as any
     }
 
