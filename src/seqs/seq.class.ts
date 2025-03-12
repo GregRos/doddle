@@ -301,23 +301,24 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    matchByProperty<
+    $_matchByProperty<
         K extends keyof T,
-        Cases extends Seq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, any>
-    >(prop: K, matchMapCases: Cases): Seq<ReturnType<Cases[keyof Cases]>> {
-        chk(this.matchByProperty).propName(prop)
+        R,
+        Cases extends Seq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, R>
+    >(prop: K, matchMapCases: Cases): Seq<Doddle.Pulled<ReturnType<Cases[keyof Cases]>>> {
+        chk(this.$_matchByProperty).propName(prop)
         const self = this
 
         return SeqOperator(this, function* matchByProperty(input) {
             let index = 0
             for (const element of input) {
                 const key = element[prop]
-                chk(self.matchByProperty).cases_key(prop, key)
+                chk(self.$_matchByProperty).cases_key(prop, key)
                 let projection = matchMapCases[key as keyof Cases]
                 if (projection == null) {
                     projection = matchMapCases.default as any
                 }
-                chk(self.matchByProperty).cases_value(key as any, projection)
+                chk(self.$_matchByProperty).cases_value(key as any, projection)
                 const result = pull(projection(element as any, key as any, index++))
                 yield result
             }

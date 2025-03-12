@@ -464,7 +464,28 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
+    _matchByProperty<
+        K extends keyof T,
+        Cases extends ASeq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, any>
+    >(prop: K, matchMapCases: Cases): ASeq<Doddle.PulledAwaited<ReturnType<Cases[keyof Cases]>>> {
+        chk(this._matchByProperty).propName(prop)
+        const self = this
 
+        return ASeqOperator(this, async function* matchByProperty(input) {
+            let index = 0
+            for await (const element of input) {
+                const key = element[prop]
+                chk(self._matchByProperty).cases_key(prop, key)
+                let projection = matchMapCases[key as keyof Cases]
+                if (projection == null) {
+                    projection = matchMapCases.default as any
+                }
+                chk(self._matchByProperty).cases_value(key as any, projection)
+                const result = await pull(projection(element as any, key as any, index++))
+                yield result
+            }
+        }) as any
+    }
     flatMap = this.concatMap
 
     setEqualsBy<K, S = T>(
@@ -819,6 +840,29 @@ export namespace ASeq {
     export type Input<E> = SimpleInput<MaybePromise<E>>
     export type NoInputAction = () => MaybeDoddle<MaybePromise<unknown>>
     export type Group<K, T> = readonly [K, ASeq<T>]
+
+    export type PropValueIteratee<E, Matcher extends object, S> = (
+        element: Extract<E, Matcher>,
+        key: keyof Matcher,
+        index: number
+    ) => Doddle.MaybePromised<S>
+    export type MatchPropMapping<K extends keyof E, E extends Record<K, PropertyKey>, S> = {
+        [val in E[K]]: PropValueIteratee<
+            E,
+            {
+                [k in K]: val
+            },
+            S
+        >
+    } & {
+        default?: PropValueIteratee<
+            E,
+            {
+                [k in K]: E[K]
+            },
+            S
+        >
+    }
 }
 // Class name is used for various checks
 // Need to make sure it's accessible even while minified

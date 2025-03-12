@@ -38,6 +38,6 @@
     ".gitignore": ".gitattributes"
   },
   "jest.runMode": {
-    "type": "watch"
+    "type": "on-demand"
   }
 }
