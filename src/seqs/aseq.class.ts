@@ -465,6 +465,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return this.seqEqualsBy(_other, x => x)
     }
 
+    flatMap = this.concatMap
+
     setEqualsBy<K, S = T>(
         _other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>

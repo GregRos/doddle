@@ -312,6 +312,8 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
+    flatMap = this.concatMap
+
     before(action: Seq.NoInputAction): Seq<T> {
         chk(this.before).action(action)
         return SeqOperator(this, function* before(input) {
