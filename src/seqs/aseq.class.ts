@@ -603,6 +603,26 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             return result
         })
     }
+    collect(outType: "array"): ASeq<T[]>
+    collect(outType: "item"): ASeq<T>
+    collect(outType: "seq"): ASeq<Seq<T>>
+    collect(): ASeq<T>
+    collect(outType?: string): any {
+        chk(this.collect).outType(outType)
+        outType ??= "item"
+        return ASeqOperator(this, async function* collect(input) {
+            const everything = await input.toArray().pull()
+            if (outType === "array") {
+                yield everything
+            } else if (outType === "item") {
+                for (const item of everything) {
+                    yield item
+                }
+            } else if (outType === "seq") {
+                yield seq(everything)
+            }
+        })
+    }
     after(action: ASeq.NoInputAction): ASeq<T> {
         chk(this.after).action(action)
         return ASeqOperator(this, async function* after(input) {

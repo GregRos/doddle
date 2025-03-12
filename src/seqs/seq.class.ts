@@ -379,7 +379,28 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-
+    collect(outType: "array"): Seq<T[]>
+    collect(outType: "item"): Seq<T>
+    collect(outType: "seq"): Seq<Seq<T>>
+    collect(): Seq<T>
+    collect(outType?: string): any {
+        chk(this.collect).outType(outType)
+        outType ??= "item"
+        return SeqOperator(this, function* collect(input) {
+            const everything = input.toArray().pull()
+            if (outType === "array") {
+                yield everything
+            } else if (outType === "item") {
+                for (const item of everything) {
+                    yield item
+                }
+            } else if (outType === "seq") {
+                yield seq(everything)
+            } else {
+                throw new DoddleError(`Invalid outType ${outType}`)
+            }
+        })
+    }
     includes<T extends S, S>(this: Seq<T>, value: S): Doddle<boolean>
     includes<S extends T>(value: S): Doddle<boolean>
     includes(value: any): Doddle<boolean> {

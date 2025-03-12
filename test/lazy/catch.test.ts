@@ -34,13 +34,13 @@ declare.it("sync.catch(sync) = sync", expect => {
 })
 
 declare.it("sync.catch(async) = mixed", expect => {
+    // @ts-expect-error Should not allow sync catch with async handler
     const myDoddle = lazies.sync().catch(handlers.async())
-    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<2>>>)
 })
 
 declare.it("sync.catch(mixed) = mixed", expect => {
+    // @ts-expect-error Should not allow sync catch with mixed handler
     const myDoddle = lazies.sync().catch(handlers.mixed())
-    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
 })
 
 declare.it("sync.catch(any) = any", expect => {
@@ -54,13 +54,13 @@ declare.it("sync.catch(doddle sync) = sync", expect => {
 })
 
 declare.it("sync.catch(doddle async) = mixed", expect => {
-    const myDoddle = lazies.sync().catch(handlers.lazy_async())
-    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<2>>>)
+    // @ts-expect-error Should not allow sync doddle with async catch
+    lazies.sync().catch(handlers.lazy_async())
 })
 
 declare.it("sync.catch(doddle mixed) = mixed", expect => {
-    const myDoddle = lazies.sync().catch(handlers.lazy_mixed())
-    expect(type_of(myDoddle)).to_equal(type<Doddle<1 | 2 | Promise<2>>>)
+    // @ts-expect-error Should not allow sync doddle with mixed catch
+    lazies.sync().catch(handlers.lazy_mixed())
 })
 
 declare.it("sync.catch(doddle any) = any", expect => {

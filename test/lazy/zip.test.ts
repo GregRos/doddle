@@ -66,8 +66,8 @@ it("zips only sync", () => {
     const fn1 = jest.fn(),
         fn2 = jest.fn(),
         fn3 = jest.fn()
-    const target = lazies.sync().each(fn1)
-    const zipped = target.zip(lazies.sync().each(fn2), lazies.sync().each(fn3))
+    const target = lazies.sync().do(fn1)
+    const zipped = target.zip(lazies.sync().do(fn2), lazies.sync().do(fn3))
     expect(zipped.pull()).toEqual([1, 1, 1])
     expect(fn1).toHaveBeenCalledTimes(1)
     expect(fn2).toHaveBeenCalledTimes(1)
@@ -81,8 +81,8 @@ it("zips async and sync", async () => {
     const fn1 = jest.fn(),
         fn2 = jest.fn(),
         fn3 = jest.fn()
-    const target = lazies.sync().each(fn1)
-    const zipped = target.zip(lazies.async().each(fn2), lazies.sync().each(fn3))
+    const target = lazies.sync().do(fn1)
+    const zipped = target.zip(lazies.async().do(fn2), lazies.sync().do(fn3))
     await expect(zipped.pull()).resolves.toEqual([1, 1, 1])
     expect(fn1).toHaveBeenCalledTimes(1)
     expect(fn2).toHaveBeenCalledTimes(1)
@@ -100,8 +100,8 @@ it("zips only async", async () => {
     const fn1 = jest.fn(),
         fn2 = jest.fn(),
         fn3 = jest.fn()
-    const target = lazies.async().each(fn1)
-    const zipped = target.zip(lazies.async().each(fn2), lazies.async().each(fn3))
+    const target = lazies.async().do(fn1)
+    const zipped = target.zip(lazies.async().do(fn2), lazies.async().do(fn3))
     await expect(zipped.pull()).resolves.toEqual([1, 1, 1])
     expect(fn1).toHaveBeenCalledTimes(1)
     expect(fn2).toHaveBeenCalledTimes(1)

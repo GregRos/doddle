@@ -64,7 +64,7 @@ export class Doddle<T> {
         }
         this._init = initializer
 
-        for (const name of ["map", "each", "zip", "catch", "pull"]) {
+        for (const name of ["map", "do", "zip", "catch", "pull"]) {
             const bound = (this as any)[name].bind(this)
             Object.defineProperty(bound, ownerInstance, { value: this })
             ;(this as any)[name] = bound
@@ -117,21 +117,22 @@ export class Doddle<T> {
         })
     }
 
-    // async.catch(async) = async
     catch<T, R>(
         this: DoddleAsync<T>,
         handler: (error: any) => Doddle.SomeAsync<R>
     ): DoddleAsync<T | Awaited<R>>
-    // async.catch(mixed) = async
     catch<T, R>(
         this: DoddleAsync<T>,
         handler: (error: any) => R | Doddle<R> | Doddle.SomeAsync<R>
     ): DoddleAsync<T | Awaited<R>>
-    // sync.catch(async) = mixed
-    // sync.catch(sync) = sync
-    // mixed.catch(mixed) = mixed
-    // mixed.catch(sync) = mixed
-    catch<R>(handler: (error: any) => R | Doddle<R>): Doddle<T | R>
+    catch<T, R>(
+        this: OnlyIfMixed<T>,
+        handler: (error: any) => Doddle.SomeAsync<R>
+    ): Doddle<T | Promise<R>>
+    catch<T, R>(this: OnlyIfMixed<T>, handler: (error: any) => R | Doddle<R>): Doddle<T | R>
+    catch<R>(
+        handler: R extends PromiseLike<any> ? never : (error: any) => R | Doddle<R>
+    ): Doddle<R | T>
     catch(handler: (error: any) => any): any {
         chk(this.catch).handler(handler)
         return doddle(() => {
@@ -147,39 +148,39 @@ export class Doddle<T> {
         })
     }
 
-    // mixed.each(async) = async
-    each<T>(
+    // mixed.do(async) = async
+    do<T>(
         this: OnlyIfMixed<T>,
         action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
     ): DoddleAsync<Awaited<T>>
-    // async.each(anything) = async
-    each<T>(
+    // async.do(anything) = async
+    do<T>(
         this: DoddleAsync<T>,
         action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void> | Doddle.SomeAsync<void>
     ): DoddleAsync<T>
-    // mixed.each(mixed | sync) = mixed
-    each<T>(
+    // mixed.do(mixed | sync) = mixed
+    do<T>(
         this: OnlyIfMixed<T>,
         action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void> | Doddle.SomeAsync<void>
     ): Doddle<T>
-    // sync.each(async) = async
-    each<T>(
+    // sync.do(async) = async
+    do<T>(
         this: Doddle<T>,
         action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
     ): DoddleAsync<T>
-    // sync.each(mixed) = mixed
-    each<T, R>(
+    // sync.do(mixed) = mixed
+    do<T, R>(
         this: OnlyIfMixed<R, Doddle<T>>,
         action: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
     ): Doddle<T | Promise<T>>
-    // sync.each(sync) = sync
-    each<T>(
+    // sync.do(sync) = sync
+    do<T>(
         this: Doddle<T>,
         action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void>
     ): Doddle<T>
 
-    each(this: any, action: (value: any) => any): any {
-        chk(this.each).action(action)
+    do(this: any, action: (value: any) => any): any {
+        chk(this.do).action(action)
         return this.map((x: any) => {
             const result = action(x)
             return doddle(() => {

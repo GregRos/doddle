@@ -117,6 +117,10 @@ const expectIntOrInfinity = expectation(
 )
 const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or Infinity`, isNatOrInfinity)
 const expectPosInt = expectation(`a positive ${wInteger}`, isPosInt)
+const expectOutType = expectation(
+    `'item', 'array', 'seq', or undefined`,
+    x => x === "item" || x === "array" || x === "seq" || x === undefined
+)
 const expectBool = expectation("true or false", isBool)
 const expectError = expectation("an error", isError)
 const expectFunc = expectation(`a ${wFunction}`, isFunction)
@@ -202,6 +206,7 @@ export const forOperator = (operator: string) => {
         checkValue("action", expectFunc),
         checkValue("handler", expectFunc),
         checkValue("separator", expectString),
+        checkValue("outType", expectOutType),
         checkValue("reverse", expectBool),
         checkValue("reducer", expectFunc),
         checkValue("stage", expectStage),
