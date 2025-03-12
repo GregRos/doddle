@@ -301,6 +301,29 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
+    matchByProperty<
+        K extends keyof T,
+        Cases extends Seq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, any>
+    >(prop: K, matchMapCases: Cases): Seq<ReturnType<Cases[keyof Cases]>> {
+        chk(this.matchByProperty).propName(prop)
+        const self = this
+
+        return SeqOperator(this, function* matchByProperty(input) {
+            let index = 0
+            for (const element of input) {
+                const key = element[prop]
+                chk(self.matchByProperty).cases_key(prop, key)
+                let projection = matchMapCases[key as keyof Cases]
+                if (projection == null) {
+                    projection = matchMapCases.default as any
+                }
+                chk(self.matchByProperty).cases_value(key as any, projection)
+                const result = pull(projection(element as any, key as any, index++))
+                yield result
+            }
+        }) as any
+    }
+
     first(): Doddle<T | undefined>
     first<const Alt>(alt: Alt): Doddle<T | Alt>
     first<const Alt = undefined>(alt?: Alt): Doddle<any> {
@@ -936,6 +959,7 @@ export namespace Seq {
 
     export type NoInputAction = () => unknown | Doddle<unknown>
     export type Iteratee<E, O> = (element: E, index: number) => MaybeDoddle<O>
+
     export type NoIndexIteratee<E, O> = (element: E) => MaybeDoddle<O>
     export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
     export type Predicate<E> = Iteratee<E, boolean>
@@ -948,6 +972,31 @@ export namespace Seq {
     export type Input<E> = MaybeDoddle<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type Group<K, V> = readonly [K, Seq<V>]
+
+    export type PropKeyIteratee<E, K extends PropertyKey> = Iteratee<E, K>
+
+    export type PropValueIteratee<E, Matcher extends object, S> = (
+        element: Extract<E, Matcher>,
+        key: keyof Matcher,
+        index: number
+    ) => MaybeDoddle<S>
+    export type MatchPropMapping<K extends keyof E, E extends Record<K, PropertyKey>, S> = {
+        [val in E[K]]: PropValueIteratee<
+            E,
+            {
+                [k in K]: val
+            },
+            S
+        >
+    } & {
+        default?: PropValueIteratee<
+            E,
+            {
+                [k in K]: E[K]
+            },
+            S
+        >
+    }
 }
 // Class name is used for various checks
 // Need to make sure it's accessible even while minified

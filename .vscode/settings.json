@@ -36,5 +36,8 @@
     ".eslintrc*": ".eslintignore",
     ".prettierrc*": ".prettierignore, .editorconfig",
     ".gitignore": ".gitattributes"
+  },
+  "jest.runMode": {
+    "type": "watch"
   }
 }

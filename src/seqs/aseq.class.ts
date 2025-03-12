@@ -788,6 +788,8 @@ export const ASeqOperator = function ___aseq<In, Out>(
 export namespace ASeq {
     export type IndexIteratee<O> = (index: number) => Doddle.MaybePromised<O>
     export type Iteratee<E, O> = (element: E, index: number) => Doddle.MaybePromised<O>
+    export type PropertyKeyIteratee<E, K extends PropertyKey> = Iteratee<E, K>
+
     export type NoIndexIteratee<E, O> = (element: E) => Doddle.MaybePromised<O>
     export type StageIteratee<E, O> = (
         element: E,

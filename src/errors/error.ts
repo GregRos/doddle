@@ -78,6 +78,7 @@ const wBe = "be"
 const wCalledWith = "called with"
 const wArguments = "arguments"
 const wDoddle = "doddle"
+const wInvoker = "invoker"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
@@ -115,16 +116,21 @@ const expectIntOrInfinity = expectation(
     `an ${wInteger} or Infinity`,
     x => isInt(x) || x === Infinity
 )
+const expectObject = expectation("an object", x => x !== null && typeof x === "object")
 const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or Infinity`, isNatOrInfinity)
 const expectPosInt = expectation(`a positive ${wInteger}`, isPosInt)
 const expectOutType = expectation(
     `'item', 'array', 'seq', or undefined`,
     x => x === "item" || x === "array" || x === "seq" || x === undefined
 )
+
 const expectBool = expectation("true or false", isBool)
 const expectError = expectation("an error", isError)
 const expectFunc = expectation(`a ${wFunction}`, isFunction)
 const expectPair = expectation("an array of length 2", isPair)
+const expectPropertyKey = expectation("a string, number, or symbol", x => {
+    return typeof x === "string" || typeof x === "number" || typeof x === "symbol"
+})
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
@@ -187,15 +193,30 @@ export const forOperator = (operator: string) => {
     function getArgSubject(name: string) {
         return getSubject(getArgThing(name), context, wBe)
     }
+    function getPropSubject(argName: string, propName: string) {
+        return getSubject(
+            ["property", `'${propName}'`],
+            [wArgument, `'${argName}`, "to", ...context],
+            wBe
+        )
+    }
     function checkValue<K extends string>(name: K, exp: Expectation) {
         return [name, exp(getArgSubject(name))] as const
+    }
+    function checkPropValue<K extends string>(arg: K, exp: Expectation) {
+        return [
+            arg,
+            (prop: string, x: any) => {
+                return exp(getPropSubject(arg, prop))(x)
+            }
+        ] as const
     }
 
     function checkFuncReturn<K extends string>(name: K, exp: Expectation) {
         return [name, checkFunctionReturn(getArgThing(name), context, exp, allowAsync)] as const
     }
 
-    const entries = [
+    const simpleEntries = [
         checkValue("size", expectPosInt),
         checkValue("start", expectInt),
         checkValue("times", expectNatOrInfinity),
@@ -212,15 +233,30 @@ export const forOperator = (operator: string) => {
         checkValue("stage", expectStage),
         checkValue("skipCount", expectPosInt),
         checkValue("keyProjection", expectFunc),
+        checkValue("propName", expectPropertyKey),
+        checkValue("cases", expectObject),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
-        checkFuncReturn("thrower", expectError)
+        checkFuncReturn("thrower", expectError),
+        checkFuncReturn("propProjection", expectPropertyKey)
     ] as const
-    type Entries = typeof entries
-    type ResultingObjectType = {
-        [K in keyof Entries & number as Entries[K][0]]: <T>(input: T) => T
+    type SimpleEntries = typeof simpleEntries
+    type SimpleCheckersObject = {
+        [K in keyof SimpleEntries & number as SimpleEntries[K][0]]: <T>(input: T) => T
     }
-    return Object.fromEntries(entries) as ResultingObjectType
+    const propEntries = [
+        checkPropValue("cases_key", expectPropertyKey),
+        checkPropValue("cases_value", expectFunc)
+    ] as const
+    type PropEntries = typeof propEntries
+    type PropertyCheckersObject = {
+        [K in keyof PropEntries & number as PropEntries[K][0]]: <T>(
+            prop: PropertyKey,
+            value: T
+        ) => T
+    }
+    return Object.fromEntries([...simpleEntries, ...propEntries]) as SimpleCheckersObject &
+        PropertyCheckersObject
 }
 
 export type OperatorMessages = ReturnType<typeof forOperator>
