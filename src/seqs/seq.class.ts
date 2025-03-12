@@ -21,7 +21,7 @@ import {
     type SkipWhileOptions,
     type TakeWhileSpecifier
 } from "./common-types.js"
-import { seq } from "./seq.ctor.js"
+import { ___seq } from "./seq.ctor.js"
 class ThrownErrorMarker {
     constructor(public error: any) {}
 }
@@ -36,7 +36,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     append<Ts extends any[]>(...items: Ts): Seq<T | Ts[number]> {
         return SeqOperator(this, function* append(input) {
-            yield* seq(input).concat(items)
+            yield* ___seq(input).concat(items)
         })
     }
     at(index: number): Doddle<T | undefined> {
@@ -106,7 +106,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     if (!result || result == null) {
                         return
                     }
-                    yield* seq(result)
+                    yield* ___seq(result)
                     return
                 }
                 i++
@@ -115,7 +115,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     prepend<Ts extends any[]>(...items: Ts): Seq<Ts[number] | T> {
         return SeqOperator(this, function* prepend(input) {
-            yield* seq(items)
+            yield* ___seq(items)
             yield* input
         })
     }
@@ -164,7 +164,7 @@ export abstract class Seq<T> implements Iterable<T> {
     excludeBy<K, S = T>(others: Seq.Input<S>, projection: Seq.NoIndexIteratee<T | S, K>): Seq<T> {
         chk(this.excludeBy).projection(projection)
         return SeqOperator(this, function* exclude(input) {
-            const set = seq(others)
+            const set = ___seq(others)
                 .map(x => {
                     return pull(projection(x))
                 })
@@ -182,7 +182,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* concatMap(input) {
             let index = 0
             for (const element of input) {
-                for (const projected of seq(pull(projection(element, index++)))) {
+                for (const projected of ___seq(pull(projection(element, index++)))) {
                     yield projected
                 }
             }
@@ -191,7 +191,7 @@ export abstract class Seq<T> implements Iterable<T> {
     concat<Seqs extends Seq.Input<any>[]>(
         ..._iterables: Seqs
     ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
-        const iterables = _iterables.map(seq)
+        const iterables = _iterables.map(___seq)
         return SeqOperator(this, function* concat(input) {
             yield* input
             for (const iterable of iterables) {
@@ -245,7 +245,7 @@ export abstract class Seq<T> implements Iterable<T> {
     filter(predicate: Seq.Predicate<T>) {
         predicate = chk(this.filter).predicate(predicate)
         return SeqOperator(this, function* filter(input) {
-            yield* seq(input).concatMap((element, index) =>
+            yield* ___seq(input).concatMap((element, index) =>
                 pull(predicate(element, index)) ? [element] : []
             )
         })
@@ -363,7 +363,7 @@ export abstract class Seq<T> implements Iterable<T> {
             for (let i = 0; ; i++) {
                 if (i < keys.length) {
                     const key = keys[i]
-                    yield [key, seq(() => getGroupIterable(key))]
+                    yield [key, ___seq(() => getGroupIterable(key))]
                     continue
                 }
                 for (const _ of shared) {
@@ -395,7 +395,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     yield item
                 }
             } else if (outType === "seq") {
-                yield seq(everything)
+                yield ___seq(everything)
             } else {
                 throw new DoddleError(`Invalid outType ${outType}`)
             }
@@ -424,7 +424,9 @@ export abstract class Seq<T> implements Iterable<T> {
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
         chk(this.map).projection(projection)
         return SeqOperator(this, function* map(input) {
-            yield* seq(input).concatMap((element, index) => [pull(projection(element, index)) as S])
+            yield* ___seq(input).concatMap((element, index) => [
+                pull(projection(element, index)) as S
+            ])
         })
     }
     maxBy<K>(projection: Seq.Iteratee<T, K>): Doddle<T | undefined>
@@ -473,7 +475,7 @@ export abstract class Seq<T> implements Iterable<T> {
         chk(this.orderBy).reverse(reverse)
         const compareKey = createCompareKey(reverse)
         return SeqOperator(this, function* orderBy(input) {
-            yield* seq(input)
+            yield* ___seq(input)
                 .map(e => returnKvp(e, projection(e), e))
                 .toArray()
                 .map(xs => {
@@ -504,7 +506,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
     reverse() {
         return SeqOperator(this, function* reverse(input) {
-            yield* seq(input)
+            yield* ___seq(input)
                 .toArray()
                 .map(x => x.reverse())
                 .pull()
@@ -539,7 +541,7 @@ export abstract class Seq<T> implements Iterable<T> {
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
     ): Doddle<boolean> {
-        const other = seq(_other)
+        const other = ___seq(_other)
         return lazyFromOperator(this, function seqEqualsBy(input) {
             const otherIterator = _iter(other)
             try {
@@ -568,7 +570,7 @@ export abstract class Seq<T> implements Iterable<T> {
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
     ): Doddle<boolean> {
-        const other = seq(_other)
+        const other = ___seq(_other)
         return lazyFromOperator(this, function setEqualsBy(input) {
             const set = new Set()
             for (const element of other) {
@@ -591,7 +593,7 @@ export abstract class Seq<T> implements Iterable<T> {
 
     shuffle() {
         return SeqOperator(this, function* shuffle(input) {
-            const array = seq(input).toArray().pull()
+            const array = ___seq(input).toArray().pull()
             shuffleArray(array)
             yield* array
         })
@@ -644,12 +646,12 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* skip(input) {
             let myCount = count
             if (myCount === 0) {
-                yield* seq(input)
+                yield* ___seq(input)
                 return
             }
             if (myCount < 0) {
                 myCount = -myCount
-                yield* seq(input)
+                yield* ___seq(input)
                     .window(myCount + 1, (...window) => {
                         if (window.length === myCount + 1) {
                             return window[0]
@@ -658,7 +660,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     })
                     .filter(x => x !== SKIP)
             } else {
-                yield* seq(input).skipWhile((_, index) => index < myCount, {})
+                yield* ___seq(input).skipWhile((_, index) => index < myCount, {})
             }
         }) as any
     }
@@ -713,7 +715,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
             if (myCount < 0) {
                 myCount = -myCount
-                const results = seq(input)
+                const results = ___seq(input)
                     .append(END_MARKER)
                     .window(myCount + 1, (...window) => {
                         if (window[window.length - 1] === END_MARKER) {
@@ -728,7 +730,7 @@ export abstract class Seq<T> implements Iterable<T> {
 
                 yield* results
             } else {
-                yield* seq(input).takeWhile((_, index) => index < myCount - 1, {
+                yield* ___seq(input).takeWhile((_, index) => index < myCount - 1, {
                     takeFinal: true
                 })
             }
@@ -770,7 +772,7 @@ export abstract class Seq<T> implements Iterable<T> {
     splice<S>(start: number, skipCount?: number, insert?: Seq.Input<S>): Seq<S | T> {
         chk(this.splice).start(start)
         skipCount ??= 0
-        const insertConverted = seq(insert ?? [])
+        const insertConverted = ___seq(insert ?? [])
         return SeqOperator(this, function* splice(input) {
             let i = 0
             for (const item of input) {
@@ -834,7 +836,7 @@ export abstract class Seq<T> implements Iterable<T> {
         // ! POLYMORPHIC !
 
         return SeqOperator(this, function* uniq(input) {
-            yield* seq(input).uniqBy(x => x)
+            yield* ___seq(input).uniqBy(x => x)
         })
     }
     window<L extends number, S>(
@@ -884,7 +886,7 @@ export abstract class Seq<T> implements Iterable<T> {
         },
         projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
     ): Seq<any> {
-        const others = _others.map(seq)
+        const others = _others.map(___seq)
         projection ??= (...args: any[]) => args as any
         chk(this.zip).projection(projection)
         return SeqOperator(this, function* zip(input) {
@@ -911,7 +913,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 }
 
-export const SeqOperator = function seq<In, Out>(
+export const SeqOperator = function ___seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {

@@ -1,7 +1,7 @@
 import { chk, loadCheckers } from "../errors/error.js"
 import { getThrownError, isFunction, isObject } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
-import { seq as seqBase } from "./seq.ctor.js"
+import { ___seq } from "./seq.ctor.js"
 const Builders = {
     iterate<T>(count: number, projection: Seq.IndexIteratee<T>): Seq<T> {
         chk(this.iterate).count(count)
@@ -47,6 +47,6 @@ const Builders = {
         })
     }
 }
-export const seq = Object.assign(seqBase, Builders)
+export const seq = Object.assign(___seq, Builders)
 
 loadCheckers(seq)

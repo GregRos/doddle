@@ -1,4 +1,4 @@
-import { seq } from "../../../src/seqs/seq.ctor"
+import { seq } from "@lib"
 
 it("splices empty into empty", () => {
     const e = seq([])

@@ -3,11 +3,11 @@ import { pull, type Doddle } from "../lazy/index.js"
 import { _iter, isArrayLike, isInt, isIterable, isNextable, isThenable } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 
-export function seq(input: readonly never[]): Seq<never>
-export function seq<E>(input: Seq.ObjectIterable<Doddle<E>>): Seq<E>
-export function seq<E>(input: readonly E[]): Seq<E>
-export function seq<E>(input: Seq.Input<E>): Seq<E>
-export function seq<E>(input: Seq.Input<E>): any {
+function seq(input: readonly never[]): Seq<never>
+function seq<E>(input: Seq.ObjectIterable<Doddle<E>>): Seq<E>
+function seq<E>(input: readonly E[]): Seq<E>
+function seq<E>(input: Seq.Input<E>): Seq<E>
+function seq<E>(input: Seq.Input<E>): any {
     input = checkSeqInputValue(input)
     if (isNextable(input)) {
         return seq(() => input).cache()
@@ -39,3 +39,5 @@ export function seq<E>(input: Seq.Input<E>): any {
         pulled.return?.()
     })
 }
+
+export const ___seq = seq

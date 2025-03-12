@@ -3,7 +3,7 @@ import { chk, loadCheckers } from "../errors/error.js"
 import { pull } from "../lazy/index.js"
 import { getThrownError, isFunction, isObject } from "../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
-import { aseq as aseqBase } from "./aseq.ctor.js"
+import { ___aseq } from "./aseq.ctor.js"
 import { seq } from "./seq.js"
 const Builders = {
     iterate<T>(count: number, projection: ASeq.IndexIteratee<T>): ASeq<T> {
@@ -42,5 +42,5 @@ const Builders = {
         })
     }
 }
-export const aseq = Object.assign(aseqBase, Builders)
+export const aseq = Object.assign(___aseq, Builders)
 loadCheckers(aseq)

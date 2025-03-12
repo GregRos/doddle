@@ -13,14 +13,14 @@ import {
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
 import { DoddleReadableStreamIterator } from "./readable-stream-aiter.js"
 
-export function aseq<E>(input: readonly E[]): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<DoddleAsync<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Promise<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Doddle<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<MaybePromise<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.Input<E>): ASeq<E>
-export function aseq<E>(input: ASeq.Input<E>): any {
+function aseq<E>(input: readonly E[]): ASeq<E>
+function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
+function aseq<E>(input: ASeq.SimpleInput<DoddleAsync<E>>): ASeq<E>
+function aseq<E>(input: ASeq.SimpleInput<Promise<E>>): ASeq<E>
+function aseq<E>(input: ASeq.SimpleInput<Doddle<E>>): ASeq<E>
+function aseq<E>(input: ASeq.SimpleInput<MaybePromise<E>>): ASeq<E>
+function aseq<E>(input: ASeq.Input<E>): ASeq<E>
+function aseq<E>(input: ASeq.Input<E>): any {
     function fromFunctionResult(input: ReturnType<ASeq.FunctionInput<MaybePromise<E>>>): ASeq<E> {
         return ASeqOperator(input, async function* aseq(input) {
             const pulled = await pull(input)
@@ -64,3 +64,5 @@ export function aseq<E>(input: ASeq.Input<E>): any {
         yield* fromFunctionResult(pulled as any)
     })
 }
+
+export const ___aseq = aseq
