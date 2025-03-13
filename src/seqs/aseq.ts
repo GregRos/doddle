@@ -9,27 +9,27 @@ const Builders = {
     iterate<T>(count: number, projection: ASeq.IndexIteratee<T>): ASeq<T> {
         chk(this.iterate).count(count)
         chk(this.iterate).projection(projection)
-        return aseq(async function* () {
+        return ___aseq(async function* () {
             for (let i = 0; i < count; i++) {
                 yield pull(projection(i)) as T
             }
         })
     },
     of<const Items extends any[]>(...items: Items): ASeq<Items extends (infer E)[] ? E : never> {
-        return aseq(items)
+        return ___aseq(items)
     },
     range(start: number, end: number, size = 1) {
         chk(this.range).size(size)
         chk(this.range).start(start)
         chk(this.range).end(end)
-        return aseq(seq.range(start, end, size))
+        return ___aseq(seq.range(start, end, size))
     },
     empty<T = never>(): ASeq<T> {
-        return aseq([])
+        return ___aseq([])
     },
     repeat<T>(times: number, value: T): ASeq<T> {
         chk(this.repeat).times(times)
-        return aseq(seq.repeat(times, value))
+        return ___aseq(seq.repeat(times, value))
     },
     is<T = unknown>(input: any): input is ASeq<T> {
         return isObject(input) && input[Symbol.toStringTag] === "ASeq" && isFunction(input.map)
