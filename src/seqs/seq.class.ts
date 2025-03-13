@@ -28,6 +28,12 @@ class ThrownErrorMarker {
 
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
+    constructor() {
+        // Class name is used for various checks
+        // Need to make sure it's accessible even while minified
+        setClassName(Seq, "ASeq")
+        loadCheckers(Seq.prototype)
+    }
     get [Symbol.toStringTag]() {
         return "Seq"
     }

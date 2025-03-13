@@ -47,6 +47,4 @@ const Builders = {
         })
     }
 }
-export const seq = Object.assign(___seq, Builders)
-
-loadCheckers(seq)
+export const seq = loadCheckers(Object.assign(___seq, Builders))

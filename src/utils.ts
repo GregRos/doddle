@@ -213,6 +213,9 @@ export function createCompareKey(desc: boolean) {
 }
 
 export function setClassName(cls: any, name: string) {
+    if (cls.name === name) {
+        return
+    }
     Object.defineProperty(cls, "name", {
         value: name
     })

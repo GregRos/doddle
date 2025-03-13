@@ -30,7 +30,13 @@ class ThrownErrorMarker {
     constructor(public error: any) {}
 }
 
-export abstract class ASeq<T> implements AsyncIterable<T> {
+abstract class ASeq<T> implements AsyncIterable<T> {
+    constructor() {
+        // Class name is used for various checks
+        // Need to make sure it's accessible even while minified
+        setClassName(ASeq, "ASeq")
+        loadCheckers(ASeq.prototype)
+    }
     get [Symbol.toStringTag]() {
         return "ASeq"
     }

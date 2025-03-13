@@ -312,7 +312,8 @@ export function splat(bits: Text): string {
 const __checkers = "__checkers"
 
 const LOADED = Symbol("CHECKERS_LOADED")
-export function loadCheckers(target: any) {
+export function loadCheckers<X>(t: X) {
+    const target = t as any
     if (target[LOADED]) {
         return
     }
@@ -326,6 +327,7 @@ export function loadCheckers(target: any) {
             })
         })
     target[LOADED] = true
+    return t
 }
 
 export function chk(input: any): OperatorMessages {

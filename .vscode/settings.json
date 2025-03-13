@@ -25,7 +25,7 @@
   "typescript.tsserver.experimental.enableProjectDiagnostics": true,
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
-    "*.ts": "${capture}.async.ts, ${capture}.sync.ts, ${capture}.sync.test.ts, ${capture}.async.test.ts, ${capture}.ctor.ts, ${capture}.class.ts",
+    "*.ts": "${capture}.async.ts, ${capture}.sync.ts, ${capture}.sync.test.ts, ${capture}.async.test.ts, ${capture}.ctor.ts, ${capture}.class.ts, ${capture}.types.ts",
     "*.sync.ts": "${capture}.sync.test.ts",
     "*.async.ts": "${capture}.async.test.ts",
     "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
