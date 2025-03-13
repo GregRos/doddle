@@ -11,9 +11,9 @@ const objectSeq = _seq([
     }
 ] as const)
 declare.it("works", expect => {
-    expect(type_of(objectSeq.$_matchByProperty)).to_strictly_subtype(type<Function>)
+    expect(type_of(objectSeq.matchMap)).to_strictly_subtype(type<Function>)
     const aa = objectSeq
-        .$_matchByProperty("a", {
+        .matchMap("a", {
             x(a) {
                 expect(type_of(a)).to_resemble(type<{ a: "x" }>)
                 return 2 as const
@@ -22,7 +22,7 @@ declare.it("works", expect => {
                 expect(type_of(a)).to_resemble(type<{ a: "y" }>)
                 return 1 as const
             },
-            default(a) {
+            __default__(a) {
                 expect(type_of(a)).to_resemble(type<{ a: "x" | "y" }>)
                 return 3 as const
             }
@@ -34,7 +34,7 @@ declare.it("works", expect => {
 })
 
 declare.it("extra property check", expect => {
-    const aa = objectSeq.$_matchByProperty("a", {
+    const aa = objectSeq.matchMap("a", {
         // @ts-expect-error Should not allow extra properties
         b(a) {
             return 1
@@ -44,12 +44,12 @@ declare.it("extra property check", expect => {
 
 it("works for empty with empty", () => {
     const input = _seq([] as const)
-    const afterEmptyMatch = input.$_matchByProperty("a", {})
+    const afterEmptyMatch = input.matchMap("", {})
     expect(afterEmptyMatch._qr).resolves.toEqual([])
 })
 
 it("works for non-empty", () => {
-    const afterMatch = objectSeq.$_matchByProperty("a", {
+    const afterMatch = objectSeq.matchMap("a", {
         x(a) {
             return 2
         },
@@ -58,4 +58,17 @@ it("works for non-empty", () => {
         }
     })
     expect(afterMatch._qr).resolves.toEqual([2, 1])
+})
+
+it("maps literal with empty path", () => {
+    const s = _seq(["a", "b"] as const)
+    const afterMatch = s.matchMap("", {
+        a(x) {
+            return 1
+        },
+        b() {
+            return 2
+        }
+    })
+    expect(afterMatch._qr).resolves.toEqual([1, 2])
 })

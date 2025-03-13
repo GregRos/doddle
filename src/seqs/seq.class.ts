@@ -4,6 +4,7 @@ import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
 import type {
     Get_All_Dotted_Paths_Of,
     Get_Match_Object_Structure,
+    Get_Value_At_Dotted_Path,
     Split_Dotted_Path
 } from "../property-paths.js"
 import {
@@ -313,13 +314,24 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
+    pathMap<KeyPath extends Get_All_Dotted_Paths_Of<T>>(
+        propertyPath: KeyPath
+    ): Seq<Get_Value_At_Dotted_Path<T, KeyPath>> {
+        chk(this.pathMap).propertyPath(propertyPath)
+        return SeqOperator(this, function* pathMap(input) {
+            for (const element of input) {
+                yield getValueAtPath(element as any, propertyPath)
+            }
+        }) as any
+    }
+
     matchMap<
         KeyPath extends Get_All_Dotted_Paths_Of<T>,
         Cases extends Seq.$_MatchKeyMapping<
             Get_Match_Object_Structure<T, Split_Dotted_Path<KeyPath>>
         >
     >(path: KeyPath, cases: Cases): Seq<Doddle.Pulled<ReturnType<Cases[keyof Cases]>>> {
-        chk(this.matchMap).propName(path)
+        chk(this.matchMap).propertyPath(path)
         const self = this
 
         return SeqOperator(this, function* matchByProperty(input) {

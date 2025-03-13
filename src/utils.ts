@@ -261,6 +261,9 @@ export function getValueAtPath<T extends object, Path extends PropertyKey[]>(
 ): Get_Value_At_Path<T, Path>
 export function getValueAtPath(input: object, path: PropertyKey | PropertyKey[]) {
     if (isString(path)) {
+        if (path === "") {
+            return input
+        }
         return getValueAtPath(input, path.split("."))
     } else if (isPropertyKey(path)) {
         path = [path]

@@ -78,7 +78,6 @@ const wBe = "be"
 const wCalledWith = "called with"
 const wArguments = "arguments"
 const wDoddle = "doddle"
-const wInvoker = "invoker"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
@@ -128,9 +127,7 @@ const expectBool = expectation("true or false", isBool)
 const expectError = expectation("an error", isError)
 const expectFunc = expectation(`a ${wFunction}`, isFunction)
 const expectPair = expectation("an array of length 2", isPair)
-const expectPropertyKey = expectation("a string, number, or symbol", x => {
-    return typeof x === "string" || typeof x === "number" || typeof x === "symbol"
-})
+
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
@@ -233,19 +230,18 @@ export const forOperator = (operator: string) => {
         checkValue("stage", expectStage),
         checkValue("skipCount", expectPosInt),
         checkValue("keyProjection", expectFunc),
-        checkValue("propName", expectPropertyKey),
+        checkValue("propertyPath", expectString),
         checkValue("cases", expectObject),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
-        checkFuncReturn("thrower", expectError),
-        checkFuncReturn("propProjection", expectPropertyKey)
+        checkFuncReturn("thrower", expectError)
     ] as const
     type SimpleEntries = typeof simpleEntries
     type SimpleCheckersObject = {
         [K in keyof SimpleEntries & number as SimpleEntries[K][0]]: <T>(input: T) => T
     }
     const propEntries = [
-        checkPropValue("cases_key", expectPropertyKey),
+        checkPropValue("cases_key", expectString),
         checkPropValue("cases_value", expectFunc)
     ] as const
     type PropEntries = typeof propEntries

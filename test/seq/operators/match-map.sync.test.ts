@@ -85,8 +85,15 @@ it("works for empty with empty", () => {
     const afterEmptyMatch = input.matchMap("", {})
     expect(afterEmptyMatch._qr).toEqual([])
 })
-
-it("works for non-empty", () => {
-    const afterMatch = objectSeq.matchMap("", {})
-    expect(afterMatch._qr).toEqual([2, 1])
+it("maps literal with empty path", () => {
+    const s = _seq(["a", "b"] as const)
+    const afterMatch = s.matchMap("", {
+        a(x) {
+            return 1
+        },
+        b() {
+            return 2
+        }
+    })
+    expect(afterMatch._qr).toEqual([1, 2])
 })

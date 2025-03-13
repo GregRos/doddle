@@ -1,11 +1,18 @@
 import { chk, loadCheckers } from "../errors/error.js"
 import type { Doddle, DoddleAsync } from "../lazy/index.js"
 import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
+import {
+    Get_All_Dotted_Paths_Of,
+    Get_Match_Object_Structure,
+    Get_Value_At_Dotted_Path,
+    Split_Dotted_Path
+} from "../property-paths.js"
 import type { DoddleReadableStream } from "../readable-stream-polyfill.js"
 import {
     Stage,
     _aiter,
     createCompareKey,
+    getValueAtPath,
     parseStage,
     returnKvp,
     setClassName,
@@ -470,24 +477,37 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
-    $_matchByProperty<
-        K extends keyof T,
-        Cases extends ASeq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, any>
-    >(prop: K, matchMapCases: Cases): ASeq<Doddle.PulledAwaited<ReturnType<Cases[keyof Cases]>>> {
-        chk(this.$_matchByProperty).propName(prop)
+    pathMap<KeyPath extends Get_All_Dotted_Paths_Of<T>>(
+        propertyPath: KeyPath
+    ): ASeq<Awaited<Get_Value_At_Dotted_Path<T, KeyPath>>> {
+        chk(this.pathMap).propertyPath(propertyPath)
+        return ASeqOperator(this, async function* pathMap(input) {
+            for await (const element of input) {
+                yield getValueAtPath(element as any, propertyPath)
+            }
+        }) as any
+    }
+
+    matchMap<
+        KeyPath extends Get_All_Dotted_Paths_Of<T>,
+        Cases extends ASeq.$_MatchKeyMapping<
+            Get_Match_Object_Structure<T, Split_Dotted_Path<KeyPath>>
+        >
+    >(path: KeyPath, cases: Cases): ASeq<Doddle.PulledAwaited<ReturnType<Cases[keyof Cases]>>> {
+        chk(this.matchMap).propertyPath(path)
         const self = this
 
         return ASeqOperator(this, async function* matchByProperty(input) {
             let index = 0
             for await (const element of input) {
-                const key = element[prop]
-                chk(self.$_matchByProperty).cases_key(prop, key)
-                let projection = matchMapCases[key as keyof Cases]
+                const key = getValueAtPath(element as any, path)
+                chk(self.matchMap).cases_key(path, key)
+                let projection = cases[key as keyof Cases]
                 if (projection == null) {
-                    projection = matchMapCases.default as any
+                    projection = cases.__default__ as any
                 }
-                chk(self.$_matchByProperty).cases_value(key as any, projection)
-                const result = await pull(projection(element as any, key as any, index++))
+                chk(self.matchMap).cases_value(key as any, projection)
+                const result = await pull(projection(element as any, key as never, index++))
                 yield result
             }
         }) as any
@@ -847,26 +867,21 @@ export namespace ASeq {
     export type NoInputAction = () => MaybeDoddle<MaybePromise<unknown>>
     export type Group<K, T> = readonly [K, ASeq<T>]
 
-    export type PropValueIteratee<E, Matcher extends object, S> = (
-        element: Extract<E, Matcher>,
-        key: keyof Matcher,
+    export type PropValueIteratee<MatchStruct, K extends keyof MatchStruct> = (
+        element: MatchStruct[K],
+        key: K,
         index: number
-    ) => Doddle.MaybePromised<S>
-    export type MatchPropMapping<K extends keyof E, E extends Record<K, PropertyKey>, S> = {
-        [val in E[K]]: PropValueIteratee<
-            E,
-            {
-                [k in K]: val
-            },
-            S
-        >
+    ) => Doddle.MaybePromised<unknown>
+
+    export type DefaultCaseIteratee<MatchStruct> = (
+        element: MatchStruct[keyof MatchStruct],
+        key: keyof MatchStruct,
+        index: number
+    ) => Doddle.MaybePromised<unknown>
+
+    export type $_MatchKeyMapping<MatchStruct> = {
+        [K in keyof MatchStruct]: PropValueIteratee<MatchStruct, K>
     } & {
-        default?: PropValueIteratee<
-            E,
-            {
-                [k in K]: E[K]
-            },
-            S
-        >
+        __default__?: DefaultCaseIteratee<MatchStruct>
     }
 }
