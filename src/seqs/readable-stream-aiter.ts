@@ -1,4 +1,7 @@
-import type { DoddleReadableStream, DoddleReadableStreamReader } from "../extra-types.js"
+import type {
+    DoddleReadableStream,
+    DoddleReadableStreamReader
+} from "../readable-stream-polyfill.js"
 
 // Adapted from https://gist.github.com/MattiasBuelens/496fc1d37adb50a733edd43853f2f60e
 // https://gist.github.com/MattiasBuelens/496fc1d37adb50a733edd43853f2f60e

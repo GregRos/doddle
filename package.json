@@ -98,7 +98,8 @@
     "shelljs": "^0.8.5",
     "shx": "^0.3.4",
     "ts-jest": "^29.2.4",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "yamprint": "^0.8.4"
   },
   "packageManager": "yarn@4.5.0"
 }

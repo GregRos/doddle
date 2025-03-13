@@ -1997,6 +1997,7 @@ __metadata:
     shx: "npm:^0.3.4"
     ts-jest: "npm:^29.2.4"
     typescript: "npm:^5.5.4"
+    yamprint: "npm:^0.8.4"
   languageName: unknown
   linkType: soft
 
@@ -4793,6 +4794,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parameter.js@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "parameter.js@npm:1.0.0"
+  checksum: 10c0/4cfd2b23b379759b3363af85a1a58c617ca0299a0dec908456aaefb7fd48563c58e8db736687ebee5815908256ebf683b2de5feed910524944e3595c5441ab96
+  languageName: node
+  linkType: hard
+
 "parent-module@npm:^1.0.0":
   version: 1.0.1
   resolution: "parent-module@npm:1.0.1"
@@ -5859,6 +5867,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:^1.7.1":
+  version: 1.14.1
+  resolution: "tslib@npm:1.14.1"
+  checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^2.6.2":
   version: 2.6.3
   resolution: "tslib@npm:2.6.3"
@@ -6220,6 +6235,16 @@ __metadata:
   version: 2.3.1
   resolution: "yaml@npm:2.3.1"
   checksum: 10c0/ed4c21a907fb1cd60a25177612fa46d95064a144623d269199817908475fe85bef20fb17406e3bdc175351b6488056a6f84beb7836e8c262646546a0220188e3
+  languageName: node
+  linkType: hard
+
+"yamprint@npm:^0.8.4":
+  version: 0.8.4
+  resolution: "yamprint@npm:0.8.4"
+  dependencies:
+    parameter.js: "npm:^1.0.0"
+    tslib: "npm:^1.7.1"
+  checksum: 10c0/086b7df7d0b1439a5715f621756ad82b33ff7da35fd1959f170ad93eb637927338c390e5bbdb63f4109bd85ab97a607d52fd3888ee48c36e0d98aa7a3a0855b5
   languageName: node
   linkType: hard
 

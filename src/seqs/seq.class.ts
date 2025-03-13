@@ -1,9 +1,15 @@
 import { chk, DoddleError, loadCheckers } from "../errors/error.js"
 import type { Doddle } from "../lazy/index.js"
 import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
+import type {
+    Get_All_Dotted_Paths_Of,
+    Get_Match_Object_Structure,
+    Split_Dotted_Path
+} from "../property-paths.js"
 import {
     _iter,
     createCompareKey,
+    getValueAtPath,
     parseStage,
     returnKvp,
     setClassName,
@@ -31,7 +37,7 @@ export abstract class Seq<T> implements Iterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
-        setClassName(Seq, "ASeq")
+        setClassName(Seq, "Seq")
         loadCheckers(Seq.prototype)
     }
     get [Symbol.toStringTag]() {
@@ -307,25 +313,26 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    $_matchByProperty<
-        K extends keyof T,
-        R,
-        Cases extends Seq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, R>
-    >(prop: K, matchMapCases: Cases): Seq<Doddle.Pulled<ReturnType<Cases[keyof Cases]>>> {
-        chk(this.$_matchByProperty).propName(prop)
+    matchMap<
+        KeyPath extends Get_All_Dotted_Paths_Of<T>,
+        Cases extends Seq.$_MatchKeyMapping<
+            Get_Match_Object_Structure<T, Split_Dotted_Path<KeyPath>>
+        >
+    >(path: KeyPath, cases: Cases): Seq<Doddle.Pulled<ReturnType<Cases[keyof Cases]>>> {
+        chk(this.matchMap).propName(path)
         const self = this
 
         return SeqOperator(this, function* matchByProperty(input) {
             let index = 0
             for (const element of input) {
-                const key = element[prop]
-                chk(self.$_matchByProperty).cases_key(prop, key)
-                let projection = matchMapCases[key as keyof Cases]
+                const key = getValueAtPath(element as any, path)
+                chk(self.matchMap).cases_key(path, key)
+                let projection = cases[key as keyof Cases]
                 if (projection == null) {
-                    projection = matchMapCases.default as any
+                    projection = cases.__default__ as any
                 }
-                chk(self.$_matchByProperty).cases_value(key as any, projection)
-                const result = pull(projection(element as any, key as any, index++))
+                chk(self.matchMap).cases_value(key as any, projection)
+                const result = pull(projection(element as any, key as never, index++))
                 yield result
             }
         }) as any
@@ -982,30 +989,21 @@ export namespace Seq {
 
     export type PropKeyIteratee<E, K extends PropertyKey> = Iteratee<E, K>
 
-    export type PropValueIteratee<E, Matcher extends object, S> = (
-        element: Extract<E, Matcher>,
-        key: keyof Matcher,
+    export type PropValueIteratee<MatchStruct, K extends keyof MatchStruct> = (
+        element: MatchStruct[K],
+        key: K,
         index: number
-    ) => MaybeDoddle<S>
-    export type MatchPropMapping<K extends keyof E, E extends Record<K, PropertyKey>, S> = {
-        [val in E[K]]: PropValueIteratee<
-            E,
-            {
-                [k in K]: val
-            },
-            S
-        >
+    ) => MaybeDoddle<unknown>
+
+    export type DefaultCaseIteratee<MatchStruct> = (
+        element: MatchStruct[keyof MatchStruct],
+        key: keyof MatchStruct,
+        index: number
+    ) => MaybeDoddle<unknown>
+
+    export type $_MatchKeyMapping<MatchStruct> = {
+        [K in keyof MatchStruct]: PropValueIteratee<MatchStruct, K>
     } & {
-        default?: PropValueIteratee<
-            E,
-            {
-                [k in K]: E[K]
-            },
-            S
-        >
+        __default__?: DefaultCaseIteratee<MatchStruct>
     }
 }
-// Class name is used for various checks
-// Need to make sure it's accessible even while minified
-setClassName(Seq, "Seq")
-loadCheckers(Seq.prototype)

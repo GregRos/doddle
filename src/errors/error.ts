@@ -2,7 +2,6 @@ import {
     getClassName,
     getValueDesc,
     isAnyIterable,
-    isArray,
     isArrayLike,
     isBool,
     isDoddle,
@@ -16,7 +15,8 @@ import {
     isPosInt,
     isReadableStream,
     isStage,
-    isThenable
+    isThenable,
+    splat
 } from "../utils.js"
 
 export class DoddleError extends Error {
@@ -302,12 +302,6 @@ export const gotAsyncIteratorInSyncContext = () => {
 export type _Text<T> = readonly (TextLeaf | T)[]
 export type TextLeaf = string | number | boolean | undefined | null
 export type Text = TextLeaf | _Text<_Text<_Text<_Text<_Text<string>>>>>
-export function splat(bits: Text): string {
-    if (!isArray(bits)) {
-        return bits as string
-    }
-    return bits.flat(5).join(" ")
-}
 
 const __checkers = "__checkers"
 
@@ -315,7 +309,7 @@ const LOADED = Symbol("CHECKERS_LOADED")
 export function loadCheckers<X>(t: X) {
     const target = t as any
     if (target[LOADED]) {
-        return
+        return t
     }
     Object.getOwnPropertyNames(target)
         .filter(key => !key.startsWith("_"))
@@ -327,7 +321,7 @@ export function loadCheckers<X>(t: X) {
             })
         })
     target[LOADED] = true
-    return t
+    return t!
 }
 
 export function chk(input: any): OperatorMessages {

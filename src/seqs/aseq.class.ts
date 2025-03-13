@@ -1,7 +1,7 @@
 import { chk, loadCheckers } from "../errors/error.js"
-import type { DoddleReadableStream } from "../extra-types.js"
 import type { Doddle, DoddleAsync } from "../lazy/index.js"
 import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
+import type { DoddleReadableStream } from "../readable-stream-polyfill.js"
 import {
     Stage,
     _aiter,
@@ -30,7 +30,7 @@ class ThrownErrorMarker {
     constructor(public error: any) {}
 }
 
-abstract class ASeq<T> implements AsyncIterable<T> {
+export abstract class ASeq<T> implements AsyncIterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
@@ -470,23 +470,23 @@ abstract class ASeq<T> implements AsyncIterable<T> {
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
-    _matchByProperty<
+    $_matchByProperty<
         K extends keyof T,
         Cases extends ASeq.MatchPropMapping<K, Extract<T, Record<K, PropertyKey>>, any>
     >(prop: K, matchMapCases: Cases): ASeq<Doddle.PulledAwaited<ReturnType<Cases[keyof Cases]>>> {
-        chk(this._matchByProperty).propName(prop)
+        chk(this.$_matchByProperty).propName(prop)
         const self = this
 
         return ASeqOperator(this, async function* matchByProperty(input) {
             let index = 0
             for await (const element of input) {
                 const key = element[prop]
-                chk(self._matchByProperty).cases_key(prop, key)
+                chk(self.$_matchByProperty).cases_key(prop, key)
                 let projection = matchMapCases[key as keyof Cases]
                 if (projection == null) {
                     projection = matchMapCases.default as any
                 }
-                chk(self._matchByProperty).cases_value(key as any, projection)
+                chk(self.$_matchByProperty).cases_value(key as any, projection)
                 const result = await pull(projection(element as any, key as any, index++))
                 yield result
             }
@@ -870,7 +870,3 @@ export namespace ASeq {
         >
     }
 }
-// Class name is used for various checks
-// Need to make sure it's accessible even while minified
-setClassName(ASeq, "ASeq")
-loadCheckers(ASeq.prototype)

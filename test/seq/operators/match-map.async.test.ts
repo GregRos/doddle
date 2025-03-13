@@ -11,9 +11,9 @@ const objectSeq = _seq([
     }
 ] as const)
 declare.it("works", expect => {
-    expect(type_of(objectSeq._matchByProperty)).to_strictly_subtype(type<Function>)
+    expect(type_of(objectSeq.$_matchByProperty)).to_strictly_subtype(type<Function>)
     const aa = objectSeq
-        ._matchByProperty("a", {
+        .$_matchByProperty("a", {
             x(a) {
                 expect(type_of(a)).to_resemble(type<{ a: "x" }>)
                 return 2 as const
@@ -34,7 +34,7 @@ declare.it("works", expect => {
 })
 
 declare.it("extra property check", expect => {
-    const aa = objectSeq._matchByProperty("a", {
+    const aa = objectSeq.$_matchByProperty("a", {
         // @ts-expect-error Should not allow extra properties
         b(a) {
             return 1
@@ -44,12 +44,12 @@ declare.it("extra property check", expect => {
 
 it("works for empty with empty", () => {
     const input = _seq([] as const)
-    const afterEmptyMatch = input._matchByProperty("a", {})
+    const afterEmptyMatch = input.$_matchByProperty("a", {})
     expect(afterEmptyMatch._qr).resolves.toEqual([])
 })
 
 it("works for non-empty", () => {
-    const afterMatch = objectSeq._matchByProperty("a", {
+    const afterMatch = objectSeq.$_matchByProperty("a", {
         x(a) {
             return 2
         },
