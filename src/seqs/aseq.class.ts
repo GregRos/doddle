@@ -4,7 +4,6 @@ import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
 import {
     Get_All_Dotted_Paths_Of,
     Get_Match_Object_Structure,
-    Get_Value_At_Dotted_Path,
     Split_Dotted_Path
 } from "../property-paths.js"
 import type { DoddleReadableStream } from "../readable-stream-polyfill.js"
@@ -100,7 +99,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     return
                 }
             }
-        })
+        }) as any
     }
     catch<S>(handler: ASeq.Iteratee<unknown, ASeq.SimpleInput<S>>): ASeq<T | S>
     catch(handler: ASeq.Iteratee<unknown, void>): ASeq<T>
@@ -173,6 +172,24 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
+
+    drain(): DoddleAsync<void> {
+        return lazyFromOperator(this, async function drain(input) {
+            for await (const _ of input) {
+            }
+        })
+    }
+
+    delay(milliseconds: number): ASeq<T> {
+        chk(this.delay).ms(milliseconds)
+        return ASeqOperator(this, async function* delay(input) {
+            for await (const element of input) {
+                await new Promise(resolve => setTimeout(resolve, milliseconds))
+                yield element
+            }
+        }) as any
+    }
+
     prepend<Ts extends any[]>(...items: Ts): ASeq<Ts[number] | T> {
         return ASeqOperator(this, async function* prepend(input) {
             yield* items
@@ -259,7 +276,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return ASeqOperator(this, async function* before(input) {
             await pull(action())
             yield* input
-        })
+        }) as any
     }
 
     toRecord<Key extends PropertyKey, Value>(
@@ -477,9 +494,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
-    pathMap<KeyPath extends Get_All_Dotted_Paths_Of<T>>(
-        propertyPath: KeyPath
-    ): ASeq<Awaited<Get_Value_At_Dotted_Path<T, KeyPath>>> {
+    pathMap<KeyPath extends Get_All_Dotted_Paths_Of<T>>(propertyPath: KeyPath): any {
         chk(this.pathMap).propertyPath(propertyPath)
         return ASeqOperator(this, async function* pathMap(input) {
             for await (const element of input) {
@@ -660,7 +675,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         chk(this.collect).outType(outType)
         outType ??= "item"
         return ASeqOperator(this, async function* collect(input) {
-            const everything = await input.toArray().pull()
+            const everything = []
+            for await (const element of input) {
+                everything.push(element)
+            }
             if (outType === "array") {
                 yield everything
             } else if (outType === "item") {
@@ -728,7 +746,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     yield element
                 }
             }
-        })
+        }) as any
     }
     uniq() {
         return ASeqOperator(this, async function* uniq(input) {
@@ -818,7 +836,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 }
-export const ASeqOperator = function ___aseq<In, Out>(
+
+export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ): ASeq<Out> {
@@ -826,8 +845,8 @@ export const ASeqOperator = function ___aseq<In, Out>(
     return Object.assign(obj, {
         _operator: impl.name,
         _operand: operand,
-        [Symbol.asyncIterator]: function operator() {
-            return _aiter(impl.call(this, this._operand))
+        get [Symbol.asyncIterator]() {
+            return impl.bind(this, this._operand)
         }
     })
 }

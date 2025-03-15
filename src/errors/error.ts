@@ -234,7 +234,8 @@ export const forOperator = (operator: string) => {
         checkValue("cases", expectObject),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
-        checkFuncReturn("thrower", expectError)
+        checkFuncReturn("thrower", expectError),
+        checkValue("ms", expectInt)
     ] as const
     type SimpleEntries = typeof simpleEntries
     type SimpleCheckersObject = {

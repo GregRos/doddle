@@ -324,7 +324,12 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
-
+    drain(): Doddle<void> {
+        return lazyFromOperator(this, function drain(input) {
+            for (const _ of input) {
+            }
+        })
+    }
     matchMap<
         KeyPath extends Get_All_Dotted_Paths_Of<T>,
         Cases extends Seq.$_MatchKeyMapping<
@@ -438,7 +443,10 @@ export abstract class Seq<T> implements Iterable<T> {
         chk(this.collect).outType(outType)
         outType ??= "item"
         return SeqOperator(this, function* collect(input) {
-            const everything = input.toArray().pull()
+            const everything = []
+            for (const element of input) {
+                everything.push(element)
+            }
             if (outType === "array") {
                 yield everything
             } else if (outType === "item") {
@@ -452,6 +460,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+
     includes<T extends S, S>(this: Seq<T>, value: S): Doddle<boolean>
     includes<S extends T>(value: S): Doddle<boolean>
     includes(value: any): Doddle<boolean> {
@@ -964,7 +973,7 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 }
 
-export const SeqOperator = function ___seq<In, Out>(
+export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {
@@ -972,8 +981,8 @@ export const SeqOperator = function ___seq<In, Out>(
     return Object.assign(myAbstractSeq, {
         _operator: impl.name,
         _operand: operand,
-        [Symbol.iterator]: function operator() {
-            return _iter(impl.call(this, this._operand))
+        get [Symbol.iterator]() {
+            return impl.bind(this, this._operand)
         }
     })
 }
