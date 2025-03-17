@@ -46,6 +46,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Setup token
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
+      - name: Run prepublish
+        run: yarn run prepublishOnly
       - name: publish doddle
         run: yarn npm publish --access public
         env:
