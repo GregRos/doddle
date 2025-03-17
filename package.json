@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.0.0-beta.14",
+  "version": "5.0.0-beta.15",
   "description": "The easiest way to handle iterables.",
   "keywords": [
     "iteration",
@@ -77,7 +77,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "prepublishOnly": "node tools/packaging.cjs",
-    "tidy": "yarn install && run-s lint:fix build:clean test"
+    "tidy": "yarn install && run-s lint:fix build:clean test prepublishOnly"
   },
   "devDependencies": {
     "@gregros/eslint-config": "^0.6.0",

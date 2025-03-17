@@ -1,4 +1,3 @@
-import "doddle"
 import { chk, loadCheckers } from "../errors/error.js"
 import { pull } from "../lazy/index.js"
 import { getThrownError, isFunction, isObject } from "../utils.js"
