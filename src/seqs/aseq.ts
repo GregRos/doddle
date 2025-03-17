@@ -15,6 +15,9 @@ const Builders = {
             }
         })
     },
+    of<const Items extends any[]>(...items: Items): ASeq<Items extends (infer E)[] ? E : never> {
+        return ___aseq(items)
+    },
 
     range(start: number, end: number, size = 1) {
         chk(this.range).size(size)

@@ -126,6 +126,39 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+
+    product<Xs extends [any, ...any[]]>(others: {
+        [K in keyof Xs]: Seq.Input<Xs[K]>
+    }): Seq<getZipValuesType<[T, ...Xs]>>
+    product<Xs extends [any, ...any[]], R>(
+        others: {
+            [K in keyof Xs]: Seq.Input<Xs[K]>
+        },
+        projection: (...args: getZipValuesType<[T, ...Xs]>) => R
+    ): Seq<R>
+    product<Xs extends [any, ...any[]], R>(
+        _others: {
+            [K in keyof Xs]: Seq.Input<Xs[K]>
+        },
+        projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
+    ): Seq<any> {
+        const others = _others.map(___seq).map(x => x.cache())
+        projection ??= (...args: any[]) => args as any
+        chk(this.product).projection(projection)
+        return SeqOperator(this, function* product(input) {
+            let partialProducts = [[]] as any[][]
+            for (const iterable of [input, ...others]) {
+                const oldPartialProducts = partialProducts
+                partialProducts = []
+                for (const item of iterable) {
+                    partialProducts = partialProducts.concat(
+                        oldPartialProducts.map(x => [item, ...x])
+                    )
+                }
+            }
+            yield* partialProducts.map(x => pull(projection.apply(null, x as any)))
+        })
+    }
     prepend<Ts extends any[]>(...items: Ts): Seq<Ts[number] | T> {
         return SeqOperator(this, function* prepend(input) {
             yield* ___seq(items)
@@ -267,7 +300,6 @@ export abstract class Seq<T> implements Iterable<T> {
     findLast<const Alt>(predicate: Seq.Predicate<T>, alt: Alt): Doddle<T | Alt>
     findLast<Alt = undefined>(predicate: Seq.Predicate<T>, alt?: Alt) {
         // ! POLYMORPHIC !
-
         predicate = chk(this.findLast).predicate(predicate)
         return lazyFromOperator(this, function findLast(input) {
             return input.filter(predicate).last(alt).pull() as any
@@ -977,14 +1009,16 @@ export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {
-    const myAbstractSeq = new (Seq as any)()
-    return Object.assign(myAbstractSeq, {
+    const myAbstractSeq = Object.assign(new (Seq as any)(), {
         _operator: impl.name,
-        _operand: operand,
-        get [Symbol.iterator]() {
+        _operand: operand
+    })
+    Object.defineProperty(myAbstractSeq, Symbol.iterator, {
+        get(this: typeof myAbstractSeq) {
             return impl.bind(this, this._operand)
         }
     })
+    return myAbstractSeq
 }
 
 export namespace Seq {

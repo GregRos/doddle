@@ -841,14 +841,14 @@ export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ): ASeq<Out> {
-    const obj = new (ASeq as any)()
-    return Object.assign(obj, {
+    const obj = Object.assign(new (ASeq as any)(), {
         _operator: impl.name,
-        _operand: operand,
-        get [Symbol.asyncIterator]() {
-            return impl.bind(this, this._operand)
-        }
+        _operand: operand
     })
+    Object.defineProperty(obj, Symbol.asyncIterator, {
+        get: () => impl.bind(obj, obj._operand)
+    })
+    return obj
 }
 
 export namespace ASeq {
