@@ -3,7 +3,7 @@
     "target": "ES2022",
     "lib": ["ES2022"],
     "sourceMap": true,
-
+    "sourceRoot": "./src",
     "noEmit": true,
     "strict": true,
     "esModuleInterop": true,

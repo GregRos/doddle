@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.0.0-beta.12",
+  "version": "5.0.0-beta.13",
   "description": "The easiest way to handle iterables.",
   "keywords": [
     "iteration",
@@ -59,7 +59,8 @@
     "README.md",
     "dist",
     "LICENSE.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "src"
   ],
   "scripts": {
     "build": "tsc -b .",
