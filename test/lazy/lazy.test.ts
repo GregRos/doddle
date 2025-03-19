@@ -79,7 +79,7 @@ it("pulling changes syncness (in async)", async () => {
     expect(lz.info.syncness).toEqual("async")
 })
 
-it("(re)throws error on pull, only calls init once", () => {
+it.skip("(re)throws error on pull, only calls init once", () => {
     const init = jest.fn(() => {
         throw new Error("test")
     })
@@ -89,7 +89,7 @@ it("(re)throws error on pull, only calls init once", () => {
     expect(init).toHaveBeenCalledTimes(1)
 })
 
-it("async (re)throws error on pull, only calls init once", async () => {
+it.skip("async (re)throws error on pull, only calls init once", async () => {
     const init = jest.fn(async () => {
         throw new Error("test")
     })

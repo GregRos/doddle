@@ -253,9 +253,7 @@ export class Doddle<T> {
      */
     pull(): Doddle.Pulled<T> {
         const info = this._info
-        if (info.stage === Stage.Threw) {
-            throw this._cached
-        }
+
         if (info.stage === Stage.Executing) {
             if (info.syncness === Syncness.Async) {
                 return this._cached
@@ -268,8 +266,14 @@ export class Doddle<T> {
         }
         info.stage = Stage.Executing
         let resource: any
-        const result = this._init!()
-        resource = isDoddle(result) ? result.pull() : result
+        try {
+            const result = this._init!()
+            resource = isDoddle(result) ? result.pull() : result
+        } finally {
+            if (!resource) {
+                info.stage = Stage.Threw
+            }
+        }
         // No need to keep holding a reference to the constructor.
         this._init = null
 

@@ -2,6 +2,16 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "TEST: doddle",
+      "runtimeExecutable": "yarn",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**"],
+      "args": ["test", "--watchAll=false", "--passWithNoTests"]
+    },
+    {
       // launch dist/refactor.js
       "type": "node",
       "request": "launch",
