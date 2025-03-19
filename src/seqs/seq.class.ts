@@ -79,19 +79,14 @@ export abstract class Seq<T> implements Iterable<T> {
                     i++
                 } else if (!alreadyDone) {
                     iterator ??= _iter(self)
-                    try {
-                        const { done, value } = iterator.next()
-                        if (done) {
-                            alreadyDone = true
-                            return
-                        }
-                        _cache.push(value)
-                        yield value
-                        i++
-                    } catch (err) {
-                        _cache.push(new ThrownErrorMarker(err as any))
-                        throw err
+                    const { done, value } = iterator.next()
+                    if (done) {
+                        alreadyDone = true
+                        return
                     }
+                    _cache.push(value)
+                    yield value
+                    i++
                 } else {
                     return
                 }

@@ -268,14 +268,8 @@ export class Doddle<T> {
         }
         info.stage = Stage.Executing
         let resource: any
-        try {
-            const result = this._init!()
-            resource = isDoddle(result) ? result.pull() : result
-        } catch (e) {
-            this._cached = e
-            info.stage = Stage.Threw
-            throw e
-        }
+        const result = this._init!()
+        resource = isDoddle(result) ? result.pull() : result
         // No need to keep holding a reference to the constructor.
         this._init = null
 

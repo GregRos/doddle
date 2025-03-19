@@ -78,20 +78,14 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     iterator ??= _aiter(self)
                     if (!pending) {
                         pending = (async () => {
-                            try {
-                                const { done, value } = await iterator.next()
-                                if (done) {
-                                    alreadyDone = true
-                                    return
-                                }
-                                _cache.push(value)
-                                pending = undefined
-                                return
-                            } catch (err) {
-                                _cache.push(new ThrownErrorMarker(err as any))
-                                pending = undefined
+                            const { done, value } = await iterator.next()
+                            if (done) {
+                                alreadyDone = true
                                 return
                             }
+                            _cache.push(value)
+                            pending = undefined
+                            return
                         })()
                     }
                     await pending
