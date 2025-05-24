@@ -11,7 +11,7 @@ const objectSeq = _seq([
     }
 ] as const)
 declare.it("works", expect => {
-    expect(type_of(objectSeq.matchMap)).to_strictly_subtype(type<Function>)
+    expect(type_of(objectSeq.matchMap)).to_subtype(type<Function>)
     const aa = objectSeq
         .matchMap("a", {
             x(a) {

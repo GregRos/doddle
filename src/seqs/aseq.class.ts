@@ -24,7 +24,7 @@ import {
     SkippingMode,
     type EachCallStage,
     type SkipWhileOptions,
-    type TakeWhileSpecifier,
+    type TakeWhileOptions,
     type getConcatElementType,
     type getWindowArgsType,
     type getWindowOutputType,
@@ -32,9 +32,6 @@ import {
 } from "./common-types.js"
 import { Seq } from "./seq.class.js"
 import { ___seq } from "./seq.ctor.js"
-class ThrownErrorMarker {
-    constructor(public error: any) {}
-}
 
 export abstract class ASeq<T> implements AsyncIterable<T> {
     constructor() {
@@ -60,7 +57,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
     cache(): ASeq<T> {
         const self = this
-        const _cache: (T | ThrownErrorMarker)[] = []
+        const _cache: T[] = []
         let alreadyDone = false
         let iterator: AsyncIterator<T>
         let pending: Promise<void> | undefined
@@ -69,9 +66,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             for (;;) {
                 if (i < _cache.length) {
                     const cur = _cache[i]
-                    if (cur instanceof ThrownErrorMarker) {
-                        throw cur.error
-                    }
                     yield cur
                     i++
                 } else if (!alreadyDone) {
@@ -605,7 +599,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     sumBy(projection: ASeq.Iteratee<T, number>): DoddleAsync<number> {
         return Seq.prototype.sumBy.call(this, projection as any) as any
     }
-    takeWhile(predicate: ASeq.Predicate<T>, specifier?: TakeWhileSpecifier): ASeq<T> {
+    takeWhile(predicate: ASeq.Predicate<T>, specifier?: TakeWhileOptions): ASeq<T> {
         chk(this.takeWhile).predicate(predicate)
         return ASeqOperator(this, async function* takeWhile(input) {
             let index = 0
@@ -695,20 +689,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         const iter = doddle(() => _aiter(this))
         let err: Error | undefined = undefined
         return ASeqOperator(this, async function* share() {
-            if (err) {
-                throw err
-            }
-            try {
-                while (true) {
-                    const { done, value } = await iter.pull().next()
-                    if (done) {
-                        return
-                    }
-                    yield value
+            while (true) {
+                const { done, value } = await iter.pull().next()
+                if (done) {
+                    return
                 }
-            } catch (e) {
-                err = e as Error
-                throw e
+                yield value
             }
         })
     }

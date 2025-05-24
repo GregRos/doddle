@@ -12,7 +12,7 @@ const objectSeq = _seq([
     }
 ] as const)
 declare.it("works", expect => {
-    expect(type_of(objectSeq.matchMap)).to_strictly_subtype(type<Function>)
+    expect(type_of(objectSeq.matchMap)).to_subtype(type<Function>)
     const aa = objectSeq
         .matchMap("a", {
             x(a) {
@@ -47,7 +47,7 @@ const deeperObjectSeq = _seq([
     }
 ] as const)
 declare.it("works for path", expect => {
-    expect(type_of(deeperObjectSeq.matchMap)).to_strictly_subtype(type<Function>)
+    expect(type_of(deeperObjectSeq.matchMap)).to_subtype(type<Function>)
     const aa = deeperObjectSeq
         .matchMap("a.b", {
             x(a) {

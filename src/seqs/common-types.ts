@@ -1,9 +1,14 @@
 export type getConcatElementType<T, S> = T extends never ? never : S
+/** The stage of yielding at which a function should be called. */
 export type EachCallStage = "before" | "after" | "both" | undefined
-export interface TakeWhileSpecifier {
+
+/** Options for `takeWhile` and similar predicate-based subsequence operations. */
+export interface TakeWhileOptions {
     takeFinal?: boolean
 }
+/** Options for `skipWhile` and similar predicate-based skipping operators. */
 export interface SkipWhileOptions {
+    /** Whether to skip the boundary element for which the predicate returns `false`. */
     skipFinal?: boolean
 }
 export const enum SkippingMode {

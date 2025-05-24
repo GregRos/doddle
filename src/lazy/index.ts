@@ -9,20 +9,10 @@ import {
     type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
+import type { Is_Any_Mixed, Is_Any_Pure_Async, Matches_Mixed_Value } from "./helpers.js"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
 
-type IsAnyPureAsync<T extends Doddle<any>[], IfTrue, IfFalse> = {
-    [K in keyof T]: T[K] extends DoddleAsync<any> ? K : never
-}[number] extends never
-    ? IfFalse
-    : IfTrue
-
-type IsAnyMixed<T extends Doddle<any>[], IfTrue, IfFalse> =
-    DoddleAsync<any> extends T[number] ? IfTrue : IfFalse
-
-type OnlyIfMixed<Input, DoddleType = Doddle<Input>> =
-    Promise<any> extends Input ? DoddleType : never
 /**
  * A TypeScript-first doddle evaluation primitive. An object that will only evaluate its initializer
  * function when the {@link pull} method is called.
@@ -84,7 +74,7 @@ export class Doddle<T> {
     ): DoddleAsync<R>
     // When the input is async, and the projection is mixed, the result is always async.
     map<T, R>(
-        this: OnlyIfMixed<R, DoddleAsync<T>>,
+        this: Matches_Mixed_Value<R, DoddleAsync<T>>,
         projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
     ): DoddleAsync<Awaited<R>>
     map<T, R>(
@@ -94,12 +84,12 @@ export class Doddle<T> {
 
     // When this is mixed, and the projection is also mixed, the result type should stay the same.
     map<T, R>(
-        this: OnlyIfMixed<T> & OnlyIfMixed<R, Doddle<T>>,
+        this: Matches_Mixed_Value<T> & Matches_Mixed_Value<R, Doddle<T>>,
         projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
     ): Doddle<R>
     // When `this` is mixed and the projection is sync, the sync result needs to be mixed.
     map<T, R>(
-        this: OnlyIfMixed<T>,
+        this: Matches_Mixed_Value<T>,
         projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
     ): Doddle<R | Promise<R>>
     map<T, R>(
@@ -126,10 +116,10 @@ export class Doddle<T> {
         handler: (error: any) => R | Doddle<R> | Doddle.SomeAsync<R>
     ): DoddleAsync<T | Awaited<R>>
     catch<T, R>(
-        this: OnlyIfMixed<T>,
+        this: Matches_Mixed_Value<T>,
         handler: (error: any) => Doddle.SomeAsync<R>
     ): Doddle<T | Promise<R>>
-    catch<T, R>(this: OnlyIfMixed<T>, handler: (error: any) => R | Doddle<R>): Doddle<T | R>
+    catch<T, R>(this: Matches_Mixed_Value<T>, handler: (error: any) => R | Doddle<R>): Doddle<T | R>
     catch<R>(
         handler: R extends PromiseLike<any> ? never : (error: any) => R | Doddle<R>
     ): Doddle<R | T>
@@ -150,7 +140,7 @@ export class Doddle<T> {
 
     // mixed.do(async) = async
     do<T>(
-        this: OnlyIfMixed<T>,
+        this: Matches_Mixed_Value<T>,
         action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
     ): DoddleAsync<Awaited<T>>
     // async.do(anything) = async
@@ -160,7 +150,7 @@ export class Doddle<T> {
     ): DoddleAsync<T>
     // mixed.do(mixed | sync) = mixed
     do<T>(
-        this: OnlyIfMixed<T>,
+        this: Matches_Mixed_Value<T>,
         action: (value: Doddle.PulledAwaited<T>) => void | Doddle<void> | Doddle.SomeAsync<void>
     ): Doddle<T>
     // sync.do(async) = async
@@ -170,7 +160,7 @@ export class Doddle<T> {
     ): DoddleAsync<T>
     // sync.do(mixed) = mixed
     do<T, R>(
-        this: OnlyIfMixed<R, Doddle<T>>,
+        this: Matches_Mixed_Value<R, Doddle<T>>,
         action: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
     ): Doddle<T | Promise<T>>
     // sync.do(sync) = sync
@@ -191,7 +181,7 @@ export class Doddle<T> {
 
     zip<const Others extends readonly [Doddle<any>, ...Doddle<any>[]]>(
         ...others: Others
-    ): IsAnyPureAsync<
+    ): Is_Any_Pure_Async<
         [Doddle<T>, ...Others],
         DoddleAsync<
             [
@@ -201,7 +191,7 @@ export class Doddle<T> {
                 }
             ]
         >,
-        IsAnyMixed<
+        Is_Any_Mixed<
             [Doddle<T>, ...Others],
             Doddle<
                 MaybePromise<
