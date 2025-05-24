@@ -9,16 +9,6 @@ declare.it("correctly typed as Doddle and disjunction with undefined if no alt",
     expect(type_of(s)).to_equal(type<Doddle<number | undefined>>)
 })
 
-declare.it("disjunction with alt if it's given", expect => {
-    const s = _seq([1, 2, 3]).last("alt" as string)
-    expect(type_of(s)).to_equal(type<Doddle<number | string>>)
-})
-
-declare.it("Alt type is const", expect => {
-    const s = _seq([1, 2, 3]).last("alt")
-    expect(type_of(s)).to_equal(type<Doddle<number | "alt">>)
-})
-
 it("gets last element", () => {
     const s = _seq([1, 2, 3]).last()
     expect(s.pull()).toEqual(3)
@@ -27,16 +17,6 @@ it("gets last element", () => {
 it("gets undefined for empty", () => {
     const s = _seq([]).last()
     expect(s.pull()).toEqual(undefined)
-})
-
-it("gets alt for empty with alt", () => {
-    const s = _seq([]).last("alt")
-    expect(s.pull()).toEqual("alt")
-})
-
-it("alt doesn't affect non-empty", () => {
-    const s = _seq([1, 2, 3]).last("alt")
-    expect(s.pull()).toEqual(3)
 })
 
 it("has no side-effects before pull", () => {

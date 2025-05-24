@@ -161,13 +161,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         }) as any
     }
 
-    drain(): DoddleAsync<void> {
-        return lazyFromOperator(this, async function drain(input) {
-            for await (const _ of input) {
-            }
-        })
-    }
-
     delay(milliseconds: number): ASeq<T> {
         chk(this.delay).ms(milliseconds)
         return ASeqOperator(this, async function* delay(input) {
@@ -202,11 +195,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
-    count(): DoddleAsync<number>
-    count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
-    count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
-        return Seq.prototype.count.call(this, predicate as any) as any
-    }
+
     each(action: ASeq.StageIteratee<T, unknown>, stage: EachCallStage = "before") {
         chk(this.each).action(action)
         chk(this.each).stage(stage)
@@ -238,35 +227,37 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             )
         })
     }
-    findLast(predicate: ASeq.Predicate<T>): DoddleAsync<T | undefined>
-    findLast<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): DoddleAsync<T | Alt>
-    findLast<Alt = T>(predicate: ASeq.Predicate<T>, alt?: Alt) {
-        return Seq.prototype.findLast.call(this, predicate as any, alt)
-    }
-    find(predicate: ASeq.Predicate<T>): DoddleAsync<T | undefined>
-    find<const Alt>(predicate: ASeq.Predicate<T>, alt: Alt): DoddleAsync<T | Alt>
-    find<Alt = T>(predicate: ASeq.Predicate<T>, alt?: Alt) {
-        return Seq.prototype.find.call(this, predicate as any, alt)
-    }
     first(): DoddleAsync<T | undefined>
-    first<const Alt>(alt: Alt): DoddleAsync<T | Alt>
-    first<const Alt = undefined>(alt?: Alt) {
+    first<const Alt = undefined>(predicate: ASeq.Predicate<T>, alt?: Alt): DoddleAsync<T | Alt>
+    first<Alt = T>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
+        predicate = predicate || (() => true)
+        chk(this.first).predicate(predicate)
         return lazyFromOperator(this, async function first(input) {
+            let index = 0
             for await (const element of input) {
-                return element
+                if (await pull(predicate(element, index++))) {
+                    return element as T | Alt
+                }
             }
-            return alt
+            return alt as T | Alt
         })
     }
-
-    before(action: ASeq.NoInputAction): ASeq<T> {
-        chk(this.before).action(action)
-        return ASeqOperator(this, async function* before(input) {
-            await pull(action())
-            yield* input
-        }) as any
+    last(): DoddleAsync<T | undefined>
+    last<const Alt = undefined>(predicate: ASeq.Predicate<T>, alt?: Alt): DoddleAsync<T | Alt>
+    last<Alt = undefined>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
+        predicate = predicate || (() => true)
+        chk(this.last).predicate(predicate)
+        return lazyFromOperator(this, async function last(input) {
+            let last: T | Alt = alt as Alt
+            let index = 0
+            for await (const element of input) {
+                if (await pull(predicate(element, index++))) {
+                    last = element
+                }
+            }
+            return last as T | Alt
+        })
     }
-
     toRecord<Key extends PropertyKey, Value>(
         projection: ASeq.Iteratee<T, readonly [Key, Value]>
     ): DoddleAsync<Record<Key, Value>> {
@@ -344,17 +335,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     includes<S extends T>(value: S): DoddleAsync<boolean> {
         return Seq.prototype.includes.call(this, value) as any
     }
-    last(): DoddleAsync<T | undefined>
-    last<const Alt>(alt: Alt): DoddleAsync<T | Alt>
-    last<Alt = undefined>(alt?: Alt) {
-        return lazyFromOperator(this, async function last(input) {
-            let last: T | Alt = alt as Alt
-            for await (const element of input) {
-                last = element
-            }
-            return last as T | Alt
-        })
-    }
+
     map<S>(projection: ASeq.Iteratee<T, S>): ASeq<S> {
         chk(this.map).projection(projection)
         return ASeqOperator(this, async function* map(input) {
@@ -482,41 +463,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     seqEquals(_other: ASeq.Input<T>) {
         return this.seqEqualsBy(_other, x => x)
     }
-    pathMap<KeyPath extends Get_All_Dotted_Paths_Of<T>>(propertyPath: KeyPath): any {
-        chk(this.pathMap).propertyPath(propertyPath)
-        return ASeqOperator(this, async function* pathMap(input) {
-            for await (const element of input) {
-                yield getValueAtPath(element as any, propertyPath)
-            }
-        }) as any
-    }
-
-    matchMap<
-        KeyPath extends Get_All_Dotted_Paths_Of<T>,
-        Cases extends ASeq.$_MatchKeyMapping<
-            Get_Match_Object_Structure<T, Split_Dotted_Path<KeyPath>>
-        >
-    >(path: KeyPath, cases: Cases): ASeq<Doddle.PulledAwaited<ReturnType<Cases[keyof Cases]>>> {
-        chk(this.matchMap).propertyPath(path)
-        const self = this
-
-        return ASeqOperator(this, async function* matchByProperty(input) {
-            let index = 0
-            for await (const element of input) {
-                const key = getValueAtPath(element as any, path)
-                chk(self.matchMap).cases_key(path, key)
-                let projection = cases[key as keyof Cases]
-                if (projection == null) {
-                    projection = cases.__default__ as any
-                }
-                chk(self.matchMap).cases_value(key as any, projection)
-                const result = await pull(projection(element as any, key as never, index++))
-                yield result
-            }
-        }) as any
+    count(): DoddleAsync<number>
+    count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
+    count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
+        return Seq.prototype.count.call(this, predicate as any) as any
     }
     flatMap = this.concatMap
-
+    before(action: ASeq.NoInputAction): ASeq<T> {
+        chk(this.before).action(action)
+        return ASeqOperator(this, async function* before(input) {
+            await pull(action())
+            yield* input
+        }) as any
+    }
     setEqualsBy<K, S = T>(
         _other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>
