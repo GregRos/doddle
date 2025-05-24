@@ -42,11 +42,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     get _qr() {
         return this.toArray().pull()
     }
-    append<Ts extends any[]>(...items: Ts): ASeq<T | Ts[number]> {
-        return ASeqOperator(this, async function* append(input) {
-            yield* ___aseq(input).concat(items)
-        })
-    }
+
     at(index: number): DoddleAsync<T | undefined> {
         return Seq.prototype.at.call(this, index)
     }
@@ -548,7 +544,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             if (myCount < 0) {
                 myCount = -myCount
                 const results = (await ___aseq(input)
-                    .append(END_MARKER)
+                    .concat([END_MARKER])
                     .window(myCount + 1, (...window) => {
                         if (window[window.length - 1] === END_MARKER) {
                             window.pop()
