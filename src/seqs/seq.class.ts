@@ -44,17 +44,6 @@ export abstract class Seq<T> implements Iterable<T> {
     get _qr() {
         return this.toArray().pull()
     }
-    /**
-     * Adds items to the end of `this` sequence.
-     *
-     * @param items The items to append.
-     * @returns A new sequence with the items appended.
-     */
-    append<Ts extends any[]>(...items: Ts): Seq<T | Ts[number]> {
-        return SeqOperator(this, function* append(input) {
-            yield* ___seq(input).concat(items)
-        })
-    }
 
     /**
      * 🦥**Lazily** gets the element at the given index in `this` sequence.
@@ -194,18 +183,6 @@ export abstract class Seq<T> implements Iterable<T> {
             yield* partialProducts.map(x => pull(projection.apply(null, x as any))) as any
         })
     }
-    /**
-     * Adds items to the beginning of `this` sequence.
-     *
-     * @param items The items to prepend.
-     * @returns A new sequence with the items prepended.
-     */
-    prepend<Ts extends any[]>(...items: Ts): Seq<Ts[number] | T> {
-        return SeqOperator(this, function* prepend(input) {
-            yield* ___seq(items)
-            yield* input
-        })
-    }
 
     /**
      * 🦥**Lazily** joins the elements of `this` sequence into a single string, separated by the
@@ -288,6 +265,16 @@ export abstract class Seq<T> implements Iterable<T> {
                 yield* iterable
             }
         }) as any
+    }
+
+    concatFirst<Seqs extends Seq.Input<any>[]>(
+        ..._iterables: Seqs
+    ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
+        if (_iterables.length === 0) {
+            return this
+        }
+        const [base, ...rest] = [..._iterables, this].map(___seq) as any[]
+        return base.concat(rest)
     }
 
     /**
@@ -397,10 +384,11 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     first(): Doddle<T | undefined>
     first<Alt = undefined>(predicate?: Seq.Predicate<T>, alt?: Alt): Doddle<T | Alt> {
+        predicate ??= () => true
         return lazyFromOperator(this, function first(input) {
             let index = 0
             for (const element of input) {
-                if (!predicate || predicate(element, index++)) {
+                if (pull(predicate(element, index++))) {
                     return element
                 }
             }
@@ -541,15 +529,6 @@ export abstract class Seq<T> implements Iterable<T> {
         return lazyFromOperator(this, function includes(input) {
             return input.some(element => values.has(element)).pull()
         })
-    } /**
-     * Invokes a handler **before** the first element of `this` sequence is yielded, but after
-     * iteration has started.
-     *
-     * @param action The handler to invoke before the first element.
-     * @returns A new sequence that invokes the handler before the first element.
-     */
-    before(action: Seq.NoInputAction): Seq<T> {
-        return this.each(action, "start")
     }
 
     /**
@@ -601,7 +580,7 @@ export abstract class Seq<T> implements Iterable<T> {
             let lastOrAlt: Alt | T = alt as Alt
             let index = 0
             for (const element of input) {
-                if (!predicate(element, index++)) {
+                if (!pull(predicate(element, index++))) {
                     continue
                 }
                 lastOrAlt = element
@@ -726,7 +705,7 @@ export abstract class Seq<T> implements Iterable<T> {
         return lazyFromOperator(this, function reduce(input) {
             return input
                 .scan(reducer, initial!)
-                .last(NO_INITIAL)
+                .last(() => true, NO_INITIAL)
                 .map(x => {
                     if (x === NO_INITIAL) {
                         throw new DoddleError("Cannot reduce empty sequence with no initial value")
@@ -789,7 +768,25 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-
+    /**
+     * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
+     * sequential input, by iterating over both.
+     *
+     * @param _input The sequence-like input to compare with.
+     * @param projection The projection function that determines the key for comparison.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
+     */
+    seqEqualsBy<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    /**
+     * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
+     * sequential input, by iterating over both.
+     *
+     * @param _input The sequence-like input to compare with.
+     * @param projection The projection function that determines the key for comparison.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
+     *   otherwise.
+     */
+    seqEqualsBy<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
     /**
      * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
      * sequential input, by iterating over both.
@@ -801,6 +798,10 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
      *   otherwise.
      */
+    seqEqualsBy<K, S = T>(
+        _input: Seq.Input<S>,
+        projection: Seq.NoIndexIteratee<S | T, K>
+    ): Doddle<boolean>
     seqEqualsBy<K, S = T>(
         _input: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
@@ -823,6 +824,30 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+    /**
+     * 🦥**Lazily** checks if `this` sequence contains the same elements as the input sequence,
+     * without regard to order.
+     *
+     * The elements are compared by key, using the given key projection.
+     *
+     * @param _input The sequence-like input to compare with.
+     * @param projection The projection function that determines the key for comparison.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
+     *   `false` otherwise.
+     */
+    setEqualsBy<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    /**
+     * 🦥**Lazily** checks if `this` sequence contains the same elements as the input sequence,
+     * without regard to order.
+     *
+     * The elements are compared by key, using the given key projection.
+     *
+     * @param _input The sequence-like input to compare with.
+     * @param projection The projection function that determines the key for comparison.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
+     *   `false` otherwise.
+     */
+    setEqualsBy<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
 
     /**
      * 🦥**Lazily** checks if `this` sequence contains the same elements as the input sequence,
@@ -835,6 +860,10 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
      *   `false` otherwise.
      */
+    setEqualsBy<K, S = T>(
+        _other: Seq.Input<S>,
+        projection: Seq.NoIndexIteratee<S | T, K>
+    ): Doddle<boolean>
     setEqualsBy<K, S = T>(
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
@@ -939,7 +968,7 @@ export abstract class Seq<T> implements Iterable<T> {
         predicate = chk(this.some).predicate(predicate)
         return lazyFromOperator(this, function some(input) {
             return input
-                .find(predicate, NO_MATCH)
+                .first(predicate, NO_MATCH)
                 .map(x => x !== NO_MATCH)
                 .pull()
         })
@@ -1006,7 +1035,7 @@ export abstract class Seq<T> implements Iterable<T> {
             if (myCount < 0) {
                 myCount = -myCount
                 const results = ___seq(input)
-                    .append(END_MARKER)
+                    .concat([END_MARKER])
                     .window(myCount + 1, (...window) => {
                         if (window[window.length - 1] === END_MARKER) {
                             window.pop()

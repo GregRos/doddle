@@ -171,12 +171,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         }) as any
     }
 
-    prepend<Ts extends any[]>(...items: Ts): ASeq<Ts[number] | T> {
-        return ASeqOperator(this, async function* prepend(input) {
-            yield* items
-            yield* input
-        })
-    }
     join(separator = ","): DoddleAsync<string> {
         return Seq.prototype.join.call(this, separator) as any
     }
@@ -245,7 +239,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     last(): DoddleAsync<T | undefined>
     last<const Alt = undefined>(predicate: ASeq.Predicate<T>, alt?: Alt): DoddleAsync<T | Alt>
     last<Alt = undefined>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
-        predicate = predicate || (() => true)
+        predicate ??= () => true
         chk(this.last).predicate(predicate)
         return lazyFromOperator(this, async function last(input) {
             let last: T | Alt = alt as Alt
@@ -637,13 +631,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         })
     }
-    after(action: ASeq.NoInputAction): ASeq<T> {
-        chk(this.after).action(action)
-        return ASeqOperator(this, async function* after(input) {
-            yield* input
-            await pull(action())
-        })
-    }
+
     share(): ASeq<T> {
         const iter = doddle(() => _aiter(this))
         let err: Error | undefined = undefined
