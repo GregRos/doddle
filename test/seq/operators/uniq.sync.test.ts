@@ -5,27 +5,27 @@ import { seq } from "@lib"
 const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("returns seq of same type", expect => {
-    const s = _seq([1, 2, 3]).uniqBy()
+    const s = _seq([1, 2, 3]).uniq()
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
 it("returns empty on empty", () => {
-    const s = _seq([]).uniqBy()
+    const s = _seq([]).uniq()
     expect(s._qr).toEqual([])
 })
 
 it("returns singleton on singleton", () => {
-    const s = _seq([1]).uniqBy()
+    const s = _seq([1]).uniq()
     expect(s._qr).toEqual([1])
 })
 
 it("removes duplicates", () => {
-    const s = _seq([1, 2, 1, 2]).uniqBy()
+    const s = _seq([1, 2, 1, 2]).uniq()
     expect(s._qr).toEqual([1, 2])
 })
 
 it("removes duplicates with weird elements, also maintains order", () => {
-    const s = _seq([1, NaN, -0, undefined, undefined, 0, null, 1, undefined]).uniqBy()
+    const s = _seq([1, NaN, -0, undefined, undefined, 0, null, 1, undefined]).uniq()
     expect(s._qr).toEqual([1, NaN, -0, undefined, null])
 })
 
@@ -34,7 +34,7 @@ it("no side-effects before pull", () => {
         yield 1
     })
     const input = _seq(fn)
-    const result = input.uniqBy()
+    const result = input.uniq()
     expect(fn).not.toHaveBeenCalled()
     for (const _ of result) {
     }
@@ -51,7 +51,7 @@ it("pulls as many as needed", () => {
         yield 3
     })
     const map = jest.fn(x => x)
-    const tkw = _seq(sq).map(map).uniqBy()
+    const tkw = _seq(sq).map(map).uniq()
     let i = 0
     expect(sq).not.toHaveBeenCalled()
     for (const _ of tkw) {

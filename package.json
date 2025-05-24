@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.0.0-beta.16",
+  "version": "5.0.0-beta.20",
   "description": "The easiest way to handle iterables.",
   "keywords": [
     "iteration",
@@ -37,10 +37,6 @@
       "import": {
         "types": "./dist/esm/index.d.ts",
         "default": "./dist/esm/index.js"
-      },
-      "node": {
-        "types": "./dist/cjs/index.d.ts",
-        "default": "./dist/cjs/index.js"
       }
     }
   },

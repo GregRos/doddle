@@ -78,6 +78,12 @@ const wBe = "be"
 const wCalledWith = "called with"
 const wArguments = "arguments"
 const wDoddle = "doddle"
+const wString = "string"
+const wError = "error"
+const wT = "true"
+const wF = "false"
+const wArray = "array"
+const wInf = "Infinity"
 const getButGot = (value: any) => {
     return [wButGot, getValueDesc(value)]
 }
@@ -110,23 +116,18 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
     }
 }
 const expectInt = expectation(`a ${wInteger}`, isInt)
-const expectString = expectation("a string", x => typeof x === "string")
+const expectString = expectation(`a ${wString}`, x => typeof x === wString)
 const expectIntOrInfinity = expectation(
-    `an ${wInteger} or Infinity`,
+    `an ${wInteger} or ${wInf}`,
     x => isInt(x) || x === Infinity
 )
-const expectObject = expectation("an object", x => x !== null && typeof x === "object")
-const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or Infinity`, isNatOrInfinity)
+const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or ${wInf}`, isNatOrInfinity)
 const expectPosInt = expectation(`a positive ${wInteger}`, isPosInt)
-const expectOutType = expectation(
-    `'item', 'array', 'seq', or undefined`,
-    x => x === "item" || x === "array" || x === "seq" || x === undefined
-)
 
-const expectBool = expectation("true or false", isBool)
-const expectError = expectation("an error", isError)
+const expectBool = expectation(`${wT} or ${wF}`, isBool)
+const expectError = expectation(`an ${wError}`, isError)
 const expectFunc = expectation(`a ${wFunction}`, isFunction)
-const expectPair = expectation("an array of length 2", isPair)
+const expectPair = expectation(`an ${wArray} of length 2`, isPair)
 
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
@@ -190,23 +191,9 @@ export const forOperator = (operator: string) => {
     function getArgSubject(name: string) {
         return getSubject(getArgThing(name), context, wBe)
     }
-    function getPropSubject(argName: string, propName: string) {
-        return getSubject(
-            ["property", `'${propName}'`],
-            [wArgument, `'${argName}`, "to", ...context],
-            wBe
-        )
-    }
+
     function checkValue<K extends string>(name: K, exp: Expectation) {
         return [name, exp(getArgSubject(name))] as const
-    }
-    function checkPropValue<K extends string>(arg: K, exp: Expectation) {
-        return [
-            arg,
-            (prop: string, x: any) => {
-                return exp(getPropSubject(arg, prop))(x)
-            }
-        ] as const
     }
 
     function checkFuncReturn<K extends string>(name: K, exp: Expectation) {
@@ -224,36 +211,20 @@ export const forOperator = (operator: string) => {
         checkValue("action", expectFunc),
         checkValue("handler", expectFunc),
         checkValue("separator", expectString),
-        checkValue("outType", expectOutType),
         checkValue("reverse", expectBool),
         checkValue("reducer", expectFunc),
         checkValue("stage", expectStage),
         checkValue("skipCount", expectPosInt),
         checkValue("keyProjection", expectFunc),
-        checkValue("propertyPath", expectString),
-        checkValue("cases", expectObject),
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
         checkFuncReturn("thrower", expectError),
         checkValue("ms", expectInt)
     ] as const
-    type SimpleEntries = typeof simpleEntries
-    type SimpleCheckersObject = {
-        [K in keyof SimpleEntries & number as SimpleEntries[K][0]]: <T>(input: T) => T
+
+    return Object.fromEntries(simpleEntries) as {
+        [X in (typeof simpleEntries)[number] as X[0]]: X[1]
     }
-    const propEntries = [
-        checkPropValue("cases_key", expectString),
-        checkPropValue("cases_value", expectFunc)
-    ] as const
-    type PropEntries = typeof propEntries
-    type PropertyCheckersObject = {
-        [K in keyof PropEntries & number as PropEntries[K][0]]: <T>(
-            prop: PropertyKey,
-            value: T
-        ) => T
-    }
-    return Object.fromEntries([...simpleEntries, ...propEntries]) as SimpleCheckersObject &
-        PropertyCheckersObject
 }
 
 export type OperatorMessages = ReturnType<typeof forOperator>
@@ -302,7 +273,7 @@ export type Text = TextLeaf | _Text<_Text<_Text<_Text<_Text<string>>>>>
 
 const __checkers = "__checkers"
 
-const LOADED = Symbol("CHECKERS_LOADED")
+const LOADED = Symbol(__checkers)
 export function loadCheckers<X>(t: X) {
     const target = t as any
     if (target[LOADED]) {
@@ -317,7 +288,10 @@ export function loadCheckers<X>(t: X) {
                 value: forOperator(`${getClassName(target)}.${v.name}`)
             })
         })
-    target[LOADED] = true
+    Object.defineProperty(target, LOADED, {
+        enumerable: false,
+        value: true
+    })
     return t!
 }
 

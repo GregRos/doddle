@@ -1,7 +1,9 @@
-import { DoddleError, type Text } from "./errors/error.js"
+import { type Text } from "./errors/error.js"
 import { pull, type Doddle, type DoddleAsync } from "./lazy/index.js"
-import type { Get_Value_At_Path, Split_Dotted_Path } from "./property-paths.js"
 import type { DoddleReadableStream } from "./readable-stream-polyfill.js"
+
+const wFunction = "function"
+
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
     return input[Symbol.iterator]()
 }
@@ -19,7 +21,7 @@ export function isObject<T>(value: T): value is T & {} {
 }
 
 export function isFunction(value: any): boolean {
-    return typeof value === "function"
+    return typeof value === wFunction
 }
 
 export function isArrayLike<T>(value: any): value is ArrayLike<T> {
@@ -157,7 +159,7 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
 }
 
 export function isDoddle<T>(value: any): value is Doddle<T> {
-    return isObject(value) && typeof value.pull === "function" && typeof value.map === "function"
+    return isObject(value) && isFunction(value.pull) && isFunction(value.map)
 }
 
 export const isArray = Array.isArray
@@ -230,58 +232,4 @@ export function setClassName(cls: any, name: string) {
     Object.defineProperty(cls, "name", {
         value: name
     })
-}
-export function splatPath(path: PropertyKey | PropertyKey[]): string {
-    return (Array.isArray(path) ? path : [path]).join(".")
-}
-
-const throwWhileLookingUp = (input: object, path: PropertyKey | PropertyKey[]) => {
-    return (subject: Text, value: any, notWhat: Text) => {
-        throw new DoddleError([
-            "While looking up",
-            `'${splatPath(path)}'`,
-            "in",
-            getObjDesc(input),
-            subject,
-            "was",
-            getValueDesc(value),
-            "not",
-            notWhat
-        ])
-    }
-}
-
-export function getValueAtPath<T extends object, Path extends string>(
-    obj: T,
-    path: Path
-): Get_Value_At_Path<T, Split_Dotted_Path<Path>>
-export function getValueAtPath<T extends object, Path extends PropertyKey[]>(
-    obj: T,
-    path: Path
-): Get_Value_At_Path<T, Path>
-export function getValueAtPath(input: object, path: PropertyKey | PropertyKey[]) {
-    if (isString(path)) {
-        if (path === "") {
-            return input
-        }
-        return getValueAtPath(input, path.split("."))
-    } else if (isPropertyKey(path)) {
-        path = [path]
-    } else if (!isArray(path)) {
-        throw new DoddleError(["Invalid path", path])
-    }
-    const thrower = throwWhileLookingUp(input, path)
-    const curPath = []
-    let result: any = input
-    for (const key of path) {
-        if (!isObject(result)) {
-            thrower("value at", curPath, "an object")
-        }
-        if (!isPropertyKey(key)) {
-            thrower(`element #${curPath.length}`, key, "a property key")
-        }
-        curPath.push(key)
-        result = result[key]
-    }
-    return result
 }

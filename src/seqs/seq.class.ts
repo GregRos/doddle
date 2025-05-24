@@ -1,16 +1,9 @@
 import { chk, DoddleError, loadCheckers } from "../errors/error.js"
 import type { Doddle } from "../lazy/index.js"
 import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
-import type {
-    Get_All_Dotted_Paths_Of,
-    Get_Match_Object_Structure,
-    Get_Value_At_Dotted_Path,
-    Split_Dotted_Path
-} from "../property-paths.js"
 import {
     _iter,
     createCompareKey,
-    getValueAtPath,
     parseStage,
     returnKvp,
     setClassName,
@@ -29,7 +22,8 @@ import {
     type TakeWhileOptions
 } from "./common-types.js"
 import { ___seq } from "./seq.ctor.js"
-
+const SPECIAL = Symbol("S")
+const SPECIAL2 = Symbol("S2")
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
     constructor() {
@@ -38,9 +32,7 @@ export abstract class Seq<T> implements Iterable<T> {
         setClassName(Seq, "Seq")
         loadCheckers(Seq.prototype)
     }
-    get [Symbol.toStringTag]() {
-        return "Seq"
-    }
+
     get _qr() {
         return this.toArray().pull()
     }
@@ -212,9 +204,10 @@ export abstract class Seq<T> implements Iterable<T> {
         size: L,
         projection?: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
     ): Seq<S> {
-        chk(this.chunk).size(size)
+        const c = chk(this.chunk)
+        c.size(size)
         projection ??= (...chunk: any) => chunk as any
-        chk(this.chunk).projection(projection)
+        c.projection(projection)
 
         return SeqOperator(this, function* chunk(input) {
             let chunk: T[] = []
@@ -286,8 +279,9 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence that invokes the handler as each element is iterated over.
      */
     each(action: Seq.StageIteratee<T, void>, stage: EachCallStage | undefined = "before") {
-        chk(this.each).action(action)
-        chk(this.each).stage(stage)
+        const c = chk(this.each)
+        c.action(action)
+        c.stage(stage)
         const myStage = parseStage(stage)
         return SeqOperator(this, function* each(input) {
             let index = 0
@@ -465,51 +459,6 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-    /**
-     * Collects the elements of `this` into an array, yielding them all as a single element.
-     *
-     * @param array The string `"array"`.
-     * @returns A new sequence with a single array element.
-     */
-    collect(array: "array"): Seq<T[]>
-    collect(outType: "item"): Seq<T>
-
-    /**
-     * Collects the elements of `this` into a sequence, yielding them all as a single element.
-     *
-     * @param seq The string `"seq"`.
-     * @returns A new sequence with a single sequence element.
-     */
-    collect(seq: "seq"): Seq<Seq<T>>
-    /**
-     * Collects the elements of `this`, caching them before yielding the first element, and then
-     * yields them one by one.
-     *
-     * @returns A new sequence with the same elements as this one, but where iteration has already
-     *   completed.
-     */
-    collect(): Seq<T>
-    collect(outType?: string): any {
-        chk(this.collect).outType(outType)
-        outType ??= "item"
-        return SeqOperator(this, function* collect(input) {
-            const everything = []
-            for (const element of input) {
-                everything.push(element)
-            }
-            if (outType === "array") {
-                yield everything
-            } else if (outType === "item") {
-                for (const item of everything) {
-                    yield item
-                }
-            } else if (outType === "seq") {
-                yield ___seq(everything)
-            } else {
-                throw new DoddleError(`Invalid outType ${outType}`)
-            }
-        })
-    }
 
     /**
      * 🦥**Lazily** checks if `this` sequence includes one or more values by iterating over it.
@@ -552,7 +501,7 @@ export abstract class Seq<T> implements Iterable<T> {
         predicate = chk(this.count).predicate(predicate)
         return lazyFromOperator(this, function count(input) {
             return input
-                .filter(predicate)
+                .filter(predicate as any)
                 .reduce(acc => acc + 1, 0)
                 .pull()
         })
@@ -611,7 +560,6 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param alt The value to return if the sequence is empty. Defaults to `undefined`.
      */
     maxBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
-        const EMPTY = Symbol("EMPTY_SEQ")
         // ! POLYMORPHIC !
         chk(this.maxBy).projection(projection)
         return lazyFromOperator(this, function maxBy(input) {
@@ -621,8 +569,8 @@ export abstract class Seq<T> implements Iterable<T> {
                 })
                 .reduce((max: any, value: any) => {
                     return max.key >= value.key ? max : value
-                }, EMPTY as any)
-                .map(x => (x === EMPTY ? alt : x.value))
+                }, SPECIAL2 as any)
+                .map(x => (x === SPECIAL2 ? alt : x.value))
                 .pull()
         })
     }
@@ -634,7 +582,6 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param alt The value to return if the sequence is empty. Defaults to `undefined`.
      */
     minBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
-        const EMPTY = Symbol("EMPTY_SEQ")
         // ! POLYMORPHIC !
         chk(this.minBy).projection(projection)
         return lazyFromOperator(this, function minBy(input) {
@@ -644,8 +591,8 @@ export abstract class Seq<T> implements Iterable<T> {
                 })
                 .reduce((min: any, value: any) => {
                     return min.key <= value.key ? min : value
-                }, EMPTY as any)
-                .map(x => (x === EMPTY ? alt : x.value))
+                }, SPECIAL2 as any)
+                .map(x => (x === SPECIAL2 ? alt : x.value))
                 .pull()
         })
     }
@@ -700,17 +647,16 @@ export abstract class Seq<T> implements Iterable<T> {
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial: Acc): Doddle<Acc>
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial?: Acc): Doddle<any> {
         // ! POLYMORPHIC !
-        const NO_INITIAL = Symbol("NO_INITIAL")
         chk(this.reduce).reducer(reducer)
         return lazyFromOperator(this, function reduce(input) {
             return input
                 .scan(reducer, initial!)
-                .last(() => true, NO_INITIAL)
+                .last(() => true, SPECIAL)
                 .map(x => {
-                    if (x === NO_INITIAL) {
+                    if (x === SPECIAL) {
                         throw new DoddleError("Cannot reduce empty sequence with no initial value")
                     }
-                    return x
+                    return x as any
                 })
                 .pull()
         }) as any
@@ -776,7 +722,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param projection The projection function that determines the key for comparison.
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
      */
-    seqEqualsBy<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    seqEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
     /**
      * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
      * sequential input, by iterating over both.
@@ -786,7 +732,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
      *   otherwise.
      */
-    seqEqualsBy<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
+    seqEquals<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
     /**
      * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
      * sequential input, by iterating over both.
@@ -798,11 +744,11 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
      *   otherwise.
      */
-    seqEqualsBy<K, S = T>(
+    seqEquals<K, S = T>(
         _input: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
     ): Doddle<boolean>
-    seqEqualsBy<K, S = T>(
+    seqEquals<K, S = T>(
         _input: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
     ): Doddle<boolean> {
@@ -835,7 +781,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
      *   `false` otherwise.
      */
-    setEqualsBy<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
+    setEquals<T extends S, S>(this: Seq<T>, _other: Seq.Input<S>): Doddle<boolean>
     /**
      * 🦥**Lazily** checks if `this` sequence contains the same elements as the input sequence,
      * without regard to order.
@@ -847,7 +793,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
      *   `false` otherwise.
      */
-    setEqualsBy<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
+    setEquals<S extends T>(_other: Seq.Input<S>): Doddle<boolean>
 
     /**
      * 🦥**Lazily** checks if `this` sequence contains the same elements as the input sequence,
@@ -860,11 +806,11 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to `true` if `this` is set-equal to the input, or
      *   `false` otherwise.
      */
-    setEqualsBy<K, S = T>(
+    setEquals<K, S = T>(
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K>
     ): Doddle<boolean>
-    setEqualsBy<K, S = T>(
+    setEquals<K, S = T>(
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
     ): Doddle<boolean> {
@@ -930,7 +876,6 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the skipped elements.
      */
     skip(count: number): Seq<T> {
-        const SKIP = Symbol("SKIP")
         chk(this.skip).count(count)
         return SeqOperator(this, function* skip(input) {
             let myCount = count
@@ -945,9 +890,9 @@ export abstract class Seq<T> implements Iterable<T> {
                         if (window.length === myCount + 1) {
                             return window[0]
                         }
-                        return SKIP
+                        return SPECIAL2
                     })
-                    .filter(x => x !== SKIP)
+                    .filter(x => x !== SPECIAL2)
             } else {
                 yield* ___seq(input).skipWhile((_, index) => index < myCount, {})
             }
@@ -964,12 +909,11 @@ export abstract class Seq<T> implements Iterable<T> {
     some(predicate: Seq.Predicate<T>): Doddle<boolean> {
         // ! POLYMORPHIC !
 
-        const NO_MATCH = Symbol("NO_MATCH")
         predicate = chk(this.some).predicate(predicate)
         return lazyFromOperator(this, function some(input) {
             return input
-                .first(predicate, NO_MATCH)
-                .map(x => x !== NO_MATCH)
+                .first(predicate, SPECIAL2)
+                .map(x => x !== SPECIAL2)
                 .pull()
         })
     }
@@ -1023,8 +967,6 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the yielded elements.
      */
     take(count: number): Seq<T> {
-        const END_MARKER = Symbol("DUMMY")
-
         chk(this.take).count(count)
         return SeqOperator(this, function* take(input) {
             let myCount = count
@@ -1035,9 +977,9 @@ export abstract class Seq<T> implements Iterable<T> {
             if (myCount < 0) {
                 myCount = -myCount
                 const results = ___seq(input)
-                    .concat([END_MARKER])
+                    .concat([SPECIAL2])
                     .window(myCount + 1, (...window) => {
-                        if (window[window.length - 1] === END_MARKER) {
+                        if (window[window.length - 1] === SPECIAL2) {
                             window.pop()
                             return window as T[]
                         }
@@ -1055,6 +997,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
+
     /**
      * 🦥**Lazily** converts `this` sequence into an array, iterating over it to collect all the
      * elements.
@@ -1064,25 +1007,6 @@ export abstract class Seq<T> implements Iterable<T> {
     toArray() {
         return lazyFromOperator(this, function toArray(input) {
             return [...input]
-        })
-    }
-
-    /**
-     * 🦥**Lazily** converts `this` sequence into a {@link Map}, iterating over it and applying the
-     * given key projection to each element to determine its key.
-     *
-     * @param projection The projection function to apply to each element to determine its key.
-     * @returns A 🦥{@link Doddle} that resolves to a {@link Map} of the elements in the sequence.
-     */
-    toMapBy<K>(projection: Seq.Iteratee<T, K>) {
-        // ! POLYMORPHIC !
-
-        projection = chk(this.toMapBy).projection(projection)
-
-        return lazyFromOperator(this, function toMapBy(input) {
-            return input
-                .toMap((x, i) => doddle(() => projection(x, i)).map(k => [k, x] as const))
-                .pull()
         })
     }
 
@@ -1110,19 +1034,8 @@ export abstract class Seq<T> implements Iterable<T> {
         return this as any as Seq<S>
     }
 
-    toRecordBy<K extends PropertyKey>(projection: Seq.Iteratee<T, K>): Doddle<Record<K, T>> {
-        // ! POLYMORPHIC !
-        projection = chk(this.toRecordBy).projection(projection)
-        return lazyFromOperator(this, function toRecordBy(input) {
-            return input
-                .toRecord((x, i) => doddle(() => projection(x, i)).map(k => [k as K, x] as const))
-                .pull()
-        })
-    }
-
     toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
         // ! POLYMORPHIC !
-
         kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
         return lazyFromOperator(this, function toMap(input) {
             return input
@@ -1137,9 +1050,9 @@ export abstract class Seq<T> implements Iterable<T> {
             return new Set(input)
         })
     }
-    uniqBy(projection: Seq.NoIndexIteratee<T, any> = x => x): Seq<T> {
-        chk(this.uniqBy).projection(projection)
-        return SeqOperator(this, function* uniqBy(input) {
+    uniq(projection: Seq.NoIndexIteratee<T, any> = x => x): Seq<T> {
+        chk(this.uniq).projection(projection)
+        return SeqOperator(this, function* uniq(input) {
             const seen = new Set()
             for (const element of input) {
                 const key = pull(projection(element))
@@ -1160,9 +1073,10 @@ export abstract class Seq<T> implements Iterable<T> {
         size: L,
         projection?: (...window: getWindowArgsType<T, L>) => S
     ): Seq<any> {
-        chk(this.window).size(size)
+        const c = chk(this.window)
+        c.size(size)
         projection ??= (...window: any) => window as any
-        chk(this.window).projection(projection)
+        c.projection(projection)
         return SeqOperator(this, function* window(input) {
             const buffer = Array<T>(size)
             let i = 0
@@ -1261,24 +1175,4 @@ export namespace Seq {
     export type Input<E> = MaybeDoddle<ObjectIterable<E>> | FunctionInput<E>
     export type ElementOfInput<T> = T extends Input<infer E> ? E : never
     export type Group<K, V> = readonly [K, Seq<V>]
-
-    export type PropKeyIteratee<E, K extends PropertyKey> = Iteratee<E, K>
-
-    export type PropValueIteratee<MatchStruct, K extends keyof MatchStruct> = (
-        element: MatchStruct[K],
-        key: K,
-        index: number
-    ) => MaybeDoddle<unknown>
-
-    export type DefaultCaseIteratee<MatchStruct> = (
-        element: MatchStruct[keyof MatchStruct],
-        key: keyof MatchStruct,
-        index: number
-    ) => MaybeDoddle<unknown>
-
-    export type $_MatchKeyMapping<MatchStruct> = {
-        [K in keyof MatchStruct]: PropValueIteratee<MatchStruct, K>
-    } & {
-        __default__?: DefaultCaseIteratee<MatchStruct>
-    }
 }

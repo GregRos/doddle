@@ -5,55 +5,55 @@ import { aseq, doddle } from "@lib"
 const _aseq = aseq
 type _ASeq<T> = ASeq<T>
 declare.it("should type as Doddle<T>", expect => {
-    expect(type_of(_aseq([1, 2, 3]).uniqBy(() => 1))).to_equal(type<_ASeq<number>>)
+    expect(type_of(_aseq([1, 2, 3]).uniq(() => 1))).to_equal(type<_ASeq<number>>)
 })
 declare.it("should not accept iteratee with 2 arguments", expect => {
     // @ts-expect-error
-    _aseq([1, 2, 3]).uniqBy((x, _) => x)
+    _aseq([1, 2, 3]).uniq((x, _) => x)
 })
 
 declare.it("allows doddle iteratee", expect => {
-    const s = _aseq([1, 2, 3]).uniqBy(() => doddle(() => true))
+    const s = _aseq([1, 2, 3]).uniq(() => doddle(() => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
 declare.it("allows doddle async iteratee", expect => {
-    const s = _aseq([1, 2, 3]).uniqBy(() => doddle(async () => true))
+    const s = _aseq([1, 2, 3]).uniq(() => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
 declare.it("allows async doddle async iteratee", expect => {
-    const s = _aseq([1, 2, 3]).uniqBy(async () => doddle(async () => true))
+    const s = _aseq([1, 2, 3]).uniq(async () => doddle(async () => true))
     expect(type_of(s)).to_equal(type<_ASeq<number>>)
 })
 
 it("allows doddle iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(() => 1)
+    const s = _aseq([1, 2, 3]).uniq(() => 1)
     expect(await s._qr).toEqual([1])
 })
 
 it("allows doddle async iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(() => 1)
+    const s = _aseq([1, 2, 3]).uniq(() => 1)
     expect(await s._qr).toEqual([1])
 })
 
 it("returns empty on empty", async () => {
-    const s = _aseq([]).uniqBy(() => 1)
+    const s = _aseq([]).uniq(() => 1)
     expect(await s._qr).toEqual([])
 })
 
 it("returns singleton on singleton", async () => {
-    const s = _aseq([1]).uniqBy(() => 1)
+    const s = _aseq([1]).uniq(() => 1)
     expect(await s._qr).toEqual([1])
 })
 
 it("removes duplicates", async () => {
-    const s = _aseq([1, 2, 1, 2]).uniqBy(() => 1)
+    const s = _aseq([1, 2, 1, 2]).uniq(() => 1)
     expect(await s._qr).toEqual([1])
 })
 
 it("removes duplicates with weird elements, also maintains order", async () => {
-    const s = _aseq([1, NaN, -0, undefined, undefined, 0, null, 1, undefined]).uniqBy(x => x)
+    const s = _aseq([1, NaN, -0, undefined, undefined, 0, null, 1, undefined]).uniq(x => x)
     expect(await s._qr).toEqual([1, NaN, -0, undefined, null])
 })
 
@@ -62,7 +62,7 @@ it("does not provide index", async () => {
         expect(i).toBeUndefined()
         return x
     }) as any
-    const s = _aseq([1, 2, 3]).uniqBy(map)
+    const s = _aseq([1, 2, 3]).uniq(map)
     for await (const _ of s) {
     }
 })
@@ -72,7 +72,7 @@ it("no side-effects before pull", async () => {
         yield 1
     })
     const input = _aseq(fn)
-    const result = input.uniqBy(() => 1)
+    const result = input.uniq(() => 1)
     expect(fn).not.toHaveBeenCalled()
     for await (const _ of result) {
     }
@@ -89,7 +89,7 @@ it("pulls, calls iteratee as many as needed", async () => {
         yield 3
     })
     const map = jest.fn(x => x)
-    const tkw = _aseq(sq).uniqBy(map)
+    const tkw = _aseq(sq).uniq(map)
     let i = 0
     expect(sq).not.toHaveBeenCalled()
     for await (const _ of tkw) {
@@ -107,26 +107,26 @@ it("pulls, calls iteratee as many as needed", async () => {
 })
 
 it("works for async iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(async x => x)
+    const s = _aseq([1, 2, 3]).uniq(async x => x)
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
 it("works for doddle iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(x => doddle(() => x))
+    const s = _aseq([1, 2, 3]).uniq(x => doddle(() => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
 it("works for async doddle iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(async x => doddle(() => x))
+    const s = _aseq([1, 2, 3]).uniq(async x => doddle(() => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
 it("works for async doddle async iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(async x => doddle(async () => x))
+    const s = _aseq([1, 2, 3]).uniq(async x => doddle(async () => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })
 
 it("works for doddle async iteratee", async () => {
-    const s = _aseq([1, 2, 3]).uniqBy(x => doddle(async () => x))
+    const s = _aseq([1, 2, 3]).uniq(x => doddle(async () => x))
     expect(await s._qr).toEqual([1, 2, 3])
 })

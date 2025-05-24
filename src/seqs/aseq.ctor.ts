@@ -11,7 +11,6 @@ import {
     type MaybePromise
 } from "../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
-import { DoddleReadableStreamIterator } from "./readable-stream-aiter.js"
 
 function aseq<E>(input: readonly E[]): ASeq<E>
 function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
@@ -33,8 +32,6 @@ function aseq<E>(input: ASeq.Input<E>): any {
                     }
                 }
                 return
-            } else if (isReadableStream(pulled)) {
-                iterator = new DoddleReadableStreamIterator(pulled, false)
             } else if (isNextable(pulled)) {
                 iterator = pulled
             } else {
