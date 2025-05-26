@@ -76,3 +76,4 @@ jspm_packages
 **/.obsidian/workspace.json
 .eslintcache
 .buildinfo
+typedoc/

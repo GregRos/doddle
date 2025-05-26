@@ -1155,24 +1155,110 @@ export const SeqOperator = function seq<In, Out>(
     return myAbstractSeq
 }
 
+/**
+ * Types associated with the {@link Seq} class.
+ */
 export namespace Seq {
-    type MaybeDoddle<T> = T | Doddle<T>
+    /**
+     * A type that can be either a value or a {@link Doddle} of that value.
+     */
+    type MaybeDoddle<Value> = Value | Doddle<Value>
 
-    export type IndexIteratee<O> = (index: number) => MaybeDoddle<O>
+    /**
+     * An iteratee that receives consecutive indexes, not elements. Used for generating sequences.
+     * @template Out The element type of the sequence.
+     */
+    export type IndexIteratee<Out> = (index: number) => MaybeDoddle<Out>
 
-    export type NoInputAction = () => unknown | Doddle<unknown>
-    export type Iteratee<E, O> = (element: E, index: number) => MaybeDoddle<O>
+    /**
+     * An iteratee that projects sequence elements individually.
+     * @template In The input element type.
+     * @template Out The output element type.
+     */
+    export type Iteratee<In, Out> = (element: In, index: number) => MaybeDoddle<Out>
 
-    export type NoIndexIteratee<E, O> = (element: E) => MaybeDoddle<O>
-    export type StageIteratee<E, O> = (element: E, index: number, stage: "before" | "after") => O
-    export type Predicate<E> = Iteratee<E, boolean>
-    export type TypePredicate<E, T extends E> = (element: E, index: number) => element is T
+    /**
+     * An {@link Iteratee} that doesn't receive element indices. Used when operators should only use
+     * values, such as in key projections.
+     * @template In The input element type.
+     * @template Out The output element type.
+     */
+    export type NoIndexIteratee<In, Out> = (element: In) => MaybeDoddle<Out>
 
-    export type Reduction<E, O> = (acc: O, element: E, index: number) => MaybeDoddle<O>
-    export type FunctionInput<E> = () => MaybeDoddle<ObjectIterable<MaybeDoddle<E>>>
+    /**
+     * An {@link Iteratee} that receives a stage indicator, which can be `"before"` or `"after"`.
+     *
+     * @template In The input element type.
+     * @template Out The output element type.
+     */
+    export type StageIteratee<In, Out> = (
+        element: In,
+        index: number,
+        stage: "before" | "after"
+    ) => Out
 
-    export type ObjectIterable<E> = object & (Iterable<E> | Iterator<E> | ArrayLike<E>)
-    export type Input<E> = MaybeDoddle<ObjectIterable<E>> | FunctionInput<E>
-    export type ElementOfInput<T> = T extends Input<infer E> ? E : never
-    export type Group<K, V> = readonly [K, Seq<V>]
+    /**
+     * A predicate {@link Iteratee} that always returns a boolean value, used for filtering.
+     * @template In The input element type.
+     */
+    export type Predicate<In> = Iteratee<In, boolean>
+    /**
+     * A type predicate {@link Iteratee}. When filtering, narrows the element type.
+     * @template In The input element type.
+     * @template Narrowed The narrowed element type.
+     */
+    export type TypePredicate<In, Narrowed extends In> = (
+        element: In,
+        index: number
+    ) => element is Narrowed
+
+    /**
+     * A reduction. Takes an accumulator, element, and index. Returns the accumulator value for
+     * the next iteration.
+     * @template In The element type of the sequence.
+     * @template Result The result of the reduction.
+     */
+    export type Reduction<In, Result> = (
+        acc: Result,
+        element: In,
+        index: number
+    ) => MaybeDoddle<Result>
+
+    /**
+     * A function that takes no arguments and returns an Iterable, Iterator, or ArrayLike.
+     *
+     * Converted into a {@link Seq}.
+     *
+     * @template Item The element type of the resulting iterable.
+     */
+    export type FunctionInput<Item> = () => MaybeDoddle<ObjectIterable<MaybeDoddle<Item>>>
+
+    /**
+     * An Iterable, Iterator, or ArrayLike but **not** a `string`.
+     *
+     * Converted into a {@link Seq}.
+     *
+     * @template Item The element type of the iterable.
+     */
+    export type ObjectIterable<Item> = object & (Iterable<Item> | Iterator<Item> | ArrayLike<Item>)
+
+    /**
+     * The type of a sequence-like input, with elements of type `Out`.
+     *
+     * Converted into a {@link Seq}.
+     * @template Item The element type of the input.
+     */
+    export type Input<Item> = MaybeDoddle<ObjectIterable<Item>> | FunctionInput<Item>
+
+    /**
+     * Infers the element type of a sequence-like input.
+     * @template SeqLike The sequence-like input type.
+     */
+    export type ElementOfInput<SeqLike> = SeqLike extends Input<infer Element> ? Element : never
+    /**
+     * A grouping of elements by a key, where `K` is the key type and `V` is the value type.
+     * @template Key The key type.
+     * @template Val The value type.
+     */
+    export type Group<Key, Val> = readonly [Key, Seq<Val>]
 }

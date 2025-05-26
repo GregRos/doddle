@@ -88,6 +88,20 @@ In addition, all operators are **Lazy**. The return one of two things:
 
 This separates _defining a computation_ from _executing it_. It also means that many operators work just fine with infinite inputs.
 
+### ⚠️ string inputs
+
+A pretty common bug happens when a string gets passed where a collection is expected. This usually doesn't cause an error,
+and instead you get `s,t,u,f,f, ,l,i,k,e, ,t,h,i,s`.
+
+Doddle doesn't do this. Both its type declarations and runtime logic _exclude string inputs_.
+
+If you want this behavior, convert the string into an array first. One of these should work:
+
+```ts
+seq("hello world".split(""))
+seq([..."abc"])
+```
+
 # ASeq
 
 This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects. You create one using the `aseq` constructor function.

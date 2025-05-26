@@ -1,0 +1,7 @@
+{
+  "plugin": ["typedoc-material-theme"],
+  "entryPoints": ["src/index.ts"],
+  "out": "./typedoc",
+  "theme": "default",
+  "themeColor": "#210A4B"
+}
