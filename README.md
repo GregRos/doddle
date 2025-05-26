@@ -11,7 +11,7 @@ Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, i
 
 -   🧰 Packed with operators from the best APIs in software.
 
--   📜 Comprehensive error reporting, with clear and detailed error messages.
+-   📜 Clear and detailed error messages.
 
 -   🔍 Built for debuggability, with _readable_ stack traces and _navigable_ source code.
 
