@@ -5,137 +5,156 @@
 [![Doddle Coveralls](https://img.shields.io/coverallsCoverage/github/GregRos/doddle?style=for-the-badge)](https://coveralls.io/github/GregRos/doddle?branch=master)
 [![Doddle minified size(gzip)](<https://img.shields.io/bundlejs/size/doddle?exports=aseq&style=for-the-badge&label=minified%20size%20(gzip)>)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Caseq%7D%5D)
 
-Doddle is a tiny and powerful library for _lazy computation_. It's inspired by `lodash`, `rxjs`, and .NET's `LINQ`.
+Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, inspired by _lodash_, _LINQ_, and _rxjs_.
 
-# Sync and async
+-   🤏 Obsessively optimized for bundle size.
 
-**Complete support for async iterables.**
+-   🧰 Packed with functionality, including operators from the best APIs in software.
 
-Doddle provides two wrapper types --
+-   📜 Comprehensive error reporting, with clear and detailed error messages.
 
--   **`Seq`** --- Manipulates sync iterables, created using the `seq` factory function.
--   **`ASeq`** --- Manipulates async iterables, created using the `aseq` factory function.
+-   🔍 Built for debuggability, with _readable_ stack traces and _navigable_ source code.
 
-While they're different types, they provide a nearly identical API, with the same set of operators, just different return types.
+-   🧪 With over 1000 test cases, ensuring the consistency of both runtime code and type declarations.
 
-## Seq
+Get it now:
 
-```ts
-const pairsSync = seq([1, 2, 3, 4])
-    .map(x => x + 1)
-    .chunk(2)
-
-for (const [a, b] of pairsSync) {
-    console.log(`${a}, ${b}`)
-}
+```bash
+yarn add doddle
 ```
 
-You first convert an existing iterable to a `Seq` using the `seq` factory function. This gives you access to a host of powerful and comprehensively tested operators, implemented as convenient instance methods.
+# Doddle
 
-**All operators are lazy** -- which means they have to be evaluated explicitly. This usually means iterating over the `Seq`.
+The library’s flagship lazy primitive. Commonly used throughout the API, but designed to be as convenient as possible.
 
-The `seq` factory function accepts a range of other inputs besides iterables. You can give it iterators, generator functions, and just functions that return collections.
+Represents a computation that may not have happened yet. To make it produce a value you call its `pull` method.
 
-```ts
-seq([1, 2, 3])
+[More Info...](https://github.com/GregRos/doddle/doddle.md)
 
-seq(function* () {
-    yield 1
-    yield 2
-    yield 3
-})
+# Seq
 
-seq(() => [1, 2, 3])
-```
+The `Seq` wrapper unifies synchronous iterables and generator functions. You create one using the `seq` constructor function.
 
-You can **construct** sequences using methods defined on the `seq` factory function itself.
-
-```ts
-seq.range(1, 10) // Gives the range 1 .. 10
-
-seq.of(1, 2, 3, 5) // Specify elements explicitly
-```
-
-## ASeq
-
-```ts
-const pairsAsync = aseq([1, 2, 3, 4])
-    .map(x => x + 1)
-    .chunk(2)
-
-for await (const [a, b] of pairsAsync) {
-    console.log(`${a}, ${b}`)
-}
-```
-
-This wrapper lets you manipulate async iterables just like sync ones. It supports the same set of methods, just with different return types!
-
-# Laziest of them all
-
-**Doddle is the laziest library.**
-
-Doddle doesn't provide any eager operations. Operators like `find` or `includes`, which normally iterate immediately, instead return Doddle's elegant lazy primitive, so invoking them doesn't do anything by itself.
-
-You have to `pull` the lazy primitive (which is also called a `Doddle`) to evaluate the operator, giving you explicit control over when iteration occurs.
-
-It's perfect for when iteration causes side-effects, such as dealing with binary streams, generator functions, and database query results.
-
-```ts
-import { seq, type Doddle } from "doddle"
-
-// This returns the Doddle lazy primitive:
-const mySeq: Doddle<number> = seq([1, 2, 3, 4]).includes(2)
-
-// This *pulls* the value out of it:
-console.log(mySeq.pull())
-```
-
-# Flexible inputs
-
-Doddle works with a wide variety of inputs, which it will carefully normalize
-
--   Iterable collections
--   Other iterables
--   Generator functions and functions returning
-
-# Instance methods
-
-Here is an example of using Doddle to manipulate an iterable.
+This function accepts lots of different inputs that can be interpreted as an Iterable. For example:
 
 ```ts
 import { seq } from "doddle"
-function* iterable() {
-    yield* [1, 2, 3, 4, 5, 6]
-}
-const it = seq(iterable)
-    .filter(x => x % 2 == 0)
-    .chunk(2)
 
-for (const [a, b] of it) {
-    console.log(`First is ${a} second is ${b}`)
-}
+// # Array
+const s1 = seq([1, 2, 3]) // {1, 2, 3}
+
+// # Generator function
+const s2 = seq(function* () {
+    yield 1
+    yield 2
+    yield 3
+}) // {1, 2}
+
+// # Array-like object
+const s3 = seq({
+    0: 1,
+    1: 1,
+    2: 3,
+    length: 3
+}) // {1, 2, 3}
 ```
 
-# Doddle is complete
+Wrapping something using `seq` has no side-effects.
 
-Doddle is a single **complete** package for manipulating sequences. You can't import specific operators like in `rxjs` or `lodash` -- they're all instance methods, more or less entirely contained in several big files.
+## Operators
 
-Doddle can get away with it by being ridiculously small. Tests have shown that making it tree-shakable on that level greatly increases bundle size.
+The `Seq` wrapper comes with a comprehensive set of operators. These operators all have the same traits:
 
-When you use doddle, you don't pick and choose the functionality you expect you need
+-   **Instance:** They’re instance methods, making them easier to use and discover.
+-   **Careful:** They never iterate more than you tell them to.
+-   **Flexible:** Accept flexible inputs, the same way as `seq`. They also interop seamlessly with the [[doddle]] lazy primitive.
+-   **Debuggable:** Produce legible stack traces; written in debug-friendly code.
 
-Doddle aims to be a complete package for manipulating sequences. You don't need to pick the specific functionality you need because the package is so small tree-shaking it on that level will just increase the bundle size.
+In addition, all operators are **Lazy**. The return one of two things:
 
-Doddle consists of three modules that are tree-shakeable
+-   Another Seq, which has to be iterated for anything to happen.
+-   A [[doddle|lazy primitive]], which must be _pulled_ explicitly to compute the operation.
 
-It also introduces a simple yet elegant lazy primitive, the `doddle`. It works for both
+This separates _defining a computation_ from _executing it_. It also means that many operators work just fine with infinite inputs.
 
-Doddle is a tiny but incredibly versatile library for working with collections and iterables, inspired by `LINQ`, `lodash`, `rxjs`, and other libraries. It also introduces its own simple yet elegant lazy primitive, which has many of the same qualities as a promise.
+# ASeq
 
-Doddle reproduces much of lodash's functionality for working with collections, but it's absolutely tiny. It offers its operators as instance methods because breaking them up into separate files has been shown to increase bundle size through overhead.
+This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects. You create one using the `aseq` constructor function.
 
-However, becuase it operates on iterables rather than on arrays directly, it will most likely be outperformed by other libraries.
+This function also accepts everything that `seq` accepts, plus async variations on those things. That includes:
 
-Doddle is extensively tested, with over 1000 individual test cases. It also has a suite of [compile-time tests](https://github.com/GregRos/declare-it) that check the logic of its type definitions.
+```ts
+import { aseq, seq } from "doddle"
 
-Doddle has been designed to be debuggable. It produces readable stack traces that mirror the code you write, and you can easily jump to, inspect, and place breakpoints in its source code.
+// An array
+aseq([1, 2, 3]) // {1, 2, 3}
+
+// Generator function
+aseq(function* () {
+    yield* [1, 2, 3]
+}) // {1, 2, 3}
+
+// Async generator function
+aseq(async function* () {
+    yield* [1, 2, 3]
+}) // {1, 2, 3}
+
+// Function returning an array
+aseq(() => [1, 2, 3])
+
+// Async function returning an array
+aseq(async () => [1, 2, 3])
+```
+
+## Operators
+
+**ASeq** wrapper comes with a carbon copy of all the operators defined on **Seq**, but tweaked for inputs that can be async.
+
+So, for example, `ASeq.map` accepts async functions, flattening them into the resulting async Iterable:
+
+```ts
+aseq([1, 2, 3]).map(async x => x + 1) // {2, 3, 4}
+```
+
+These operators have the same names and functionality, with the bonus of accepting async variations.
+
+## Non-concurrent
+
+ASeq will always await all promises before continuing the iteration. This means that something like this will wait 100ms before each element is yielded:
+
+```ts
+function sleep(t: number) {
+    return new Promise(resolve => setTimeout(resolve, t))
+}
+await aseq([1, 2, 3])
+    .map(async x => {
+        await sleep(100)
+        return x
+    })
+    .toArray()
+    .pull()
+```
+
+As opposed to something like this, which will wait only 100ms in total:
+
+```ts
+await Promise.all(
+    [1, 2, 3].map(async x => {
+        await sleep(100)
+        return x
+    })
+)
+```
+
+This is by design, since it has several advantages:
+
+-   Elements will never be yielded out of order.
+-   It doesn’t require a cache to keep concurrent promises.
+-   The logic of each operator is identical to its sync counterpart, enabling code reuse.
+-   It results in legible stack traces and debuggable code.
+
+It does mean that `aseq` can’t be used for concurrent processing, like sending a bunch of requests at the same time.
+
+That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that’s currently in the works.
+
+It will have similar operators, minus the ordering, and come with very different logic that probably won’t be as friendly.
