@@ -7,15 +7,19 @@
 
 Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, inspired by `lodash`, `LINQ`, and `rxjs`.
 
--   🤏 Tiny bundle size — without compromising user experience.
+-   🤏 **Miniscule** — Tiny bundle size — without compromising user experience.
 
--   🧰 Packed with operators from the best APIs in software.
+-   🧰 **Powerful** — Packed with operators from the best APIs in software.
 
--   📜 Clear and detailed error messages.
+-   🪞 **Flexible** — Perfect for both sync and async iterables.
 
--   🔍 Built for debuggability, with _readable_ stack traces and _navigable_ source code.
+-   📜 **Friendly** — Strong typing combined with clear and detailed error messages.
 
--   🧪 With over 1000 test cases, ensuring the consistency of both runtime code and type declarations.
+-   🔍 **Debuggable** — With _readable_ stack traces and _navigable_ source code.
+
+-   🧪 **Tested** — With over 1000 test cases, ensuring the consistency of both runtime code and type declarations.
+
+-   🛡️ **Immutable** — Works via _composition_, not _mutation_.
 
 Get it now:
 
@@ -40,7 +44,7 @@ const d = doddle(() => {
 d.pull() // 5
 ```
 
-[More Info...](https://github.com/GregRos/doddle/doddle.md)
+[See more](https://github.com/GregRos/doddle/doddle.md)
 
 # Seq
 
