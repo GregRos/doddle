@@ -11,7 +11,7 @@ Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, i
 
 -   🧰 **Powerful** — Packed with operators from the best APIs in software.
 
--   🪞 **Flexible** — Perfect for both sync and async iterables.
+-   🪞 **Consistent** — An elegant API shared between sync and async iterables.
 
 -   📜 **Friendly** — Strong typing combined with clear and detailed error messages.
 
@@ -85,10 +85,10 @@ The `Seq` wrapper comes with a comprehensive set of operators. These operators a
 -   **Flexible:** Accept flexible inputs, the same way as `seq`. They also interop seamlessly with the Doddle lazy primitive.
 -   **Debuggable:** Produce legible stack traces; written in debug-friendly code.
 
-In addition, all operators are **Lazy**. The return one of two things:
+They're also **Lazy**. That means they return one of two things:
 
--   Another Seq, which has to be iterated for anything to happen.
--   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which must be _pulled_ explicitly to compute the operation.
+-   Another Seq, which needs to be iterated for anything to happen.
+-   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
 
 This separates _defining a computation_ from _executing it_. It also means that many operators work just fine with infinite inputs.
 
@@ -110,12 +110,12 @@ seq([..."abc"])
 
 This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects. You create one using the `aseq` constructor function.
 
-This function also accepts everything that `seq` accepts, plus async variations on those things. That includes:
+This function accepts everything that `seq` accepts, plus async variations on those things. That includes:
 
 ```ts
 import { aseq, seq } from "doddle"
 
-// An array
+// Array
 aseq([1, 2, 3]) // {1, 2, 3}
 
 // Generator function
@@ -128,11 +128,11 @@ aseq(async function* () {
     yield* [1, 2, 3]
 }) // {1, 2, 3}
 
-// Function returning an array
-aseq(() => [1, 2, 3])
+// Iterable
+aseq(seq([1, 2, 3]))
 
-// Async function returning an array
-aseq(async () => [1, 2, 3])
+// Async iterable
+aseq(aseq([1, 2, 3]))
 ```
 
 ## Operators
@@ -145,7 +145,7 @@ So, for example, `ASeq.map` accepts async functions, flattening them into the re
 aseq([1, 2, 3]).map(async x => x + 1) // {2, 3, 4}
 ```
 
-These operators have the same names and functionality, with the bonus of accepting async variations.
+They're easy to navigate because the operators are named the same and have almost the same signatures.
 
 ## Non-concurrent
 
@@ -180,6 +180,8 @@ This is by design, since it has several advantages:
 -   Elements will never be yielded out of order.
 -   It doesn’t require a cache to keep concurrent promises.
 -   The logic of each operator is identical to its sync counterpart, enabling code reuse.
--   It results in legible stack traces and debuggable code.
+-   Legible stack traces and debuggable code.
 
-That does mean that `aseq` can’t be used for concurrent processing. That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that's currently in the works.
+That does mean that `aseq` can’t be used for concurrent processing in the same way as `rxjs`.
+
+That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that's currently in the works.
