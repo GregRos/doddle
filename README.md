@@ -7,9 +7,9 @@
 
 Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, inspired by `lodash`, `LINQ`, and `rxjs`.
 
--   🤏 Obsessively optimized for bundle size.
+-   🤏 Tiny bundle size — without compromising user experience.
 
--   🧰 Packed with functionality, including operators from the best APIs in software.
+-   🧰 Packed with operators from the best APIs in software.
 
 -   📜 Comprehensive error reporting, with clear and detailed error messages.
 
@@ -164,8 +164,4 @@ This is by design, since it has several advantages:
 -   The logic of each operator is identical to its sync counterpart, enabling code reuse.
 -   It results in legible stack traces and debuggable code.
 
-It does mean that `aseq` can’t be used for concurrent processing, like sending a bunch of requests at the same time.
-
-That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that’s currently in the works.
-
-It will have similar operators, minus the ordering, and come with very different logic that probably won’t be as friendly.
+That does mean that `aseq` can’t be used for concurrent processing. That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that's currently in the works.
