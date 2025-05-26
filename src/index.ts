@@ -1,4 +1,4 @@
-export { Doddle, DoddleAsync, doddle, pull } from "./lazy/index.js"
+export { Doddle, DoddleAsync, doddle, pull } from "./doddle/index.js"
 export { ASeq } from "./seqs/aseq.class.js"
 export { aseq } from "./seqs/aseq.js"
 export { Seq } from "./seqs/seq.class.js"

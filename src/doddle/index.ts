@@ -392,7 +392,7 @@ export type DoddleAsync<T> = Doddle<Promise<T>>
 export type _IterationType<T> = T extends string ? T : T extends Iterable<infer R> ? R : T
 export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T
 
-export function lazyFromOperator<In, Out>(
+export function lazyOperator<In, Out>(
     operand: In,
     func: (input: In) => Out | Doddle.Pulled<Out>
 ): Doddle<Out> {

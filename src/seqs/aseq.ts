@@ -1,5 +1,5 @@
+import { pull } from "../doddle/index.js"
 import { chk, loadCheckers } from "../errors/error.js"
-import { pull } from "../lazy/index.js"
 import { getClassName, getThrownError, isFunction, isObject } from "../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { ___aseq } from "./aseq.ctor.js"

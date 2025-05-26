@@ -1,5 +1,5 @@
+import { pull, type Doddle } from "../doddle/index.js"
 import { checkSeqInputValue, gotAsyncIteratorInSyncContext } from "../errors/error.js"
-import { pull, type Doddle } from "../lazy/index.js"
 import { _iter, isArrayLike, isInt, isIterable, isNextable, isThenable } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 

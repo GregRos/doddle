@@ -40,7 +40,7 @@ it("doddle<1> for doddle(() => 1)", () => {
     expect(lz.pull()).toEqual(1)
 })
 
-it("lazyAsync<1> for doddle(async () => 1)", async () => {
+it("DoddleAsync<1> for doddle(async () => 1)", async () => {
     const lz = doddle(async () => 1)
     expect(lz).toBeInstanceOf(Doddle)
     await expect(lz.pull()).resolves.toEqual(1)
@@ -52,25 +52,25 @@ it("doddle<1> for doddle(() => doddle(() => 1))", () => {
     expect(lz.pull()).toEqual(1)
 })
 
-it("lazyAsync<1> for doddle(async () => doddle(async () => 1))", async () => {
+it("DoddleAsync<1> for doddle(async () => doddle(async () => 1))", async () => {
     const lz = doddle(async () => doddle(async () => 1))
     expect(lz).toBeInstanceOf(Doddle)
     await expect(lz.pull()).resolves.toEqual(1)
 })
 
-it("lazyAsync<1> for doddle(() => doddle(async () => 1))", async () => {
+it("DoddleAsync<1> for doddle(() => doddle(async () => 1))", async () => {
     const lz = doddle(() => doddle(async () => 1))
     expect(lz).toBeInstanceOf(Doddle)
     await expect(lz.pull()).resolves.toEqual(1)
 })
 
-it("lazyAsync<1> for doddle(async () => doddle(() => 1))", async () => {
+it("DoddleAsync<1> for doddle(async () => doddle(() => 1))", async () => {
     const lz = doddle(async () => doddle(() => 1))
     expect(lz).toBeInstanceOf(Doddle)
     await expect(lz.pull()).resolves.toEqual(1)
 })
 
-it("lazyAsync<1> for doddle(async () => doddle(async () => 1))", async () => {
+it("DoddleAsync<1> for doddle(async () => doddle(async () => 1))", async () => {
     const lz = doddle(async () => doddle(async () => 1))
     expect(lz).toBeInstanceOf(Doddle)
     await expect(lz.pull()).resolves.toEqual(1)

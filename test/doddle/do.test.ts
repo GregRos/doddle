@@ -12,13 +12,13 @@ const callbacks = {
     mixed() {
         return jest.fn(() => null! as Promise<void> | void)
     },
-    lazy_sync() {
+    doddle_sync() {
         return jest.fn(() => doddle(() => {}))
     },
-    lazy_async() {
+    doddle_async() {
         return jest.fn(() => doddle(async () => {}))
     },
-    lazy_mixed() {
+    doddle_mixed() {
         return jest.fn(() => doddle(() => null! as Promise<void> | void))
     }
 }
@@ -37,7 +37,7 @@ const callbacks = {
         expect(myCallback).toHaveBeenCalledTimes(1)
     })
     {
-        const myCallback = callbacks.lazy_sync()
+        const myCallback = callbacks.doddle_sync()
         const myDoddle = lazies.sync().do(myCallback)
         declare.it("sync.each(doddle sync) = sync", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<1>>)
@@ -62,7 +62,7 @@ const callbacks = {
         expect(myCallback).toHaveBeenCalledTimes(1)
     })
     {
-        const myCallback = callbacks.lazy_async()
+        const myCallback = callbacks.doddle_async()
         const myDoddle = doddle(() => 1).do(myCallback)
         declare.it("sync.each(doddle async) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<number>>)
@@ -81,7 +81,7 @@ const callbacks = {
     })
 
     {
-        const myCallback = callbacks.lazy_mixed()
+        const myCallback = callbacks.doddle_mixed()
         const myDoddle = lazies.sync().do(myCallback)
         declare.it("sync.each(doddle mixed) = mixed", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<1>>>)
@@ -102,7 +102,7 @@ const callbacks = {
         expect(myCallback).toHaveBeenCalledTimes(1)
     })
     {
-        const myCallback = callbacks.lazy_sync()
+        const myCallback = callbacks.doddle_sync()
         const myDoddle = doddle(async () => 1).do(myCallback)
         declare.it("async.each(doddle sync) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<number>>)
@@ -128,7 +128,7 @@ const callbacks = {
         expect(myCallback).toHaveBeenCalledTimes(1)
     })
     {
-        const myCallback = callbacks.lazy_async()
+        const myCallback = callbacks.doddle_async()
         const myDoddle = doddle(async () => 1).do(myCallback)
         declare.it("async.each(doddle async) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<number>>)
@@ -147,7 +147,7 @@ const callbacks = {
     })
 
     {
-        const myCallback = callbacks.lazy_mixed()
+        const myCallback = callbacks.doddle_mixed()
         const myDoddle = doddle(async () => 1).do(myCallback)
         declare.it("async.each(doddle mixed) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<number>>)
@@ -162,7 +162,7 @@ const callbacks = {
     })
 
     {
-        const myCallback = callbacks.lazy_sync()
+        const myCallback = callbacks.doddle_sync()
         const myDoddle = lazies.mixed().do(myCallback)
         declare.it("mixed.each(doddle sync) = mixed", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<1 | Promise<1>>>)
@@ -177,7 +177,7 @@ const callbacks = {
     })
 
     {
-        const myCallback = callbacks.lazy_async()
+        const myCallback = callbacks.doddle_async()
         const myDoddle = lazies.mixed().do(myCallback)
         declare.it("mixed.each(doddle async) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<1>>)

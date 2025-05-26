@@ -1,5 +1,5 @@
+import { pull, type Doddle, type DoddleAsync } from "./doddle/index.js"
 import { type Text } from "./errors/error.js"
-import { pull, type Doddle, type DoddleAsync } from "./lazy/index.js"
 import type { DoddleReadableStream } from "./readable-stream-polyfill.js"
 
 const wFunction = "function"

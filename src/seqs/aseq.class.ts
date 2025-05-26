@@ -1,6 +1,6 @@
+import type { Doddle, DoddleAsync } from "../doddle/index.js"
+import { doddle, lazyOperator, pull } from "../doddle/index.js"
 import { chk, loadCheckers } from "../errors/error.js"
-import type { Doddle, DoddleAsync } from "../lazy/index.js"
-import { doddle, lazyFromOperator, pull } from "../lazy/index.js"
 import type { DoddleReadableStream } from "../readable-stream-polyfill.js"
 import {
     Stage,
@@ -219,7 +219,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     first<Alt = T>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate = predicate || (() => true)
         chk(this.first).predicate(predicate)
-        return lazyFromOperator(this, async function first(input) {
+        return lazyOperator(this, async function first(input) {
             let index = 0
             for await (const element of input) {
                 if (await pull(predicate(element, index++))) {
@@ -234,7 +234,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     last<Alt = undefined>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate ??= () => true
         chk(this.last).predicate(predicate)
-        return lazyFromOperator(this, async function last(input) {
+        return lazyOperator(this, async function last(input) {
             let last: T | Alt = alt as Alt
             let index = 0
             for await (const element of input) {
@@ -409,7 +409,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         projection ??= x => x as K
 
         const other = ___aseq(_other)
-        return lazyFromOperator(this, async function seqEquals(input) {
+        return lazyOperator(this, async function seqEquals(input) {
             const otherIterator = _aiter(other)
             try {
                 for await (const element of input) {
@@ -445,7 +445,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     ): DoddleAsync<boolean> {
         projection ??= x => x as K
         const other = ___aseq(_other)
-        return lazyFromOperator(this, async function setEquals(input) {
+        return lazyOperator(this, async function setEquals(input) {
             const set = new Set()
             for await (const element of other) {
                 set.add(await pull(projection(element)))
@@ -564,7 +564,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         }) as any
     }
     toArray() {
-        return lazyFromOperator(this, async function toArray(input) {
+        return lazyOperator(this, async function toArray(input) {
             const result: T[] = []
             for await (const element of input) {
                 result.push(element)
@@ -590,7 +590,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return Seq.prototype.toMap.call(this, kvpProjection as any) as any
     }
     toSet() {
-        return lazyFromOperator(this, async function toSet(input) {
+        return lazyOperator(this, async function toSet(input) {
             const result = new Set<T>()
             for await (const element of input) {
                 result.add(element)
@@ -690,7 +690,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     toSeq(): DoddleAsync<Seq<T>> {
-        return lazyFromOperator(this, async function toSeq(input) {
+        return lazyOperator(this, async function toSeq(input) {
             const all = await ___aseq(input).toArray().pull()
             return ___seq(all)
         })

@@ -1,5 +1,5 @@
+import { pull, type Doddle, type DoddleAsync } from "../doddle/index.js"
 import { checkASeqInputValue } from "../errors/error.js"
-import { pull, type Doddle, type DoddleAsync } from "../lazy/index.js"
 import {
     _xiter,
     isArrayLike,

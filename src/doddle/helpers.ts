@@ -1,4 +1,4 @@
-import { Doddle, DoddleAsync } from "../lazy/index.js"
+import { Doddle, DoddleAsync } from "./index.js"
 
 export type Is_Any_Pure_Async<T extends Doddle<any>[], IfTrue, IfFalse> = {
     [K in keyof T]: T[K] extends DoddleAsync<any> ? K : never

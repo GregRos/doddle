@@ -15,16 +15,16 @@ const maps = {
     any() {
         return jest.fn(() => 2 as any)
     },
-    lazy_sync() {
+    doddle_sync() {
         return jest.fn(() => doddle(() => 2 as 2))
     },
-    lazy_async() {
+    doddle_async() {
         return jest.fn(() => doddle(async () => 2 as 2))
     },
-    lazy_mixed() {
+    doddle_mixed() {
         return jest.fn(() => doddle(() => 2 as 2 | Promise<2>))
     },
-    lazy_any() {
+    doddle_any() {
         return jest.fn(() => doddle(() => 2 as any))
     }
 }
@@ -43,7 +43,7 @@ const maps = {
         expect(myMap).toHaveBeenCalledTimes(1)
     })
     {
-        const myMap = maps.lazy_sync()
+        const myMap = maps.doddle_sync()
         const myDoddle = lazies.sync().map(myMap)
         declare.it("sync.map(doddle sync) = sync", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<2>>)
@@ -68,7 +68,7 @@ const maps = {
         expect(myMap).toHaveBeenCalledTimes(1)
     })
     {
-        const myMap = maps.lazy_async()
+        const myMap = maps.doddle_async()
         const myDoddle = lazies.sync().map(myMap)
         declare.it("sync.map(doddle async) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<2>>)
@@ -86,7 +86,7 @@ const maps = {
         expect(type_of(myDoddle)).to_equal(type<Doddle<2 | Promise<2>>>)
     })
     {
-        const myMap = maps.lazy_mixed()
+        const myMap = maps.doddle_mixed()
         const myDoddle = lazies.sync().map(myMap)
         declare.it("sync.map(doddle mixed) = mixed", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<2 | Promise<2>>>)
@@ -108,7 +108,7 @@ const maps = {
         expect(myMap).toHaveBeenCalledTimes(1)
     })
     {
-        const myMap = maps.lazy_sync()
+        const myMap = maps.doddle_sync()
         const myDoddle = lazies.async().map(myMap)
         declare.it("async.map(doddle sync) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<2>>)
@@ -133,7 +133,7 @@ const maps = {
         expect(myMap).toHaveBeenCalledTimes(1)
     })
     {
-        const myMap = maps.lazy_async()
+        const myMap = maps.doddle_async()
         const myDoddle = lazies.async().map(myMap)
         declare.it("async.map(doddle async) = async", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<2>>)
@@ -151,7 +151,7 @@ const maps = {
         expect(type_of(myDoddle)).to_equal(type<DoddleAsync<2>>)
     })
     {
-        const myMap = maps.lazy_mixed()
+        const myMap = maps.doddle_mixed()
         const myDoddle = lazies.async().map(myMap)
         declare.it("async.map(doddle mixed) = mixed", expect => {
             expect(type_of(myDoddle)).to_equal(type<DoddleAsync<2>>)
@@ -173,7 +173,7 @@ const maps = {
         expect(myMap).toHaveBeenCalledTimes(1)
     })
     {
-        const myMap = maps.lazy_sync()
+        const myMap = maps.doddle_sync()
         const myDoddle = lazies.mixed().map(myMap)
         declare.it("mixed.map(doddle sync) = mixed", expect => {
             expect(type_of(myDoddle)).to_equal(type<Doddle<2 | Promise<2>>>)
