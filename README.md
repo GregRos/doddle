@@ -29,6 +29,17 @@ The library’s flagship lazy primitive. Commonly used throughout the API, but d
 
 Represents a computation that may not have happened yet. To make it produce a value you call its `pull` method.
 
+```ts
+import { doddle } from "doddle"
+
+const d = doddle(() => {
+    console.log("evaluated when pulled")
+    return 5
+})
+
+d.pull() // 5
+```
+
 [More Info...](https://github.com/GregRos/doddle/doddle.md)
 
 # Seq
