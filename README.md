@@ -11,9 +11,9 @@ Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, i
 
 -   🧰 **Powerful** — Packed with operators from the best APIs in software.
 
--   🪞 **Consistent** — An elegant API shared between sync and async iterables.
-
 -   📜 **Friendly** — Strong typing combined with clear and detailed error messages.
+
+-   🪞 **Consistent** — An elegant API shared between sync and async iterables.
 
 -   🔍 **Debuggable** — With _readable_ stack traces and _navigable_ source code.
 
@@ -29,9 +29,7 @@ yarn add doddle
 
 # Doddle
 
-The library’s flagship lazy primitive. Commonly used throughout the API, but designed to be as convenient as possible.
-
-Represents a computation that may not have happened yet. To make it produce a value you call its `pull` method.
+The library’s general-purpose lazy primitive. Represents a computation that may not have happened yet. You need to _pull_ it to get the value out.
 
 ```ts
 import { doddle } from "doddle"
@@ -44,7 +42,7 @@ const d = doddle(() => {
 d.pull() // 5
 ```
 
-[See more](https://github.com/GregRos/doddle/doddle.md)
+Commonly used throughout the API. It's simple, elegant, and really comes in handy. [See more](https://github.com/GregRos/doddle/doddle.md)
 
 # Seq
 
@@ -99,7 +97,7 @@ and instead you get `s,t,u,f,f, ,l,i,k,e, ,t,h,i,s`.
 
 Doddle doesn't do this. Both its type declarations and runtime logic _exclude string inputs_.
 
-If you want this behavior, convert the string into an array first. One of these should work:
+If you actually want to process a string by character, convert it into an array first. One of these should work:
 
 ```ts
 seq("hello world".split(""))
