@@ -1,7 +1,7 @@
 {
   "name": "doddle",
-  "version": "5.0.4",
-  "description": "The easiest way to handle iterables.",
+  "version": "5.0.6",
+  "description": "The nicest way to work with (async) iterables.",
   "keywords": [
     "iteration",
     "iterable",
@@ -48,6 +48,7 @@
     "README.md",
     "dist",
     "LICENSE.md",
+    "doddle.md",
     "CHANGELOG.md",
     "src"
   ],

@@ -78,13 +78,13 @@ The `Seq` wrapper comes with a comprehensive set of operators. These operators a
 
 -   **Instance:** They’re instance methods, making them easier to use and discover.
 -   **Careful:** They never iterate more than you tell them to.
--   **Flexible:** Accept flexible inputs, the same way as `seq`. They also interop seamlessly with the [[doddle]] lazy primitive.
+-   **Flexible:** Accept flexible inputs, the same way as `seq`. They also interop seamlessly with the Doddle lazy primitive.
 -   **Debuggable:** Produce legible stack traces; written in debug-friendly code.
 
 In addition, all operators are **Lazy**. The return one of two things:
 
 -   Another Seq, which has to be iterated for anything to happen.
--   A [[doddle|lazy primitive]], which must be _pulled_ explicitly to compute the operation.
+-   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which must be _pulled_ explicitly to compute the operation.
 
 This separates _defining a computation_ from _executing it_. It also means that many operators work just fine with infinite inputs.
 
