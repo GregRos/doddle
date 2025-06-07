@@ -74,6 +74,24 @@ const s3 = seq({
 
 Wrapping something using `seq` has no side-effects.
 
+## ⚠️ string inputs
+
+A pretty common bug happens when a string gets passed where a collection is expected. This usually doesn't cause an error,
+and instead you get `s,t,u,f,f, ,l,i,k,e, ,t,h,i,s`.
+
+Doddle doesn't do this. Both its type declarations and runtime logic _exclude string inputs_. So the following code would both result in a compilation error and a thrown exception:
+
+```ts
+seq("abc") // DoddleError: strings not allowed
+```
+
+If you actually want to process a string by character, convert it into an array first. One of these should work:
+
+```ts
+seq("hello world".split(""))
+seq([..."abc"])
+```
+
 ## Operators
 
 The `Seq` wrapper comes with a comprehensive set of operators. These operators all have the same traits:
@@ -90,46 +108,84 @@ They're also **Lazy**. That means they return one of two things:
 
 This separates _defining a computation_ from _executing it_. It also means that many operators work just fine with infinite inputs.
 
-### ⚠️ string inputs
+## Generator function inputs
 
-A pretty common bug happens when a string gets passed where a collection is expected. This usually doesn't cause an error,
-and instead you get `s,t,u,f,f, ,l,i,k,e, ,t,h,i,s`.
+When you pass a generator function to `seq`, the resulting iterable will call the function every time it’s iterated over.
 
-Doddle doesn't do this. Both its type declarations and runtime logic _exclude string inputs_.
-
-If you actually want to process a string by character, convert it into an array first. One of these should work:
+So for example, with the code:
 
 ```ts
-seq("hello world".split(""))
-seq([..."abc"])
+const items = seq(function* () {
+    console.log("starting iteration!")
+    yield 1
+    yield 2
+})
+for (const _ of items) {
+}
+
+for (const _ of items) {
+}
 ```
+
+We’ll get the output:
+
+```
+starting iteration!
+starting iteration!
+```
+
+If you don’t want this behavior, you’ll need to use the `cache` operator, which will cache the sequence so side-effects happen only once.
+
+## Other function inputs
+
+Generator functions are just functions that return iterables.
+
+This means that you can pass other functions to the `seq` constructor function, and they will behave the same way provided they return an iterable.
+
+This lets you create an iterable that does some computation before producing any elements.
+
+```ts
+const items = seq(() => {
+    console.log("starting iteration!")
+    return [1, 2, 3]
+})
+
+for (const _ of items) {
+}
+for (const _ of items) {
+}
+```
+
+This will also write `"starting iteration!"` twice to the console.
 
 # ASeq
 
-This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects. You create one using the `aseq` constructor function.
+This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects.
+
+You create one using the `aseq` constructor function.
 
 This function accepts everything that `seq` accepts, plus async variations on those things. That includes:
 
 ```ts
 import { aseq, seq } from "doddle"
 
-// Array
+// # Array
 aseq([1, 2, 3]) // {1, 2, 3}
 
-// Generator function
+// # Generator function
 aseq(function* () {
     yield* [1, 2, 3]
 }) // {1, 2, 3}
 
-// Async generator function
+// # Async generator function
 aseq(async function* () {
     yield* [1, 2, 3]
 }) // {1, 2, 3}
 
-// Iterable
+// # Iterable
 aseq(seq([1, 2, 3]))
 
-// Async iterable
+// # Async iterable
 aseq(aseq([1, 2, 3]))
 ```
 
@@ -144,6 +200,40 @@ aseq([1, 2, 3]).map(async x => x + 1) // {2, 3, 4}
 ```
 
 They're easy to navigate because the operators are named the same and have almost the same signatures.
+
+## Using in async code
+
+It often makes sense to use `aseq` when working in an async function.
+
+For instance, we might get a list of strings from an async function as an array, and then process each of the strings asynchronously.
+
+Here’s how that might look like:
+
+```ts
+async function example() {
+    const strs = await getStrings()
+    return aseq(strs).map(x => doSomething(x))
+}
+```
+
+But if you do it like this, the return type of the function becomes double async — `Promise<ASeq<T>>`. That’s really annoying to work with!
+
+Luckily, there is a better way.
+
+We can leave off the `async` qualifiers from the function. Instead, we pass an async function to the `aseq` constructor and perform the initialization inside.
+
+Here’s how that looks like:
+
+```ts
+function example() {
+    return aseq(async () => {
+        const strs = await getStrings()
+        return aseq(strs).map(x => doSomething(x))
+    })
+}
+```
+
+The `aseq` constructor function is flexible enough to flatten the resulting type to a simple `ASeq<T>`. Using `aseq` twice is not an issue either, since the code is smart enough to unpack things and avoid redundancy.
 
 ## Non-concurrent
 
@@ -173,13 +263,12 @@ await Promise.all(
 )
 ```
 
-This is by design, since it has several advantages:
+**This means that `aseq` can’t be used for concurrent processing** in the same way as `rxjs`.
+
+However, it does provide other benefits:
 
 -   Elements will never be yielded out of order.
 -   It doesn’t require a cache to keep concurrent promises.
--   The logic of each operator is identical to its sync counterpart, enabling code reuse.
--   Legible stack traces and debuggable code.
-
-That does mean that `aseq` can’t be used for concurrent processing in the same way as `rxjs`.
+-   The logic of each operator is identical to its sync counterpart, enabling code reuse and better compression.
 
 That functionality is saved for a future out-of-order, highly concurrent version of `aseq` that's currently in the works.

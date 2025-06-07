@@ -203,7 +203,7 @@ export function createCompare(desc: boolean) {
             for (let i = 0; i < a.length; i++) {
                 const result = baseCompare(a[i], b[i])
                 if (result !== 0) {
-                    return desc ? -result : result
+                    return result
                 }
             }
             return 0
