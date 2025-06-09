@@ -14,6 +14,7 @@ import {
     type MaybePromise
 } from "../utils.js"
 import { ___aseq } from "./aseq.ctor.js"
+import { aseq } from "./aseq.js"
 import {
     SkippingMode,
     type EachCallStage,
@@ -395,6 +396,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
             yield* everything
         })
+    }
+    concatFirst(other: ASeq.Input<T>) {
+        return aseq(other).concat(this)
     }
     scan(reducer: ASeq.Reducer<T, T>): ASeq<T>
     scan<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): ASeq<Acc>

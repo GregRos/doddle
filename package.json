@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "The nicest way to work with (async) iterables.",
   "keywords": [
     "iteration",
