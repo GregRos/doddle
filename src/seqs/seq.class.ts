@@ -596,6 +596,48 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
+
+    /**
+     * Collects the elements of `this`, caching them before yielding the first element, and then
+     * yields them one by one.
+     *
+     * @returns A new sequence with the same elements as this one, but where iteration has already
+     *   completed.
+     */
+    collect(): Seq<T> {
+        return SeqOperator(this, function* collect(input) {
+            yield* [...input]
+        })
+    }
+
+    /**
+     * Invokes a handler **before** the first element of `this` sequence is yielded, but after
+     * iteration has started.
+     *
+     * @param action The handler to invoke before the first element.
+     * @returns A new sequence that invokes the handler before the first element.
+     */
+    before(action: Seq.NoInputAction): Seq<T> {
+        chk(this.before).action(action)
+        return SeqOperator(this, function* before(input) {
+            pull(action())
+            yield* input
+        })
+    }
+    /**
+     * Performs an action **after** the final element of `this` sequence has been yielded, but
+     * before iteration completes.
+     *
+     * @param action The action to perform after the final element.
+     * @returns A new sequence that performs the action after the final element.
+     */
+    after(action: Seq.NoInputAction): Seq<T> {
+        chk(this.after).action(action)
+        return SeqOperator(this, function* after(input) {
+            yield* input
+            pull(action())
+        })
+    }
     /**
      * Orders the elements of `this` sequence using by several keys, using the given multi-key
      * projection.
@@ -607,6 +649,7 @@ export abstract class Seq<T> implements Iterable<T> {
         projection: Seq.NoIndexIteratee<T, K>,
         reverse?: boolean
     ): Seq<T>
+
     /**
      * Orders the elements of `this` sequence by key, using the given key projection.
      *
@@ -1266,4 +1309,10 @@ export namespace Seq {
      * @template Val The value type.
      */
     export type Group<Key, Val> = readonly [Key, Seq<Val>]
+
+    /**
+     * A function that takes no arguments but may return a Doddle, which will be pulled before
+     * executing continues.
+     */
+    export type NoInputAction = () => unknown | Doddle<unknown>
 }

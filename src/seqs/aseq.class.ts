@@ -372,6 +372,30 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 .pull()
         })
     }
+    before(action: ASeq.NoInputAction): ASeq<T> {
+        chk(this.before).action(action)
+        return ASeqOperator(this, async function* before(input) {
+            await pull(action())
+            yield* input
+        }) as any
+    }
+    after(action: ASeq.NoInputAction): ASeq<T> {
+        chk(this.after).action(action)
+        return ASeqOperator(this, async function* after(input) {
+            yield* input
+            await pull(action())
+        })
+    }
+
+    collect(): ASeq<T> {
+        return ASeqOperator(this, async function* collect(input) {
+            const everything = []
+            for await (const element of input) {
+                everything.push(element)
+            }
+            yield* everything
+        })
+    }
     scan(reducer: ASeq.Reducer<T, T>): ASeq<T>
     scan<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): ASeq<Acc>
     scan<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc) {
