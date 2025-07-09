@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "The nicest way to work with (async) iterables.",
   "keywords": [
     "iteration",
@@ -51,7 +51,9 @@
     "LICENSE.md",
     "doddle.md",
     "CHANGELOG.md",
-    "src"
+    "src",
+    "!**/tsconfig*",
+    "!**/*tsbuild*"
   ],
   "scripts": {
     "build": "tsc -b .",
