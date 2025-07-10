@@ -20,6 +20,7 @@ type neverToUndefined<T> = T extends never ? undefined : T
 export type getZipValuesType<Xs extends [any, ...any[]]> = {
     [K in keyof Xs]: neverToUndefined<Xs[K]> | undefined
 }
+
 export type getWindowArgsType<T, L> = L extends 0
     ? []
     : number extends L

@@ -591,6 +591,30 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             }
         }) as any
     }
+
+    product<Xs extends any[], R = [T, ...Xs]>(
+        _others: {
+            [K in keyof Xs]: ASeq.Input<Xs[K]>
+        },
+        projection?: (...args: [T, ...Xs]) => R
+    ): ASeq<R> {
+        const others = _others.map(___aseq).map(x => x.cache())
+        projection ??= (...args: any[]) => args as any
+        chk(this.product).projection(projection)
+        return ASeqOperator(this, async function* product(input) {
+            let partialProducts = [[]] as any[][]
+            for (const iterable of [input, ...others].reverse()) {
+                const oldPartialProducts = partialProducts
+                partialProducts = []
+                for await (const item of iterable) {
+                    partialProducts = partialProducts.concat(
+                        oldPartialProducts.map(x => [item, ...x])
+                    )
+                }
+            }
+            yield* partialProducts.map(x => pull(projection.apply(null, x as any))) as any
+        })
+    }
     toArray() {
         return lazyOperator(this, async function toArray(input) {
             const result: T[] = []

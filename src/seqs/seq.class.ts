@@ -152,18 +152,18 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param projection An N-ary projection to apply to each combination of elements.
      * @returns A new sequence representing the cartesian product of this and the other sequences.
      */
-    product<Xs extends [any, ...any[]], R = getZipValuesType<[T, ...Xs]>>(
+    product<Xs extends any[], R = [T, ...Xs]>(
         _others: {
             [K in keyof Xs]: Seq.Input<Xs[K]>
         },
-        projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
+        projection?: (...args: [T, ...Xs]) => R
     ): Seq<R> {
         const others = _others.map(___seq).map(x => x.cache())
         projection ??= (...args: any[]) => args as any
         chk(this.product).projection(projection)
         return SeqOperator(this, function* product(input) {
             let partialProducts = [[]] as any[][]
-            for (const iterable of [input, ...others]) {
+            for (const iterable of [input, ...others].reverse()) {
                 const oldPartialProducts = partialProducts
                 partialProducts = []
                 for (const item of iterable) {
