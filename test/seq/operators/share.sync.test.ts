@@ -23,3 +23,16 @@ it("iterates partially twice with a break", () => {
     expect(s.take(1).toArray().pull()).toEqual([1])
     expect(s.toArray().pull()).toEqual([2, 3])
 })
+
+it("fails on circular reference", () => {
+    const iterable = {
+        [Symbol.iterator]: function* () {
+            yield 1
+            yield* shared
+        }
+    } as Iterable<number>
+    const shared = _seq(iterable).share()
+    expect(() => {
+        return shared._qr
+    }).toThrow()
+})

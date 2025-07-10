@@ -103,3 +103,16 @@ it.skip("reproduces thrown error at the same index", () => {
 
     expect(endsWithErrorIndex._qr).toEqual([1, 2, 2])
 })
+
+it("fails on circular reference", () => {
+    const iterable = {
+        [Symbol.iterator]: function* () {
+            yield 1
+            yield* cached
+        }
+    } as Iterable<number>
+    const cached = _seq(iterable).cache()
+    expect(() => {
+        return cached._qr
+    }).toThrow()
+})

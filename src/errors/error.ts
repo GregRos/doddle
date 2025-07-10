@@ -298,3 +298,7 @@ export function loadCheckers<X>(t: X) {
 export function chk(input: any): OperatorMessages {
     return input[__checkers]
 }
+
+export const invalidRecursionError = (parentType: string) => {
+    return `Child iterable called its own ${parentType} during iteration, which is illegal.`
+}

@@ -1,6 +1,6 @@
 import type { Doddle } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
-import { chk, DoddleError, loadCheckers } from "../errors/error.js"
+import { chk, DoddleError, invalidRecursionError, loadCheckers } from "../errors/error.js"
 import {
     _iter,
     createCompareKey,
@@ -64,9 +64,12 @@ export abstract class Seq<T> implements Iterable<T> {
         const _cache: T[] = []
         let alreadyDone = false
         let iterator: Iterator<T>
-
+        let isCallingNext = false
         return SeqOperator(this, function* cache() {
             let i = 0
+            if (isCallingNext) {
+                throw new DoddleError(invalidRecursionError("cache"))
+            }
             for (;;) {
                 if (i < _cache.length) {
                     const cur = _cache[i]
@@ -74,7 +77,12 @@ export abstract class Seq<T> implements Iterable<T> {
                     i++
                 } else if (!alreadyDone) {
                     iterator ??= _iter(self)
-                    const { done, value } = iterator.next()
+                    try {
+                        isCallingNext = true
+                        var { done, value } = iterator.next()
+                    } finally {
+                        isCallingNext = false
+                    }
                     if (done) {
                         alreadyDone = true
                         return
@@ -349,9 +357,19 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     share(): Seq<T> {
         const iter = doddle(() => _iter(this))
+        let isCallingNext = false
+
         return SeqOperator(this, function* share() {
+            if (isCallingNext) {
+                throw new DoddleError(invalidRecursionError("share"))
+            }
             while (true) {
-                const { done, value } = iter.pull().next()
+                try {
+                    isCallingNext = true
+                    var { done, value } = iter.pull().next()
+                } finally {
+                    isCallingNext = false
+                }
                 if (done) {
                     return
                 }
