@@ -110,5 +110,5 @@
     "typescript": "^5.9.2",
     "yamprint": "^0.8.4"
   },
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@4.9.2"
 }
