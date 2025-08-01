@@ -1,6 +1,6 @@
 import { pull } from "../doddle/index.js"
 import { chk, loadCheckers } from "../errors/error.js"
-import { getClassName, getThrownError, isFunction, isObject } from "../utils.js"
+import { assign, getClassName, getThrownError, isFunction, isObject } from "../utils.js"
 import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { ___aseq } from "./aseq.ctor.js"
 import { seq } from "./seq.js"
@@ -95,4 +95,4 @@ const Builders = {
         })
     }
 }
-export const aseq = loadCheckers(Object.assign(___aseq, Builders))
+export const aseq = loadCheckers(assign(___aseq, Builders))

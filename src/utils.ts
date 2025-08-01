@@ -1,15 +1,36 @@
-import { pull, type Doddle, type DoddleAsync } from "./doddle/index.js"
+import { type Doddle, type DoddleAsync } from "./doddle/index.js"
 import { type Text } from "./errors/error.js"
 import type { DoddleReadableStream } from "./readable-stream-polyfill.js"
-
-const wFunction = "function"
+import {
+    syAsyncIterator,
+    syIterator,
+    syToStringTag,
+    wAfter,
+    wAnonymous,
+    wAsyncIterable,
+    wBefore,
+    wBigInt,
+    wBoth,
+    wConstructor,
+    wDescription,
+    wFunction,
+    wIterable,
+    wIterator,
+    wLength,
+    wNull,
+    wObject,
+    wPromise,
+    wString,
+    wSymbol,
+    wToString
+} from "./words.js"
 
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
-    return input[Symbol.iterator]()
+    return (input as any)[syIterator]()
 }
 
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
-    return input[Symbol.asyncIterator]()
+    return (input as any)[syAsyncIterator]()
 }
 
 export function _xiter<T>(input: Iterable<T> | AsyncIterable<T>): Iterator<T> | AsyncIterator<T> {
@@ -17,24 +38,30 @@ export function _xiter<T>(input: Iterable<T> | AsyncIterable<T>): Iterator<T> | 
 }
 
 export function isObject<T>(value: T): value is T & {} {
-    return typeof value === "object" && value != null
+    return typeof value === wObject && value != null
 }
 
-export function isFunction(value: any): boolean {
+export function isFunction(value: any): value is (...args: any[]) => any {
     return typeof value === wFunction
 }
-
+export function isDoddle<T>(value: any): value is Doddle<T> {
+    return isObject(value) && isFunction(value.pull) && isFunction(value.map)
+}
 export function isArrayLike<T>(value: any): value is ArrayLike<T> {
-    return isObject(value) && isInt(value.length)
+    return isObject(value) && isInt(getLength(value))
+}
+
+export function getLength<T extends { length: any }>(value: T): T["length"] {
+    return value[wLength]
 }
 
 export function isIterable<T>(value: any): value is Iterable<T> {
-    return isObject(value) && isFunction(value[Symbol.iterator])
+    return isObject(value) && isFunction(value[syIterator])
 }
 export function isAnyIterable(value: any): value is Iterable<any> {
     return isIterable(value) || isAsyncIterable(value)
 }
-const orderedStages = [undefined, "before", "after", "both"] as const
+const orderedStages = [undefined, wBefore, wAfter, wBoth]
 export const parseStage = (value: (typeof orderedStages)[number]): Stage => {
     return orderedStages.indexOf(value)
 }
@@ -49,10 +76,10 @@ export const isIntOrInfinity = (v: number) => isInt(v) || v === Infinity
 export const isNatOrInfinity = (v: number) => isIntOrInfinity(v) && v >= 0
 export const isBool = (value: boolean) => !!value === value
 export const isNotNullish = (value: any) => value != null
-export const isPair = (value: any) => Array.isArray(value) && value.length === 2
+export const isPair = (value: any) => isArray(value) && value.length === 2
 export const isPosInt = (value: number) => isInt(value) && value > 0
 export const isError = (value: any) => value instanceof Error
-export const isSymbol = (value: any) => typeof value === "symbol"
+export const isSymbol = (value: any) => typeof value === wSymbol
 export const enum Stage {
     Before = 1,
     After = 2,
@@ -60,7 +87,7 @@ export const enum Stage {
 }
 
 export function isAsyncIterable<T>(value: any): value is AsyncIterable<T> {
-    return isObject(value) && isFunction(value[Symbol.asyncIterator])
+    return isObject(value) && isFunction(value[syAsyncIterator])
 }
 
 export function isReadableStream(value: any): value is DoddleReadableStream<unknown> {
@@ -68,11 +95,11 @@ export function isReadableStream(value: any): value is DoddleReadableStream<unkn
 }
 
 export function isBigInt(value: any): value is bigint {
-    return typeof value === "bigint"
+    return typeof value === wBigInt
 }
 
 export function isString(value: any): value is string {
-    return typeof value === "string"
+    return typeof value === wString
 }
 export function isPropertyKey(value: any): value is PropertyKey {
     return isString(value) || isSymbol(value) || isNumber(value)
@@ -92,32 +119,31 @@ export function getClassName(something: any) {
         return typeof something
     }
     if (something === null) {
-        return "null"
+        return wNull
     }
-    const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object"
+    const ctorName = something[wConstructor]?.name ?? something?.[syToStringTag] ?? wObject
     return ctorName
 }
 
 export function getSymbolDescription(symbol: symbol) {
-    return `Symbol(${symbol.description})`
+    return `${wSymbol}(${symbol[wDescription]})`
 }
 
 export function getObjDesc(object: any) {
     if (isDoddle(object)) {
-        return object.toString()
+        return object[wToString]()
     }
+    const cName = getClassName(object)
     if (isIterable(object)) {
-        return `iterable ${getClassName(object)}`
+        return `${wIterable} ${cName}`
     } else if (isAsyncIterable(object)) {
-        return `async iterable ${getClassName(object)}`
+        return `${wAsyncIterable} ${cName}`
     } else if (isNextable(object)) {
-        return `iterator ${getClassName(object)}`
-    } else if (isDoddle(object)) {
-        return object.toString()
+        return `${wIterator} ${cName}`
     } else if (isThenable(object)) {
-        return `a Promise`
+        return `a ${wPromise}`
     } else {
-        return `object ${getClassName(object)}`
+        return `${wObject} ${cName}`
     }
 }
 export function getValueDesc(object: any) {
@@ -125,7 +151,7 @@ export function getValueDesc(object: any) {
         return `${object}`
     }
     if (isFunction(object)) {
-        return `function ${getFunctionName(object) || "<anonymous>"}`
+        return `${wFunction} ${getFunctionName(object) || wAnonymous}`
     }
     if (isBigInt(object)) {
         return `${object}n`
@@ -134,7 +160,7 @@ export function getValueDesc(object: any) {
         return getSymbolDescription(object)
     }
     if (isString(object)) {
-        if (object.length > 30) {
+        if (getLength(object) > 30) {
             object = object.slice(0, 30) + "⋯"
         }
         return `"${object}"`
@@ -158,33 +184,16 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
     return isObject(what) && isFunction((what as any).then)
 }
 
-export function isDoddle<T>(value: any): value is Doddle<T> {
-    return isObject(value) && isFunction(value.pull) && isFunction(value.map)
-}
-
 export const isArray = Array.isArray
 
-export function returnKvp(input: any, key: any, value: any) {
-    key = pull(key)
-    if (isAsyncIterable(input) && isThenable(key)) {
-        return key.then(key => ({
-            key: pull(key),
-            value: value
-        })) as Promise<any>
-    }
-    return {
-        key: key,
-        value: value
-    }
-}
 export type MaybePromise<T> = T | Promise<T>
 export type MaybeDoddle<T> = T | Doddle<T> | DoddleAsync<T>
 export function getThrownError(thrown: unknown) {
     return thrown instanceof Error ? thrown : new Error(String(thrown))
 }
 export function shuffleArray<T>(array: T[]) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
+    for (let i = getLength(array) - 1; i > 0; i--) {
+        const j = floor(random() * (i + 1))
         const temp = array[i]
         array[i] = array[j]
         array[j] = temp
@@ -199,8 +208,8 @@ function createBaseCompare(desc: boolean) {
 export function createCompare(desc: boolean) {
     const baseCompare = createBaseCompare(desc)
     return (a: any, b: any) => {
-        if (Array.isArray(a) && Array.isArray(b)) {
-            for (let i = 0; i < a.length; i++) {
+        if (isArray(a) && isArray(b)) {
+            for (let i = 0; i < getLength(a); i++) {
                 const result = baseCompare(a[i], b[i])
                 if (result !== 0) {
                     return result
@@ -225,11 +234,46 @@ export function splat(bits: Text): string {
     return bits.flat(5).join(" ")
 }
 
+export const promiseAll = Promise.all.bind(Promise)
+export const assign = Object.assign
+export const fromEntries = Object.fromEntries
+export const defineProperty = Object.defineProperty
+export const keys = Object.keys
+export const entries = Object.entries
+export const setTimeout = globalThis.setTimeout
+export const promise = <T>(
+    executor: (resolve: (value: T) => void, reject: (reason: any) => void) => void
+) => {
+    return new Promise<T>(executor)
+}
+export const defineValueProperty = (target: any, key: PropertyKey, value: any) => {
+    defineProperty(target, key, {
+        value
+    })
+}
+export const getOwnPropertyNames = Object.getOwnPropertyNames
+export function createOperator(name: string, ctor: any, key: PropertyKey) {
+    return {
+        [name](operand: any, impl: any) {
+            const myAbstractSeq = assign(new ctor(), [impl.name, operand])
+            defineProperty(myAbstractSeq, key, {
+                get(this: typeof myAbstractSeq) {
+                    return impl.bind(this, this[1])
+                }
+            })
+            return myAbstractSeq
+        }
+    }[name]
+}
 export function setClassName(cls: any, name: string) {
     if (cls.name === name) {
         return
     }
-    Object.defineProperty(cls, "name", {
+    defineProperty(cls, "name", {
         value: name
     })
 }
+export const floor = Math.floor
+export const sign = Math.sign
+export const abs = Math.abs
+export const random = Math.random

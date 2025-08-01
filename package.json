@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "6.0.0",
+  "version": "6.0.2",
   "description": "The nicest way to work with (async) iterables.",
   "keywords": [
     "iteration",
@@ -38,12 +38,25 @@
         "types": "./dist/esm/index.d.ts",
         "default": "./dist/esm/index.js"
       },
+      "default": {
+        "require": "./dist/cjs/index.js",
+        "import": "./dist/esm/index.js",
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/cjs/index.js"
+      },
       "types": "./dist/cjs/index.d.ts"
     }
   },
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
   "types": "./dist/cjs/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/cjs/index.d.ts"
+      ]
+    }
+  },
   "typings": "./dist/cjs/index",
   "files": [
     "README.md",
@@ -94,7 +107,7 @@
     "ts-jest": "^29.2.4",
     "typedoc": "^0.28.5",
     "typedoc-material-theme": "^1.4.0",
-    "typescript": "^5.5.4",
+    "typescript": "^5.9.2",
     "yamprint": "^0.8.4"
   },
   "packageManager": "yarn@4.5.0"

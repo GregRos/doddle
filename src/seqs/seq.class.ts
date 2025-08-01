@@ -1,15 +1,41 @@
+import { returnKvp } from "../doddle/helpers.js"
 import type { Doddle } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
 import { chk, DoddleError, invalidRecursionError, loadCheckers } from "../errors/error.js"
 import {
     _iter,
     createCompareKey,
+    createOperator,
+    fromEntries,
+    getLength,
+    isNotNullish,
     parseStage,
-    returnKvp,
     setClassName,
     shuffleArray,
     Stage
 } from "../utils.js"
+import {
+    syIterator,
+    syToStringTag,
+    wAction,
+    wAfter,
+    wBefore,
+    wCount,
+    wcSeq,
+    wHandler,
+    wIndex,
+    wKeyProjection,
+    wKvpProjection,
+    wPredicate,
+    wProjection,
+    wPrototype,
+    wReducer,
+    wReverse,
+    wSeparator,
+    wSeq,
+    wSize,
+    wStage
+} from "../words.js"
 
 import {
     SkippingMode,
@@ -29,8 +55,8 @@ export abstract class Seq<T> implements Iterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
-        setClassName(Seq, "Seq")
-        loadCheckers(Seq.prototype)
+        setClassName(Seq, wcSeq)
+        loadCheckers(Seq[wPrototype])
     }
 
     get _qr() {
@@ -44,7 +70,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to the item at the given index.
      */
     at(index: number): Doddle<T | undefined> {
-        chk(this.at).index(index)
+        chk(this.at)[wIndex](index)
         return lazyOperator(this, function at(input) {
             if (index < 0) {
                 return input.take(index).first().pull()
@@ -71,7 +97,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 throw new DoddleError(invalidRecursionError("cache"))
             }
             for (;;) {
-                if (i < _cache.length) {
+                if (i < getLength(_cache)) {
                     const cur = _cache[i]
                     yield cur
                     i++
@@ -104,7 +130,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence that handles errors.
      */
     catch<S = T>(handler: Seq.Iteratee<unknown, Seq.Input<S> | void>): Seq<T | S> {
-        chk(this.catch).handler(handler)
+        chk(this.catch)[wHandler](handler)
         return SeqOperator(this, function* catch_(input) {
             let i = 0
             const iterator = _iter(input)
@@ -168,7 +194,7 @@ export abstract class Seq<T> implements Iterable<T> {
     ): Seq<R> {
         const others = _others.map(___seq).map(x => x.cache())
         projection ??= (...args: any[]) => args as any
-        chk(this.product).projection(projection)
+        chk(this.product)[wProjection](projection)
         return SeqOperator(this, function* product(input) {
             let partialProducts = [[]] as any[][]
             for (const iterable of [input, ...others].reverse()) {
@@ -192,7 +218,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to the joined string.
      */
     join(separator: string): Doddle<string> {
-        chk(this.join).separator(separator)
+        chk(this.join)[wSeparator](separator)
         return lazyOperator(this, function join(input) {
             return input
                 .toArray()
@@ -213,20 +239,20 @@ export abstract class Seq<T> implements Iterable<T> {
         projection?: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
     ): Seq<S> {
         const c = chk(this.chunk)
-        c.size(size)
+        c[wSize](size)
         projection ??= (...chunk: any) => chunk as any
-        c.projection(projection)
+        c[wProjection](projection)
 
         return SeqOperator(this, function* chunk(input) {
             let chunk: T[] = []
             for (const item of input) {
                 chunk.push(item)
-                if (chunk.length === size) {
+                if (getLength(chunk) === size) {
                     yield pull(projection(...(chunk as any)))
                     chunk = []
                 }
             }
-            if (chunk.length) {
+            if (getLength(chunk)) {
                 yield pull(projection(...(chunk as any)))
             }
         }) as any
@@ -240,7 +266,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the flattened results.
      */
     concatMap<S>(projection: Seq.Iteratee<T, Seq.Input<S>>): Seq<getConcatElementType<T, S>> {
-        chk(this.concatMap).projection(projection)
+        chk(this.concatMap)[wProjection](projection)
         return SeqOperator(this, function* concatMap(input) {
             let index = 0
             for (const element of input) {
@@ -271,7 +297,7 @@ export abstract class Seq<T> implements Iterable<T> {
     concatFirst<Seqs extends Seq.Input<any>[]>(
         ..._iterables: Seqs
     ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
-        if (_iterables.length === 0) {
+        if (getLength(_iterables) === 0) {
             return this
         }
         const [base, ...rest] = [..._iterables, this].map(___seq) as any[]
@@ -286,20 +312,20 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param stage The **stage** at which to invoke the function (`before`, `after`, or `both`).
      * @returns A new sequence that invokes the handler as each element is iterated over.
      */
-    each(action: Seq.StageIteratee<T, void>, stage: EachCallStage | undefined = "before") {
+    each(action: Seq.StageIteratee<T, void>, stage: EachCallStage | undefined = wBefore) {
         const c = chk(this.each)
-        c.action(action)
-        c.stage(stage)
+        c[wAction](action)
+        c[wStage](stage)
         const myStage = parseStage(stage)
         return SeqOperator(this, function* each(input) {
             let index = 0
             for (const element of input) {
                 if (myStage & Stage.Before) {
-                    pull(action(element, index, "before"))
+                    pull(action(element, index, wBefore))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    pull(action(element, index, "after"))
+                    pull(action(element, index, wAfter))
                 }
                 index++
             }
@@ -339,7 +365,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     filter(predicate: Seq.Predicate<T>): Seq<T>
     filter(predicate: Seq.Predicate<T>) {
-        predicate = chk(this.filter).predicate(predicate)
+        predicate = chk(this.filter)[wPredicate](predicate)
         return SeqOperator(this, function* filter(input) {
             yield* ___seq(input).concatMap((element, index) =>
                 pull(predicate(element, index)) ? [element] : []
@@ -419,7 +445,7 @@ export abstract class Seq<T> implements Iterable<T> {
      *   iterable of values.
      */
     groupBy<K>(keyProjection: Seq.NoIndexIteratee<T, K>): Seq<Seq.Group<K, T>> {
-        chk(this.groupBy).keyProjection(keyProjection)
+        chk(this.groupBy)[wKeyProjection](keyProjection)
 
         return SeqOperator(this, function* groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
@@ -440,17 +466,17 @@ export abstract class Seq<T> implements Iterable<T> {
             function* getGroupIterable(key: K): Iterable<T> {
                 const group = map.get(key)!
                 for (let i = 0; ; i++) {
-                    if (i < group.length) {
+                    if (i < getLength(group)) {
                         yield group[i]
                         continue
                     }
 
                     for (const _ of shared) {
-                        if (i < group.length) {
+                        if (i < getLength(group)) {
                             break
                         }
                     }
-                    if (i >= group.length) {
+                    if (i >= getLength(group)) {
                         // must've completed
                         return
                     }
@@ -459,17 +485,17 @@ export abstract class Seq<T> implements Iterable<T> {
             }
 
             for (let i = 0; ; i++) {
-                if (i < keys.length) {
+                if (i < getLength(keys)) {
                     const key = keys[i]
                     yield [key, ___seq(() => getGroupIterable(key))]
                     continue
                 }
                 for (const _ of shared) {
-                    if (i < keys.length) {
+                    if (i < getLength(keys)) {
                         break
                     }
                 }
-                if (i >= keys.length) {
+                if (i >= getLength(keys)) {
                     // must've completed
                     return
                 }
@@ -516,7 +542,7 @@ export abstract class Seq<T> implements Iterable<T> {
     count(predicate?: Seq.Predicate<T>): Doddle<number> {
         // ! POLYMORPHIC !
         predicate ??= () => true
-        predicate = chk(this.count).predicate(predicate)
+        predicate = chk(this.count)[wPredicate](predicate)
         return lazyOperator(this, function count(input) {
             return input
                 .filter(predicate as any)
@@ -542,7 +568,7 @@ export abstract class Seq<T> implements Iterable<T> {
     last<const Alt = undefined>(predicate: Seq.Predicate<T>, alt?: Alt): Doddle<T | Alt>
     last<Alt>(predicate?: Seq.Predicate<T>, alt?: Alt): Doddle<T | Alt> {
         predicate ??= () => true
-        chk(this.last).predicate(predicate)
+        chk(this.last)[wPredicate](predicate)
         return lazyOperator(this, function last(input) {
             let lastOrAlt: Alt | T = alt as Alt
             let index = 0
@@ -563,7 +589,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the projected elements.
      */
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
-        chk(this.map).projection(projection)
+        chk(this.map)[wProjection](projection)
         return SeqOperator(this, function* map(input) {
             yield* ___seq(input).concatMap((element, index) => [
                 pull(projection(element, index)) as S
@@ -579,7 +605,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     maxBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
         // ! POLYMORPHIC !
-        chk(this.maxBy).projection(projection)
+        chk(this.maxBy)[wProjection](projection)
         return lazyOperator(this, function maxBy(input) {
             return input
                 .map((element, index) => {
@@ -601,7 +627,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     minBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
         // ! POLYMORPHIC !
-        chk(this.minBy).projection(projection)
+        chk(this.minBy)[wProjection](projection)
         return lazyOperator(this, function minBy(input) {
             return input
                 .map((element, index) => {
@@ -636,7 +662,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence that invokes the handler before the first element.
      */
     before(action: Seq.NoInputAction): Seq<T> {
-        chk(this.before).action(action)
+        chk(this.before)[wAction](action)
         return SeqOperator(this, function* before(input) {
             pull(action())
             yield* input
@@ -650,7 +676,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence that performs the action after the final element.
      */
     after(action: Seq.NoInputAction): Seq<T> {
-        chk(this.after).action(action)
+        chk(this.after)[wAction](action)
         return SeqOperator(this, function* after(input) {
             yield* input
             pull(action())
@@ -676,8 +702,8 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     orderBy<K>(projection: Seq.NoIndexIteratee<T, K>, reverse?: boolean): Seq<T>
     orderBy<K>(projection: Seq.NoIndexIteratee<T, K>, reverse = false): Seq<T> {
-        chk(this.orderBy).projection(projection)
-        chk(this.orderBy).reverse(reverse)
+        chk(this.orderBy)[wProjection](projection)
+        chk(this.orderBy)[wReverse](reverse)
         const compareKey = createCompareKey(reverse)
         return SeqOperator(this, function* orderBy(input) {
             yield* ___seq(input)
@@ -708,7 +734,7 @@ export abstract class Seq<T> implements Iterable<T> {
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial: Acc): Doddle<Acc>
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial?: Acc): Doddle<any> {
         // ! POLYMORPHIC !
-        chk(this.reduce).reducer(reducer)
+        chk(this.reduce)[wReducer](reducer)
         return lazyOperator(this, function reduce(input) {
             return input
                 .scan(reducer, initial!)
@@ -754,7 +780,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     scan<Acc>(reduction: Seq.Reduction<T, Acc>, initial: Acc): Seq<Acc>
     scan<Acc>(reduction: Seq.Reduction<T, Acc>, initial?: Acc) {
-        chk(this.scan).reducer(reduction)
+        chk(this.scan)[wReducer](reduction)
         return SeqOperator(this, function* scan(input) {
             let hasAcc = initial !== undefined
 
@@ -910,7 +936,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns
      */
     skipWhile(predicate: Seq.Predicate<T>, options?: SkipWhileOptions): Seq<T> {
-        predicate = chk(this.skipWhile).predicate(predicate)
+        predicate = chk(this.skipWhile)[wPredicate](predicate)
         return SeqOperator(this, function* skipWhile(input) {
             let prevMode = SkippingMode.None as SkippingMode
             let index = 0
@@ -937,7 +963,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the skipped elements.
      */
     skip(count: number): Seq<T> {
-        chk(this.skip).count(count)
+        chk(this.skip)[wCount](count)
         return SeqOperator(this, function* skip(input) {
             let myCount = count
             if (myCount === 0) {
@@ -948,7 +974,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 myCount = -myCount
                 yield* ___seq(input)
                     .window(myCount + 1, (...window) => {
-                        if (window.length === myCount + 1) {
+                        if (getLength(window) === myCount + 1) {
                             return window[0]
                         }
                         return SPECIAL2
@@ -970,7 +996,7 @@ export abstract class Seq<T> implements Iterable<T> {
     some(predicate: Seq.Predicate<T>): Doddle<boolean> {
         // ! POLYMORPHIC !
 
-        predicate = chk(this.some).predicate(predicate)
+        predicate = chk(this.some)[wPredicate](predicate)
         return lazyOperator(this, function some(input) {
             return input
                 .first(predicate, SPECIAL2)
@@ -988,7 +1014,7 @@ export abstract class Seq<T> implements Iterable<T> {
     sumBy(projection: Seq.Iteratee<T, number>) {
         // ! POLYMORPHIC !
 
-        chk(this.sumBy).projection(projection)
+        chk(this.sumBy)[wProjection](projection)
         return lazyOperator(this, function sumBy(input) {
             return input
                 .map(projection)
@@ -1005,7 +1031,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the yielded elements.
      */
     takeWhile(predicate: Seq.Predicate<T>, options?: TakeWhileOptions): Seq<T> {
-        chk(this.takeWhile).predicate(predicate)
+        chk(this.takeWhile)[wPredicate](predicate)
         return SeqOperator(this, function* takeWhile(input) {
             let index = 0
             for (const element of input) {
@@ -1028,7 +1054,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A new sequence with the yielded elements.
      */
     take(count: number): Seq<T> {
-        chk(this.take).count(count)
+        chk(this.take)[wCount](count)
         return SeqOperator(this, function* take(input) {
             let myCount = count
             if (myCount === 0) {
@@ -1040,13 +1066,13 @@ export abstract class Seq<T> implements Iterable<T> {
                 const results = ___seq(input)
                     .concat([SPECIAL2])
                     .window(myCount + 1, (...window) => {
-                        if (window[window.length - 1] === SPECIAL2) {
+                        if (window.at(-1) === SPECIAL2) {
                             window.pop()
                             return window as T[]
                         }
                         return undefined
                     })
-                    .filter(x => x !== undefined)
+                    .filter(isNotNullish)
                     .first()
                     .pull() as T[]
 
@@ -1081,12 +1107,12 @@ export abstract class Seq<T> implements Iterable<T> {
     toRecord<Key extends PropertyKey, Value>(
         kvpProjection: Seq.Iteratee<T, readonly [Key, Value]>
     ): Doddle<Record<Key, Value>> {
-        chk(this.toRecord).kvpProjection(kvpProjection)
+        chk(this.toRecord)[wKvpProjection](kvpProjection)
         return lazyOperator(this, function toObject(input) {
             return input
                 .map(kvpProjection)
                 .toArray()
-                .map(x => Object.fromEntries(x))
+                .map(x => fromEntries(x))
                 .pull() as any
         })
     }
@@ -1097,7 +1123,7 @@ export abstract class Seq<T> implements Iterable<T> {
 
     toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
         // ! POLYMORPHIC !
-        kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
+        kvpProjection = chk(this.toMap)[wKvpProjection](kvpProjection)
         return lazyOperator(this, function toMap(input) {
             return input
                 .map(kvpProjection)
@@ -1106,13 +1132,16 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
+    get [syToStringTag]() {
+        return wcSeq
+    }
     toSet() {
         return lazyOperator(this, function toSet(input) {
             return new Set(input)
         })
     }
     uniq(projection: Seq.NoIndexIteratee<T, any> = x => x): Seq<T> {
-        chk(this.uniq).projection(projection)
+        chk(this.uniq)[wProjection](projection)
         return SeqOperator(this, function* uniq(input) {
             const seen = new Set()
             for (const element of input) {
@@ -1135,9 +1164,9 @@ export abstract class Seq<T> implements Iterable<T> {
         projection?: (...window: getWindowArgsType<T, L>) => S
     ): Seq<any> {
         const c = chk(this.window)
-        c.size(size)
+        c[wSize](size)
         projection ??= (...window: any) => window as any
-        c.projection(projection)
+        c[wProjection](projection)
         return SeqOperator(this, function* window(input) {
             const buffer = Array<T>(size)
             let i = 0
@@ -1175,7 +1204,7 @@ export abstract class Seq<T> implements Iterable<T> {
     ): Seq<any> {
         const others = _others.map(___seq)
         projection ??= (...args: any[]) => args as any
-        chk(this.zip).projection(projection)
+        chk(this.zip)[wProjection](projection)
         return SeqOperator(this, function* zip(input) {
             const iterators = [input, ...others].map(_iter) as (Iterator<any> | undefined)[]
             while (true) {
@@ -1200,22 +1229,8 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 }
 
-export const SeqOperator = function seq<In, Out>(
-    operand: In,
-    impl: (input: In) => Iterable<Out>
-): Seq<Out> {
-    const myAbstractSeq = Object.assign(new (Seq as any)(), {
-        _operator: impl.name,
-        _operand: operand
-    })
-    Object.defineProperty(myAbstractSeq, Symbol.iterator, {
-        get(this: typeof myAbstractSeq) {
-            return impl.bind(this, this._operand)
-        }
-    })
-    return myAbstractSeq
-}
-
+export const SeqOperator: <In, Out>(operand: In, impl: (input: In) => Iterable<Out>) => Seq<Out> =
+    createOperator(wSeq, Seq, syIterator)
 /** Types associated with the {@link Seq} class. */
 export namespace Seq {
     /** A type that can be either a value or a {@link Doddle} of that value. */

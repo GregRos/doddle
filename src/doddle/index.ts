@@ -1,14 +1,18 @@
 import { cannotRecurseSync, chk, loadCheckers } from "../errors/error.js"
 import {
+    assign,
+    defineProperty,
     getClassName,
     getFunctionName,
     getValueDesc,
     isDoddle,
     isThenable,
+    promiseAll,
     setClassName,
     type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
+import { syToStringTag, wDoddle } from "../words.js"
 import type { Is_Any_Mixed, Is_Any_Pure_Async, Matches_Mixed_Value } from "./helpers.js"
 export const methodName = Symbol("methodName")
 export const ownerInstance = Symbol("ownerInstance")
@@ -30,7 +34,7 @@ export class Doddle<T> {
         const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
         const stageWord = ["untouched", "executing", "done", "threw"][stage]
         const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
-        const namePart = name ? `doddle(${name})` : "doddle"
+        const namePart = name ? `${wDoddle}(${name})` : wDoddle
 
         return {
             isReady: stage >= Stage.Done,
@@ -56,7 +60,7 @@ export class Doddle<T> {
 
         for (const name of ["map", "do", "zip", "catch", "pull"]) {
             const bound = (this as any)[name].bind(this)
-            Object.defineProperty(bound, ownerInstance, { value: this })
+            defineProperty(bound, ownerInstance, { value: this })
             ;(this as any)[name] = bound
         }
         loadCheckers(this)
@@ -218,7 +222,7 @@ export class Doddle<T> {
         return doddle(() => {
             const values = [this, ...others].map(x => x.pull())
             if (values.some(isThenable)) {
-                return Promise.all(values)
+                return promiseAll(values)
             }
             return values
         })
@@ -287,8 +291,8 @@ export class Doddle<T> {
         return resource
     }
 
-    get [Symbol.toStringTag]() {
-        return this.toString()
+    get [syToStringTag]() {
+        return "Doddle"
     }
 }
 /**
@@ -336,7 +340,7 @@ const Helpers = {
         return isDoddle(value)
     }
 }
-export const doddle = Object.assign(doddleBase, Helpers)
+export const doddle = assign(doddleBase, Helpers)
 const enum Stage {
     Untouched = 0,
     Executing = 1,
@@ -404,7 +408,7 @@ export function lazyOperator<In, Out>(
     func: (input: In) => Out | Doddle.Pulled<Out>
 ): Doddle<Out> {
     const lz = doddle(() => func.call(operand, operand)) as any
-    Object.assign(lz, {
+    assign(lz, {
         operator: func.name,
         operand
     })
