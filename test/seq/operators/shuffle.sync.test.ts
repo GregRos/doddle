@@ -2,7 +2,6 @@ import { declare, type, type_of } from "declare-it"
 
 import type { Seq } from "@lib"
 import { seq } from "@lib"
-import { abs } from "@utils"
 import { countEachItemAppearance } from "./shuffle.utils.helper"
 const _seq = seq
 type _Seq<T> = Seq<T>
@@ -34,7 +33,7 @@ it("randomness: every element appears in every position", () => {
     const positions = countEachItemAppearance(shuffles)
     for (const [, pos] of Object.entries(positions)) {
         for (const [, count] of Object.entries(pos)) {
-            expect(abs(count - 1 / array.length)).toBeLessThan(0.15)
+            expect(Math.abs(count - 1 / array.length)).toBeLessThan(0.15)
         }
     }
 })

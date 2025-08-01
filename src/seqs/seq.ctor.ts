@@ -1,15 +1,6 @@
 import { pull, type Doddle } from "../doddle/index.js"
 import { checkSeqInputValue, gotAsyncIteratorInSyncContext } from "../errors/error.js"
-import {
-    _iter,
-    isArrayLike,
-    isFunction,
-    isInt,
-    isIterable,
-    isNextable,
-    isThenable,
-    keys
-} from "../utils.js"
+import { _iter, isArrayLike, isInt, isIterable, isNextable, isThenable } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 
 /**
@@ -59,10 +50,10 @@ function seq<E>(input: Seq.Input<E>): any {
     }
 
     return SeqOperator(input, function* seq(input) {
-        const invoked = isFunction(input) ? input() : input
+        const invoked = typeof input === "function" ? input() : input
         let pulled = pull(invoked)
         if (isArrayLike(pulled)) {
-            for (const key of keys(pulled)) {
+            for (const key of Object.keys(pulled)) {
                 if (isInt(+key)) {
                     yield pull(pulled[+key])
                 }

@@ -1,5 +1,5 @@
 import { chk, loadCheckers } from "../errors/error.js"
-import { assign, getClassName, getThrownError, isFunction, isObject, sign } from "../utils.js"
+import { getClassName, getThrownError, isFunction, isObject } from "../utils.js"
 import { SeqOperator, type Seq } from "./seq.class.js"
 import { ___seq } from "./seq.ctor.js"
 const Builders = {
@@ -42,7 +42,7 @@ const Builders = {
         c.size(size)
         c.start(start)
         c.end(end)
-        const direction = sign(end - start)
+        const direction = Math.sign(end - start)
         return ___seq(function* range() {
             for (let i = start; direction * i < direction * end; i += direction * size) {
                 yield i
@@ -97,4 +97,4 @@ const Builders = {
         })
     }
 }
-export const seq = loadCheckers(assign(___seq, Builders))
+export const seq = loadCheckers(Object.assign(___seq, Builders))

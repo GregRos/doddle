@@ -1,6 +1,5 @@
 import type { ASeq } from "@lib"
 import { aseq } from "@lib"
-import { abs, entries } from "@utils"
 import { declare, type, type_of } from "declare-it"
 import { countEachItemAppearance } from "./shuffle.utils.helper"
 const _aseq = aseq
@@ -32,9 +31,9 @@ it("randomness: every element appears in every position", async () => {
 
     const shuffles = await aseq.repeat(100, 1).map(() => _aseq([...array]).shuffle()._qr)._qr
     const positions = countEachItemAppearance(shuffles)
-    for (const [, pos] of entries(positions)) {
-        for (const [, count] of entries(pos)) {
-            expect(abs(count - 1 / array.length)).toBeLessThan(0.15)
+    for (const [, pos] of Object.entries(positions)) {
+        for (const [, count] of Object.entries(pos)) {
+            expect(Math.abs(count - 1 / array.length)).toBeLessThan(0.15)
         }
     }
 })

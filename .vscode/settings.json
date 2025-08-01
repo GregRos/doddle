@@ -39,6 +39,5 @@
   },
   "jest.runMode": {
     "type": "on-demand"
-  },
-  "typescript.tsdk": "node_modules\\typescript\\lib"
+  }
 }

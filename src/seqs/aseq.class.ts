@@ -1,4 +1,3 @@
-import { returnKvp } from "../doddle/helpers.js"
 import type { Doddle, DoddleAsync } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
 import { chk, loadCheckers } from "../errors/error.js"
@@ -7,36 +6,13 @@ import {
     Stage,
     _aiter,
     createCompareKey,
-    createOperator,
-    getLength,
-    isNotNullish,
     parseStage,
-    promise,
-    promiseAll,
+    returnKvp,
     setClassName,
-    setTimeout,
     shuffleArray,
     type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
-import {
-    syAsyncIterator,
-    syToStringTag,
-    wAction,
-    wAfter,
-    wAseq,
-    wBefore,
-    wCount,
-    wHandler,
-    wKeyProjection,
-    wPredicate,
-    wProjection,
-    wPrototype,
-    wReverse,
-    wSize,
-    wStage,
-    wcASeq
-} from "../words.js"
 import { ___aseq } from "./aseq.ctor.js"
 import { aseq } from "./aseq.js"
 import {
@@ -51,17 +27,17 @@ import {
 } from "./common-types.js"
 import { Seq } from "./seq.class.js"
 import { ___seq } from "./seq.ctor.js"
+
 const SPECIAL = Symbol("special")
-const seqProto = Seq[wPrototype]
 export abstract class ASeq<T> implements AsyncIterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
-        setClassName(ASeq, wcASeq)
-        loadCheckers(ASeq[wPrototype])
+        setClassName(ASeq, "ASeq")
+        loadCheckers(ASeq.prototype)
     }
-    get [syToStringTag]() {
-        return wcASeq
+    get [Symbol.toStringTag]() {
+        return "ASeq"
     }
     abstract [Symbol.asyncIterator](): AsyncIterator<T>
     get _qr() {
@@ -74,7 +50,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the item at the given index.
      */
     at(index: number): DoddleAsync<T | undefined> {
-        return seqProto.at.call(this, index)
+        return Seq.prototype.at.call(this, index)
     }
 
     /**
@@ -92,7 +68,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return ASeqOperator(this, async function* cache() {
             let i = 0
             for (;;) {
-                if (i < getLength(_cache)) {
+                if (i < _cache.length) {
                     const cur = _cache[i]
                     yield cur
                     i++
@@ -144,7 +120,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     catch<S>(
         handler: ASeq.Iteratee<unknown, void | Promise<void> | ASeq.SimpleInput<S>>
     ): ASeq<any> {
-        chk(this.catch)[wHandler](handler)
+        chk(this.catch).handler(handler)
         return ASeqOperator(this, async function* catch_(input) {
             let i = 0
             const iterator = _aiter(input)
@@ -207,19 +183,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         projection?: (...window: getWindowArgsType<T, L>) => S
     ): ASeq<getWindowOutputType<T, L>> {
         const c = chk(this.chunk)
-        c[wSize](size)
+        c.size(size)
         projection ??= (...chunk: any) => chunk as any
-        c[wProjection](projection)
+        c.projection(projection)
         return ASeqOperator(this, async function* chunk(input) {
             let chunk: T[] = []
             for await (const item of input) {
                 chunk.push(item)
-                if (getLength(chunk) === size) {
+                if (chunk.length === size) {
                     yield pull(projection(...(chunk as any)))
                     chunk = []
                 }
             }
-            if (getLength(chunk)) {
+            if (chunk.length) {
                 yield pull(projection(...(chunk as any)))
             }
         }) as any
@@ -235,7 +211,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     concatMap<S>(
         projection: ASeq.Iteratee<T, ASeq.SimpleInput<S>>
     ): ASeq<getConcatElementType<T, S>> {
-        chk(this.concatMap)[wProjection](projection)
+        chk(this.concatMap).projection(projection)
         return ASeqOperator(this, async function* concatMap(input) {
             let index = 0
             for await (const element of input) {
@@ -256,7 +232,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         chk(this.delay).ms(milliseconds)
         return ASeqOperator(this, async function* delay(input) {
             for await (const element of input) {
-                await promise(resolve => setTimeout(resolve, milliseconds))
+                await new Promise(resolve => setTimeout(resolve, milliseconds))
                 yield element
             }
         }) as any
@@ -270,7 +246,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the joined string.
      */
     join(separator = ","): DoddleAsync<string> {
-        return seqProto.join.call(this, separator) as any
+        return Seq.prototype.join.call(this, separator) as any
     }
 
     /**
@@ -304,20 +280,20 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @param stage The **stage** at which to invoke the function (`before`, `after`, or `both`).
      * @returns A new async sequence that invokes the handler as each element is iterated over.
      */
-    each(action: ASeq.StageIteratee<T, unknown>, stage: EachCallStage = wBefore) {
+    each(action: ASeq.StageIteratee<T, unknown>, stage: EachCallStage = "before") {
         const c = chk(this.each)
-        c[wAction](action)
-        c[wStage](stage)
+        c.action(action)
+        c.stage(stage)
         const myStage = parseStage(stage)
         return ASeqOperator(this, async function* each(input) {
             let index = 0
             for await (const element of input) {
                 if (myStage & Stage.Before) {
-                    await pull(action(element, index, wBefore))
+                    await pull(action(element, index, "before"))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    await pull(action(element, index, wAfter))
+                    await pull(action(element, index, "after"))
                 }
                 index++
             }
@@ -332,7 +308,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   otherwise.
      */
     every(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return seqProto.every.call(this, predicate as any) as any
+        return Seq.prototype.every.call(this, predicate as any) as any
     }
 
     /**
@@ -357,7 +333,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence of elements that satisfy the predicate.
      */
     filter(predicate: ASeq.Predicate<T>) {
-        predicate = chk(this.filter)[wPredicate](predicate)
+        predicate = chk(this.filter).predicate(predicate)
         return ASeqOperator(this, async function* filter(input) {
             yield* ___aseq(input).concatMap(async (element, index) =>
                 (await pull(predicate(element, index))) ? [element] : []
@@ -393,7 +369,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     first<Alt = T>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate = predicate || (() => true)
-        chk(this.first)[wPredicate](predicate)
+        chk(this.first).predicate(predicate)
         return lazyOperator(this, async function first(input) {
             let index = 0
             for await (const element of input) {
@@ -433,7 +409,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     last<Alt = undefined>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate ??= () => true
-        chk(this.last)[wPredicate](predicate)
+        chk(this.last).predicate(predicate)
         return lazyOperator(this, async function last(input) {
             let last: T | Alt = alt as Alt
             let index = 0
@@ -456,7 +432,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     toRecord<Key extends PropertyKey, Value>(
         projection: ASeq.Iteratee<T, readonly [Key, Value]>
     ): DoddleAsync<Record<Key, Value>> {
-        return seqProto.toRecord.call(this, projection as any) as any
+        return Seq.prototype.toRecord.call(this, projection as any) as any
     }
 
     /**
@@ -477,7 +453,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence of groups, each as a `[key, ASeq<T>]` tuple.
      */
     groupBy<K>(keyProjection: ASeq.NoIndexIteratee<T, K>): ASeq<ASeq.Group<K, T>> {
-        chk(this.groupBy)[wKeyProjection](keyProjection)
+        chk(this.groupBy).keyProjection(keyProjection)
 
         return ASeqOperator(this, async function* groupBy(input) {
             const map = new Map<K, [T, ...T[]]>()
@@ -497,28 +473,28 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             async function* getGroupIterable(key: K): AsyncIterable<T> {
                 const group = map.get(key)!
                 for (let i = 0; ; i++) {
-                    if (i < getLength(group)) {
+                    if (i < group.length) {
                         yield group[i]
                         continue
                     }
                     for await (const _ of shared) {
-                        if (i < getLength(group)) break
+                        if (i < group.length) break
                     }
-                    if (i >= getLength(group)) return
+                    if (i >= group.length) return
                     i--
                 }
             }
 
             for (let i = 0; ; i++) {
-                if (i < getLength(keys)) {
+                if (i < keys.length) {
                     const key = keys[i]
                     yield [key, ___aseq(() => getGroupIterable(key))]
                     continue
                 }
                 for await (const _ of shared) {
-                    if (i < getLength(keys)) break
+                    if (i < keys.length) break
                 }
-                if (i >= getLength(keys)) return
+                if (i >= keys.length) return
                 i--
             }
         })
@@ -540,7 +516,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     includes<S extends T>(value: S): DoddleAsync<boolean>
 
     includes<S extends T>(value: S): DoddleAsync<boolean> {
-        return seqProto.includes.call(this, value) as any
+        return Seq.prototype.includes.call(this, value) as any
     }
     /**
      * Transforms each element of `this` async sequence by applying the given projection function.
@@ -550,7 +526,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence of projected values.
      */
     map<S>(projection: ASeq.Iteratee<T, S>): ASeq<S> {
-        chk(this.map)[wProjection](projection)
+        chk(this.map).projection(projection)
         return ASeqOperator(this, async function* map(input) {
             yield* ___aseq(input).concatMap(async (element, index) => [
                 (await pull(projection(element, index))) as S
@@ -579,7 +555,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     maxBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
 
     maxBy<R>(projection: ASeq.Iteratee<T, R>, alt?: any) {
-        return seqProto.maxBy.call(this, projection, alt)
+        return Seq.prototype.maxBy.call(this, projection, alt)
     }
 
     /**
@@ -603,7 +579,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     minBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
 
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
-        return seqProto.minBy.call(this, projection, alt)
+        return Seq.prototype.minBy.call(this, projection, alt)
     }
 
     /**
@@ -630,8 +606,8 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
 
     orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, reverse = false): ASeq<T> {
         const c = chk(this.orderBy)
-        c[wProjection](projection)
-        c[wReverse](reverse)
+        c.projection(projection)
+        c.reverse(reverse)
         const compareKey = createCompareKey(reverse)
         return ASeqOperator(this, async function* orderBy(input) {
             yield* await ___aseq(input)
@@ -662,7 +638,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): DoddleAsync<Acc>
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc): any {
-        return seqProto.reduce.call(this, reducer as any, initial)
+        return Seq.prototype.reduce.call(this, reducer as any, initial)
     }
 
     /**
@@ -772,38 +748,39 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     /**
      * Compares `this` sequence to another for element-wise equality using optional projection.
      *
-     * @param input The sequence to compare against.
+     * @param other The sequence to compare against.
      * @returns A 🦥{@link DoddleAsync} that resolves to `true` if sequences are equal in order and
      *   length.
      */
-    seqEquals<T extends S, S>(this: AsyncIterable<T>, input: ASeq.Input<S>): DoddleAsync<boolean>
+    seqEquals<T extends S, S>(this: AsyncIterable<T>, other: ASeq.Input<S>): DoddleAsync<boolean>
     /**
      * Compares `this` sequence to another for element-wise equality using optional projection.
      *
-     * @param input The sequence to compare against.
+     * @param other The sequence to compare against.
      * @returns A 🦥{@link DoddleAsync} that resolves to `true` if sequences are equal in order and
      *   length.
      */
-    seqEquals<S extends T>(input: ASeq.Input<S>): DoddleAsync<boolean>
+    seqEquals<S extends T>(other: ASeq.Input<S>): DoddleAsync<boolean>
     /**
      * Compares `this` sequence to another for element-wise equality using a key projection.
      *
-     * @param input The sequence to compare against.
+     * @param other The sequence to compare against.
      * @param projection Function to extract comparison key from elements.
      * @returns A 🦥{@link DoddleAsync} that resolves to `true` if projected keys match in order and
      *   length.
      */
     seqEquals<K, S = T>(
-        input: ASeq.Input<S>,
+        other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>
     ): DoddleAsync<boolean>
 
     seqEquals<K, S = T>(
-        input: ASeq.Input<S>,
+        _other: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K> = x => x as K
     ): DoddleAsync<boolean> {
         projection ??= x => x as K
-        const other = ___aseq(input)
+
+        const other = ___aseq(_other)
         return lazyOperator(this, async function seqEquals(input) {
             const otherIterator = _aiter(other)
             try {
@@ -837,7 +814,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
     count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
-        return seqProto.count.call(this, predicate as any) as any
+        return Seq.prototype.count.call(this, predicate as any) as any
     }
 
     /** Alias for `concatMap`, mapping and flattening the sequence. */
@@ -911,7 +888,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence of elements after skipping.
      */
     skipWhile(predicate: ASeq.Predicate<T>, options?: SkipWhileOptions): ASeq<T> {
-        predicate = chk(this.skipWhile)[wPredicate](predicate)
+        predicate = chk(this.skipWhile).predicate(predicate)
         return ASeqOperator(this, async function* skipWhile(input) {
             let prevMode = SkippingMode.None as SkippingMode
             let index = 0
@@ -940,7 +917,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     skip(count: number): ASeq<T> {
         const SKIP = SPECIAL
-        chk(this.skip)[wCount](count)
+        chk(this.skip).count(count)
         return ASeqOperator(this, async function* skip(input) {
             let myCount = count
             if (myCount === 0) {
@@ -951,7 +928,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 myCount = -myCount
                 yield* ___aseq(input)
                     .window(myCount + 1, (...window) => {
-                        if (getLength(window) === myCount + 1) {
+                        if (window.length === myCount + 1) {
                             return window[0]
                         }
                         return SKIP
@@ -971,7 +948,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   or `false` otherwise.
      */
     some(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return seqProto.some.call(this, predicate as any) as any
+        return Seq.prototype.some.call(this, predicate as any) as any
     }
 
     /**
@@ -981,7 +958,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the sum of all projected values.
      */
     sumBy(projection: ASeq.Iteratee<T, number>): DoddleAsync<number> {
-        return seqProto.sumBy.call(this, projection as any) as any
+        return Seq.prototype.sumBy.call(this, projection as any) as any
     }
 
     /**
@@ -993,7 +970,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence of elements taken.
      */
     takeWhile(predicate: ASeq.Predicate<T>, specifier?: TakeWhileOptions): ASeq<T> {
-        chk(this.takeWhile)[wPredicate](predicate)
+        chk(this.takeWhile).predicate(predicate)
         return ASeqOperator(this, async function* takeWhile(input) {
             let index = 0
             for await (const element of input) {
@@ -1018,7 +995,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     take(count: number): ASeq<T> {
         const END_MARKER = SPECIAL
-        chk(this.take)[wCount](count)
+        chk(this.take).count(count)
         return ASeqOperator(this, async function* take(input) {
             let myCount = count
             if (myCount === 0) {
@@ -1029,13 +1006,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                 const results = (await ___aseq(input)
                     .concat([END_MARKER])
                     .window(myCount + 1, (...window) => {
-                        if (window.at(-1) === END_MARKER) {
+                        if (window[window.length - 1] === END_MARKER) {
                             window.pop()
                             return window as T[]
                         }
                         return undefined
                     })
-                    .filter(isNotNullish)
+                    .filter(x => x !== undefined)
                     .first()
                     .pull()) as T[]
                 yield* results
@@ -1064,7 +1041,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     ): ASeq<R> {
         const others = _others.map(___aseq).map(x => x.cache())
         projection ??= (...args: any[]) => args as any
-        chk(this.product)[wProjection](projection)
+        chk(this.product).projection(projection)
         return ASeqOperator(this, async function* product(input) {
             let partialProducts = [[]] as any[][]
             for (const iterable of [input, ...others].reverse()) {
@@ -1122,7 +1099,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to a `Map` of all projected key/value pairs.
      */
     toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): DoddleAsync<Map<K, V>> {
-        return seqProto.toMap.call(this, kvpProjection as any) as any
+        return Seq.prototype.toMap.call(this, kvpProjection as any) as any
     }
 
     /**
@@ -1148,7 +1125,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A new async sequence containing unique elements based on the projection.
      */
     uniq(projection: ASeq.NoIndexIteratee<T, any> = x => x): ASeq<T> {
-        chk(this.uniq)[wProjection](projection)
+        chk(this.uniq).projection(projection)
         return ASeqOperator(this, async function* uniq(input) {
             const seen = new Set<any>()
             for await (const element of input) {
@@ -1195,9 +1172,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         projection?: (...window: getWindowArgsType<T, L>) => Doddle.MaybePromised<S>
     ): ASeq<any> {
         const c = chk(this.window)
-        c[wSize](size)
+        c.size(size)
         projection ??= (...window: any) => window as any
-        c[wProjection](projection)
+        c.projection(projection)
         return ASeqOperator(this, async function* window(input) {
             const buffer = Array<T>(size)
             let i = 0
@@ -1224,34 +1201,34 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * Zips `this` async sequence with other sequences, yielding arrays of parallel elements,
      * optionally applying a projection.
      *
-     * @param inputs An array of other sequence inputs to zip with.
+     * @param others An array of other sequence inputs to zip with.
      * @returns A new async sequence of tuples containing parallel elements.
      */
-    zip<Xs extends [any, ...any[]]>(inputs: { [K in keyof Xs]: Seq.Input<Xs[K]> }): ASeq<
+    zip<Xs extends [any, ...any[]]>(others: { [K in keyof Xs]: Seq.Input<Xs[K]> }): ASeq<
         getZipValuesType<[T, ...Xs]>
     >
     /**
      * Zips `this` async sequence with other sequences, yielding arrays of parallel elements,
      * optionally applying a projection.
      *
-     * @param inputs An array of other sequence inputs to zip with.
+     * @param _others An array of other sequence inputs to zip with.
      * @param projection A function mapping each tuple of elements to a value or promise of a value.
      * @returns A new async sequence of projected zipped values.
      */
     zip<Xs extends [any, ...any[]], R>(
-        inputs: { [K in keyof Xs]: ASeq.Input<Xs[K]> },
+        _others: { [K in keyof Xs]: ASeq.Input<Xs[K]> },
         projection: (...args: getZipValuesType<[T, ...Xs]>) => Doddle.MaybePromised<R>
     ): ASeq<R>
 
     zip<Xs extends [any, ...any[]], R>(
-        inputs: {
+        _others: {
             [K in keyof Xs]: ASeq.Input<Xs[K]>
         },
         projection?: (...args: getZipValuesType<[T, ...Xs]>) => Doddle.MaybePromised<R>
     ): ASeq<any> {
-        const others = inputs.map(___aseq)
+        const others = _others.map(___aseq)
         projection ??= (...args: any[]) => args as any
-        chk(this.zip)[wProjection](projection)
+        chk(this.zip).projection(projection)
         return ASeqOperator(this, async function* zip(input) {
             const iterators = [input, ...others].map(_aiter) as (AsyncIterator<any> | undefined)[]
             while (true) {
@@ -1268,7 +1245,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     }
                     return result
                 })
-                const results = await promiseAll(pResults)
+                const results = await Promise.all(pResults)
                 if (results.every(r => !r)) {
                     break
                 }
@@ -1291,11 +1268,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 }
 
-export const ASeqOperator: <In, Out>(
+export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
-) => ASeq<Out> = createOperator(wAseq, ASeq, syAsyncIterator)
-
+): ASeq<Out> {
+    const obj = Object.assign(new (ASeq as any)(), {
+        _operator: impl.name,
+        _operand: operand
+    })
+    Object.defineProperty(obj, Symbol.asyncIterator, {
+        get: () => impl.bind(obj, obj._operand)
+    })
+    return obj
+}
 /** A collection of type definitions for asynchronous sequence operations in Doddle. */
 export namespace ASeq {
     /**

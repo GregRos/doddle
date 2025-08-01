@@ -4,12 +4,10 @@ import {
     _xiter,
     isArrayLike,
     isAsyncIterable,
-    isFunction,
     isInt,
     isIterable,
     isNextable,
     isReadableStream,
-    keys,
     type MaybePromise
 } from "../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
@@ -76,7 +74,7 @@ function aseq<E>(input: ASeq.Input<E>): any {
             if (isAsyncIterable(pulled) || isIterable(pulled)) {
                 var iterator = _xiter(pulled)
             } else if (isArrayLike(pulled)) {
-                for (const key of keys(pulled)) {
+                for (const key of Object.keys(pulled)) {
                     if (isInt(+key)) {
                         yield pull(pulled[+key])
                     }
@@ -85,7 +83,7 @@ function aseq<E>(input: ASeq.Input<E>): any {
             } else if (isNextable(pulled)) {
                 iterator = pulled
             } else {
-                throw new Error()
+                throw new Error("Should be unreachable")
             }
             for (let item = await iterator.next(); !item.done; item = await iterator.next()) {
                 yield pull(item.value)
@@ -103,7 +101,7 @@ function aseq<E>(input: ASeq.Input<E>): any {
     }
 
     return ASeqOperator(input, async function* aseq(input) {
-        const result = isFunction(input) ? await input() : input
+        const result = typeof input === "function" ? await input() : input
         const pulled = await pull(result)
         if (isNextable(pulled) || isReadableStream(pulled)) {
             yield* fromFunctionResult(pulled as any).cache()

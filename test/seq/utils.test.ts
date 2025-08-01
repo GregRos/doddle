@@ -19,5 +19,5 @@ it("gives 'Object' for objects without constructor.name or Symbol.toStringTag", 
             constructor: undefined,
             [Symbol.toStringTag]: undefined
         })
-    ).toBe("object")
+    ).toBe("Object")
 })
