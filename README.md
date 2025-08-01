@@ -3,7 +3,7 @@
 [![Doddle workflow status](https://img.shields.io/github/actions/workflow/status/GregRos/doddle/push.yaml?style=for-the-badge)](https://github.com/GregRos/doddle/actions/workflows/push.yaml)
 [![Doddle package version](https://img.shields.io/npm/v/doddle?style=for-the-badge)](https://www.npmjs.com/package/doddle)
 [![Doddle Coveralls](https://img.shields.io/coverallsCoverage/github/GregRos/doddle?style=for-the-badge)](https://coveralls.io/github/GregRos/doddle?branch=master)
-[![Doddle minified size(gzip)](<https://img.shields.io/bundlejs/size/doddle?exports=aseq&style=for-the-badge&label=minified%20size%20(gzip)>)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
+[![Doddle minified size(gzip)](<https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=minified%20size%20(gzip)>)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
 
 Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, inspired by `lodash`, `LINQ`, and `rxjs`.
 
@@ -24,7 +24,11 @@ Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, i
 Get it now:
 
 ```bash
+# yarn
 yarn add doddle
+
+# npm
+npm install doddle
 ```
 
 # Doddle
