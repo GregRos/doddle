@@ -11,7 +11,55 @@ import {
     type MaybePromise
 } from "../utils.js"
 import { ASeqOperator, type ASeq } from "./aseq.class.js"
-
+/**
+ * Creates a {@link ASeq} from the sequential input. See examples for usage.
+ *
+ * @example
+ *     // An array
+ *     aseq([1, 2, 3])
+ *
+ *     // A generator function
+ *     aseq(function* () {
+ *         yield 1
+ *         yield 2
+ *     })
+ *
+ *     // An async generator function
+ *     aseq(async function* () {
+ *         yield 1
+ *         yield 2
+ *     })
+ *
+ *     // An array-like object, such as a NodeList:
+ *     seq(document.getElementsByTagName("div"))
+ *
+ *     // A readable stream
+ *     const response = await fetch("https://example.com/data")
+ *     aseq(response.body!)
+ *
+ *     // An async function returning a sequence
+ *     aseq(async () => [1, 2, 3])
+ *
+ *     // A Doddle yielding a sequence
+ *     aseq(doddle(() => [1, 2, 3]))
+ *
+ *     // An async Doddle yielding a sequence
+ *     aseq(doddle(async () => [1, 2, 3]))
+ *
+ *     // An iterable
+ *     aseq(seq([1, 2, 3]))
+ *
+ *     // An async iterable
+ *     aseq(aseq([1, 2, 3]))
+ *
+ *     // An async function returning an async iterable
+ *     aseq(async () => aseq([1, 2, 3]))
+ *
+ *     // ⛔ Strings are not allowed here.
+ *     seq("hello")
+ *
+ * @param input The input to create the {@link ASeq} from.
+ */
 function aseq<E>(input: readonly E[]): ASeq<E>
 function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
 function aseq<E>(input: ASeq.SimpleInput<DoddleAsync<E>>): ASeq<E>

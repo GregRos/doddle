@@ -24,7 +24,7 @@ export class Doddle<T> {
     private _cached?: any
     private _info: InnerInfo
     private _cacheName!: string
-    get info(): Readonly<Doddle.Info> {
+    get info(): Readonly<Doddle.Metadata> {
         const { stage, syncness, name } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
         const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
@@ -354,13 +354,19 @@ interface InnerInfo {
     name: string | null
 }
 export namespace Doddle {
-    export interface Info {
+    /** An metadata object describing the state of a {@link Doddle} instance. */
+    export interface Metadata {
         readonly isReady: boolean
         readonly stage: string
         readonly syncness: string
         readonly name: string | null
         readonly desc: string
     }
+
+    /**
+     * Recursively pulls the result type of a {@link Doddle}, cutting thoruhg any {@link PromiseLike}
+     * types. Returns an async representation if the input as async.
+     */
     export type Pulled<T> =
         T extends PromiseLike<infer X>
             ? Promise<PulledAwaited<X>>
@@ -368,6 +374,7 @@ export namespace Doddle {
               ? Pulled<X>
               : T
 
+    /** Recursively pulls the result type of a {@link Doddle}, cutting through any {@link PromiseLike} */
     export type PulledAwaited<T> =
         T extends Doddle<infer R>
             ? PulledAwaited<R>
@@ -375,19 +382,19 @@ export namespace Doddle {
               ? PulledAwaited<R>
               : T
 
+    /** An async value or a {@link Doddle} that can be pulled to get an async value. */
     export type SomeAsync<T> =
         | Promise<T>
         | DoddleAsync<T>
         | Promise<Doddle<T>>
         | Promise<DoddleAsync<T>>
+
+    /** A value, a promise, a doddle, an async doddle, or similar nestings. */
     export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddle<T>>
 }
 
+/** An async {@link Doddle}, which is just a `Doddle<Promise<T>>`. */
 export type DoddleAsync<T> = Doddle<Promise<T>>
-
-/** The stage of a lazily initialized value. */
-
-/** An interface that represents a lazily initialized value. */
 
 export type _IterationType<T> = T extends string ? T : T extends Iterable<infer R> ? R : T
 export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T
@@ -404,7 +411,19 @@ export function lazyOperator<In, Out>(
     return lz
 }
 
+/**
+ * Similar to `await`. Pulls a value from a {@link Doddle}, which may be async. The same as calling
+ * {@link Doddle.pull} on the input.
+ *
+ * @param input
+ */
 export function pull<T>(input: 1 extends 0 & T ? T : never): any
+/**
+ * Similar to `await`. Pulls a value from a {@link Doddle}, which may be async. The same as calling
+ * {@link Doddle.pull} on the input.
+ *
+ * @param input
+ */
 export function pull<T>(input: T): Doddle.Pulled<T>
 export function pull<T>(input: Doddle<T> | T): Doddle.Pulled<T> {
     return doddle(() => input).pull()
