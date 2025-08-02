@@ -5,7 +5,6 @@ import {
     getValueDesc,
     isDoddle,
     isThenable,
-    setClassName,
     type MaybeDoddle,
     type MaybePromise
 } from "../utils.js"
@@ -24,6 +23,9 @@ export class Doddle<T> {
     private _cached?: any
     private _info: InnerInfo
     private _cacheName!: string
+    static get name() {
+        return "Doddle"
+    }
     get info(): Readonly<Doddle.Metadata> {
         const { stage, syncness, name } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
@@ -428,7 +430,3 @@ export function pull<T>(input: T): Doddle.Pulled<T>
 export function pull<T>(input: Doddle<T> | T): Doddle.Pulled<T> {
     return doddle(() => input).pull()
 }
-
-// Class name is used for various checks
-// Need to make sure it's accessible even while minified
-setClassName(Doddle, "Doddle")

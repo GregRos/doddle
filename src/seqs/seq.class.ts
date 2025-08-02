@@ -1,15 +1,7 @@
 import type { Doddle } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
 import { chk, DoddleError, invalidRecursionError, loadCheckers } from "../errors/error.js"
-import {
-    _iter,
-    createCompareKey,
-    parseStage,
-    returnKvp,
-    setClassName,
-    shuffleArray,
-    Stage
-} from "../utils.js"
+import { _iter, createCompareKey, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
 import {
     SkippingMode,
     type EachCallStage,
@@ -26,10 +18,12 @@ const SPECIAL = Symbol("S")
 const SPECIAL2 = Symbol("S2")
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
+    static get name() {
+        return "ASeq"
+    }
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
-        setClassName(Seq, "Seq")
         loadCheckers(Seq.prototype)
     }
 
@@ -1202,13 +1196,10 @@ export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {
-    const myAbstractSeq = Object.assign(new (Seq as any)(), {
-        _operator: impl.name,
-        _operand: operand
-    })
+    const myAbstractSeq = Object.assign(new (Seq as any)(), [impl.name, operand])
     Object.defineProperty(myAbstractSeq, Symbol.iterator, {
         get(this: typeof myAbstractSeq) {
-            return impl.bind(this, this._operand)
+            return impl.bind(this, this[1])
         }
     })
     return myAbstractSeq

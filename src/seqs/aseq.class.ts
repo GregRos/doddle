@@ -8,7 +8,6 @@ import {
     createCompareKey,
     parseStage,
     returnKvp,
-    setClassName,
     shuffleArray,
     type MaybeDoddle,
     type MaybePromise
@@ -32,8 +31,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
-        setClassName(ASeq, "ASeq")
         loadCheckers(ASeq.prototype)
+    }
+    static get name() {
+        return "ASeq"
     }
     get [Symbol.toStringTag]() {
         return "ASeq"
@@ -1271,12 +1272,9 @@ export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ): ASeq<Out> {
-    const obj = Object.assign(new (ASeq as any)(), {
-        _operator: impl.name,
-        _operand: operand
-    })
+    const obj = Object.assign(new (ASeq as any)(), [impl.name, operand])
     Object.defineProperty(obj, Symbol.asyncIterator, {
-        get: () => impl.bind(obj, obj._operand)
+        get: () => impl.bind(obj, obj[1])
     })
     return obj
 }

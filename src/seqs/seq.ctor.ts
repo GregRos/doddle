@@ -8,7 +8,6 @@ import {
 import {
     _iter,
     getClassName,
-    getThrownError,
     isArrayLike,
     isFunction,
     isInt,
@@ -188,7 +187,7 @@ export namespace seq {
         thrower = chk(throws).thrower(thrower)
         return SeqOperator(thrower, function* throws(input) {
             const result = input()
-            throw getThrownError(result)
+            throw result
         })
     }
 }

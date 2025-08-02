@@ -3,7 +3,6 @@ import { checkASeqInputValue, chk, loadCheckers } from "../errors/error.js"
 import {
     _xiter,
     getClassName,
-    getThrownError,
     isArrayLike,
     isAsyncIterable,
     isFunction,
@@ -204,7 +203,7 @@ export namespace aseq {
         thrower = chk(throws).thrower(thrower)
         return ASeqOperator(thrower, async function* throws(input) {
             const result = input()
-            throw getThrownError(result)
+            throw result
         })
     }
 }

@@ -180,9 +180,7 @@ export function returnKvp(input: any, key: any, value: any) {
 }
 export type MaybePromise<T> = T | Promise<T>
 export type MaybeDoddle<T> = T | Doddle<T> | DoddleAsync<T>
-export function getThrownError(thrown: unknown) {
-    return thrown instanceof Error ? thrown : new Error(String(thrown))
-}
+
 export function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1))
@@ -220,17 +218,8 @@ export function createCompareKey(desc: boolean) {
     }
 }
 export function splat(bits: Text): string {
-    if (!isArray(bits)) {
+    if (!Array.isArray(bits)) {
         return bits as string
     }
     return bits.flat(5).join(" ")
-}
-
-export function setClassName(cls: any, name: string) {
-    if (cls.name === name) {
-        return
-    }
-    Object.defineProperty(cls, "name", {
-        value: name
-    })
 }
