@@ -65,27 +65,8 @@ subject.must
 - of operator '${operator}'
 -
 */
-const wFunction = "function"
-const wInteger = "integer"
-const wArgument = "argument"
-const wReturn = "return"
-const wIterable = "iterable"
-const wAsync = "(async)"
-const wIterator = "iterator"
-const wConversion = "conversion"
-const wButGot = "but got"
-const wBe = "be"
-const wCalledWith = "called with"
-const wArguments = "arguments"
-const wDoddle = "doddle"
-const wString = "string"
-const wError = "error"
-const wT = "true"
-const wF = "false"
-const wArray = "array"
-const wInf = "Infinity"
 const getButGot = (value: any) => {
-    return [wButGot, getValueDesc(value)]
+    return ["but got", getValueDesc(value)]
 }
 
 export const getSubject = (thing: Text, context: Text, verb: Text) => {
@@ -96,9 +77,9 @@ export function checkNumberArgs(context: string) {
         return (args: any[]) => {
             if (args.length < min || args.length > max) {
                 throw new DoddleError([
-                    getSubject(wCalledWith, [context], wBe),
+                    getSubject("called with", [context], "be"),
                     min === max ? min : [min, "to", max],
-                    wArguments,
+                    "arguments",
                     getButGot(args.length)
                 ])
             }
@@ -115,28 +96,25 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
         return x
     }
 }
-const expectInt = expectation(`a ${wInteger}`, isInt)
-const expectString = expectation(`a ${wString}`, x => typeof x === wString)
-const expectIntOrInfinity = expectation(
-    `an ${wInteger} or ${wInf}`,
-    x => isInt(x) || x === Infinity
-)
-const expectNatOrInfinity = expectation(`a non-negative ${wInteger} or ${wInf}`, isNatOrInfinity)
-const expectPosInt = expectation(`a positive ${wInteger}`, isPosInt)
+const expectInt = expectation(`a integer`, isInt)
+const expectString = expectation(`a string`, x => typeof x === "string")
+const expectIntOrInfinity = expectation(`an integer or Infinity`, x => isInt(x) || x === Infinity)
+const expectNatOrInfinity = expectation(`a non-negative integer or Infinity`, isNatOrInfinity)
+const expectPosInt = expectation(`a positive integer`, isPosInt)
 
-const expectBool = expectation(`${wT} or ${wF}`, isBool)
-const expectError = expectation(`an ${wError}`, isError)
-const expectFunc = expectation(`a ${wFunction}`, isFunction)
-const expectPair = expectation(`an ${wArray} of length 2`, isPair)
+const expectBool = expectation(`true or false`, isBool)
+const expectError = expectation(`an error`, isError)
+const expectFunc = expectation(`a function`, isFunction)
+const expectPair = expectation(`an array of length 2`, isPair)
 
 const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
-    anOrStructure([wIterable, wIterator, wDoddle].join(", "), wFunction),
+    anOrStructure(["iterable", "iterator", "doddle"].join(", "), "function"),
     x => isIterable(x) || isFunction(x) || isDoddle(x) || isNextable(x) || isArrayLike(x)
 )
 const expectAsyncInputValue = expectation(
-    anOrStructure([[wAsync, wIterable, wIterator], wDoddle].join(", "), wFunction),
+    anOrStructure([["(async)", "iterable", "iterator"], "doddle"].join(", "), "function"),
     x =>
         isAnyIterable(x) ||
         isFunction(x) ||
@@ -145,13 +123,13 @@ const expectAsyncInputValue = expectation(
         isReadableStream(x) ||
         isArrayLike(x)
 )
-const iterableOrIterator = anOrStructure(wIterable, wIterator)
+const iterableOrIterator = anOrStructure("iterable", "iterator")
 const expectSyncIterableOrIterator = expectation(
-    anOrStructure(wIterable, wIterator),
+    anOrStructure("iterable", "iterator"),
     x => isIterable(x) || isNextable(x) || isDoddle(x) || isArrayLike(x)
 )
 const expectAsyncIterableOrIterator = expectation(
-    anOrStructure([wAsync, wIterable], wIterator),
+    anOrStructure(["(async)", "iterable"], "iterator"),
     x => isAnyIterable(x) || isNextable(x) || isDoddle(x) || isReadableStream(x) || isArrayLike(x)
 )
 const checkFunctionReturn = (
@@ -161,10 +139,10 @@ const checkFunctionReturn = (
     allowAsync: boolean
 ) => {
     return (f: (...args: any[]) => any) => {
-        expectFunc(getSubject(thing, context, wBe))(f)
+        expectFunc(getSubject(thing, context, "be"))(f)
         return (...args: any[]) => {
             const result = f(...args)
-            const resultChecker = expectReturn(getSubject([wFunction, thing], context, wReturn))
+            const resultChecker = expectReturn(getSubject(["function", thing], context, "return"))
             if (isThenable(result) && allowAsync) {
                 return result.then(x => {
                     if (isDoddle(x)) {
@@ -185,11 +163,11 @@ const checkFunctionReturn = (
 export const forOperator = (operator: string) => {
     const context = ["operator", `'${operator}'`]
     function getArgThing(name: string) {
-        return [wArgument, `'${name}'`]
+        return ["argument", `'${name}'`]
     }
     const allowAsync = ["a", "A"].includes(operator[0])
     function getArgSubject(name: string) {
-        return getSubject(getArgThing(name), context, wBe)
+        return getSubject(getArgThing(name), context, "be")
     }
 
     function checkValue<K extends string>(name: K, exp: Expectation) {
@@ -232,8 +210,8 @@ const wInput = "input"
 const wSeq = "seq"
 const wAseq = "aseq"
 export const checkSeqInputValue = <T>(input: T) => {
-    const context = [wConversion, wSeq]
-    expectSyncInputValue(getSubject(wInput, context, wBe))(input)
+    const context = ["conversion", wSeq]
+    expectSyncInputValue(getSubject(wInput, context, "be"))(input)
     if (isFunction(input)) {
         return checkFunctionReturn(
             wInput,
@@ -246,8 +224,8 @@ export const checkSeqInputValue = <T>(input: T) => {
 }
 
 export const checkASeqInputValue = <T>(input: T) => {
-    const context = [wConversion, wAseq]
-    expectAsyncInputValue(getSubject(wInput, context, wBe))(input)
+    const context = ["conversion", wAseq]
+    expectAsyncInputValue(getSubject(wInput, context, "be"))(input)
     if (isFunction(input)) {
         return checkFunctionReturn(
             wInput,
@@ -261,9 +239,9 @@ export const checkASeqInputValue = <T>(input: T) => {
 
 export const gotAsyncIteratorInSyncContext = () => {
     throw new DoddleError([
-        getSubject(wInput, [wConversion, wAseq], wBe),
+        getSubject(wInput, ["conversion", wAseq], "be"),
         iterableOrIterator,
-        [wButGot, "an async", wIterator]
+        ["but got", "an async", "iterator"]
     ])
 }
 
