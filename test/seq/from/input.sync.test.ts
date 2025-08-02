@@ -19,7 +19,7 @@ declare.it("element type is same as iterable", expect => {
 declare.it("can specify type when converting from array", expect => {
     const s = _seq<1>([1])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
-    _seq.empty<number>()
+    _seq<number>([])
 })
 declare.it("can specify type when converting from empty array", expect => {
     const s = _seq<1>([])
@@ -27,7 +27,7 @@ declare.it("can specify type when converting from empty array", expect => {
 })
 
 declare.it("can specify type when converting from nothing", expect => {
-    const s = _seq.empty<1>()
+    const s = _seq<1>([])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
 })
 declare.it("cannot be called using async iterable", () => {
@@ -89,7 +89,7 @@ it("throws on iteration if given a function returning a string", () => {
     }).toThrow(DoddleError)
 })
 it("empty argslist gives empty seq", () => {
-    expect(_seq.empty()._qr).toEqual([])
+    expect(_seq([])._qr).toEqual([])
 })
 it("converts from array", () => {
     expect(_seq([1, 2, 3])._qr).toEqual([1, 2, 3])

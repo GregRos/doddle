@@ -21,7 +21,7 @@ it("should support operators", async () => {
     await expect(seq._qr).resolves.toEqual([2])
 })
 
-it("should be accepted by seq.empty() and concat()", async () => {
+it("should be accepted by seq([]) and concat()", async () => {
     const seq = new CustomSeq()
     const result = seq.concat(seq)
     await expect(result._qr).resolves.toEqual([0, 1, 2, 0, 1, 2])

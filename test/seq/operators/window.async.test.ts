@@ -91,7 +91,7 @@ it("errors on window length of 0 immediately", async () => {
 })
 
 it("is not eager", async () => {
-    const s = aseq.repeat(Infinity, 1)
+    const s = aseq.iterate(Infinity, () => 1)
     const windowed = s.window(3)
     for await (const _ of windowed) {
         break

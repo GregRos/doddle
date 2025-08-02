@@ -68,13 +68,13 @@ it("projects correctly when mapped to different inputs", () => {
         })._qr
     ).toEqual([1, 1, 1])
 
-    expect(s.concatMap(_ => _seq.of(1, 2))._qr).toEqual([1, 2, 1, 2, 1, 2])
-    expect(s.concatMap(_ => () => _seq.of(1, 2)[Symbol.iterator]())._qr).toEqual([1, 2, 1, 2, 1, 2])
+    expect(s.concatMap(_ => _seq([1, 2]))._qr).toEqual([1, 2, 1, 2, 1, 2])
+    expect(s.concatMap(_ => () => _seq([1, 2])[Symbol.iterator]())._qr).toEqual([1, 2, 1, 2, 1, 2])
 })
 
 it("is not eager", () => {
-    const s = _seq.repeat(Infinity, 1)
-    const projected = s.concatMap(_ => _seq.repeat(Infinity, "a"))
+    const s = _seq.iterate(Infinity, () => 1)
+    const projected = s.concatMap(_ => _seq.iterate(Infinity, () => "a"))
     for (const _ of projected) {
         break
     }

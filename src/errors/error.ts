@@ -182,7 +182,7 @@ export const forOperator = (operator: string) => {
         checkValue("size", expectPosInt),
         checkValue("start", expectInt),
         checkValue("times", expectNatOrInfinity),
-        checkValue("end", expectInt),
+        checkValue("end", expectIntOrInfinity),
         checkValue("index", expectInt),
         checkValue("count", expectIntOrInfinity),
         checkValue("projection", expectFunc),

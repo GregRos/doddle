@@ -77,8 +77,8 @@ it("projects when empty to non empty, function not called", async () => {
 })
 
 it("is not eager", async () => {
-    const s = _seq.repeat(Infinity, 1)
-    const projected = s.concatMap(_ => _seq.repeat(Infinity, "a"))
+    const s = _seq.iterate(Infinity, () => 1)
+    const projected = s.concatMap(_ => _seq.iterate(Infinity, () => "a"))
     for await (const _ of projected) {
         break
     }

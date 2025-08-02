@@ -13,7 +13,7 @@ describe("type tests", () => {
         expect(type_of(s123.concat())).to_equal(type<_Seq<number>>)
     })
     declare.it("never stays never when given no args", expect => {
-        expect(type_of(_seq.empty().concat())).to_equal(Seq_never)
+        expect(type_of(_seq([]).concat())).to_equal(Seq_never)
     })
 
     declare.it("disjunction with different element types", expect => {
@@ -24,20 +24,20 @@ describe("type tests", () => {
     })
 
     declare.it("disjunction with different input types", expect => {
-        expect(type_of(s123.concat(_seq.empty(), [1]))).to_equal(type<_Seq<number>>)
+        expect(type_of(s123.concat(_seq([]), [1]))).to_equal(type<_Seq<number>>)
         expect(
             type_of(
                 s123.concat(
-                    _seq.empty(),
+                    _seq([]),
                     function* () {
                         yield "aaa"
                     },
-                    seq.of(1n as bigint),
+                    seq([1n as bigint]),
                     async function* () {
                         yield null
                     },
-                    _seq.of(true, false)[Symbol.asyncIterator],
-                    seq.of(undefined)[Symbol.iterator]
+                    _seq([true, false])[Symbol.asyncIterator],
+                    seq([undefined])[Symbol.iterator]
                 )
             )
         ).to_equal(type<_Seq<number | string | boolean | bigint | null | undefined>>)
@@ -61,18 +61,18 @@ it("concats with multiple inputs", async () => {
 
 it("concats with different types of inputs", async () => {
     const s = _seq([1, 2, 3]).concat(
-        seq.of(4, 5),
+        seq([4, 5]),
         function* () {
             yield 6
         },
-        () => _iter(seq.of(7))
+        () => _iter(seq([7]))
     )
     await expect(s._qr).resolves.toEqual([1, 2, 3, 4, 5, 6, 7])
 })
 
 it("doesn't pull iterables before needed", async () => {
     const fn = jest.fn(function* () {})
-    const s = _seq.of(1, 2, 3).concat(fn)
+    const s = _seq([1, 2, 3]).concat(fn)
     let i = 0
     for await (const _ of s) {
         if (i++ < 3) {
@@ -89,7 +89,7 @@ it("only pulls as many elements as needed", async () => {
         yield 2
         expect(true).toBe(false)
     })
-    const s = _seq.of(1).concat(fn)
+    const s = _seq([1]).concat(fn)
     let i = 0
     for await (const _ of s) {
         if (i++ > 1) {
@@ -99,7 +99,7 @@ it("only pulls as many elements as needed", async () => {
 })
 
 it("concats to infinite", async () => {
-    const s = _seq.repeat(Infinity, 1).concat([2, 3])
+    const s = _seq.iterate(Infinity, () => 1).concat([2, 3])
     await expect(s.take(3)._qr).resolves.toEqual([1, 1, 1])
 })
 

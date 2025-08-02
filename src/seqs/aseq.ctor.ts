@@ -2,18 +2,15 @@ import { pull, type Doddle, type DoddleAsync } from "../doddle/index.js"
 import { checkASeqInputValue, chk, loadCheckers } from "../errors/error.js"
 import {
     _xiter,
-    getClassName,
     isArrayLike,
     isAsyncIterable,
-    isFunction,
     isInt,
     isIterable,
     isNextable,
-    isObject,
     isReadableStream,
     type MaybePromise
 } from "../utils.js"
-import { ASeqOperator, type ASeq } from "./aseq.class.js"
+import { ASeq, ASeqOperator } from "./aseq.class.js"
 import { seq } from "./seq.ctor.js"
 /**
  * Creates a {@link ASeq} from the sequential input. See examples for usage.
@@ -135,18 +132,6 @@ export namespace aseq {
     }
 
     /**
-     * Creates an {@link ASeq} of items from the provided values.
-     *
-     * @param items Values to include in the {@link ASeq}.
-     * @returns An {@link ASeq} of the provided items.
-     */
-    export function of<const Items extends any[]>(
-        ...items: Items
-    ): ASeq<Items extends (infer E)[] ? E : never> {
-        return aseq(items)
-    }
-
-    /**
      * Creates an {@link ASeq} of numbers in the specified range.
      *
      * @param start Starting number of the range.
@@ -163,34 +148,13 @@ export namespace aseq {
     }
 
     /**
-     * Creates an empty {@link ASeq}.
-     *
-     * @returns An empty {@link ASeq}.
-     */
-    export function empty<T = never>(): ASeq<T> {
-        return aseq([])
-    }
-
-    /**
-     * Creates an {@link ASeq} that repeats the specified value a given number of times.
-     *
-     * @param times Number of times to repeat the value.
-     * @param value Value to repeat.
-     * @returns An {@link ASeq} that contains the repeated value.
-     */
-    export function repeat<T>(times: number, value: T): ASeq<T> {
-        chk(repeat).times(times)
-        return aseq(seq.repeat(times, value))
-    }
-
-    /**
      * Checks if the provided input is an {@link ASeq}.
      *
      * @param input Input to check.
      * @returns `true` if the input is an {@link ASeq}, otherwise `false`.
      */
     export function is<T = unknown>(input: any): input is ASeq<T> {
-        return isObject(input) && getClassName(input) === "ASeq" && isFunction(input.map)
+        return input instanceof ASeq
     }
 
     /**
@@ -201,9 +165,8 @@ export namespace aseq {
      */
     export function throws<T = never>(thrower: () => Error): ASeq<T> {
         thrower = chk(throws).thrower(thrower)
-        return ASeqOperator(thrower, async function* throws(input) {
-            const result = input()
-            throw result
+        return aseq(() => {
+            throw thrower()
         })
     }
 }

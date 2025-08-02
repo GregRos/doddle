@@ -17,7 +17,7 @@ it("should support operators", () => {
     expect([...seq]).toEqual([2])
 })
 
-it("should be accepted by seq.empty() and concat()", () => {
+it("should be accepted by seq([]) and concat()", () => {
     const seq = new CustomSeq()
     const result = seq.concat(seq)
     expect([...result]).toEqual([0, 1, 2, 0, 1, 2])

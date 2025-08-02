@@ -3,15 +3,14 @@ import { doddle, seq } from "@lib"
 import { declare } from "declare-it"
 
 declare.it("callable with various returns", () => {
-    seq.empty().before(() => {})
-    seq.empty().before(() => 1)
-    seq.empty().before(() => [])
+    seq([]).before(() => {})
+    seq([]).before(() => 1)
+    seq([]).before(() => [])
 })
 
 it("empty stays empty", () => {
     expect(
-        seq
-            .empty()
+        seq([])
             .before(() => 1)
             .toArray()
             .pull()

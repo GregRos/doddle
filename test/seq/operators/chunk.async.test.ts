@@ -65,7 +65,7 @@ it("errors on chunk length of 0 immediately", async () => {
 })
 
 it("is not eager", async () => {
-    const s = aseq.repeat(Infinity, 1)
+    const s = aseq.iterate(Infinity, () => 1)
     const chunked = s.chunk(3)
     for await (const _ of chunked) {
         break

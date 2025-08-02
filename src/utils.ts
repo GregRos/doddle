@@ -64,7 +64,7 @@ export function isNextable<T>(value: any): value is Iterator<T> | AsyncIterator<
 
 export function getClassName(something: any): string {
     if (!isObject(something)) {
-        return getValueDesc(something) as string
+        return typeof something
     }
     if (something === null) {
         return "null"

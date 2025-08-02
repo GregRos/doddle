@@ -29,7 +29,7 @@ it("returns array containing same elements", () => {
 it("randomness: every element appears in every position", () => {
     const array = [1, 2, 3, 4, 5, 6, 7]
 
-    const shuffles = seq.repeat(10000, 1).map(() => _seq([...array]).shuffle()._qr)._qr
+    const shuffles = seq.iterate(10000, () => 1).map(() => _seq([...array]).shuffle()._qr)._qr
     const positions = countEachItemAppearance(shuffles)
     for (const [, pos] of Object.entries(positions)) {
         for (const [, count] of Object.entries(pos)) {

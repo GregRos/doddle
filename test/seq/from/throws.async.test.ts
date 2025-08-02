@@ -31,8 +31,7 @@ it("throws error based on function returning Error", async () => {
 
 it("works when appended to another aseq", async () => {
     const each = jest.fn()
-    const s = aseq
-        .of(1, 2, 3)
+    const s = aseq([1, 2, 3])
         .concat(aseq.throws(() => new Error("error")))
         .each(each)
     await expect(async () => {

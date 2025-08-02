@@ -26,8 +26,7 @@ it("throws error based on function returning Error", () => {
 
 it("works when appended to another seq", () => {
     const each = jest.fn()
-    const s = seq
-        .of(1, 2, 3)
+    const s = seq([1, 2, 3])
         .concat(seq.throws(() => new Error("error")))
         .each(each)
     expect(() => [...s]).toThrow("error")

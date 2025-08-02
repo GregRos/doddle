@@ -51,7 +51,7 @@ it("errors on length of 0", () => {
 })
 
 it("is not eager", () => {
-    const s = seq.repeat(Infinity, 1)
+    const s = seq.range(1, Infinity).map(x => 1)
     const chunked = s.chunk(3)
     for (const _ of chunked) {
         break

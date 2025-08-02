@@ -4,15 +4,14 @@ import { declare } from "declare-it"
 
 describe("async", () => {
     declare.it("callable with various returns", async () => {
-        await aseq.empty().before(() => {})
-        await aseq.empty().before(() => 1)
-        await aseq.empty().before(() => [])
+        await aseq([]).before(() => {})
+        await aseq([]).before(() => 1)
+        await aseq([]).before(() => [])
     })
 
     it("empty stays empty", async () => {
         expect(
-            await aseq
-                .empty()
+            await aseq([])
                 .before(() => 1)
                 .toArray()
                 .pull()

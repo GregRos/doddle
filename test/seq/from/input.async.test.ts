@@ -84,7 +84,7 @@ it("throws on iteration if given a function returning a string", async () => {
 })
 
 it("empty argslist gives empty aseq", async () => {
-    expect(await _seq.empty()._qr).toEqual([])
+    expect(await _seq([])._qr).toEqual([])
 })
 
 it("converts from array", async () => {
@@ -190,12 +190,6 @@ it("calls next as many times as needed", async () => {
 it("converts from function returning iterable", async () => {
     const iterable = _seq(() => [1, 2])
     expect(await iterable._qr).toEqual([1, 2])
-})
-
-declare.it("can specify type when converting from array", expect => {
-    const s = _seq<1>([1])
-    expect(type_of(s)).to_equal(type<_Seq<1>>)
-    _seq.empty<number>()
 })
 
 declare.it("can specify type when converting from empty array", expect => {

@@ -5,18 +5,8 @@ import {
     gotAsyncIteratorInSyncContext,
     loadCheckers
 } from "../errors/error.js"
-import {
-    _iter,
-    getClassName,
-    isArrayLike,
-    isFunction,
-    isInt,
-    isIterable,
-    isNextable,
-    isObject,
-    isThenable
-} from "../utils.js"
-import { SeqOperator, type Seq } from "./seq.class.js"
+import { _iter, isArrayLike, isInt, isIterable, isNextable, isThenable } from "../utils.js"
+import { Seq, SeqOperator } from "./seq.class.js"
 
 /**
  * Creates a {@link Seq} from the provided input. See examples for usage.
@@ -108,18 +98,6 @@ export namespace seq {
     }
 
     /**
-     * Creates a {@link Seq} of items from the provided values.
-     *
-     * @param items Values to include in the {@link Seq}.
-     * @returns A {@link Seq} of the provided items.
-     */
-    export function of<const Items extends any[]>(
-        ...items: Items
-    ): Seq<Items extends (infer E)[] ? E : never> {
-        return seq(items)
-    }
-
-    /**
      * Creates a {@link Seq} of numbers in the specified range.
      *
      * @param start Starting number of the range.
@@ -141,32 +119,6 @@ export namespace seq {
     }
 
     /**
-     * Creates a {@link Seq} that repeats the specified value a given number of times.
-     *
-     * @param times Number of times to repeat the value.
-     * @param value Value to repeat.
-     * @returns A {@link Seq} that contains the repeated value.
-     */
-    export function repeat<T>(times: number, value: T): Seq<T> {
-        return seq(function* () {
-            for (let i = 0; i < times; i++) {
-                yield value
-            }
-        })
-    }
-
-    /**
-     * Checks if the provided input is a {@link Seq}.
-     *
-     * @template T Type of items in the {@link Seq}.
-     * @param input Input to check.
-     * @returns `true` if the input is a {@link Seq}, otherwise `false`.
-     */
-    export function empty<T = never>(): Seq<T> {
-        return seq([])
-    }
-
-    /**
      * Checks if the provided input is a {@link Seq}.
      *
      * @template T Type of items in the {@link Seq}.
@@ -174,7 +126,7 @@ export namespace seq {
      * @returns `true` if the input is a {@link Seq}, otherwise `false`.
      */
     export function is<T = unknown>(input: any): input is Seq<T> {
-        return isObject(input) && getClassName(input) === "Seq" && isFunction(input.map)
+        return input instanceof Seq
     }
 
     /**

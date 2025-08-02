@@ -6,21 +6,21 @@ const _seq = seq
 type _Seq<T> = Seq<T>
 declare.it("fails on array of values", expect => {
     // @ts-expect-error product expects an array of sequences
-    _seq.empty().product([1])
+    _seq([]).product([1])
 })
 
 declare.it("empty input gives singletons", expect => {
-    const a = _seq.empty<number>().product([])
+    const a = _seq<number>([]).product([])
     expect(type_of(a)).to_equal(type<_Seq<[number]>>)
 })
 
 declare.it("number, string gives number×string", expect => {
-    const s = _seq.empty<number>().product([_seq.empty<string>()])
+    const s = _seq<number>([]).product([_seq<string>([])])
     expect(type_of(s)).to_equal(type<_Seq<[number, string]>>)
 })
 
 declare.it("number, string, boolean gives number×string×boolean", expect => {
-    const s = _seq.empty<number>().product([_seq.empty<string>(), _seq.empty<boolean>()])
+    const s = _seq<number>([]).product([_seq<string>([]), _seq<boolean>([])])
     expect(type_of(s)).to_equal(type<_Seq<[number, string, boolean]>>)
 })
 
@@ -36,8 +36,8 @@ declare.it("projection to string", expect => {
 })
 
 declare.it("array input → min tuple", expect => {
-    const a = _seq.empty<number>()
-    const b = _seq.empty<number>()
+    const a = _seq<number>([])
+    const b = _seq<number>([])
     const arr = [b]
     const product = a.product(arr)
     expect(type_of(product)).to_equal(type<_Seq<[number, ...number[]]>>)

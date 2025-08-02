@@ -29,7 +29,7 @@ it("returns array containing same elements", async () => {
 it("randomness: every element appears in every position", async () => {
     const array = [1, 2, 3, 4, 5, 6, 7]
 
-    const shuffles = await aseq.repeat(100, 1).map(() => _aseq([...array]).shuffle()._qr)._qr
+    const shuffles = await aseq.iterate(100, () => 1).map(() => _aseq([...array]).shuffle()._qr)._qr
     const positions = countEachItemAppearance(shuffles)
     for (const [, pos] of Object.entries(positions)) {
         for (const [, count] of Object.entries(pos)) {

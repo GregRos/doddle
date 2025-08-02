@@ -74,7 +74,7 @@ it("errors on length of 0", () => {
 })
 
 it("is not eager", () => {
-    const s = seq.repeat(Infinity, 1)
+    const s = seq.iterate(Infinity, () => 1)
     const windowed = s.window(3)
     for (const _ of windowed) {
         break

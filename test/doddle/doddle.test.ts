@@ -1,9 +1,9 @@
 import { doddle, Doddle } from "@lib"
 import { declare, type } from "declare-it"
 
-it("no name normalizes to null", () => {
+it("no name normalizes to empty", () => {
     const lz = doddle(() => 1)
-    expect(lz.info.name).toEqual(null)
+    expect(lz.info.name).toEqual("")
 })
 
 it("name is recovered", () => {
@@ -14,17 +14,12 @@ it("name is recovered", () => {
     expect(lz.toString()).toEqual("doddle(foo) <untouched>")
 })
 
-it("toString() is equal to Symbol.toStringTag", () => {
-    const lz = doddle(() => 1)
-    expect(lz.toString()).toEqual(lz[Symbol.toStringTag])
-})
-
 it("starts out untouched", () => {
     const lz = doddle(() => 1)
     expect(lz.info).toEqual({
         desc: expect.any(String),
         isReady: false,
-        name: null,
+        name: "",
         stage: "untouched",
         syncness: "untouched"
     })

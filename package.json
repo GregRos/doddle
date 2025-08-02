@@ -72,6 +72,9 @@
     "prepublishOnly": "node tools/packaging.cjs",
     "tidy": "yarn install && run-s lint:fix build:clean test prepublishOnly"
   },
+  "dependencies": {
+    "tslib": "^2.8.1"
+  },
   "devDependencies": {
     "@gregros/eslint-config": "^0.6.0",
     "@size-limit/esbuild": "^11.2.0",
@@ -108,9 +111,11 @@
       "path": "dist/esm/seq.js",
       "limit": "5 kB",
       "gzip": true
+    },
+    {
+      "path": "dist/esm/index.js",
+      "limit": "6.25 kB",
+      "gzip": true
     }
-  ],
-  "dependencies": {
-    "tslib": "^2.8.1"
-  }
+  ]
 }
