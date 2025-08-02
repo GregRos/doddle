@@ -23,9 +23,6 @@ export abstract class Seq<T> implements Iterable<T> {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
         loadCheckers(Seq.prototype)
-        Object.defineProperty(this, "name", {
-            value: "ASeq"
-        })
     }
 
     get _qr() {
@@ -263,7 +260,7 @@ export abstract class Seq<T> implements Iterable<T> {
         }) as any
     }
 
-    concatFirst<Seqs extends Seq.Input<any>[]>(
+    concatTo<Seqs extends Seq.Input<any>[]>(
         ..._iterables: Seqs
     ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
         if (_iterables.length === 0) {
@@ -281,7 +278,10 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param stage The **stage** at which to invoke the function (`before`, `after`, or `both`).
      * @returns A new sequence that invokes the handler as each element is iterated over.
      */
-    each(action: Seq.StageIteratee<T, void>, stage: EachCallStage | undefined = "before") {
+    each(
+        action: Seq.StageIteratee<T, void>,
+        stage: EachCallStage | undefined = orderedStages[Stage.Before]
+    ) {
         const c = chk(this.each)
         c.action(action)
         c.stage(stage)
@@ -290,11 +290,11 @@ export abstract class Seq<T> implements Iterable<T> {
             let index = 0
             for (const element of input) {
                 if (myStage & Stage.Before) {
-                    pull(action(element, index, "before"))
+                    pull(action(element, index, orderedStages[Stage.Before]))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    pull(action(element, index, "after"))
+                    pull(action(element, index, orderedStages[Stage.After]))
                 }
                 index++
             }

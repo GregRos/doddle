@@ -33,7 +33,7 @@ export const orderedStages = [undefined, "before", "after", "both"] as const
 
 export const isStage = (value: any) => {
     const parsed = orderedStages.indexOf(value)
-    return parsed > 0 && parsed <= 3
+    return parsed > 0
 }
 
 export const isNumber = (v: number) => +v === v
@@ -63,11 +63,11 @@ export function isNextable<T>(value: any): value is Iterator<T> | AsyncIterator<
 }
 
 export function getClassName(something: any): string {
-    if (!isObject(something)) {
-        return typeof something
-    }
     if (something === null) {
         return "null"
+    }
+    if (!isObject(something)) {
+        return typeof something
     }
     const ctorName = something.constructor?.name ?? something?.[Symbol.toStringTag] ?? "Object"
     return ctorName

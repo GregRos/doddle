@@ -1,25 +1,11 @@
 import { doddle, Doddle } from "@lib"
 import { declare, type } from "declare-it"
 
-it("no name normalizes to empty", () => {
-    const lz = doddle(() => 1)
-    expect(lz.info.name).toEqual("")
-})
-
-it("name is recovered", () => {
-    const lz = doddle(function foo() {
-        return 1
-    })
-    expect(lz.info.name).toEqual("foo")
-    expect(lz.toString()).toEqual("doddle(foo) <untouched>")
-})
-
 it("starts out untouched", () => {
     const lz = doddle(() => 1)
     expect(lz.info).toEqual({
         desc: expect.any(String),
         isReady: false,
-        name: "",
         stage: "untouched",
         syncness: "untouched"
     })

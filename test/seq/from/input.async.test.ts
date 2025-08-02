@@ -196,3 +196,12 @@ declare.it("can specify type when converting from empty array", expect => {
     const s = _seq<1>([])
     expect(type_of(s)).to_equal(type<_Seq<1>>)
 })
+
+it("works for array-like objects", () => {
+    const arrayLike = { 0: 10, 1: 20, 2: 30, length: 3 }
+    expect(_seq(arrayLike)._qr).resolves.toEqual([10, 20, 30])
+    const int32Array = new Int32Array([1, 2, 3])
+    expect(_seq(int32Array)._qr).resolves.toEqual([1, 2, 3])
+    const emptyArrayLike = { length: 0 }
+    expect(_seq(emptyArrayLike)._qr).resolves.toEqual([])
+})

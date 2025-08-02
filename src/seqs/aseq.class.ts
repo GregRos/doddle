@@ -27,15 +27,12 @@ import { Seq } from "./seq.class.js"
 import { seq } from "./seq.ctor.js"
 
 const SPECIAL = Symbol("special")
-const sProto = Seq.prototype
+const seqPrototype = Seq.prototype
 export abstract class ASeq<T> implements AsyncIterable<T> {
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
         loadCheckers(ASeq.prototype)
-        Object.defineProperty(this, "name", {
-            value: "ASeq"
-        })
     }
 
     get [Symbol.toStringTag]() {
@@ -52,7 +49,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the item at the given index.
      */
     at(index: number): DoddleAsync<T | undefined> {
-        return sProto.at.call(this, index)
+        return seqPrototype.at.call(this, index)
     }
 
     /**
@@ -248,7 +245,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the joined string.
      */
     join(separator = ","): DoddleAsync<string> {
-        return sProto.join.call(this, separator) as any
+        return seqPrototype.join.call(this, separator) as any
     }
 
     /**
@@ -291,11 +288,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             let index = 0
             for await (const element of input) {
                 if (myStage & Stage.Before) {
-                    await pull(action(element, index, "before"))
+                    await (myStage & Stage.Before && pull(action(element, index, "before")))
                 }
                 yield element
                 if (myStage & Stage.After) {
-                    await pull(action(element, index, "after"))
+                    await (myStage & Stage.After && pull(action(element, index, "after")))
                 }
                 index++
             }
@@ -310,7 +307,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   otherwise.
      */
     every(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return sProto.every.call(this, predicate as any) as any
+        return seqPrototype.every.call(this, predicate as any) as any
     }
 
     /**
@@ -434,7 +431,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     toRecord<Key extends PropertyKey, Value>(
         projection: ASeq.Iteratee<T, readonly [Key, Value]>
     ): DoddleAsync<Record<Key, Value>> {
-        return sProto.toRecord.call(this, projection as any) as any
+        return seqPrototype.toRecord.call(this, projection as any) as any
     }
 
     /**
@@ -518,7 +515,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     includes<S extends T>(value: S): DoddleAsync<boolean>
 
     includes<S extends T>(value: S): DoddleAsync<boolean> {
-        return sProto.includes.call(this, value) as any
+        return seqPrototype.includes.call(this, value) as any
     }
     /**
      * Transforms each element of `this` async sequence by applying the given projection function.
@@ -557,7 +554,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     maxBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
 
     maxBy<R>(projection: ASeq.Iteratee<T, R>, alt?: any) {
-        return sProto.maxBy.call(this, projection, alt)
+        return seqPrototype.maxBy.call(this, projection, alt)
     }
 
     /**
@@ -581,7 +578,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     minBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
 
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
-        return sProto.minBy.call(this, projection, alt)
+        return seqPrototype.minBy.call(this, projection, alt)
     }
 
     /**
@@ -640,7 +637,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): DoddleAsync<Acc>
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc): any {
-        return sProto.reduce.call(this, reducer as any, initial)
+        return seqPrototype.reduce.call(this, reducer as any, initial)
     }
 
     /**
@@ -706,7 +703,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @param other The sequence to emit before the current sequence.
      * @returns A new async sequence with `other` followed by `this`.
      */
-    concatFirst(other: ASeq.Input<T>): ASeq<T> {
+    concatTo(other: ASeq.Input<T>): ASeq<T> {
         return aseq(other).concat(this)
     }
 
@@ -816,7 +813,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
     count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
-        return sProto.count.call(this, predicate as any) as any
+        return seqPrototype.count.call(this, predicate as any) as any
     }
 
     /** Alias for `concatMap`, mapping and flattening the sequence. */
@@ -949,7 +946,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   or `false` otherwise.
      */
     some(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return sProto.some.call(this, predicate as any) as any
+        return seqPrototype.some.call(this, predicate as any) as any
     }
 
     /**
@@ -959,7 +956,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the sum of all projected values.
      */
     sumBy(projection: ASeq.Iteratee<T, number>): DoddleAsync<number> {
-        return sProto.sumBy.call(this, projection as any) as any
+        return seqPrototype.sumBy.call(this, projection as any) as any
     }
 
     /**
@@ -1099,7 +1096,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to a `Map` of all projected key/value pairs.
      */
     toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): DoddleAsync<Map<K, V>> {
-        return sProto.toMap.call(this, kvpProjection as any) as any
+        return seqPrototype.toMap.call(this, kvpProjection as any) as any
     }
 
     /**

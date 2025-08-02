@@ -65,20 +65,7 @@ const getButGot = (value: any) => {
 export const getSubject = (thing: Text, context: Text, verb: Text) => {
     return [thing, "of", context, "must", verb]
 }
-export function checkNumberArgs(context: string) {
-    return (min: number, max: number = min) => {
-        return (args: any[]) => {
-            if (args.length < min || args.length > max) {
-                throw new DoddleError([
-                    getSubject("called with", [context], "be"),
-                    min === max ? min : [min, "to", max],
-                    "arguments",
-                    getButGot(args.length)
-                ])
-            }
-        }
-    }
-}
+
 type Expectation = (start: Text) => (x: any) => any
 const expectation = (expectation: Text, check: (x: any) => boolean) => {
     return (start: Text) => (x: any) => {

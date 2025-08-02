@@ -23,19 +23,17 @@ export class Doddle<T> {
     private _cacheName!: string
 
     get info(): Readonly<Doddle.Metadata> {
-        const { stage, syncness, name } = this._info
+        const { stage, syncness } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
         const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
         const stageWord = ["untouched", "executing", "done", "threw"][stage]
         const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
-        const namePart = name ? `doddle(${name})` : "doddle"
 
         return {
             isReady: stage >= Stage.Done,
-            desc: [namePart, ...syncnessPart, stagePart].join(" "),
+            desc: ["doddle", ...syncnessPart, stagePart].join(" "),
             stage: stageWord,
-            syncness: syncnessWord,
-            name
+            syncness: syncnessWord
         }
     }
     /**
@@ -47,20 +45,16 @@ export class Doddle<T> {
     constructor(initializer: (...args: any[]) => any) {
         this._info = {
             syncness: Syncness.Untouched,
-            stage: Stage.Untouched,
-            name: initializer.name
+            stage: Stage.Untouched
         }
         this._init = initializer
 
-        for (const name of ["map", "do", "zip", "catch", "pull"]) {
+        for (const name of ["map", "do", "zip", "catch", "pull"] as const) {
             const bound = (this as any)[name].bind(this)
-            Object.defineProperty(bound, ownerInstance, { value: this })
-            ;(this as any)[name] = bound
+            bound[ownerInstance] = this
+            this[name] = bound
         }
         loadCheckers(this)
-        if (Doddle.name !== "Doddle") {
-            Object.defineProperty(this, "name", { value: "Doddle" })
-        }
     }
 
     // When the projection is async, the result is always DoddleAsync, no matter
@@ -348,7 +342,6 @@ const enum Syncness {
 interface InnerInfo {
     syncness: Syncness
     stage: Stage
-    name: string | null
 }
 export namespace Doddle {
     /** An metadata object describing the state of a {@link Doddle} instance. */
@@ -356,7 +349,6 @@ export namespace Doddle {
         readonly isReady: boolean
         readonly stage: string
         readonly syncness: string
-        readonly name: string | null
         readonly desc: string
     }
 

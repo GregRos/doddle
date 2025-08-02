@@ -57,6 +57,26 @@ declare.it("element type same as doddle's value type", expect => {
     expect(type_of(s)).to_equal(type<_Seq<number>>)
 })
 
+declare.it("works with array-like object (NodeList)", expect => {
+    const nodeList = document.querySelectorAll("*")
+    expect(type_of(_seq(nodeList))).to_equal(type<_Seq<Element>>)
+})
+
+declare.it("element type is correct for plain array-like object", expect => {
+    const arrayLike = { 0: "a", 1: "b", length: 2 }
+    expect(type_of(_seq(arrayLike))).to_equal(type<_Seq<string>>)
+})
+
+declare.it("empty plain array-like object gives empty seq", expect => {
+    const arrayLike = { length: 0 }
+    expect(type_of(_seq(arrayLike)._qr)).to_equal(type<unknown[]>)
+})
+
+declare.it("fails if object has no length", () => {
+    // @ts-expect-error
+    _seq({ 0: "a", 1: "b" })
+})
+
 declare.it("element type is doddle value type for iterable of doddle", expect => {
     const s = _seq(null! as Iterable<Doddle<number>>)
     expect(type_of(s)).to_equal(type<_Seq<number>>)
@@ -163,4 +183,13 @@ it("caches iterator returning function", async () => {
     const a = iterable._qr
     const b = iterable._qr
     expect(a).toEqual(b)
+})
+
+it("works for array-like objects", () => {
+    const arrayLike = { 0: 10, 1: 20, 2: 30, length: 3 }
+    expect(_seq(arrayLike)._qr).toEqual([10, 20, 30])
+    const int32Array = new Int32Array([1, 2, 3])
+    expect(_seq(int32Array)._qr).toEqual([1, 2, 3])
+    const emptyArrayLike = { length: 0 }
+    expect(_seq(emptyArrayLike)._qr).toEqual([])
 })

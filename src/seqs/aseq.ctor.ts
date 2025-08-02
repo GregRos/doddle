@@ -81,10 +81,8 @@ export function aseq<E>(input: ASeq.Input<E>): any {
                     }
                 }
                 return
-            } else if (isNextable(pulled)) {
-                iterator = pulled
             } else {
-                throw new Error("Should be unreachable")
+                iterator = pulled as any
             }
             for (let item = await iterator.next(); !item.done; item = await iterator.next()) {
                 yield pull(item.value)
