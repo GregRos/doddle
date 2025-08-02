@@ -263,11 +263,7 @@ export abstract class Seq<T> implements Iterable<T> {
     concatTo<Seqs extends Seq.Input<any>[]>(
         ..._iterables: Seqs
     ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
-        if (_iterables.length === 0) {
-            return this
-        }
-        const [base, ...rest] = [..._iterables, this].map(seq) as any[]
-        return base.concat(rest)
+        return seq([]).concat(..._iterables, this) as any
     }
 
     /**
@@ -1071,9 +1067,11 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param kvpProjection
      * @returns
      */
-    toRecord<Key extends PropertyKey, Value>(
+    toRecord<const Key extends PropertyKey, Value>(
         kvpProjection: Seq.Iteratee<T, readonly [Key, Value]>
-    ): Doddle<Record<Key, Value>> {
+    ): Doddle<{
+        [k in Key]: Value
+    }> {
         chk(this.toRecord).kvpProjection(kvpProjection)
         return lazyOperator(this, function toObject(input) {
             return input

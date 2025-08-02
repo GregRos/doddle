@@ -222,22 +222,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Delays yielding each element of the sequence by the given number of milliseconds.
-     *
-     * @param milliseconds The delay in milliseconds before yielding each element.
-     * @returns A new async sequence with delayed elements.
-     */
-    delay(milliseconds: number): ASeq<T> {
-        chk(this.delay).ms(milliseconds)
-        return ASeqOperator(this, async function* delay(input) {
-            for await (const element of input) {
-                await new Promise(resolve => setTimeout(resolve, milliseconds))
-                yield element
-            }
-        }) as any
-    }
-
-    /**
      * 🦥**Lazily** joins the elements of `this` async sequence into a single string, separated by
      * the given separator.
      *
@@ -428,7 +412,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @param projection A function mapping each element to a `[key, value]` tuple.
      * @returns A 🦥{@link DoddleAsync} that resolves to a record of accumulated key/value pairs.
      */
-    toRecord<Key extends PropertyKey, Value>(
+    toRecord<const Key extends PropertyKey, Value>(
         projection: ASeq.Iteratee<T, readonly [Key, Value]>
     ): DoddleAsync<Record<Key, Value>> {
         return seqPrototype.toRecord.call(this, projection as any) as any
@@ -703,8 +687,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @param other The sequence to emit before the current sequence.
      * @returns A new async sequence with `other` followed by `this`.
      */
-    concatTo(other: ASeq.Input<T>): ASeq<T> {
-        return aseq(other).concat(this)
+    concatTo<Seqs extends ASeq.Input<any>[]>(
+        ..._iterables: Seqs
+    ): ASeq<T | ASeq.ElementOfInput<Seqs[number]>> {
+        return aseq([]).concat(..._iterables, this) as any
     }
 
     /**
