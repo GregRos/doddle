@@ -1,5 +1,5 @@
 export { Doddle, DoddleAsync, doddle, pull } from "./doddle/index.js"
 export { ASeq } from "./seqs/aseq.class.js"
-export { aseq } from "./seqs/aseq.js"
+export { aseq } from "./seqs/aseq.ctor.js"
 export { Seq } from "./seqs/seq.class.js"
-export { seq } from "./seqs/seq.js"
+export { seq } from "./seqs/seq.ctor.js"

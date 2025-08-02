@@ -1,0 +1,46 @@
+{
+    "folders": [
+        {
+            "path": ".",
+            "name": "doddle"
+        }
+    ],
+    "settings": {
+        "eslint.enable": false,
+        "jest.disabledWorkspaceFolders": ["root"],
+        "files.exclude": {
+            "tutorials": true,
+            "packages/parjs": true,
+            "packages/char-info": true,
+            "packages/debug": true,
+            "**/.git": true,
+            "**/.svn": true,
+            "**/.hg": true,
+            "**/.nyc_output": true,
+            "**/coverage": true,
+            "**/dist-spec": true,
+            "**/CVS": true,
+            "**/.DS_Store": true,
+            "**/Thumbs.db": true,
+            "**/*.aux": true,
+            "**/*.bbl": true,
+            "**/*.fdb_latexmk": true,
+            "**/*.fls": true,
+            "**/*.out": true,
+            "**/*.synctex.gz": true,
+            "**/.idea": true,
+            "**/.mypy_cache": true,
+            "**/__pycache__": true,
+            "**/dist": true,
+            "**/dist_aux": true,
+            ".nyc_output": true,
+            "coverage": true,
+            "docs": true
+        },
+        "search.exclude": {
+            "**/node_modules": false,
+            "**/bower_components": true,
+            "**/*.code-search": true
+        }
+    }
+}

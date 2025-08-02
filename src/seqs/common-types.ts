@@ -1,4 +1,4 @@
-export type getConcatElementType<T, S> = T extends never ? never : S
+export type Get_Concat_Element_Type<T, S> = T extends never ? never : S
 /** The stage of yielding at which a function should be called. */
 export type EachCallStage = "before" | "after" | "both" | undefined
 

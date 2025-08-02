@@ -5,21 +5,15 @@
 [![Doddle Coveralls](https://img.shields.io/coverallsCoverage/github/GregRos/doddle?style=for-the-badge)](https://coveralls.io/github/GregRos/doddle?branch=master)
 [![Doddle minified size(gzip)](<https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=minified%20size%20(gzip)>)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
 
-Doddle is a tiny yet feature-packed library for iteration and lazy evaluation, inspired by `lodash`, `LINQ`, and `rxjs`.
+Doddle is a tiny yet feature-packed library for working with sync and async iterables. It’s inspired by LINQ, lodash, and rxjs.
 
--   🤏 **Tiny**: Tiny bundle size, without compromising user experience.
+Here are its features:
 
--   🔥 **Powerful**: Packed with operators from the best APIs in software.
-
--   🤗 **Friendly**: Combines strong typing combined with clear and detailed error messages.
-
--   🪞 **Consistent**: With an elegant API shared between sync and async iterables.
-
--   🔍 **Debuggable**: Actually _readable_ stack traces and _navigable_ source code.
-
--   🧪 **Tested**: Over 1000 test cases, checking both **runtime code** and **type declarations**.
-
--   🛡️ **Immutable** — Built on functional principles.
+-   🤏 Tiny bundle size, without compromising user experience.
+-   🔥 Packed with operators from the best APIs in software.
+-   🤗 Strongly typed and extensively validated. Throws meaningful errors too.
+-   🪞 One consistent API shared between sync and async iterables.
+-   🔍 Produces concise, readable stack traces.
 
 Get it now:
 
@@ -32,8 +26,13 @@ npm install doddle
 ```
 
 # Doddle
+The Doddle is the library’s lazy primitive. It represents a delayed computation, just like a function.
 
-The library’s general-purpose lazy primitive. Represents a computation that may not have happened yet and a value that hasn't been produced. You need to _pull_ it to run the computation and get the value out.
+When a Doddle is _pulled_, it’s evaluated and the result is cached. Evaluation only happens once.
+
+The Doddle is designed like a Promise. It chains, flattens, and supports several useful operators. Its key method is `pull()`. It’s designed for both sync and async computations.
+
+You can create one using the `doddle` function, passing it a function that will produce the value. This function can return a Promise.
 
 ```ts
 import { doddle } from "doddle"
@@ -46,28 +45,40 @@ const d = doddle(() => {
 d.pull() // 5
 ```
 
-Commonly used throughout the API. It's simple, elegant, and really comes in handy. [See more](https://github.com/GregRos/doddle/doddle.md)
-
+Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more about them here!](https://github.com/GregRos/doddle/doddle.md)
 # Seq
+This **wrapper** unifies iterables and generator functions. You create one using the `seq` function. 
 
-The `Seq` wrapper unifies synchronous iterables and generator functions. You create one using the `seq` constructor function.
+You can pass this function an Iterable, like an array:
+```ts
+seq([1, 2, 3])
+```
 
-This function accepts a lot of different inputs that can be interpreted as an Iterable. For example:
+Or a generator function:
+```ts
+seq(function*() {
+	yield 1
+	yield 2
+})
+```
+
+`seq` is a lot more flexible than that, though. You can even pass it a function that returns an array instead of a generator:
 
 ```ts
-import { seq } from "doddle"
+seq(() => [1, 2, 3])
+```
 
-// # Array
-const s1 = seq([1, 2, 3]) // {1, 2, 3}
+You can pass it a `Doddle` that returns an Iterable too:
 
-// # Generator function
-const s2 = seq(function* () {
-    yield 1
-    yield 2
-    yield 3
-}) // {1, 2}
+```ts
+const doddle1 = doddle(() => 1)
+const doddle123 = doddle(() => [1, 2, 3])
+seq(doddle(() => [1, 2, 3]))
+```
 
-// # Array-like object
+You can also pass it an array-like object:
+
+```ts
 const s3 = seq({
     0: 1,
     1: 1,
@@ -76,181 +87,124 @@ const s3 = seq({
 }) // {1, 2, 3}
 ```
 
-Wrapping something using `seq` has no side-effects.
+But you **can’t** pass it a string! 
 
-## ⚠️ string inputs
+Although strings are iterable, they’re rarely used that way, and treating them as collections just causes lots of bugs.
 
-A pretty common bug happens when a string gets passed where a collection is expected. This usually doesn't cause an error, and instead you get `s,t,u,f,f, ,l,i,k,e, ,t,h,i,s`.
-
-Doddle doesn't do this. Both its type declarations and runtime logic _exclude string inputs_. So the following code would both result in a compilation error and a thrown exception:
+`seq` doesn’t accept strings and trying to pass one will error both duration compilation and at runtime:
 
 ```ts
-seq("abc") // DoddleError: strings not allowed
-// "abc" is not assignable to ...
+// ‼️ DoddleError: Strings not allowed
+seq("this will error")
+// TypeScript: Type `string` is not assignable to type ...
 ```
-
-If you actually want to process a string by character, convert it into an array first. One of these should work:
-
-```ts
-seq("hello world".split(""))
-seq([..."abc"])
-```
-
 ## Operators
 
-The `Seq` wrapper comes with a comprehensive set of operators. These operators all have the same traits:
+The `Seq` wrapper comes with a comprehensive set of operators. These are all instance methods, making them easy to discover and call. 
 
--   **Instance:** They’re instance methods, making them easier to use and discover.
--   **Careful:** They never iterate more than you tell them to.
--   **Flexible:** Accept flexible inputs, the same way as `seq`. They also interop seamlessly with the Doddle lazy primitive.
--   **Debuggable:** Produce legible stack traces and the code is debug friendly.
+They never iterate more than they need to and they produce legible stack traces (there is almost always one entry per operator). 
 
 They're also **Lazy**. That means they return one of two things:
 
 -   Another Seq, which needs to be iterated for anything to happen.
 -   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
 
-This lets you control exactly when the operation happens.
-
-## Generator function inputs
-
-When you pass a generator function to `seq`, the resulting iterable will call the function every time it’s iterated over.
-
-So for example, with the code:
-
-```ts
-const items = seq(function* () {
-    console.log("starting iteration!")
-    yield 1
-    yield 2
-})
-for (const _ of items) {
-}
-
-for (const _ of items) {
-}
-```
-
-We’ll get the output:
-
-```
-starting iteration!
-starting iteration!
-```
-
-If you don’t want this behavior, you’ll need to use the `cache` operator, which will cache the sequence so side-effects happen only once.
-
-## Other function inputs
-
-Generator functions are just functions that return iterables.
-
-This means that you can pass other functions to the `seq` constructor function, and they will behave the same way provided they return an iterable.
-
-This lets you create an iterable that does some computation before producing any elements.
-
-```ts
-const items = seq(() => {
-    console.log("starting iteration!")
-    return [1, 2, 3]
-})
-
-for (const _ of items) {
-}
-for (const _ of items) {
-}
-```
-
-This will also write `"starting iteration!"` twice to the console.
-
+This lets you control exactly when the operation is computed.
 # ASeq
 
-This wrapper is an async version of `Seq`, built for asynchronous iterables and similar objects.
+This wrapper unifies **async iterables** and **async generator functions**, while also supporting any input that [Seq](#Seq) supports. You create one using the `aseq` function.
 
-You create one using the `aseq` constructor function.
-
-This function accepts everything that `seq` accepts, plus async variations on those things. That includes:
-
+You can pass it an async generator:
 ```ts
-import { aseq, seq } from "doddle"
-
-// # Array
-aseq([1, 2, 3]) // {1, 2, 3}
-
-// # Generator function
-aseq(function* () {
-    yield* [1, 2, 3]
-}) // {1, 2, 3}
-
-// # Async generator function
-aseq(async function* () {
-    yield* [1, 2, 3]
-}) // {1, 2, 3}
-
-// # Iterable
-aseq(seq([1, 2, 3]))
-
-// # Async iterable
-aseq(aseq([1, 2, 3]))
+aseq(async function*() {
+	yield 1
+	yield 2
+})
 ```
 
+An array:
+```ts
+aseq([1, 2, 3])
+```
+
+An async iterable:
+```ts
+aseq(aseq([1]))
+```
+
+An async function that returns an array:
+```ts
+aseq(async() => [1, 2, 3])
+```
+
+Or even an async function that returns an async Iterable:
+```ts
+aseq(async() => aseq([1, 2, 3]))
+```
 ## Operators
+The **ASeq** wrapper has the same API as **Seq**, except that all inputs can be async. That means:
+
+- You can pass async iterables instead of regular ones.
+- You can pass functions that return promises.
 
 **ASeq** wrapper comes with a carbon copy of all the operators defined on **Seq**, but tweaked for inputs that can be async.
 
-So, for example, `ASeq.map` accepts async functions, flattening them into the resulting async Iterable:
+So, for example, `ASeq.map` accepts async functions and automatically flattens the resulting promise:
 
 ```ts
-aseq([1, 2, 3]).map(async x => x + 1) // {2, 3, 4}
+const example = 
+	aseq([1, 2, 3]).map(async x => x + 1)
+
+for await (const x of example) { // 1, 2, 3
+	console.log(x)
+}
 ```
 
-They're easy to navigate because the operators are named the same and have almost the same signatures.
-
 ## Using in async code
+You’ll often find yourself using `aseq` inside an async function, after awaiting something.
 
-It often makes sense to use `aseq` when working in an async function.
-
-For instance, we might get a list of strings from an async function as an array, and then process each of the strings asynchronously.
-
-Here’s how that might look like:
+Here is an example:
 
 ```ts
 async function example() {
-    const strs = await getStrings()
-    return aseq(strs).map(x => doSomething(x))
+	const strings = await getStrings()
+	return aseq(strings).map(x => x.toUpperCase())
 }
 ```
 
-But if you do it like this, the return type of the function becomes double async — `Promise<ASeq<T>>`. That’s really annoying to work with!
+But this code returns a `Promise<ASeq<string>>`, which is really annoying to work with. 
 
-Luckily, there is a better way.
-
-We can leave off the `async` qualifiers from the function. Instead, we pass an async function to the `aseq` constructor and perform the initialization inside.
-
-Here’s how that looks like:
+There is a better way, though! You can just put the `await` *inside* the definition of the sequence, like this:
 
 ```ts
 function example() {
-    return aseq(async () => {
-        const strs = await getStrings()
-        return aseq(strs).map(x => doSomething(x))
-    })
+	return aseq(async() => {
+		const strings = await getStrings()
+		return aseq(strings).map(x => x.toUpperCase())
+	})
 }
 ```
 
-The `aseq` constructor function is flexible enough to flatten the resulting type to a simple `ASeq<T>`. Using `aseq` twice is not an issue either, since the code is smart enough to unpack things and avoid redundancy.
-
+The `aseq` function will flatten the entire thing, giving you a simple `ASeq<string>`.
 ## Sequential
 
-ASeq will always await a promise before continuing iteration. This makes it much more consistent and easier to work with than observables:
+Lots of **ASeq** operators, like `ASeq.map` and `ASeq.each`, support functions that return promises. 
 
-1. Stack traces always point to where an error occurred.
-2. Elements are always yielded based on the order they appeared in the input.
-3. Avoids caching the input.
+When **ASeq** encounters one, it will await the resulting promise before continuing to iterate over the input. This happens even if the return value of the function isn’t used, like with the `each` operator:
 
-On the other hand, it means it's not very good for building pipelines handling lots of data.
+```ts
+import {setTimeout} from "timers/promises"
 
-### PSeq
+aseq([1, 2, 3]).each(async x => {
+	await setTimeout(100)
+})
+```
 
-To rectify the issue, we're planning to release a highly concurrent counterpart called PSeq (for Parallel).
+This makes **ASeq** much easier to work with than observables, since stack traces will always point to where the error occurred and elements will always be yielded in the same order.
 
-It's expected to be much more complex than ASeq but better for handling lots of async processing.
+However, it does mean that **ASeq** is bad at async processing with I/O that can be parallelized, like this:
+
+```ts
+import {got} from "got"
+aseq([url1, url2, url3]).map(url => got(url))
+```

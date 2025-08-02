@@ -317,12 +317,12 @@ export class Doddle<T> {
  *   be synchronous or asynchronous and will also handle nested doddle primitives.
  */
 
-function doddleBase<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
-function doddleBase<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
-function doddleBase<X>(initializer: () => Promise<X>): DoddleAsync<X>
-function doddleBase<T>(initializer: () => Doddle<T>): Doddle<T>
-function doddleBase<T>(initializer: () => T | Doddle<T>): Doddle<T>
-function doddleBase<T>(initializer: () => T | Doddle<T>): Doddle<T> {
+export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
+export function doddle<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
+export function doddle<X>(initializer: () => Promise<X>): DoddleAsync<X>
+export function doddle<T>(initializer: () => Doddle<T>): Doddle<T>
+export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T>
+export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
     if (!initializer) {
         throw new Error(`Initializer must be a function, but got ${getValueDesc(initializer)}`)
     }
@@ -331,12 +331,12 @@ function doddleBase<T>(initializer: () => T | Doddle<T>): Doddle<T> {
     }
     return Doddle.create(initializer) as any
 }
-const Helpers = {
-    is<T = unknown>(value: any): value is Doddle<T> {
+export namespace doddle {
+    export function is<T = unknown>(value: any): value is Doddle<T> {
         return isDoddle(value)
     }
 }
-export const doddle = Object.assign(doddleBase, Helpers)
+
 const enum Stage {
     Untouched = 0,
     Executing = 1,

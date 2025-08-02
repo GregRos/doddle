@@ -10,18 +10,18 @@ import {
     shuffleArray,
     Stage
 } from "../utils.js"
-
 import {
     SkippingMode,
     type EachCallStage,
-    type getConcatElementType,
+    type Get_Concat_Element_Type,
     type getWindowArgsType,
     type getWindowOutputType,
     type getZipValuesType,
     type SkipWhileOptions,
     type TakeWhileOptions
 } from "./common-types.js"
-import { ___seq } from "./seq.ctor.js"
+
+import { seq } from "./seq.ctor.js"
 const SPECIAL = Symbol("S")
 const SPECIAL2 = Symbol("S2")
 export abstract class Seq<T> implements Iterable<T> {
@@ -122,7 +122,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     if (!result || result == null) {
                         return
                     }
-                    yield* ___seq(result)
+                    yield* seq(result)
                     return
                 }
                 i++
@@ -166,7 +166,7 @@ export abstract class Seq<T> implements Iterable<T> {
         },
         projection?: (...args: [T, ...Xs]) => R
     ): Seq<R> {
-        const others = _others.map(___seq).map(x => x.cache())
+        const others = _others.map(seq).map(x => x.cache())
         projection ??= (...args: any[]) => args as any
         chk(this.product).projection(projection)
         return SeqOperator(this, function* product(input) {
@@ -239,12 +239,12 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param projection The sequence projection to apply to each element.
      * @returns A new sequence with the flattened results.
      */
-    concatMap<S>(projection: Seq.Iteratee<T, Seq.Input<S>>): Seq<getConcatElementType<T, S>> {
+    concatMap<S>(projection: Seq.Iteratee<T, Seq.Input<S>>): Seq<Get_Concat_Element_Type<T, S>> {
         chk(this.concatMap).projection(projection)
         return SeqOperator(this, function* concatMap(input) {
             let index = 0
             for (const element of input) {
-                for (const projected of ___seq(pull(projection(element, index++)))) {
+                for (const projected of seq(pull(projection(element, index++)))) {
                     yield projected
                 }
             }
@@ -259,7 +259,7 @@ export abstract class Seq<T> implements Iterable<T> {
     concat<Seqs extends Seq.Input<any>[]>(
         ..._iterables: Seqs
     ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
-        const iterables = _iterables.map(___seq)
+        const iterables = _iterables.map(seq)
         return SeqOperator(this, function* concat(input) {
             yield* input
             for (const iterable of iterables) {
@@ -274,7 +274,7 @@ export abstract class Seq<T> implements Iterable<T> {
         if (_iterables.length === 0) {
             return this
         }
-        const [base, ...rest] = [..._iterables, this].map(___seq) as any[]
+        const [base, ...rest] = [..._iterables, this].map(seq) as any[]
         return base.concat(rest)
     }
 
@@ -341,7 +341,7 @@ export abstract class Seq<T> implements Iterable<T> {
     filter(predicate: Seq.Predicate<T>) {
         predicate = chk(this.filter).predicate(predicate)
         return SeqOperator(this, function* filter(input) {
-            yield* ___seq(input).concatMap((element, index) =>
+            yield* seq(input).concatMap((element, index) =>
                 pull(predicate(element, index)) ? [element] : []
             )
         })
@@ -461,7 +461,7 @@ export abstract class Seq<T> implements Iterable<T> {
             for (let i = 0; ; i++) {
                 if (i < keys.length) {
                     const key = keys[i]
-                    yield [key, ___seq(() => getGroupIterable(key))]
+                    yield [key, seq(() => getGroupIterable(key))]
                     continue
                 }
                 for (const _ of shared) {
@@ -565,9 +565,7 @@ export abstract class Seq<T> implements Iterable<T> {
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
         chk(this.map).projection(projection)
         return SeqOperator(this, function* map(input) {
-            yield* ___seq(input).concatMap((element, index) => [
-                pull(projection(element, index)) as S
-            ])
+            yield* seq(input).concatMap((element, index) => [pull(projection(element, index)) as S])
         })
     }
     /**
@@ -680,7 +678,7 @@ export abstract class Seq<T> implements Iterable<T> {
         chk(this.orderBy).reverse(reverse)
         const compareKey = createCompareKey(reverse)
         return SeqOperator(this, function* orderBy(input) {
-            yield* ___seq(input)
+            yield* seq(input)
                 .map(e => returnKvp(e, projection(e), e))
                 .toArray()
                 .map(xs => {
@@ -729,7 +727,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     reverse() {
         return SeqOperator(this, function* reverse(input) {
-            yield* ___seq(input)
+            yield* seq(input)
                 .toArray()
                 .map(x => x.reverse())
                 .pull()
@@ -813,7 +811,7 @@ export abstract class Seq<T> implements Iterable<T> {
         _input: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
     ): Doddle<boolean> {
-        const other = ___seq(_input)
+        const other = seq(_input)
         return lazyOperator(this, function seqEqualsBy(input) {
             const otherIterator = _iter(other)
             try {
@@ -875,7 +873,7 @@ export abstract class Seq<T> implements Iterable<T> {
         _other: Seq.Input<S>,
         projection: Seq.NoIndexIteratee<S | T, K> = x => x as any
     ): Doddle<boolean> {
-        const other = ___seq(_other)
+        const other = seq(_other)
         return lazyOperator(this, function setEqualsBy(input) {
             const set = new Set()
             for (const element of other) {
@@ -897,7 +895,7 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     shuffle() {
         return SeqOperator(this, function* shuffle(input) {
-            const array = ___seq(input).toArray().pull()
+            const array = seq(input).toArray().pull()
             shuffleArray(array)
             yield* array
         })
@@ -941,12 +939,12 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* skip(input) {
             let myCount = count
             if (myCount === 0) {
-                yield* ___seq(input)
+                yield* seq(input)
                 return
             }
             if (myCount < 0) {
                 myCount = -myCount
-                yield* ___seq(input)
+                yield* seq(input)
                     .window(myCount + 1, (...window) => {
                         if (window.length === myCount + 1) {
                             return window[0]
@@ -955,7 +953,7 @@ export abstract class Seq<T> implements Iterable<T> {
                     })
                     .filter(x => x !== SPECIAL2)
             } else {
-                yield* ___seq(input).skipWhile((_, index) => index < myCount, {})
+                yield* seq(input).skipWhile((_, index) => index < myCount, {})
             }
         }) as any
     }
@@ -1037,7 +1035,7 @@ export abstract class Seq<T> implements Iterable<T> {
             }
             if (myCount < 0) {
                 myCount = -myCount
-                const results = ___seq(input)
+                const results = seq(input)
                     .concat([SPECIAL2])
                     .window(myCount + 1, (...window) => {
                         if (window[window.length - 1] === SPECIAL2) {
@@ -1052,7 +1050,7 @@ export abstract class Seq<T> implements Iterable<T> {
 
                 yield* results
             } else {
-                yield* ___seq(input).takeWhile((_, index) => index < myCount - 1, {
+                yield* seq(input).takeWhile((_, index) => index < myCount - 1, {
                     takeFinal: true
                 })
             }
@@ -1173,7 +1171,7 @@ export abstract class Seq<T> implements Iterable<T> {
         },
         projection?: (...args: getZipValuesType<[T, ...Xs]>) => R
     ): Seq<any> {
-        const others = _others.map(___seq)
+        const others = _others.map(seq)
         projection ??= (...args: any[]) => args as any
         chk(this.zip).projection(projection)
         return SeqOperator(this, function* zip(input) {

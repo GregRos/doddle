@@ -1,5 +1,5 @@
 {
-  "plugin": ["typedoc-material-theme"],
+  "plugin": ["typedoc-material-theme", "typedoc-plugin-mdn-links"],
   "entryPoints": ["src/index.ts"],
   "out": "./typedoc",
   "theme": "default",
