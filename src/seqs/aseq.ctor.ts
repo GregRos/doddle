@@ -15,6 +15,7 @@ import { seq } from "./seq.ctor.js"
 /**
  * Creates a {@link ASeq} from the sequential input. See examples for usage.
  *
+ * @category Create
  * @example
  *     // An array
  *     aseq([1, 2, 3])
@@ -109,6 +110,12 @@ export function aseq<E>(input: ASeq.Input<E>): any {
     })
 }
 
+/**
+ * Tools for creating {@link ASeq} instances.
+ *
+ * @category Create
+ * @class
+ */
 export namespace aseq {
     /**
      * Creates an {@link ASeq} of items by iterating a projection function.

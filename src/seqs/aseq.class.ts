@@ -28,17 +28,26 @@ import { seq } from "./seq.ctor.js"
 
 const SPECIAL = Symbol("special")
 const seqPrototype = Seq.prototype
-export abstract class ASeq<T> implements AsyncIterable<T> {
+/**
+ * The ASeq class, which wraps an async iterable.
+ *
+ * @category Use
+ */
+export abstract class ASeq<T> implements Async1Iterable<T> {
+    /** @internal */
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
         loadCheckers(ASeq.prototype)
     }
-
+    /** @internal */
     get [Symbol.toStringTag]() {
         return "ASeq"
     }
+    /** @ignore */
+
     abstract [Symbol.asyncIterator](): AsyncIterator<T>
+    /** @internal */
     get _qr() {
         return this.toArray().pull()
     }
@@ -325,8 +334,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * 🦥**Lazily** finds the first element in `this` async sequence that matches the given
-     * predicate, by iterating over it.
+     * 🦥**Lazily** finds the first element in `this` async sequence.
      *
      * @returns A 🦥{@link DoddleAsync} resolving to the first element or `undefined` if none match.
      */
@@ -341,15 +349,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   alternative value.
      */
     first<const Alt = undefined>(predicate: ASeq.Predicate<T>, alt?: Alt): DoddleAsync<T | Alt>
-    /**
-     * 🦥**Lazily** finds the first element in `this` async sequence that matches the given
-     * predicate, by iterating over it.
-     *
-     * @param predicate The predicate used to find the element. Defaults to always-true.
-     * @param alt Alternative value to return if no element matches.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the first matching element or the
-     *   alternative value.
-     */
+
     first<Alt = T>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate = predicate || (() => true)
         chk(this.first).predicate(predicate)
@@ -365,31 +365,24 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * 🦥**Lazily** finds the last element in `this` async sequence that matches the given
-     * predicate, by iterating over it.
+     * 🦥**Lazily** gets the last element in `this` sequence, or `undefined`.
      *
-     * @returns A 🦥{@link DoddleAsync} resolving to the last element or `undefined` if none match.
+     * @returns A 🦥{@link Doddle} that resolves to the last element in `this` sequence, or
+     *   `undefined`.
      */
     last(): DoddleAsync<T | undefined>
     /**
-     * 🦥**Lazily** finds the last element in `this` async sequence that matches the given
-     * predicate, by iterating over it.
+     * 🦥**Lazily** finds the last element in `this` sequence that matches the given predicate, by
+     * iterating over it.
      *
-     * @param predicate The predicate used to test each element.
-     * @param alt Alternative value to return if no element matches. Defaults to `undefined`.
+     * @param predicate The predicate for testing each element.
+     * @param alt Optionally, the value to return if no matching value is found. Defaults to
+     *   `undefined`.
      * @returns A 🦥{@link DoddleAsync} that resolves to the last matching element or the alternative
      *   value.
      */
     last<const Alt = undefined>(predicate: ASeq.Predicate<T>, alt?: Alt): DoddleAsync<T | Alt>
-    /**
-     * 🦥**Lazily** finds the last element in `this` async sequence that matches the given
-     * predicate, by iterating over it.
-     *
-     * @param predicate The predicate used to test each element. Defaults to always-true.
-     * @param alt Alternative value to return if no element matches.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the last matching element or the alternative
-     *   value.
-     */
+
     last<Alt = undefined>(predicate?: ASeq.Predicate<T>, alt?: Alt) {
         predicate ??= () => true
         chk(this.last).predicate(predicate)
@@ -502,11 +495,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         return seqPrototype.includes.call(this, value) as any
     }
     /**
-     * Transforms each element of `this` async sequence by applying the given projection function.
+     * Applies a projection to each element of `this` sequence.
      *
-     * @param projection A function mapping an element and its index to a new value or a promise of
-     *   a new value.
-     * @returns A new async sequence of projected values.
+     * @param projection The projection to apply to each element.
+     * @returns A new sequence with the projected elements.
      */
     map<S>(projection: ASeq.Iteratee<T, S>): ASeq<S> {
         chk(this.map).projection(projection)
@@ -518,80 +510,66 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * 🦥**Lazily** finds the element in `this` async sequence for which the projection yields the
-     * maximum key.
+     * 🦥**Lazily** finds the maximum element in `this` sequence by key, or the given alternative
+     * value if the sequence is empty.
      *
-     * @param projection A function mapping each element to a comparable key.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the element with the maximum key, or
-     *   `undefined` if the sequence is empty.
+     * @param projection The projection function to apply to each element so it can be compared.
+     * @param alt The value to return if the sequence is empty. Defaults to `undefined`.
      */
-    maxBy<K>(projection: ASeq.Iteratee<T, K>): DoddleAsync<T | undefined>
-    /**
-     * 🦥**Lazily** finds the element in `this` async sequence for which the projection yields the
-     * maximum key.
-     *
-     * @param projection A function mapping each element to a comparable key.
-     * @param alt Alternative value to return if the sequence is empty.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the element with the maximum key, or `alt`
-     *   if the sequence is empty.
-     */
-    maxBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
+    maxBy<K, const Alt = undefined>(
+        projection: ASeq.Iteratee<T, K>,
+        alt?: Alt
+    ): DoddleAsync<T | Alt>
 
     maxBy<R>(projection: ASeq.Iteratee<T, R>, alt?: any) {
         return seqPrototype.maxBy.call(this, projection, alt)
     }
 
     /**
-     * 🦥**Lazily** finds the element in `this` async sequence for which the projection yields the
-     * minimum key.
+     * 🦥**Lazily** finds the minimum element in `this` sequence, or the given alternative value if
+     * the sequence is empty.
      *
-     * @param projection A function mapping each element to a comparable key.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the element with the minimum key, or
-     *   `undefined` if the sequence is empty.
-     */
-    minBy<K>(projection: ASeq.Iteratee<T, K>): DoddleAsync<T | undefined>
-    /**
-     * 🦥**Lazily** finds the element in `this` async sequence for which the projection yields the
-     * minimum key.
-     *
-     * @param projection A function mapping each element to a comparable key.
-     * @param alt Alternative value to return if the sequence is empty.
+     * @param projection The projection function to apply to each element so it can be compared.
+     * @param alt The value to return if the sequence is empty. Defaults to `undefined`.
      * @returns A 🦥{@link DoddleAsync} that resolves to the element with the minimum key, or `alt`
      *   if the sequence is empty.
      */
-    minBy<K, const Alt>(projection: ASeq.Iteratee<T, K>, alt?: Alt): DoddleAsync<T | Alt>
+    minBy<K, const Alt = undefined>(
+        projection: ASeq.Iteratee<T, K>,
+        alt?: Alt
+    ): DoddleAsync<T | Alt>
 
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
         return seqPrototype.minBy.call(this, projection, alt)
     }
+    /**
+     * Orders the elements of `this` sequence by key, using the given key projection. Has to iterate
+     * over the entire sequence.
+     *
+     * @param projection A projection that returns a key to order by.
+     * @param descending Whether to use descending order.
+     * @returns A new sequence with the elements ordered by the given key.
+     */
+    orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, descending?: boolean): ASeq<T>
 
     /**
-     * Sorts the elements of `this` async sequence by a key projection, optionally reversing the
-     * order.
+     * Orders the elements of `this` using the given mutli-key tuple projection. The keys are
+     * compared in the order they appear. Has to iterate over the entire sequence.
      *
-     * @param projection A function mapping each element to its sort key.
-     * @param reverse If `true`, sorts in descending order; otherwise ascending.
-     * @returns A new async sequence of sorted elements.
+     * @param projection A projection function that returns a tuple of keys to order by.
+     * @param descending Whether to use descending order.
+     * @returns A new sequence with the elements ordered by the given keys.
      */
     orderBy<K extends [unknown, ...unknown[]]>(
         projection: ASeq.NoIndexIteratee<T, K>,
-        reverse?: boolean
+        descending?: boolean
     ): ASeq<T>
-    /**
-     * Sorts the elements of `this` async sequence by a key projection, optionally reversing the
-     * order.
-     *
-     * @param projection A function mapping each element to its sort key.
-     * @param reverse If `true`, sorts in descending order; otherwise ascending.
-     * @returns A new async sequence of sorted elements.
-     */
-    orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, reverse?: boolean): ASeq<T>
 
-    orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, reverse = false): ASeq<T> {
+    orderBy<S>(projection: ASeq.NoIndexIteratee<T, S>, descending = false): ASeq<T> {
         const c = chk(this.orderBy)
         c.projection(projection)
-        c.reverse(reverse)
-        const compareKey = createCompareKey(reverse)
+        c.descending(descending)
+        const compareKey = createCompareKey(descending)
         return ASeqOperator(this, async function* orderBy(input) {
             yield* await aseq(input)
                 .map(e => returnKvp(input, projection(e), e) as any)
@@ -605,19 +583,20 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * 🦥**Lazily** reduces the elements of `this` async sequence to a single accumulated value.
+     * 🦥**Lazily** reduces `this` sequence to a single value by applying the given reduction. Uses
+     * the first element as the initial value.
      *
-     * @param reducer A function combining the accumulator and each element.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the reduced value, using the first element
-     *   as the initial accumulator.
+     * @param reducer The reduction to apply to each element.
+     * @returns A 🦥{@link DoddleAsync} that yields the reduced value.
      */
     reduce(reducer: ASeq.Reducer<T, T>): DoddleAsync<T>
     /**
-     * 🦥**Lazily** reduces the elements of `this` async sequence to a single accumulated value.
+     * 🦥**Lazily** reduces `this` sequence to a single value by applying the given reduction, using
+     * the given initial value.
      *
      * @param reducer A function combining the accumulator and each element.
-     * @param initial The initial accumulator value.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the reduced value.
+     * @param initial The initial value to start the reduction with.
+     * @returns A 🦥{@link DoddleAsync} that yields the reduced value.
      */
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): DoddleAsync<Acc>
     reduce<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc): any {
@@ -625,10 +604,9 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Reverses `this` async sequence by collecting all elements then yielding them in reverse
-     * order.
+     * Reverses `this` sequence. Iterates over the entire sequence before yielding.
      *
-     * @returns A new async sequence containing the elements in reverse.
+     * @returns A new sequence with the elements in reverse order.
      */
     reverse(): ASeq<T> {
         return ASeqOperator(this, async function* reverse(input) {
@@ -640,10 +618,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Executes a side-effect action once before any elements are yielded.
+     * Executes a side effect action once before any elements are yielded, but after iteration has
+     * begun.
      *
-     * @param action A function to invoke before iteration starts.
-     * @returns A new async sequence that performs `action` then yields elements.
+     * @param action A function to invoke before any elements are yielded.
+     * @returns A new async sequence that performs `action` before yielding elements.
      */
     before(action: ASeq.NoInputAction): ASeq<T> {
         chk(this.before).action(action)
@@ -654,10 +633,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Executes a side-effect action once after all elements have been yielded.
+     * Executes a side-effect action after all elements have been yielded, but before iteration
+     * finishes.
      *
      * @param action A function to invoke after iteration completes.
-     * @returns A new async sequence that yields elements then performs `action`.
+     * @returns A new async sequence that acts like `this` but invokes `action` before it's
+     *   finished.
      */
     after(action: ASeq.NoInputAction): ASeq<T> {
         chk(this.after).action(action)
@@ -667,9 +648,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
     /**
-     * Collects all elements of `this` async sequence into memory, then emits them in order.
+     * When iteration starts, will immediately iterate over everything in `this` async sequence.
+     * Yields the same elements as `this`.
      *
-     * @returns A new async sequence containing all elements after collection.
+     * @returns An async sequence that collects all elements into memory before yielding anything.
      */
     collect(): ASeq<T> {
         return ASeqOperator(this, async function* collect(input) {
@@ -682,31 +664,35 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Concatenates `other` sequence before `this` sequence, emitting `other` elements first.
+     * Concatenates `others` before `this` sequence. `others` are concatenated in the order they
+     * appear.
      *
-     * @param other The sequence to emit before the current sequence.
-     * @returns A new async sequence with `other` followed by `this`.
+     * @param others The sequences that will appear before `this` sequence.
+     * @returns A new async sequence with all of `others` followed by `this`.
      */
     concatTo<Seqs extends ASeq.Input<any>[]>(
-        ..._iterables: Seqs
+        ...others: Seqs
     ): ASeq<T | ASeq.ElementOfInput<Seqs[number]>> {
-        return aseq([]).concat(..._iterables, this) as any
+        return aseq([]).concat(...others, this) as any
     }
 
     /**
-     * Applies a reducer over the sequence, emitting the accumulated value at each step.
+     * Applies a reducer over the sequence. Returns a sequence that yields the accumulated value at
+     * each step.
      *
      * @param reducer A function combining accumulator and element to produce a new accumulator.
+     *   Uses the first element as the initial value.
      * @returns A new async sequence of accumulated values, using the first element as initial
      *   accumulator.
+     * @throws If `this` is empty.
      */
     scan(reducer: ASeq.Reducer<T, T>): ASeq<T>
     /**
-     * Applies a reducer over the sequence, emitting the accumulated value at each step.
+     * Applies a reduction to each element of `this` sequence, yielding the accumulated value at
+     * each step.
      *
-     * @param reducer A function combining accumulator and element to produce a new accumulator.
-     * @param initial The initial accumulator value.
-     * @returns A new async sequence of accumulated values, starting with `initial`.
+     * @param reduction The reduction function to apply.
+     * @param initial The initial value to start the reduction with.
      */
     scan<Acc>(reducer: ASeq.Reducer<T, Acc>, initial: Acc): ASeq<Acc>
     scan<Acc>(reducer: ASeq.Reducer<T, Acc>, initial?: Acc): ASeq<any> {
@@ -731,41 +717,44 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Compares `this` sequence to another for element-wise equality using optional projection.
+     * 🦥**Lazily** checks if the elements of `this` sequence are all sequentially equal to the
+     * elements in the `input` by iterating over both.
      *
-     * @param other The sequence to compare against.
-     * @returns A 🦥{@link DoddleAsync} that resolves to `true` if sequences are equal in order and
-     *   length.
+     * @param input The sequential input to compare with.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`.
      */
-    seqEquals<T extends S, S>(this: AsyncIterable<T>, other: ASeq.Input<S>): DoddleAsync<boolean>
+    seqEquals<T extends S, S>(this: AsyncIterable<T>, input: ASeq.Input<S>): DoddleAsync<boolean>
     /**
-     * Compares `this` sequence to another for element-wise equality using optional projection.
+     * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in the
+     * `input` by iterating over both.
      *
-     * @param other The sequence to compare against.
-     * @returns A 🦥{@link DoddleAsync} that resolves to `true` if sequences are equal in order and
-     *   length.
+     * @param input The sequential input to compare with.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`.
      */
-    seqEquals<S extends T>(other: ASeq.Input<S>): DoddleAsync<boolean>
+    seqEquals<S extends T>(input: ASeq.Input<S>): DoddleAsync<boolean>
     /**
-     * Compares `this` sequence to another for element-wise equality using a key projection.
+     * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in the
+     * `input`, by iterating over both.
      *
-     * @param other The sequence to compare against.
-     * @param projection Function to extract comparison key from elements.
-     * @returns A 🦥{@link DoddleAsync} that resolves to `true` if projected keys match in order and
-     *   length.
+     * The elements are compared by key, using the given key projection.
+     *
+     * @param input The sequential input to compare with.
+     * @param projection The projection function that determines the key for comparison.
+     * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
+     *   otherwise.
      */
     seqEquals<K, S = T>(
-        other: ASeq.Input<S>,
+        input: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K>
     ): DoddleAsync<boolean>
 
     seqEquals<K, S = T>(
-        _other: ASeq.Input<S>,
+        input: ASeq.Input<S>,
         projection: ASeq.NoIndexIteratee<S | T, K> = x => x as K
     ): DoddleAsync<boolean> {
         projection ??= x => x as K
 
-        const other = aseq(_other)
+        const other = aseq(input)
         return lazyOperator(this, async function seqEquals(input) {
             const otherIterator = _aiter(other)
             try {
@@ -785,24 +774,24 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     }
 
     /**
-     * Counts the number of elements in the sequence, optionally matching a predicate.
+     * 🦥**Lazily** counts the number of elements in `this` sequence by iterating over it.
      *
-     * @param predicate Optional function to test each element.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the count of (matching) elements.
+     * @returns A 🦥{@link Doddle} that resolves to the number of elements in `this`.
      */
     count(): DoddleAsync<number>
     /**
-     * Counts the number of elements in the sequence, optionally matching a predicate.
+     * 🦥**Lazily** counts the number of elements in `this` sequence that match the given predicate,
+     * by iterating over it.
      *
-     * @param predicate Optional function to test each element.
-     * @returns A 🦥{@link DoddleAsync} that resolves to the count of (matching) elements.
+     * @param predicate The predicate used to test each element.
+     * @returns A 🦥{@link Doddle} that resolves to the number of matching elements.
      */
     count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
     count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
         return seqPrototype.count.call(this, predicate as any) as any
     }
 
-    /** Alias for `concatMap`, mapping and flattening the sequence. */
+    /** {@link concatMap} */
     flatMap = this.concatMap
     /**
      * Compares `this` sequence to another as sets of projected keys, ignoring order.
@@ -1246,7 +1235,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
 }
-
+/** @internal */
 export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
@@ -1257,7 +1246,11 @@ export const ASeqOperator = function aseq<In, Out>(
     })
     return obj
 }
-/** A collection of type definitions for asynchronous sequence operations in Doddle. */
+/**
+ * A collection of type definitions for asynchronous sequence operations in Doddle.
+ *
+ * @category Types
+ */
 export namespace ASeq {
     /**
      * An iteratee that receives only the index and returns a value or promise of a value. Useful

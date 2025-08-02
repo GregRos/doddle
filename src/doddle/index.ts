@@ -16,6 +16,8 @@ export const ownerInstance = Symbol("ownerInstance")
  * function when the {@link pull} method is called.
  *
  * The initializer can return another {@link Doddle}, which will be chained like a promise.
+ *
+ * @category Use
  */
 export class Doddle<T> {
     /** The cached value or error, stored from a previous execution of the initializer. */
@@ -23,23 +25,9 @@ export class Doddle<T> {
     private _info: InnerInfo
     private _cacheName!: string
 
-    get info(): Readonly<Doddle.Metadata> {
-        const { stage, syncness } = this._info
-        const syncnessWord = ["untouched", "sync", "async"][syncness]
-        const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
-        const stageWord = ["untouched", "executing", "done", "threw"][stage]
-        const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
-
-        return {
-            isReady: stage >= Stage.Done,
-            desc: ["doddle", ...syncnessPart, stagePart].join(" "),
-            stage: stageWord,
-            syncness: syncnessWord
-        }
-    }
     /**
      * The initializer function that will be called to construct the value. It will be cleared after
-     * the value is constructed, unless `LAZY_NOCLEAR` is set.
+     * the value is constructed.
      */
     private _init: null | ((...args: any[]) => T)
 
@@ -58,8 +46,34 @@ export class Doddle<T> {
         loadCheckers(this)
     }
 
-    // When the projection is async, the result is always DoddleAsync, no matter
-    // what the `this` is.
+    /**
+     * Creates a new {@link Doddle} based on `this`. When pulled, it will pull `this` and project the
+     * result using the given function.
+     *
+     * When `this` is async, the projection will be passed the awaited value, and the function will
+     * return an async Doddle. It also happens if you pass an async projection.
+     *
+     * @example
+     *     // Sync inputs:
+     *     const d = doddle(() => 42)
+     *     const mapped = d.map(x => x + 1)
+     *     const pulled = mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     *     // async inputs:
+     *     const d = doddle(async () => 42)
+     *     const mapped = d.map(x => x + 1) // note that the awaited value is used
+     *     const pulled = await mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     *     // async projection:
+     *     const d = doddle(() => 42)
+     *     const mapped = d.map(async x => x + 1)
+     *     const pulled = await mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     * @param projection The function to apply to the pulled value.
+     */
     map<T, R>(
         this: Doddle<T>,
         projection: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<R>
@@ -99,6 +113,41 @@ export class Doddle<T> {
         })
     }
 
+    /**
+     * Returns a new {@link Doddle} based on this one. When pulled, it will pull `this` and yield the
+     * same value. If an error occurs, the handler will be called with the error. The doddle then
+     * yields whatever the handler returns.
+     *
+     * You can pass an async handler only if `this` is async too.
+     *
+     * @example
+     *     const d = doddle(() => {
+     *         throw new Error("Oops")
+     *     })
+     *     const handled = d.catch(error => {
+     *         console.error(error)
+     *         return 42
+     *     })
+     *     const pulled = handled.pull()
+     *     console.log(pulled) // 42
+     *
+     *     // async Doddles allow an async handler:
+     *     const d = doddle(async () => {
+     *         throw new Error("Oops")
+     *     })
+     *     const handled = d.catch(async error => {
+     *         console.error(error)
+     *         return 42
+     *     })
+     *     const pulled = await handled.pull()
+     *     console.log(pulled) // 42
+     *
+     *     // @ts-expect-error but passing an async handler for a sync doddle isn't allowed.
+     *     const d = doddle(() => 1).catch(async () => 2)
+     *
+     * @param this The Doddle instance.
+     * @param handler The error handler function.
+     */
     catch<T, R>(
         this: DoddleAsync<T>,
         handler: (error: any) => Doddle.SomeAsync<R>
@@ -130,7 +179,15 @@ export class Doddle<T> {
         })
     }
 
-    // mixed.do(async) = async
+    /**
+     * Returns a new {@link Doddle} based on this one. When pulled, it will pull `this` and invoke
+     * the given action function as a side-effect. It will then yield whatever `this` did.
+     *
+     * If the action returns a Promise, it will be awaited before yielding the result, making the
+     * returned Doddle async.
+     *
+     * @param action The action to perform.
+     */
     do<T>(
         this: Matches_Mixed_Value<T>,
         action: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<void>
@@ -171,6 +228,14 @@ export class Doddle<T> {
         })
     }
 
+    /**
+     * Returns a new Doddle based on this one, together with the input Doddles. When pulled, it will
+     * pull `this` and all `others`, yielding their results in an array.
+     *
+     * If either `this` or any of `others` is async, the resulting Doddle will also be async.
+     *
+     * @param others The other Doddles to zip with.
+     */
     zip<const Others extends readonly [Doddle<any>, ...Doddle<any>[]]>(
         ...others: Others
     ): Is_Any_Pure_Async<
@@ -221,16 +286,20 @@ export class Doddle<T> {
         return this.info.desc
     }
 
+    /**
+     * Returns a memoized function, which acts like this Doddle while hiding its type.
+     *
+     * @returns A memoized function that pulls `this` and returns its result.
+     */
     memoize(): () => T {
         return this.pull as any
     }
 
     /**
      * Evaluates this {@link Doddle} instance, flattening any nested {@link Doddle} or {@link Promise}
-     * types.
+     * types and yielding its value.
      *
-     * @returns The value produced by the initializer, after flattening any nested {@link Doddle} or
-     *   {@link Promise} instances.
+     * @returns The yielded value.
      * @throws The error thrown during initialization, if any.
      */
     pull(): Doddle.Pulled<T> {
@@ -281,14 +350,34 @@ export class Doddle<T> {
         return resource
     }
 
+    /** @internal */
     get [Symbol.toStringTag]() {
         return "Doddle"
     }
+
+    /** Returns metadata about the current state of the Doddle. */
+    get info(): Readonly<Doddle.Metadata> {
+        const { stage, syncness } = this._info
+        const syncnessWord = ["untouched", "sync", "async"][syncness]
+        const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
+        const stageWord = ["untouched", "executing", "done", "threw"][stage]
+        const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
+
+        return {
+            isReady: stage >= Stage.Done,
+            desc: ["doddle", ...syncnessPart, stagePart].join(" "),
+            stage: stageWord,
+            syncness: syncnessWord
+        }
+    }
 }
 /**
- * Creates a doddle primitive around the given function, making sure it's only executed once. Works
- * for both synchronous and asynchronous evaluation.
+ * Creates a {@link Doddle} lazy primitive initialized with the given function. Supports both sync
+ * and async initializers and flattens nested Doddle or {@link Promise} types.
  *
+ * See examples for usage.
+ *
+ * @category Create
  * @example
  *     // Simple initializer:
  *     const regular = doddle(() => 1) satisfies Doddle<number>
@@ -310,7 +399,6 @@ export class Doddle<T> {
  * @param initializer An initializer function that will be executed once to produce the value. Can
  *   be synchronous or asynchronous and will also handle nested doddle primitives.
  */
-
 export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
 export function doddle<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
 export function doddle<X>(initializer: () => Promise<X>): DoddleAsync<X>
@@ -325,6 +413,12 @@ export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
     }
     return new Doddle(initializer) as any
 }
+
+/**
+ * Doddle utility functions.
+ *
+ * @category Create
+ */
 export namespace doddle {
     export const is = isDoddle
 }
@@ -344,6 +438,11 @@ interface InnerInfo {
     syncness: Syncness
     stage: Stage
 }
+/**
+ * Doddle utility types.
+ *
+ * @category Types
+ */
 export namespace Doddle {
     /** An metadata object describing the state of a {@link Doddle} instance. */
     export interface Metadata {
@@ -383,12 +482,14 @@ export namespace Doddle {
     export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddle<T>>
 }
 
-/** An async {@link Doddle}, which is just a `Doddle<Promise<T>>`. */
+/**
+ * An async {@link Doddle}, which is just a `Doddle<Promise<T>>`.
+ *
+ * @category Use
+ */
 export type DoddleAsync<T> = Doddle<Promise<T>>
 
-export type _IterationType<T> = T extends string ? T : T extends Iterable<infer R> ? R : T
-export type _AsyncIterationType<T> = T extends AsyncIterable<infer R> ? R : T
-
+/** @internal */
 export function lazyOperator<In, Out>(
     operand: In,
     func: (input: In) => Out | Doddle.Pulled<Out>
@@ -405,6 +506,7 @@ export function lazyOperator<In, Out>(
  * Similar to `await`. Pulls a value from a {@link Doddle}, which may be async. The same as calling
  * {@link Doddle.pull} on the input.
  *
+ * @category Use
  * @param input
  */
 export function pull<T>(input: 1 extends 0 & T ? T : never): any

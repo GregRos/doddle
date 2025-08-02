@@ -1,12 +1,24 @@
 export type Get_Concat_Element_Type<T, S> = T extends never ? never : S
-/** The stage of yielding at which a function should be called. */
+/**
+ * The stage of yielding at which a function should be called.
+ *
+ * @inline
+ */
 export type EachCallStage = "before" | "after" | "both" | undefined
 
-/** Options for `takeWhile` and similar predicate-based subsequence operations. */
+/**
+ * Options for `takeWhile` and similar predicate-based subsequence operations.
+ *
+ * @inline
+ */
 export interface TakeWhileOptions {
     takeFinal?: boolean
 }
-/** Options for `skipWhile` and similar predicate-based skipping operators. */
+/**
+ * Options for `skipWhile` and similar predicate-based skipping operators.
+ *
+ * @inline
+ */
 export interface SkipWhileOptions {
     /** Whether to skip the boundary element for which the predicate returns `false`. */
     skipFinal?: boolean

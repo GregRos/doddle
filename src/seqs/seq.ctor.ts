@@ -11,6 +11,7 @@ import { Seq, SeqOperator } from "./seq.class.js"
 /**
  * Creates a {@link Seq} from the provided input. See examples for usage.
  *
+ * @category Create
  * @example
  *     // Array
  *     seq([1, 2, 3]) // {1, 2, 3}
@@ -78,6 +79,14 @@ export function seq<E>(input: Seq.Input<E>): any {
     })
 }
 
+/**
+ * Tools for creating {@link Seq} instances.
+ *
+ * @category Create
+ * @example
+ *     seq.range(0, 10) // { 0 .. 10 }
+ *     seq.iterate(5, i => i * 2) // { 0, 2, 4, 6, 8 }
+ */
 export namespace seq {
     /**
      * Creates a {@link Seq} of items by iterating a projection function.

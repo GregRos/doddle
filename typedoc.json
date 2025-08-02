@@ -2,6 +2,12 @@
   "plugin": ["typedoc-material-theme", "typedoc-plugin-mdn-links"],
   "entryPoints": ["src/index.ts"],
   "out": "./typedoc",
+  "navigation": {
+    "includeCategories": true
+  },
   "theme": "default",
+  "defaultCategory": "Main",
+  "kindSortOrder": ["Class", "Function", "TypeAlias", "Namespace"],
+  "categoryOrder": ["Create", "Use", "Types"],
   "themeColor": "#210A4B"
 }

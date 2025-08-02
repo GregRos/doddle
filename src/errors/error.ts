@@ -176,7 +176,7 @@ export const forOperator = (operator: string) => {
         checkValue("action", expectFunc),
         checkValue("handler", expectFunc),
         checkValue("separator", expectString),
-        checkValue("reverse", expectBool),
+        checkValue("descending", expectBool),
         checkValue("reducer", expectFunc),
         checkValue("stage", expectStage),
         checkValue("skipCount", expectPosInt),
