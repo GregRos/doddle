@@ -1,7 +1,7 @@
 import type { Doddle } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
 import { chk, DoddleError, invalidRecursionError, loadCheckers } from "../errors/error.js"
-import { _iter, createCompareKey, parseStage, returnKvp, shuffleArray, Stage } from "../utils.js"
+import { _iter, createCompareKey, orderedStages, returnKvp, shuffleArray, Stage } from "../utils.js"
 import {
     SkippingMode,
     type EachCallStage,
@@ -18,13 +18,14 @@ const SPECIAL = Symbol("S")
 const SPECIAL2 = Symbol("S2")
 export abstract class Seq<T> implements Iterable<T> {
     abstract [Symbol.iterator](): Iterator<T>
-    static get name() {
-        return "ASeq"
-    }
+
     constructor() {
         // Class name is used for various checks
         // Need to make sure it's accessible even while minified
         loadCheckers(Seq.prototype)
+        Object.defineProperty(this, "name", {
+            value: "ASeq"
+        })
     }
 
     get _qr() {
@@ -284,7 +285,7 @@ export abstract class Seq<T> implements Iterable<T> {
         const c = chk(this.each)
         c.action(action)
         c.stage(stage)
-        const myStage = parseStage(stage)
+        const myStage = orderedStages.indexOf(stage)
         return SeqOperator(this, function* each(input) {
             let index = 0
             for (const element of input) {
@@ -578,9 +579,9 @@ export abstract class Seq<T> implements Iterable<T> {
                     return returnKvp(input, projection(element, index), element)
                 })
                 .reduce((max: any, value: any) => {
-                    return max.key >= value.key ? max : value
-                }, SPECIAL2 as any)
-                .map(x => (x === SPECIAL2 ? alt : x.value))
+                    return max?.[0] >= value[0] ? max : value
+                }, null)
+                .map(x => (x === null ? alt : x[1]))
                 .pull()
         })
     }
@@ -599,10 +600,10 @@ export abstract class Seq<T> implements Iterable<T> {
                 .map((element, index) => {
                     return returnKvp(input, projection(element, index), element)
                 })
-                .reduce((min: any, value: any) => {
-                    return min.key <= value.key ? min : value
-                }, SPECIAL2 as any)
-                .map(x => (x === SPECIAL2 ? alt : x.value))
+                .reduce((acc: any, cur: any) => {
+                    return acc?.[0] <= cur[0] ? acc : cur
+                }, null)
+                .map(x => (x === null ? alt : x[1]))
                 .pull()
         })
     }
@@ -677,7 +678,7 @@ export abstract class Seq<T> implements Iterable<T> {
                 .toArray()
                 .map(xs => {
                     void xs.sort(compareKey)
-                    return xs.map((x: any) => x.value)
+                    return xs.map((x: any) => x[1])
                 })
                 .pull()
         })
@@ -1137,16 +1138,12 @@ export abstract class Seq<T> implements Iterable<T> {
                 buffer[i++ % size] = item
                 if (i >= size) {
                     yield pull(
-                        (projection as any).call(
-                            null,
-                            ...buffer.slice(i % size),
-                            ...buffer.slice(0, i % size)
-                        )
+                        (projection as any)(...buffer.slice(i % size), ...buffer.slice(0, i % size))
                     )
                 }
             }
             if (i > 0 && i < size) {
-                yield pull((projection as any).call(null, ...buffer.slice(0, i)))
+                yield pull((projection as any)(...buffer.slice(0, i)))
             }
         })
     }

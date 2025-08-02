@@ -1,11 +1,10 @@
 import {
     getClassName,
     getValueDesc,
-    isAnyIterable,
     isArrayLike,
+    isAsyncIterable,
     isBool,
     isDoddle,
-    isError,
     isFunction,
     isInt,
     isIterable,
@@ -15,21 +14,15 @@ import {
     isPosInt,
     isReadableStream,
     isStage,
-    isThenable,
-    splat
+    isThenable
 } from "../utils.js"
 
 export class DoddleError extends Error {
     constructor(message: Text) {
-        super(splat(!Array.isArray(message) ? [message] : message))
+        super((!Array.isArray(message) ? [message] : message).flat().join(" "))
     }
 }
 
-export function cannotRecurseSync() {
-    return new DoddleError(
-        `Tried to call 'Doddle.pull' recursively in a sync context, which would not terminate.`
-    )
-}
 /*
 Sample error messages:
 > Doddle: Argument 'predicate' of oprator 'Seq.filter' must be a function,
@@ -103,7 +96,7 @@ const expectNatOrInfinity = expectation(`a non-negative integer or Infinity`, is
 const expectPosInt = expectation(`a positive integer`, isPosInt)
 
 const expectBool = expectation(`true or false`, isBool)
-const expectError = expectation(`an error`, isError)
+const expectError = expectation(`an error`, x => x instanceof Error)
 const expectFunc = expectation(`a function`, isFunction)
 const expectPair = expectation(`an array of length 2`, isPair)
 
@@ -116,7 +109,8 @@ const expectSyncInputValue = expectation(
 const expectAsyncInputValue = expectation(
     anOrStructure([["(async)", "iterable", "iterator"], "doddle"].join(", "), "function"),
     x =>
-        isAnyIterable(x) ||
+        isIterable(x) ||
+        isAsyncIterable(x) ||
         isFunction(x) ||
         isDoddle(x) ||
         isNextable(x) ||
@@ -130,7 +124,13 @@ const expectSyncIterableOrIterator = expectation(
 )
 const expectAsyncIterableOrIterator = expectation(
     anOrStructure(["(async)", "iterable"], "iterator"),
-    x => isAnyIterable(x) || isNextable(x) || isDoddle(x) || isReadableStream(x) || isArrayLike(x)
+    x =>
+        isIterable(x) ||
+        isAsyncIterable(x) ||
+        isNextable(x) ||
+        isDoddle(x) ||
+        isReadableStream(x) ||
+        isArrayLike(x)
 )
 const checkFunctionReturn = (
     thing: Text,

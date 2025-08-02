@@ -1,16 +1,12 @@
 import { pull, type Doddle, type DoddleAsync } from "./doddle/index.js"
-import { type Text } from "./errors/error.js"
 import type { DoddleReadableStream } from "./readable-stream-polyfill.js"
 
-export const syIterator = Symbol.iterator
-export const syAsyncIterator = Symbol.asyncIterator
-
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
-    return (input as any)[syIterator]()
+    return (input as any)[Symbol.iterator]()
 }
 
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
-    return (input as any)[syAsyncIterator]()
+    return (input as any)[Symbol.asyncIterator]()
 }
 
 export function _xiter<T>(input: Iterable<T> | AsyncIterable<T>): Iterator<T> | AsyncIterator<T> {
@@ -21,7 +17,7 @@ export function isObject<T>(value: T): value is T & {} {
     return typeof value === "object" && value != null
 }
 
-export function isFunction(value: any): boolean {
+export function isFunction(value: any): value is (...args: any[]) => any {
     return typeof value === "function"
 }
 
@@ -32,15 +28,11 @@ export function isArrayLike<T>(value: any): value is ArrayLike<T> {
 export function isIterable<T>(value: any): value is Iterable<T> {
     return isObject(value) && isFunction(value[Symbol.iterator])
 }
-export function isAnyIterable(value: any): value is Iterable<any> {
-    return isIterable(value) || isAsyncIterable(value)
-}
-const orderedStages = [undefined, "before", "after", "both"] as const
-export const parseStage = (value: (typeof orderedStages)[number]): Stage => {
-    return orderedStages.indexOf(value)
-}
+
+export const orderedStages = [undefined, "before", "after", "both"] as const
+
 export const isStage = (value: any) => {
-    const parsed = parseStage(value)
+    const parsed = orderedStages.indexOf(value)
     return parsed > 0 && parsed <= 3
 }
 
@@ -49,11 +41,8 @@ export const isInt = Number.isSafeInteger
 export const isIntOrInfinity = (v: number) => isInt(v) || v === Infinity
 export const isNatOrInfinity = (v: number) => isIntOrInfinity(v) && v >= 0
 export const isBool = (value: boolean) => !!value === value
-export const isNotNullish = (value: any) => value != null
 export const isPair = (value: any) => Array.isArray(value) && value.length === 2
 export const isPosInt = (value: number) => isInt(value) && value > 0
-export const isError = (value: any) => value instanceof Error
-export const isSymbol = (value: any) => typeof value === "symbol"
 export const enum Stage {
     Before = 1,
     After = 2,
@@ -68,29 +57,14 @@ export function isReadableStream(value: any): value is DoddleReadableStream<unkn
     return isObject(value) && isFunction(value.getReader)
 }
 
-export function isBigInt(value: any): value is bigint {
-    return typeof value === "bigint"
-}
-
-export function isString(value: any): value is string {
-    return typeof value === "string"
-}
-export function isPropertyKey(value: any): value is PropertyKey {
-    return isString(value) || isSymbol(value) || isNumber(value)
-}
-
-export function isNullish(value: any): value is null | undefined {
-    return value == null
-}
-
 export function isNextable<T>(value: any): value is Iterator<T> | AsyncIterator<T> {
     // Checks if value is an iterator
     return isObject(value) && isFunction(value.next)
 }
 
-export function getClassName(something: any) {
+export function getClassName(something: any): string {
     if (!isObject(something)) {
-        return typeof something
+        return getValueDesc(something) as string
     }
     if (something === null) {
         return "null"
@@ -99,55 +73,44 @@ export function getClassName(something: any) {
     return ctorName
 }
 
-export function getSymbolDescription(symbol: symbol) {
-    return `Symbol(${symbol.description})`
-}
-
-export function getObjDesc(object: any) {
-    if (isDoddle(object)) {
-        return object.toString()
-    }
-    if (isIterable(object)) {
-        return `iterable ${getClassName(object)}`
-    } else if (isAsyncIterable(object)) {
-        return `async iterable ${getClassName(object)}`
-    } else if (isNextable(object)) {
-        return `iterator ${getClassName(object)}`
-    } else if (isDoddle(object)) {
-        return object.toString()
-    } else if (isThenable(object)) {
-        return `a Promise`
-    } else {
-        return `object ${getClassName(object)}`
-    }
-}
 export function getValueDesc(object: any) {
-    if (isNullish(object)) {
+    if (object == null) {
         return `${object}`
     }
     if (isFunction(object)) {
-        return `function ${getFunctionName(object) || "<anonymous>"}`
+        return `function ${object.name || "<anonymous>"}`
     }
-    if (isBigInt(object)) {
+    if (typeof object === "bigint") {
         return `${object}n`
     }
-    if (isSymbol(object)) {
-        return getSymbolDescription(object)
+    if (typeof object === "symbol") {
+        return object.description
     }
-    if (isString(object)) {
+    if (typeof object === "string") {
         if (object.length > 30) {
             object = object.slice(0, 30) + "⋯"
         }
         return `"${object}"`
     }
     if (isObject(object)) {
-        return getObjDesc(object)
+        if (isDoddle(object)) {
+            return object.toString()
+        }
+        if (isIterable(object)) {
+            return `iterable ${getClassName(object)}`
+        } else if (isAsyncIterable(object)) {
+            return `async iterable ${getClassName(object)}`
+        } else if (isNextable(object)) {
+            return `iterator ${getClassName(object)}`
+        } else if (isDoddle(object)) {
+            return object.toString()
+        } else if (isThenable(object)) {
+            return `a Promise`
+        } else {
+            return `object ${getClassName(object)}`
+        }
     }
     return `${object}`
-}
-
-export function getFunctionName(initializer: Function) {
-    return initializer.name || null
 }
 
 /**
@@ -160,23 +123,15 @@ export function isThenable<T = unknown>(what: unknown): what is PromiseLike<T> {
 }
 
 export function isDoddle<T>(value: any): value is Doddle<T> {
-    return isObject(value) && isFunction(value.pull) && isFunction(value.map)
+    return isObject(value) && isFunction(value.pull)
 }
-
-export const isArray = Array.isArray
 
 export function returnKvp(input: any, key: any, value: any) {
     key = pull(key)
     if (isAsyncIterable(input) && isThenable(key)) {
-        return key.then(key => ({
-            key: pull(key),
-            value: value
-        })) as Promise<any>
+        return key.then(key => [pull(key), value])
     }
-    return {
-        key: key,
-        value: value
-    }
+    return [key, value]
 }
 export type MaybePromise<T> = T | Promise<T>
 export type MaybeDoddle<T> = T | Doddle<T> | DoddleAsync<T>
@@ -191,12 +146,8 @@ export function shuffleArray<T>(array: T[]) {
     return array
 }
 
-function createBaseCompare(desc: boolean) {
-    return (a: any, b: any) => (desc ? -1 : 1) * (a < b ? -1 : a > b ? 1 : 0)
-}
-
 export function createCompare(desc: boolean) {
-    const baseCompare = createBaseCompare(desc)
+    const baseCompare = (a: any, b: any) => (desc ? -1 : 1) * (a < b ? -1 : a > b ? 1 : 0)
     return (a: any, b: any) => {
         if (Array.isArray(a) && Array.isArray(b)) {
             for (let i = 0; i < a.length; i++) {
@@ -214,12 +165,6 @@ export function createCompare(desc: boolean) {
 export function createCompareKey(desc: boolean) {
     const compare = createCompare(desc)
     return (a: any, b: any) => {
-        return compare(a.key, b.key)
+        return compare(a[0], b[0])
     }
-}
-export function splat(bits: Text): string {
-    if (!Array.isArray(bits)) {
-        return bits as string
-    }
-    return bits.flat(5).join(" ")
 }

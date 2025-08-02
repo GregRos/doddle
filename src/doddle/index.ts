@@ -1,7 +1,6 @@
-import { cannotRecurseSync, chk, loadCheckers } from "../errors/error.js"
+import { chk, DoddleError, loadCheckers } from "../errors/error.js"
 import {
     getClassName,
-    getFunctionName,
     getValueDesc,
     isDoddle,
     isThenable,
@@ -23,9 +22,7 @@ export class Doddle<T> {
     private _cached?: any
     private _info: InnerInfo
     private _cacheName!: string
-    static get name() {
-        return "Doddle"
-    }
+
     get info(): Readonly<Doddle.Metadata> {
         const { stage, syncness, name } = this._info
         const syncnessWord = ["untouched", "sync", "async"][syncness]
@@ -52,7 +49,7 @@ export class Doddle<T> {
         this._info = {
             syncness: Syncness.Untouched,
             stage: Stage.Untouched,
-            name: getFunctionName(initializer)
+            name: initializer.name
         }
         this._init = initializer
 
@@ -62,6 +59,9 @@ export class Doddle<T> {
             ;(this as any)[name] = bound
         }
         loadCheckers(this)
+        if (Doddle.name !== "Doddle") {
+            Object.defineProperty(this, "name", { value: "Doddle" })
+        }
     }
 
     static create<T>(f: () => T): Doddle<T> {
@@ -250,7 +250,9 @@ export class Doddle<T> {
             if (info.syncness === Syncness.Async) {
                 return this._cached
             } else {
-                throw cannotRecurseSync()
+                throw new DoddleError(
+                    `Tried to call 'Doddle.pull' recursively in a sync context, which would not terminate.`
+                )
             }
         }
         if (info.stage === Stage.Done) {
