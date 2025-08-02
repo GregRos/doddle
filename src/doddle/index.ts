@@ -8,8 +8,7 @@ import {
     type MaybePromise
 } from "../utils.js"
 import type { Is_Any_Mixed, Is_Any_Pure_Async, Matches_Mixed_Value } from "./helpers.js"
-export const methodName = Symbol("methodName")
-export const ownerInstance = Symbol("ownerInstance")
+export const ownerInstance = Symbol()
 
 /**
  * A TypeScript-first doddle evaluation primitive. An object that will only evaluate its initializer
@@ -45,7 +44,7 @@ export class Doddle<T> {
      */
     private _init: null | ((...args: any[]) => T)
 
-    protected constructor(initializer: (...args: any[]) => any) {
+    constructor(initializer: (...args: any[]) => any) {
         this._info = {
             syncness: Syncness.Untouched,
             stage: Stage.Untouched,
@@ -62,10 +61,6 @@ export class Doddle<T> {
         if (Doddle.name !== "Doddle") {
             Object.defineProperty(this, "name", { value: "Doddle" })
         }
-    }
-
-    static create<T>(f: () => T): Doddle<T> {
-        return new Doddle(f)
     }
 
     // When the projection is async, the result is always DoddleAsync, no matter
@@ -292,7 +287,7 @@ export class Doddle<T> {
     }
 
     get [Symbol.toStringTag]() {
-        return this.toString()
+        return "Doddle"
     }
 }
 /**
@@ -333,12 +328,10 @@ export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
     if (ownerInstance in initializer) {
         return initializer[ownerInstance] as any
     }
-    return Doddle.create(initializer) as any
+    return new Doddle(initializer) as any
 }
 export namespace doddle {
-    export function is<T = unknown>(value: any): value is Doddle<T> {
-        return isDoddle(value)
-    }
+    export const is = isDoddle
 }
 
 const enum Stage {

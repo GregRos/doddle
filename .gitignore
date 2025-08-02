@@ -77,3 +77,5 @@ jspm_packages
 .eslintcache
 .buildinfo
 typedoc/
+
+esbuild-why.html

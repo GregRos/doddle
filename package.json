@@ -109,5 +109,8 @@
       "limit": "5 kB",
       "gzip": true
     }
-  ]
+  ],
+  "dependencies": {
+    "tslib": "^2.8.1"
+  }
 }

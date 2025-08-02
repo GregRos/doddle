@@ -5,9 +5,10 @@
     "sourceMap": true,
     "noEmit": true,
     "strict": true,
-    "esModuleInterop": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "importHelpers": true,
+    "useDefineForClassFields": false
   },
   "files": []
 }
