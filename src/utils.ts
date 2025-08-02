@@ -2,14 +2,15 @@ import { pull, type Doddle, type DoddleAsync } from "./doddle/index.js"
 import { type Text } from "./errors/error.js"
 import type { DoddleReadableStream } from "./readable-stream-polyfill.js"
 
-const wFunction = "function"
+export const syIterator = Symbol.iterator
+export const syAsyncIterator = Symbol.asyncIterator
 
 export function _iter<T>(input: Iterable<T>): Iterator<T> {
-    return input[Symbol.iterator]()
+    return (input as any)[syIterator]()
 }
 
 export function _aiter<T>(input: AsyncIterable<T>): AsyncIterator<T> {
-    return input[Symbol.asyncIterator]()
+    return (input as any)[syAsyncIterator]()
 }
 
 export function _xiter<T>(input: Iterable<T> | AsyncIterable<T>): Iterator<T> | AsyncIterator<T> {
@@ -21,7 +22,7 @@ export function isObject<T>(value: T): value is T & {} {
 }
 
 export function isFunction(value: any): boolean {
-    return typeof value === wFunction
+    return typeof value === "function"
 }
 
 export function isArrayLike<T>(value: any): value is ArrayLike<T> {
