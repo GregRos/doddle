@@ -9,7 +9,7 @@ import {
     type MaybePromise
 } from "../utils.js"
 import type { Is_Any_Mixed, Is_Any_Pure_Async, Matches_Mixed_Value } from "./helpers.js"
-export const ownerInstance = Symbol()
+export const ownerInstance = Symbol("ownerInstance")
 
 /**
  * A TypeScript-first doddle evaluation primitive. An object that will only evaluate its initializer

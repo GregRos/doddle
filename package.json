@@ -1,7 +1,7 @@
 {
   "name": "doddle",
-  "version": "6.0.4",
-  "description": "The nicest way to work with (async) iterables.",
+  "version": "7.0.0",
+  "description": "Tiny, simple, and comprehensive (async) iteration toolkit.",
   "keywords": [
     "iteration",
     "iterable",
@@ -60,6 +60,7 @@
     "prepare": "husky install",
     "build:clean": "run-s clean build",
     "clean": "shx rm -rf dist .buildinfo || true",
+    "size:test": "size-limit",
     "prettier:fix": "prettier --write .",
     "eslint:fix": "eslint 'src/**/*.ts' --fix",
     "eslint:check": "eslint 'src/**/*.ts'",
@@ -67,10 +68,10 @@
     "lint:fix": "run-s prettier:fix eslint:fix",
     "lint:check": "run-s eslint:check prettier:check",
     "bundle": "esbuild dist/esm/index.js --bundle --minify --outfile=bundle-dist/bundle.js",
-    "test": "jest",
+    "test": "jest && yarn size:test",
     "test:coverage": "jest --coverage",
-    "prepublishOnly": "node tools/packaging.cjs",
-    "tidy": "yarn install && run-s lint:fix build:clean test prepublishOnly"
+    "package": "node tools/packaging.cjs",
+    "tidy": "yarn install && run-s lint:fix build:clean test package"
   },
   "dependencies": {
     "tslib": "^2.8.1"
