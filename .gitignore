@@ -78,4 +78,4 @@ jspm_packages
 .buildinfo
 typedoc/
 
-esbuild-why.html
+esbuild-why*.html

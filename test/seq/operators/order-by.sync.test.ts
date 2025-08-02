@@ -87,3 +87,18 @@ it("works with doddle key selector", () => {
     const s = _seq([2, 3, 1]).orderBy(x => doddle(() => x))
     expect(s._qr).toEqual([1, 2, 3])
 })
+
+it("works with multiple keys", () => {
+    const s = _seq([
+        { a: 1, b: 2 },
+        { a: 1, b: 1 },
+        { a: 2, b: 1 },
+        { a: 2, b: 1, c: 3 }
+    ]).orderBy(x => [x.a, x.b])
+    expect(s._qr).toEqual([
+        { a: 1, b: 1 },
+        { a: 1, b: 2 },
+        { a: 2, b: 1 },
+        { a: 2, b: 1, c: 3 }
+    ])
+})

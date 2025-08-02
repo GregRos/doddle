@@ -8,13 +8,12 @@ import {
     isFunction,
     isInt,
     isIterable,
-    isNatOrInfinity,
     isNextable,
     isPair,
     isPosInt,
     isReadableStream,
-    isStage,
-    isThenable
+    isThenable,
+    orderedStages
 } from "../utils.js"
 
 export class DoddleError extends Error {
@@ -79,7 +78,6 @@ const expectation = (expectation: Text, check: (x: any) => boolean) => {
 const expectInt = expectation(`a integer`, isInt)
 const expectString = expectation(`a string`, x => typeof x === "string")
 const expectIntOrInfinity = expectation(`an integer or Infinity`, x => isInt(x) || x === Infinity)
-const expectNatOrInfinity = expectation(`a non-negative integer or Infinity`, isNatOrInfinity)
 const expectPosInt = expectation(`a positive integer`, isPosInt)
 
 const expectBool = expectation(`true or false`, isBool)
@@ -87,7 +85,10 @@ const expectError = expectation(`an error`, x => x instanceof Error)
 const expectFunc = expectation(`a function`, isFunction)
 const expectPair = expectation(`an array of length 2`, isPair)
 
-const expectStage = expectation("'before', 'after', 'both', or undefined", isStage)
+const expectStage = expectation(
+    "'before', 'after', 'both', or undefined",
+    stage => orderedStages.indexOf(stage) > -1
+)
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
     anOrStructure(["iterable", "iterator", "doddle"].join(", "), "function"),
@@ -168,7 +169,6 @@ export const forOperator = (operator: string) => {
     const simpleEntries = [
         checkValue("size", expectPosInt),
         checkValue("start", expectInt),
-        checkValue("times", expectNatOrInfinity),
         checkValue("end", expectIntOrInfinity),
         checkValue("index", expectInt),
         checkValue("count", expectIntOrInfinity),

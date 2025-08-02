@@ -119,3 +119,18 @@ it("allows async doddle async iteratee", async () => {
     const s = _seq([1, 2, 3]).orderBy(async i => doddle(async () => i % 2))
     expect(await s._qr).toEqual([2, 1, 3])
 })
+
+it("works with multiple keys", async () => {
+    const s = _seq([
+        { a: 1, b: 2 },
+        { a: 1, b: 1 },
+        { a: 2, b: 1 },
+        { a: 2, b: 1, c: 3 }
+    ]).orderBy(x => [x.a, x.b])
+    await expect(s._qr).resolves.toEqual([
+        { a: 1, b: 1 },
+        { a: 1, b: 2 },
+        { a: 2, b: 1 },
+        { a: 2, b: 1, c: 3 }
+    ])
+})

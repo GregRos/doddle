@@ -31,15 +31,7 @@ export function isIterable<T>(value: any): value is Iterable<T> {
 
 export const orderedStages = [undefined, "before", "after", "both"] as const
 
-export const isStage = (value: any) => {
-    const parsed = orderedStages.indexOf(value)
-    return parsed > 0
-}
-
-export const isNumber = (v: number) => +v === v
 export const isInt = Number.isSafeInteger
-export const isIntOrInfinity = (v: number) => isInt(v) || v === Infinity
-export const isNatOrInfinity = (v: number) => isIntOrInfinity(v) && v >= 0
 export const isBool = (value: boolean) => !!value === value
 export const isPair = (value: any) => Array.isArray(value) && value.length === 2
 export const isPosInt = (value: number) => isInt(value) && value > 0
@@ -96,12 +88,12 @@ export function getValueDesc(object: any) {
         if (isDoddle(object)) {
             return object.toString()
         }
-        if (isIterable(object)) {
+        if (isNextable(object)) {
+            return `iterator ${getClassName(object)}`
+        } else if (isIterable(object)) {
             return `iterable ${getClassName(object)}`
         } else if (isAsyncIterable(object)) {
             return `async iterable ${getClassName(object)}`
-        } else if (isNextable(object)) {
-            return `iterator ${getClassName(object)}`
         } else if (isDoddle(object)) {
             return object.toString()
         } else if (isThenable(object)) {

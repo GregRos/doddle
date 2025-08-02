@@ -3,6 +3,7 @@ import {
     getClassName,
     getValueDesc,
     isDoddle,
+    isFunction,
     isThenable,
     type MaybeDoddle,
     type MaybePromise
@@ -316,7 +317,7 @@ export function doddle<X>(initializer: () => Promise<X>): DoddleAsync<X>
 export function doddle<T>(initializer: () => Doddle<T>): Doddle<T>
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T>
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {
-    if (!initializer) {
+    if (!isFunction(initializer)) {
         throw new Error(`Initializer must be a function, but got ${getValueDesc(initializer)}`)
     }
     if (ownerInstance in initializer) {

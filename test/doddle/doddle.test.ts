@@ -48,6 +48,36 @@ it("pulling changes syncness (in sync)", () => {
     expect(lz.info.syncness).toEqual("sync")
 })
 
+it("fails when input is not a function: number", () => {
+    // @ts-expect-error numbers not allowed
+    expect(() => doddle(1)).toThrow("1")
+})
+
+it("fails when input is not a function: object", () => {
+    // @ts-expect-error objects not allowed
+    expect(() => doddle({})).toThrow("object")
+})
+
+it("fails when input is not a function: array", () => {
+    // @ts-expect-error arrays not allowed
+    expect(() => doddle([])).toThrow("iterable")
+})
+
+it("fails when input is not a function: iterator", () => {
+    // @ts-expect-error iterator not allowed
+    expect(() => doddle(new Map()[Symbol.iterator]())).toThrow("iterator")
+})
+
+it("fails when input is doddle", () => {
+    // @ts-expect-error doddle not allowed
+    expect(() => doddle(doddle(() => 1))).toThrow("doddle")
+})
+
+it("fails when input is not a function: string", () => {
+    // @ts-expect-error strings not allowed
+    expect(() => doddle("string")).toThrow("string")
+})
+
 it("pulling changes syncness (in async)", async () => {
     const lz = doddle(async () => {
         expect(lz.info.syncness).toEqual("untouched")
