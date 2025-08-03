@@ -56,3 +56,15 @@ jobs:
         run: yarn npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: GENERATE TYPEDOC
+        run: yarn run typedoc
+      - name: SETUP PAGES
+        uses: actions/configure-pages@v5
+      - name: UPLOAD PAGES HTML
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: typedoc
+      - name: DEPLOY
+        id: deployment
+        uses: actions/deploy-pages@v4

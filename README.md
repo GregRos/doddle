@@ -9,11 +9,11 @@ Doddle is a tiny yet feature-packed library for working with sync and async iter
 
 Here are its features:
 
--   🤏 Tiny bundle size, without compromising user experience.
--   🔥 Packed with operators from the best APIs in software.
--   🤗 Strongly typed and extensively validated. Throws meaningful errors too.
--   🪞 One consistent API shared between sync and async iterables.
--   🔍 Produces concise, readable stack traces.
+- 🤏 Tiny bundle size, without compromising user experience.
+- 🔥 Packed with operators from the best APIs in software.
+- 🤗 Strongly typed and extensively validated. Throws meaningful errors too.
+- 🪞 One consistent API shared between sync and async iterables.
+- 🔍 Produces concise, readable stack traces.
 
 Get it now:
 
@@ -112,8 +112,8 @@ They never iterate more than they need to and they produce legible stack traces 
 
 They're also **Lazy**. That means they return one of two things:
 
--   Another Seq, which needs to be iterated for anything to happen.
--   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
+- Another Seq, which needs to be iterated for anything to happen.
+- A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
 
 This lets you control exactly when the operation is computed.
 
@@ -158,8 +158,8 @@ aseq(async () => aseq([1, 2, 3]))
 
 The **ASeq** wrapper has the same API as **Seq**, except that all inputs can be async. That means:
 
--   You can pass async iterables instead of regular ones.
--   You can pass functions that return promises.
+- You can pass async iterables instead of regular ones.
+- You can pass functions that return promises.
 
 **ASeq** wrapper comes with a carbon copy of all the operators defined on **Seq**, but tweaked for inputs that can be async.
 

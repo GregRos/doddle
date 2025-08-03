@@ -26,7 +26,12 @@
   "repository": "github:GregRos/doddle",
   "license": "MIT",
   "author": "GregRos",
-  "sideEffects": false,
+  "sideEffects": [
+    "dist/cjs/seq.ctor.js",
+    "dist/esm/seq.ctor.js",
+    "dist/cjs/aseq.ctor.js",
+    "dist/esm/aseq.ctor.js"
+  ],
   "type": "module",
   "exports": {
     ".": {
