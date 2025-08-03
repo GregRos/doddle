@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         node-version:
-          - 20.9.0
+          - 22.18.0
     env:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
