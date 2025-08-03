@@ -13,9 +13,9 @@ const lazy = doddle(() => {
 
 A `Doddle` represents a computation that hasn’t happened yet. It’s kind of like a function, but it follows additional rules:
 
--   **Nullary:** It doesn’t accept any arguments.
--   **Memoized:** The computation is only ever executed once. The result is cached.
--   **Chained:** Like a promise, a `Doddle` doesn’t nest. It always chains or flattens. We’ll see how that works a bit later.
+- **Nullary:** It doesn’t accept any arguments.
+- **Memoized:** The computation is only ever executed once. The result is cached.
+- **Chained:** Like a promise, a `Doddle` doesn’t nest. It always chains or flattens. We’ll see how that works a bit later.
 
 To get the value from a `Doddle`, possibly invoking the computation in the process, you use the `pull` method or a function with the same name:
 
