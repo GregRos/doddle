@@ -5,9 +5,10 @@
 [![Codacy coverage](https://img.shields.io/codacy/coverage/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/coverage)
 [![Doddle minified size(gzip)](https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=gzip)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
 [![Codacy grade](https://img.shields.io/codacy/grade/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-Doddle is a tiny yet feature-packed library for working with sync and async iterables. It’s inspired by LINQ, lodash, and rxjs.
 
-Here are its features:
+Doddle is a tiny yet feature-packed iteration toolkit. It’s inspired by LINQ, lodash, and rxjs.
+
+Here are some of its features:
 
 - 🤏 Tiny bundle size, without compromising user experience.
 - 🔥 Packed with operators from the best APIs in software.
@@ -46,7 +47,7 @@ const d = doddle(() => {
 d.pull() // 5
 ```
 
-Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more about them here!](https://github.com/GregRos/doddle/doddle.md)
+Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more!](https://github.com/GregRos/doddle/doddle.md)
 
 ## Seq
 
@@ -222,5 +223,7 @@ However, it does mean that **ASeq** is bad at async processing with I/O that can
 
 ```ts
 import { got } from "got"
+
+// Don't do this if you care about performance
 aseq([url1, url2, url3]).map(url => got(url))
 ```
