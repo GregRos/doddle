@@ -2,8 +2,9 @@
 
 [![Doddle workflow status](https://img.shields.io/github/actions/workflow/status/GregRos/doddle/push.yaml?style=for-the-badge)](https://github.com/GregRos/doddle/actions/workflows/push.yaml)
 [![Doddle package version](https://img.shields.io/npm/v/doddle?style=for-the-badge)](https://www.npmjs.com/package/doddle)
-[![Doddle Coveralls](https://img.shields.io/coverallsCoverage/github/GregRos/doddle?style=for-the-badge)](https://coveralls.io/github/GregRos/doddle?branch=master)
-[![Doddle minified size(gzip)](<https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=minified%20size%20(gzip)>)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
+![Codacy coverage](https://img.shields.io/codacy/coverage/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)
+[![Doddle minified size(gzip)](https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=gzip)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
+![Codacy grade](https://img.shields.io/codacy/grade/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)
 
 Doddle is a tiny yet feature-packed library for working with sync and async iterables. It’s inspired by LINQ, lodash, and rxjs.
 
@@ -25,7 +26,7 @@ yarn add doddle
 npm install doddle
 ```
 
-# Doddle
+## The Doddle
 
 The Doddle is the library’s lazy primitive. It represents a delayed computation, just like a function.
 
@@ -48,7 +49,7 @@ d.pull() // 5
 
 Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more about them here!](https://github.com/GregRos/doddle/doddle.md)
 
-# Seq
+## Seq
 
 This **wrapper** unifies iterables and generator functions. You create one using the `seq` function.
 
@@ -104,7 +105,7 @@ seq("this will error")
 // TypeScript: Type `string` is not assignable to type ...
 ```
 
-## Operators
+### Operators
 
 The `Seq` wrapper comes with a comprehensive set of operators. These are all instance methods, making them easy to discover and call.
 
@@ -117,7 +118,7 @@ They're also **Lazy**. That means they return one of two things:
 
 This lets you control exactly when the operation is computed.
 
-# ASeq
+## ASeq
 
 This wrapper unifies **async iterables** and **async generator functions**, while also supporting any input that [Seq](#Seq) supports. You create one using the `aseq` function.
 
@@ -154,7 +155,7 @@ Or even an async function that returns an async Iterable:
 aseq(async () => aseq([1, 2, 3]))
 ```
 
-## Operators
+### Operators
 
 The **ASeq** wrapper has the same API as **Seq**, except that all inputs can be async. That means:
 
@@ -174,7 +175,7 @@ for await (const x of example) {
 }
 ```
 
-## Using in async code
+### Using in async code
 
 You’ll often find yourself using `aseq` inside an async function, after awaiting something.
 
@@ -202,7 +203,7 @@ function example() {
 
 The `aseq` function will flatten the entire thing, giving you a simple `ASeq<string>`.
 
-## Sequential
+### Sequential
 
 Lots of **ASeq** operators, like `ASeq.map` and `ASeq.each`, support functions that return promises.
 

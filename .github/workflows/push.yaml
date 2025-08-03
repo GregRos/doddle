@@ -21,34 +21,38 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - name: Enable corepack
+      - name: COREPACK
         run: corepack enable
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: USE ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: "20.9.0"
+          node-version: "22.18.0"
           cache: yarn
           registry-url: "https://registry.yarnpkg.com"
 
-      - name: Set yarn version
+      - name: SET YARN VERSION
         run: yarn set version stable
-      - name: Install dependencies
+      - name: INSTALL
         run: yarn install --immutable
-      - name: build
+      - name: BUILD
         run: yarn run build
-      - name: lint:check
+      - name: CHECK STYLE
         run: yarn run lint:check
-      - name: test
+      - name: TEST
         run: yarn run test:coverage
-      - name: code coverage
-        uses: coverallsapp/github-action@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup token
+      - name: UPLOAD COVERAGE(codacy)
+        run: |
+          bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        env:
+          CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          CODACY_USERNAME: GregRos
+          CODACY_PROJECT_NAME: doddle
+          CODACY_ORGANIZATION_PROVIDER: gh
+      - name: SETUP TOKEN
         run: 'echo "npmAuthToken: ${NPM_TOKEN}" >> ~/.yarnrc.yml'
-      - name: Run prepublish
-        run: yarn run prepublishOnly
-      - name: publish doddle
+      - name: PACKAGING SCRIPT
+        run: yarn run package
+      - name: PUBLISH
         run: yarn npm publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

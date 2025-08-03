@@ -12,26 +12,30 @@ jobs:
           - 22.18.0
     steps:
       - uses: actions/checkout@v4
-      - name: Enable corepack
+      - name: COREPACK
         run: corepack enable
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: USE ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: "20.9.0"
+          node-version: "22.18.0"
           cache: yarn
           registry-url: "https://registry.yarnpkg.com"
 
-      - name: Set yarn version
+      - name: SET YARN VERSION
         run: yarn set version stable
-      - name: Install dependencies
+      - name: INSTALL
         run: yarn install --immutable
-      - name: build
-        run: yarn build
-      - name: lint:check
-        run: yarn lint:check
-      - name: test
-        run: yarn test
-      - name: code coverage
-        uses: coverallsapp/github-action@master
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: BUILD
+        run: yarn run build
+      - name: CHECK STYLE
+        run: yarn run lint:check
+      - name: TEST
+        run: yarn run test:coverage
+      - name: UPLOAD COVERAGE(codacy)
+        run: |
+          bash <(curl -Ls https://coverage.codacy.com/get.sh)
+        env:
+          CODACY_API_TOKEN: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          CODACY_USERNAME: GregRos
+          CODACY_PROJECT_NAME: doddle
+          CODACY_ORGANIZATION_PROVIDER: gh

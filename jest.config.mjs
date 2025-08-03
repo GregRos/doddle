@@ -1,5 +1,6 @@
 /** @type {import("jest").Config} */
 export default {
+    rootDir: ".",
     transform: {
         "^.+\\.ts$": [
             "ts-jest",
@@ -20,5 +21,6 @@ export default {
     testMatch: ["<rootDir>/test/**/*.test.ts"],
     collectCoverageFrom: ["<rootDir>/src/**/*.ts"],
     coverageDirectory: "./coverage",
-    collectCoverage: false
+    collectCoverage: false,
+    testPathIgnorePatterns: ["node_modules", "dist"]
 }

@@ -1,3 +1,5 @@
+# Doddle
+
 Doddle offers a lazy primitive, called the `Doddle`, which is a key part of many APIs. However, it’s designed for general use, and you might find using it a lot in your own code.
 
 Here’s how you make one:
@@ -38,7 +40,7 @@ doddle(() => {
 
 Unlike a `Promise`, though, a `Doddle` can be either sync or async.
 
-# Async doddles
+## Async doddles
 
 An async `Doddle` is just a `Doddle` that yields a `Promise`. It’s also aliased as `DoddleAsync<T>`.
 
@@ -52,7 +54,7 @@ const r1: number = await thisIsAsync.pull()
 
 To keep things simple, the library will normalize all other nestings of `Promise` and `Doddle` to `DoddleAsync<T>`. So you won’t have to worry about something like `Promise<Doddle<T>>`.
 
-# Operators
+## Operators
 
 Promises support operators like `then` and `catch`; Doddles support operators too. These operators never actually pull the `Doddle`, so they never cause the computation to occur. They just project the result in some way.
 
@@ -73,7 +75,7 @@ const d3 = d1.map(() => d2)
 d3.pull() // 6
 ```
 
-## Async cases
+### Async cases
 
 Operators work somewhat differently for async Doddles.
 

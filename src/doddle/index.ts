@@ -372,8 +372,8 @@ export class Doddle<T> {
     }
 }
 /**
- * Creates a {@link Doddle} lazy primitive initialized with the given function. Supports both sync
- * and async initializers and flattens nested Doddle or {@link Promise} types.
+ * Creates a {@link Doddle} lazy primitive around a given function. Supports both sync and async
+ * initializers and flattens nested Doddle or {@link Promise} types.
  *
  * See examples for usage.
  *
@@ -396,8 +396,7 @@ export class Doddle<T> {
  *         doddle(async () => 1)
  *     ) satisfies DoddleAsync<number>
  *
- * @param initializer An initializer function that will be executed once to produce the value. Can
- *   be synchronous or asynchronous and will also handle nested doddle primitives.
+ * @param initializer An initializer that will be called once to produce the value.
  */
 export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
 export function doddle<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
