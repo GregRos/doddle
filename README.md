@@ -2,19 +2,18 @@
 
 [![Doddle workflow status](https://img.shields.io/github/actions/workflow/status/GregRos/doddle/push.yaml?style=for-the-badge)](https://github.com/GregRos/doddle/actions/workflows/push.yaml)
 [![Doddle package version](https://img.shields.io/npm/v/doddle?style=for-the-badge)](https://www.npmjs.com/package/doddle)
-![Codacy coverage](https://img.shields.io/codacy/coverage/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)
+[![Codacy coverage](https://img.shields.io/codacy/coverage/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/coverage)
 [![Doddle minified size(gzip)](https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=gzip)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
-![Codacy grade](https://img.shields.io/codacy/grade/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)
-
+[![Codacy grade](https://img.shields.io/codacy/grade/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 Doddle is a tiny yet feature-packed library for working with sync and async iterables. It’s inspired by LINQ, lodash, and rxjs.
 
 Here are its features:
 
-- 🤏 Tiny bundle size, without compromising user experience.
-- 🔥 Packed with operators from the best APIs in software.
-- 🤗 Strongly typed and extensively validated. Throws meaningful errors too.
-- 🪞 One consistent API shared between sync and async iterables.
-- 🔍 Produces concise, readable stack traces.
+-   🤏 Tiny bundle size, without compromising user experience.
+-   🔥 Packed with operators from the best APIs in software.
+-   🤗 Strongly typed and extensively validated. Throws meaningful errors too.
+-   🪞 One consistent API shared between sync and async iterables.
+-   🔍 Produces concise, readable stack traces.
 
 Get it now:
 
@@ -113,8 +112,8 @@ They never iterate more than they need to and they produce legible stack traces 
 
 They're also **Lazy**. That means they return one of two things:
 
-- Another Seq, which needs to be iterated for anything to happen.
-- A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
+-   Another Seq, which needs to be iterated for anything to happen.
+-   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
 
 This lets you control exactly when the operation is computed.
 
@@ -159,8 +158,8 @@ aseq(async () => aseq([1, 2, 3]))
 
 The **ASeq** wrapper has the same API as **Seq**, except that all inputs can be async. That means:
 
-- You can pass async iterables instead of regular ones.
-- You can pass functions that return promises.
+-   You can pass async iterables instead of regular ones.
+-   You can pass functions that return promises.
 
 **ASeq** wrapper comes with a carbon copy of all the operators defined on **Seq**, but tweaked for inputs that can be async.
 
