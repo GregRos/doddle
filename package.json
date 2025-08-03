@@ -1,6 +1,6 @@
 {
   "name": "doddle",
-  "version": "7.1.1",
+  "version": "7.1.2",
   "description": "Tiny, simple, and comprehensive (async) iteration toolkit.",
   "keywords": [
     "iteration",
@@ -26,12 +26,7 @@
   "repository": "github:GregRos/doddle",
   "license": "MIT",
   "author": "GregRos",
-  "sideEffects": [
-    "dist/cjs/seq.ctor.js",
-    "dist/esm/seq.ctor.js",
-    "dist/cjs/aseq.ctor.js",
-    "dist/esm/aseq.ctor.js"
-  ],
+  "sideEffects": false,
   "type": "module",
   "exports": {
     ".": {
