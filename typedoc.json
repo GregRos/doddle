@@ -1,6 +1,7 @@
 {
   "plugin": ["typedoc-material-theme", "typedoc-plugin-mdn-links"],
   "entryPoints": ["src/index.ts"],
+  "tsconfig": "src/tsconfig.esm.json",
   "out": "./typedoc",
   "navigation": {
     "includeCategories": true

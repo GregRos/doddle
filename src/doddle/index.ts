@@ -20,17 +20,18 @@ export const ownerInstance = Symbol("ownerInstance")
  * @category Use
  */
 export class Doddle<T> {
+    private _cacheName!: string
+
     /** The cached value or error, stored from a previous execution of the initializer. */
     private _cached?: any
     private _info: InnerInfo
-    private _cacheName!: string
-
     /**
      * The initializer function that will be called to construct the value. It will be cleared after
      * the value is constructed.
      */
     private _init: null | ((...args: any[]) => T)
 
+    /** @ignore */
     constructor(initializer: (...args: any[]) => any) {
         this._info = {
             syncness: Syncness.Untouched,
@@ -46,73 +47,26 @@ export class Doddle<T> {
         loadCheckers(this)
     }
 
-    /**
-     * Creates a new {@link Doddle} based on `this`. When pulled, it will pull `this` and project the
-     * result using the given function.
-     *
-     * When `this` is async, the projection will be passed the awaited value, and the function will
-     * return an async Doddle. It also happens if you pass an async projection.
-     *
-     * @example
-     *     // Sync inputs:
-     *     const d = doddle(() => 42)
-     *     const mapped = d.map(x => x + 1)
-     *     const pulled = mapped.pull()
-     *     console.log(pulled) // 43
-     *
-     *     // async inputs:
-     *     const d = doddle(async () => 42)
-     *     const mapped = d.map(x => x + 1) // note that the awaited value is used
-     *     const pulled = await mapped.pull()
-     *     console.log(pulled) // 43
-     *
-     *     // async projection:
-     *     const d = doddle(() => 42)
-     *     const mapped = d.map(async x => x + 1)
-     *     const pulled = await mapped.pull()
-     *     console.log(pulled) // 43
-     *
-     * @param projection The function to apply to the pulled value.
-     */
-    map<T, R>(
-        this: Doddle<T>,
-        projection: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<R>
-    ): DoddleAsync<R>
-    // When the input is async, and the projection is mixed, the result is always async.
-    map<T, R>(
-        this: Matches_Mixed_Value<R, DoddleAsync<T>>,
-        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
-    ): DoddleAsync<Awaited<R>>
-    map<T, R>(
-        this: DoddleAsync<T>,
-        projection: (value: Doddle.PulledAwaited<T>) => Doddle<R> | R
-    ): DoddleAsync<R>
-
-    // When this is mixed, and the projection is also mixed, the result type should stay the same.
-    map<T, R>(
-        this: Matches_Mixed_Value<T> & Matches_Mixed_Value<R, Doddle<T>>,
-        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
-    ): Doddle<R>
-    // When `this` is mixed and the projection is sync, the sync result needs to be mixed.
-    map<T, R>(
-        this: Matches_Mixed_Value<T>,
-        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
-    ): Doddle<R | Promise<R>>
-    map<T, R>(
-        this: Doddle<T>,
-        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
-    ): Doddle<R>
-    map(this: Doddle<any>, projection: (a: any) => any): any {
-        const _projection = chk(this.map).projection(projection)
-        return doddle(() => {
-            const pulled = this.pull()
-            if (isThenable(pulled)) {
-                return pulled.then(_projection)
-            }
-            return _projection(pulled)
-        })
+    /** @internal */
+    get [Symbol.toStringTag]() {
+        return "Doddle"
     }
 
+    /** Returns metadata about the current state of the Doddle. */
+    get info(): Readonly<Doddle.Metadata> {
+        const { stage, syncness } = this._info
+        const syncnessWord = ["untouched", "sync", "async"][syncness]
+        const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
+        const stageWord = ["untouched", "executing", "done", "threw"][stage]
+        const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
+
+        return {
+            isReady: stage >= Stage.Done,
+            desc: ["doddle", ...syncnessPart, stagePart].join(" "),
+            stage: stageWord,
+            syncness: syncnessWord
+        }
+    }
     /**
      * Returns a new {@link Doddle} based on this one. When pulled, it will pull `this` and yield the
      * same value. If an error occurs, the handler will be called with the error. The doddle then
@@ -229,61 +183,70 @@ export class Doddle<T> {
     }
 
     /**
-     * Returns a new Doddle based on this one, together with the input Doddles. When pulled, it will
-     * pull `this` and all `others`, yielding their results in an array.
+     * Creates a new {@link Doddle} based on `this`. When pulled, it will pull `this` and project the
+     * result using the given function.
      *
-     * If either `this` or any of `others` is async, the resulting Doddle will also be async.
+     * When `this` is async, the projection will be passed the awaited value, and the function will
+     * return an async Doddle. It also happens if you pass an async projection.
      *
-     * @param others The other Doddles to zip with.
+     * @example
+     *     // Sync inputs:
+     *     const d = doddle(() => 42)
+     *     const mapped = d.map(x => x + 1)
+     *     const pulled = mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     *     // async inputs:
+     *     const d = doddle(async () => 42)
+     *     const mapped = d.map(x => x + 1) // note that the awaited value is used
+     *     const pulled = await mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     *     // async projection:
+     *     const d = doddle(() => 42)
+     *     const mapped = d.map(async x => x + 1)
+     *     const pulled = await mapped.pull()
+     *     console.log(pulled) // 43
+     *
+     * @param projection The function to apply to the pulled value.
      */
-    zip<const Others extends readonly [Doddle<any>, ...Doddle<any>[]]>(
-        ...others: Others
-    ): Is_Any_Pure_Async<
-        [Doddle<T>, ...Others],
-        DoddleAsync<
-            [
-                Doddle.PulledAwaited<T>,
-                ...{
-                    [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
-                }
-            ]
-        >,
-        Is_Any_Mixed<
-            [Doddle<T>, ...Others],
-            Doddle<
-                MaybePromise<
-                    [
-                        Doddle.PulledAwaited<T>,
-                        ...{
-                            [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
-                        }
-                    ]
-                >
-            >,
-            Doddle<
-                [
-                    Doddle.Pulled<T>,
-                    ...{
-                        [K in keyof Others]: Doddle.Pulled<Others[K]>
-                    }
-                ]
-            >
-        >
-    >
+    map<T, R>(
+        this: Doddle<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => Doddle.SomeAsync<R>
+    ): DoddleAsync<R>
+    // When the input is async, and the projection is mixed, the result is always async.
+    map<T, R>(
+        this: Matches_Mixed_Value<R, DoddleAsync<T>>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): DoddleAsync<Awaited<R>>
+    map<T, R>(
+        this: DoddleAsync<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => Doddle<R> | R
+    ): DoddleAsync<R>
 
-    zip(this: Doddle<any>, ...others: Doddle<any>[]): any {
+    // When this is mixed, and the projection is also mixed, the result type should stay the same.
+    map<T, R>(
+        this: Matches_Mixed_Value<T> & Matches_Mixed_Value<R, Doddle<T>>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R>
+    // When `this` is mixed and the projection is sync, the sync result needs to be mixed.
+    map<T, R>(
+        this: Matches_Mixed_Value<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R | Promise<R>>
+    map<T, R>(
+        this: Doddle<T>,
+        projection: (value: Doddle.PulledAwaited<T>) => R | Doddle<R>
+    ): Doddle<R>
+    map(this: Doddle<any>, projection: (a: any) => any): any {
+        const _projection = chk(this.map).projection(projection)
         return doddle(() => {
-            const values = [this, ...others].map(x => x.pull())
-            if (values.some(isThenable)) {
-                return Promise.all(values)
+            const pulled = this.pull()
+            if (isThenable(pulled)) {
+                return pulled.then(_projection)
             }
-            return values
+            return _projection(pulled)
         })
-    }
-
-    /** Returns a short description of the Doddle value and its state. */
-    toString() {
-        return this.info.desc
     }
 
     /**
@@ -350,25 +313,62 @@ export class Doddle<T> {
         return resource
     }
 
-    /** @internal */
-    get [Symbol.toStringTag]() {
-        return "Doddle"
+    /** Returns a short description of the Doddle value and its state. */
+    toString() {
+        return this.info.desc
     }
 
-    /** Returns metadata about the current state of the Doddle. */
-    get info(): Readonly<Doddle.Metadata> {
-        const { stage, syncness } = this._info
-        const syncnessWord = ["untouched", "sync", "async"][syncness]
-        const syncnessPart = syncness === Syncness.Untouched ? [] : [syncnessWord]
-        const stageWord = ["untouched", "executing", "done", "threw"][stage]
-        const stagePart = stage === Stage.Done ? this._cacheName : `<${stageWord}>`
+    /**
+     * Returns a new Doddle based on this one, together with the input Doddles. When pulled, it will
+     * pull `this` and all `others`, yielding their results in an array.
+     *
+     * If either `this` or any of `others` is async, the resulting Doddle will also be async.
+     *
+     * @param others The other Doddles to zip with.
+     */
+    zip<const Others extends readonly [Doddle<any>, ...Doddle<any>[]]>(
+        ...others: Others
+    ): Is_Any_Pure_Async<
+        [Doddle<T>, ...Others],
+        DoddleAsync<
+            [
+                Doddle.PulledAwaited<T>,
+                ...{
+                    [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
+                }
+            ]
+        >,
+        Is_Any_Mixed<
+            [Doddle<T>, ...Others],
+            Doddle<
+                MaybePromise<
+                    [
+                        Doddle.PulledAwaited<T>,
+                        ...{
+                            [K in keyof Others]: Doddle.PulledAwaited<Others[K]>
+                        }
+                    ]
+                >
+            >,
+            Doddle<
+                [
+                    Doddle.Pulled<T>,
+                    ...{
+                        [K in keyof Others]: Doddle.Pulled<Others[K]>
+                    }
+                ]
+            >
+        >
+    >
 
-        return {
-            isReady: stage >= Stage.Done,
-            desc: ["doddle", ...syncnessPart, stagePart].join(" "),
-            stage: stageWord,
-            syncness: syncnessWord
-        }
+    zip(this: Doddle<any>, ...others: Doddle<any>[]): any {
+        return doddle(() => {
+            const values = [this, ...others].map(x => x.pull())
+            if (values.some(isThenable)) {
+                return Promise.all(values)
+            }
+            return values
+        })
     }
 }
 /**
@@ -435,8 +435,8 @@ const enum Syncness {
     Async = 2
 }
 interface InnerInfo {
-    syncness: Syncness
     stage: Stage
+    syncness: Syncness
 }
 /**
  * Doddle utility types.
@@ -446,10 +446,14 @@ interface InnerInfo {
 export namespace Doddle {
     /** An metadata object describing the state of a {@link Doddle} instance. */
     export interface Metadata {
-        readonly isReady: boolean
-        readonly stage: string
-        readonly syncness: string
+        /** A human-readable representation of the Doddle's state. */
         readonly desc: string
+        /** Whether the Doddle has already been pulled. */
+        readonly isReady: boolean
+        /** The current stage of the Doddle's execution. */
+        readonly stage: string
+        /** Whether the Doddle is sync or async (or whether it's unknown). */
+        readonly syncness: string
     }
 
     /**
@@ -467,16 +471,16 @@ export namespace Doddle {
     export type PulledAwaited<T> =
         T extends Doddle<infer R>
             ? PulledAwaited<R>
-            : T extends Promise<infer R>
+            : T extends PromiseLike<infer R>
               ? PulledAwaited<R>
               : T
 
     /** An async value or a {@link Doddle} that can be pulled to get an async value. */
     export type SomeAsync<T> =
-        | Promise<T>
+        | PromiseLike<T>
         | DoddleAsync<T>
-        | Promise<Doddle<T>>
-        | Promise<DoddleAsync<T>>
+        | PromiseLike<Doddle<T>>
+        | PromiseLike<DoddleAsync<T>>
 
     /** A value, a promise, a doddle, an async doddle, or similar nestings. */
     export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddle<T>>

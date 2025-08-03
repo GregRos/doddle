@@ -96,7 +96,7 @@ But you **can’t** pass it a string!
 
 Although strings are iterable, they’re rarely used that way, and treating them as collections just causes lots of bugs.
 
-`seq` doesn’t accept strings and trying to pass one will error both duration compilation and at runtime:
+`seq` doesn’t accept strings and trying to pass one will error both during compilation and at runtime:
 
 ```ts
 // ‼️ DoddleError: Strings not allowed

@@ -22,8 +22,8 @@ const SPECIAL2 = Symbol("S2")
  * @category Use
  */
 export abstract class Seq<T> implements Iterable<T> {
-    /** @ignore */
-    abstract [Symbol.iterator](): Iterator<T>
+    flatMap = this.concatMap
+
     /** @internal */
 
     constructor() {
@@ -35,6 +35,34 @@ export abstract class Seq<T> implements Iterable<T> {
 
     get _qr() {
         return this.toArray().pull()
+    }
+
+    /**
+     * Calls a side-effect function after all elements have been yielded, but before iteration
+     * finishes.
+     *
+     * ⚠️ If the client stops iterating early, the action won't be executed.
+     *
+     * @param action A function to invoke after iteration completes.
+     * @returns A new sequence that acts like `this` but invokes `action` before it's finished.
+     */
+    after(action: Seq.NoInputAction): Seq<T> {
+        chk(this.after).action(action)
+        return SeqOperator(this, function* after(input) {
+            yield* input
+            pull(action())
+        })
+    }
+    /**
+     * Reinterprets the declared element type of `this` as another, arbitrary type.
+     *
+     * ℹ️ This is only useful in TypeScript and has no runtime effects.
+     *
+     * @template S The new element type.
+     * @returns The same sequence, but with a different declared type.
+     */
+    as<S>() {
+        return this as any as Seq<S>
     }
 
     /**
@@ -57,6 +85,20 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
+    /**
+     * Executes a side effect action once before any elements are yielded, but after iteration has
+     * begun.
+     *
+     * @param action Invokes before any elements are yielded.
+     * @returns A new async sequence that performs `action` before yielding elements.
+     */
+    before(action: Seq.NoInputAction): Seq<T> {
+        chk(this.before).action(action)
+        return SeqOperator(this, function* before(input) {
+            pull(action())
+            yield* input
+        })
+    }
     /**
      * Caches the elements of `this` sequence as they're iterated over, so that it's evaluated only
      * once.
@@ -135,85 +177,14 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * Returns a cartesian product of `this` sequence with one or more other sequences, optionally
-     * applying an N-ary projection to each combination of elements.
-     *
-     * The product of `N` sequences is the collection of all possible sets of elements from each
-     * sequence.
-     *
-     * For example, the product of `[1, 2]` and `[3, 4]` is:
-     *
-     * ```ts
-     * ;[
-     *     [1, 3],
-     *     [1, 4],
-     *     [2, 3],
-     *     [2, 4]
-     * ]
-     * ```
-     *
-     * @example
-     *     seq([1, 2]).product([3, 4])
-     *     // => [[1, 3], [1, 4], [2, 3], [2, 4]]
-     *     seq([]).product([3, 4])
-     *     // => []
-     *     seq([1, 2]).product([3, 4], (a, b) => a + b)
-     *     // => [4, 5, 5, 6]
-     *
-     * @param others One or more sequence-like inputs for the product.
-     * @param projection Optionally, an N-ary projection to apply to each combination of elements.
-     *   If not given, each combination is yielded as an array.
-     * @returns A new sequence.
-     */
-    product<Xs extends any[], R = [T, ...Xs]>(
-        _others: {
-            [K in keyof Xs]: Seq.Input<Xs[K]>
-        },
-        projection?: (...args: [T, ...Xs]) => R
-    ): Seq<R> {
-        const others = _others.map(seq).map(x => x.cache())
-        projection ??= (...args: any[]) => args as any
-        chk(this.product).projection(projection)
-        return SeqOperator(this, function* product(input) {
-            let partialProducts = [[]] as any[][]
-            for (const iterable of [input, ...others].reverse()) {
-                const oldPartialProducts = partialProducts
-                partialProducts = []
-                for (const item of iterable) {
-                    partialProducts = partialProducts.concat(
-                        oldPartialProducts.map(x => [item, ...x])
-                    )
-                }
-            }
-            yield* partialProducts.map(x => pull(projection.apply(null, x as any))) as any
-        })
-    }
-
-    /**
-     * 🦥**Lazily** joins the elements of `this` sequence into a single string, separated by the
-     * given separator.
-     *
-     * ⚠️ Requires iterating over the entire sequence.
-     *
-     * @param separator The string to use as a separator between elements.
-     * @returns A 🦥{@link Doddle} that resolves to the joined string.
-     */
-    join(separator: string): Doddle<string> {
-        chk(this.join).separator(separator)
-        return lazyOperator(this, function join(input) {
-            return input
-                .toArray()
-                .map(x => x.join(separator))
-                .pull()
-        })
-    }
-    /**
      * Splits `this` sequence into chunks of the given size, optionally applying a projection to
      * each chunk.
      *
-     * @param size The size of each chunk. The last chunk may be smaller.
-     * @param projection Optionally, an N-ary projection to apply to each chunk. If not specified,
-     *   the elements are collected into an array.
+     * ℹ️ The last chunk may be smaller than the given size.
+     *
+     * @param size The size of each chunk.
+     * @param projection Optionally, an N-ary projection to apply to each chunk. Defaults to
+     *   collecting the elements into an array.
      * @returns A new sequence.
      */
     chunk<L extends number, S = getWindowOutputType<T, L>>(
@@ -241,6 +212,42 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
+     * Returns a new sequence. When iterated, before yielding its first element, it will iterate
+     * over all the elements of `this` and store them in memory. Then it will yield all of them one
+     * by one.
+     *
+     * ℹ️ Used to control side-effects. Makes sure all side-effects execute before continuing to
+     * apply other operators.
+     *
+     * @returns A new sequence with the same elements as this one, but where iteration has already
+     *   completed.
+     */
+    collect(): Seq<T> {
+        return SeqOperator(this, function* collect(input) {
+            yield* [...input]
+        })
+    }
+
+    /**
+     * Concatenates one or more sequences to the end of `this`, so that their elements appear in
+     * order.
+     *
+     * @param inputs The sequential inputs to concatenate to the end of `this`.
+     * @returns A new sequence with the concatenated elements.
+     */
+    concat<Seqs extends Seq.Input<any>[]>(
+        ...inputs: Seqs
+    ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
+        const iterables = inputs.map(seq)
+        return SeqOperator(this, function* concat(input) {
+            yield* input
+            for (const iterable of iterables) {
+                yield* iterable
+            }
+        }) as any
+    }
+
+    /**
      * Applies a sequence projection on each element of `this` sequence and concatenates the
      * resulting sequences.
      *
@@ -259,25 +266,6 @@ export abstract class Seq<T> implements Iterable<T> {
         }) as any
     }
     /**
-     * Concatenates one or more sequences to the end of `this`, so that their elements appear in
-     * order.
-     *
-     * @param _iterables The sequence-like inputs to concatenate to the end of `this`.
-     * @returns A new sequence with the concatenated elements.
-     */
-    concat<Seqs extends Seq.Input<any>[]>(
-        ..._iterables: Seqs
-    ): Seq<T | Seq.ElementOfInput<Seqs[number]>> {
-        const iterables = _iterables.map(seq)
-        return SeqOperator(this, function* concat(input) {
-            yield* input
-            for (const iterable of iterables) {
-                yield* iterable
-            }
-        }) as any
-    }
-
-    /**
      * Concatenates `this` sequence to the end of one or more other sequences.
      *
      * ℹ️ Input sequences are concatenated in the order that they appear.
@@ -292,6 +280,34 @@ export abstract class Seq<T> implements Iterable<T> {
         return seq([]).concat(...inputs, this) as any
     }
 
+    /**
+     * 🦥**Lazily** counts the number of elements in `this` sequence.
+     *
+     * ⚠️ Requires iterating over the entire sequence.
+     *
+     * @returns A 🦥{@link Doddle} that resolves to the number of elements in `this`.
+     */
+    count(): Doddle<number>
+    /**
+     * 🦥**Lazily** counts the number of elements in `this` sequence that match the given predicate.
+     *
+     * ⚠️ Requires iterating over the entire sequence.
+     *
+     * @param predicate The predicate used to test each element.
+     * @returns A 🦥{@link Doddle} that resolves to the number of matching elements.
+     */
+    count(predicate: Seq.Predicate<T>): Doddle<number>
+    count(predicate?: Seq.Predicate<T>): Doddle<number> {
+        // ! POLYMORPHIC !
+        predicate ??= () => true
+        predicate = chk(this.count).predicate(predicate)
+        return lazyOperator(this, function count(input) {
+            return input
+                .filter(predicate as any)
+                .reduce(acc => acc + 1, 0)
+                .pull()
+        })
+    }
     /**
      * Calls an action function as each element in `this` is iterated over. Calls the function
      * before or after yielding the element, or both.
@@ -366,36 +382,11 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * Returns a new sequence that shares its iterator state. This allows different loops to iterate
-     * over it, sharing progress.
+     * 🦥**Lazily** finds the first element in `this` sequence, or `undefined` if it's empty.
      *
-     * ⚠️ Can be iterated over exactly once, and will be empty afterwards.
-     *
-     * @returns A new, shared iterable sequence that can be iterated over exactly once.
+     * @returns A 🦥{@link Doddle} that resolves to the first element or the alternative value.
      */
-    share(): Seq<T> {
-        const iter = doddle(() => _iter(this))
-        let isCallingNext = false
-
-        return SeqOperator(this, function* share() {
-            if (isCallingNext) {
-                throw new DoddleError(invalidRecursionError("share"))
-            }
-            while (true) {
-                try {
-                    isCallingNext = true
-                    var { done, value } = iter.pull().next()
-                } finally {
-                    isCallingNext = false
-                }
-                if (done) {
-                    return
-                }
-                yield value
-            }
-        })
-    }
-
+    first(): Doddle<T | undefined>
     /**
      * 🦥**Lazily** finds the first element in `this` sequence that matches the given predicate.
      *
@@ -405,12 +396,7 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param alt The value to return if no element matches the predicate. Defaults to `undefined`.
      */
     first<const Alt = undefined>(predicate: Seq.Predicate<T>, alt?: Alt): Doddle<T | Alt>
-    /**
-     * 🦥**Lazily** finds the first element in `this` sequence, or `undefined` if it's empty.
-     *
-     * @returns A 🦥{@link Doddle} that resolves to the first element or the alternative value.
-     */
-    first(): Doddle<T | undefined>
+
     first<Alt = undefined>(predicate?: Seq.Predicate<T>, alt?: Alt): Doddle<T | Alt> {
         predicate ??= () => true
         return lazyOperator(this, function first(input) {
@@ -423,8 +409,6 @@ export abstract class Seq<T> implements Iterable<T> {
             return alt as Alt
         })
     }
-
-    flatMap = this.concatMap
 
     /**
      * Groups the elements of `this` sequence by key, resulting in a sequence of pairs where the
@@ -518,30 +502,20 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * 🦥**Lazily** counts the number of elements in `this` sequence.
+     * 🦥**Lazily** joins the elements of `this` sequence into a single string, separated by the
+     * given separator.
      *
      * ⚠️ Requires iterating over the entire sequence.
      *
-     * @returns A 🦥{@link Doddle} that resolves to the number of elements in `this`.
+     * @param separator The string to use as a separator between elements.
+     * @returns A 🦥{@link Doddle} that resolves to the joined string.
      */
-    count(): Doddle<number>
-    /**
-     * 🦥**Lazily** counts the number of elements in `this` sequence that match the given predicate.
-     *
-     * ⚠️ Requires iterating over the entire sequence.
-     *
-     * @param predicate The predicate used to test each element.
-     * @returns A 🦥{@link Doddle} that resolves to the number of matching elements.
-     */
-    count(predicate: Seq.Predicate<T>): Doddle<number>
-    count(predicate?: Seq.Predicate<T>): Doddle<number> {
-        // ! POLYMORPHIC !
-        predicate ??= () => true
-        predicate = chk(this.count).predicate(predicate)
-        return lazyOperator(this, function count(input) {
+    join(separator: string): Doddle<string> {
+        chk(this.join).separator(separator)
+        return lazyOperator(this, function join(input) {
             return input
-                .filter(predicate as any)
-                .reduce(acc => acc + 1, 0)
+                .toArray()
+                .map(x => x.join(separator))
                 .pull()
         })
     }
@@ -640,55 +614,6 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * Returns a new sequence. When iterated, before yielding its first element, it will iterate
-     * over all the elements of `this` and store them in memory. Then it will yield all of them one
-     * by one.
-     *
-     * ℹ️ Used to control side-effects. Makes sure all side-effects execute before processing the
-     * rest of the sequence.
-     *
-     * @returns A new sequence with the same elements as this one, but where iteration has already
-     *   completed.
-     */
-    collect(): Seq<T> {
-        return SeqOperator(this, function* collect(input) {
-            yield* [...input]
-        })
-    }
-
-    /**
-     * Executes a side effect action once before any elements are yielded, but after iteration has
-     * begun.
-     *
-     * @param action Invokes before any elements are yielded.
-     * @returns A new async sequence that performs `action` before yielding elements.
-     */
-    before(action: Seq.NoInputAction): Seq<T> {
-        chk(this.before).action(action)
-        return SeqOperator(this, function* before(input) {
-            pull(action())
-            yield* input
-        })
-    }
-    /**
-     * Calls a side-effect action after all elements have been yielded, but before iteration
-     * finishes.
-     *
-     * ⚠️ If the client stops iterating early, the action won't be executed.
-     *
-     * @param action A function to invoke after iteration completes.
-     * @returns A new async sequence that acts like `this` but invokes `action` before it's
-     *   finished.
-     */
-    after(action: Seq.NoInputAction): Seq<T> {
-        chk(this.after).action(action)
-        return SeqOperator(this, function* after(input) {
-            yield* input
-            pull(action())
-        })
-    }
-
-    /**
      * Orders the elements of `this` sequence by key, using the given key projection.
      *
      * ⚠️ Has to iterate over the entire sequence.
@@ -728,6 +653,61 @@ export abstract class Seq<T> implements Iterable<T> {
                 .pull()
         })
     }
+    /**
+     * Returns a cartesian product of `this` sequence with one or more other sequences, optionally
+     * applying an N-ary projection to each combination of elements.
+     *
+     * The product of `N` sequences is the collection of all possible sets of elements from each
+     * sequence.
+     *
+     * For example, the product of `[1, 2]` and `[3, 4]` is:
+     *
+     * ```ts
+     * ;[
+     *     [1, 3],
+     *     [1, 4],
+     *     [2, 3],
+     *     [2, 4]
+     * ]
+     * ```
+     *
+     * @example
+     *     seq([1, 2]).product([3, 4])
+     *     // => [[1, 3], [1, 4], [2, 3], [2, 4]]
+     *     seq([]).product([3, 4])
+     *     // => []
+     *     seq([1, 2]).product([3, 4], (a, b) => a + b)
+     *     // => [4, 5, 5, 6]
+     *
+     * @param others One or more sequence-like inputs for the product.
+     * @param projection Optionally, an N-ary projection to apply to each combination of elements.
+     *   If not given, each combination is yielded as an array.
+     * @returns A new sequence.
+     */
+    product<Xs extends any[], R = [T, ...Xs]>(
+        _others: {
+            [K in keyof Xs]: Seq.Input<Xs[K]>
+        },
+        projection?: (...args: [T, ...Xs]) => R
+    ): Seq<R> {
+        const others = _others.map(seq).map(x => x.cache())
+        projection ??= (...args: any[]) => args as any
+        chk(this.product).projection(projection)
+        return SeqOperator(this, function* product(input) {
+            let partialProducts = [[]] as any[][]
+            for (const iterable of [input, ...others].reverse()) {
+                const oldPartialProducts = partialProducts
+                partialProducts = []
+                for (const item of iterable) {
+                    partialProducts = partialProducts.concat(
+                        oldPartialProducts.map(x => [item, ...x])
+                    )
+                }
+            }
+            yield* partialProducts.map(x => pull(projection.apply(null, x as any))) as any
+        })
+    }
+
     /**
      * 🦥**Lazily** reduces `this` sequence to a single value by applying the given reduction.
      *
@@ -831,24 +811,23 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     seqEquals<T extends S, S>(this: Seq<T>, input: Seq.Input<S>): Doddle<boolean>
     /**
-     * 🦥**Lazily** checks if the elements of `this` sequence are all equal to the elements in a
-     * sequential input, by iterating over both.
+     * 🦥**Lazily** checks if `this` sequence is equal to the `input` sequence.
+     *
+     * ℹ️ For two sequences to be equal, their elements must be equal and be in the same order.
      *
      * @param input The sequence-like input to compare with.
      * @param projection The projection function that determines the key for comparison.
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
-     *   otherwise.
      */
     seqEquals<S extends T>(input: Seq.Input<S>): Doddle<boolean>
     /**
      * 🦥**Lazily** checks if `this` sequence is equal to the `input` sequence.
      *
-     * The elements are compared by key, using the given key projection.
+     * ℹ️ For two sequences to be equal, their elements must be equal and be in the same order.
      *
-     * @param input The sequential input to compare with.
+     * @param input The sequence-like input to compare with.
      * @param projection The projection function that determines the key for comparison.
      * @returns A 🦥{@link Doddle} that resolves to `true` if all elements are equal, or `false`
-     *   otherwise.
      */
     seqEquals<K, S = T>(
         input: Seq.Input<S>,
@@ -934,6 +913,37 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
+     * Returns a new sequence that shares its iterator state. This allows different loops to iterate
+     * over it, sharing progress.
+     *
+     * ⚠️ Can be iterated over exactly once, and will be empty afterwards.
+     *
+     * @returns A new, shared iterable sequence that can be iterated over exactly once.
+     */
+    share(): Seq<T> {
+        const iter = doddle(() => _iter(this))
+        let isCallingNext = false
+
+        return SeqOperator(this, function* share() {
+            if (isCallingNext) {
+                throw new DoddleError(invalidRecursionError("share"))
+            }
+            while (true) {
+                try {
+                    isCallingNext = true
+                    var { done, value } = iter.pull().next()
+                } finally {
+                    isCallingNext = false
+                }
+                if (done) {
+                    return
+                }
+                yield value
+            }
+        })
+    }
+
+    /**
      * Shuffles the elements of `this` sequence randomly.
      *
      * ⚠️ Requires iterating over the entire sequence.
@@ -947,36 +957,6 @@ export abstract class Seq<T> implements Iterable<T> {
             yield* array
         })
     }
-    /**
-     * Skips elements from `this` sequence while the given predicate is true, and yields the rest.
-     *
-     * ℹ️ You can use the `options` argument to keep the final element.
-     *
-     * @param predicate The predicate to determine whether to continue skipping.
-     * @param options Options for skipping behavior.
-     * @returns A new sequence without the skipped elements.
-     */
-    skipWhile(predicate: Seq.Predicate<T>, options?: SkipWhileOptions): Seq<T> {
-        predicate = chk(this.skipWhile).predicate(predicate)
-        return SeqOperator(this, function* skipWhile(input) {
-            let prevMode = SkippingMode.None as SkippingMode
-            let index = 0
-            for (const element of input) {
-                if (prevMode === SkippingMode.NotSkipping) {
-                    yield element
-                    continue
-                }
-                const newSkipping: boolean = pull(predicate(element, index++))
-                if (!newSkipping) {
-                    if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
-                        yield element
-                    }
-                }
-                prevMode = newSkipping ? SkippingMode.Skipping : SkippingMode.NotSkipping
-            }
-        }) as any
-    }
-
     /**
      * Skips the first `count` elements of `this` sequence, yielding the rest.
      *
@@ -1008,6 +988,36 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
+    /**
+     * Skips elements from `this` sequence while the given predicate is true, and yields the rest.
+     *
+     * ℹ️ You can use the `options` argument to skip the first element that returns `false`.
+     *
+     * @param predicate The predicate to determine whether to continue skipping.
+     * @param options Options for skipping behavior.
+     * @returns A new sequence without the skipped elements.
+     */
+    skipWhile(predicate: Seq.Predicate<T>, options?: SkipWhileOptions): Seq<T> {
+        predicate = chk(this.skipWhile).predicate(predicate)
+        return SeqOperator(this, function* skipWhile(input) {
+            let prevMode = SkippingMode.None as SkippingMode
+            let index = 0
+            for (const element of input) {
+                if (prevMode === SkippingMode.NotSkipping) {
+                    yield element
+                    continue
+                }
+                const newSkipping: boolean = pull(predicate(element, index++))
+                if (!newSkipping) {
+                    if (prevMode !== SkippingMode.Skipping || !options?.skipFinal) {
+                        yield element
+                    }
+                }
+                prevMode = newSkipping ? SkippingMode.Skipping : SkippingMode.NotSkipping
+            }
+        }) as any
+    }
+
     /**
      * 🦥**Lazily** checks if any element in `this` sequence matches the given predicate, by
      * iterating over it until a match is found.
@@ -1046,32 +1056,10 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
     /**
-     * Yields the first elements of `this` sequence while the given predicate is true, skipping the
-     * rest.
+     * Yields the first `count` elements of `this` sequence.
      *
-     * @param predicate The predicate to determine whether to continue yielding.
-     * @param options Extra options.
-     * @returns A new sequence with the yielded elements.
-     */
-    takeWhile(predicate: Seq.Predicate<T>, options?: TakeWhileOptions): Seq<T> {
-        chk(this.takeWhile).predicate(predicate)
-        return SeqOperator(this, function* takeWhile(input) {
-            let index = 0
-            for (const element of input) {
-                if (pull(predicate(element, index++))) {
-                    yield element
-                } else {
-                    if (options?.takeFinal) {
-                        yield element
-                    }
-                    return
-                }
-            }
-        }) as any
-    }
-    /**
-     * Yields the first `count` elements of `this` sequence, or `-count` elements from the end if
-     * `count` is negative.
+     * ℹ️ If `count` is negative, yields the last `-count` elements instead.\
+     * ℹ️ If the sequence is smaller than `count`, it yields all elements.
      *
      * @param count The number of elements to yield.
      * @returns A new sequence with the yielded elements.
@@ -1109,10 +1097,39 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * 🦥**Lazily** converts `this` sequence into an array, iterating over it to collect all the
-     * elements.
+     * Yields the first elements of `this` sequence while the given predicate is true and skips the
+     * rest.
      *
-     * @returns A 🦥{@link Doddle} that resolves to an array of the elements in the sequence.
+     * ℹ️ If the sequence is too small, the result will be empty.\
+     * ℹ️ The `options` argument lets you keep the first element for which the predicate returns
+     * `false`.
+     *
+     * @param predicate The predicate to determine whether to continue yielding.
+     * @param options Extra options.
+     * @returns A new sequence with the yielded elements.
+     */
+    takeWhile(predicate: Seq.Predicate<T>, options?: TakeWhileOptions): Seq<T> {
+        chk(this.takeWhile).predicate(predicate)
+        return SeqOperator(this, function* takeWhile(input) {
+            let index = 0
+            for (const element of input) {
+                if (pull(predicate(element, index++))) {
+                    yield element
+                } else {
+                    if (options?.takeFinal) {
+                        yield element
+                    }
+                    return
+                }
+            }
+        }) as any
+    }
+    /**
+     * 🦥**Lazily** converts `this` sequence into an array.
+     *
+     * ⚠️ Has to iterate over the entire sequence.
+     *
+     * @returns A 🦥{@link Doddle} that resolves to an array.
      */
     toArray() {
         return lazyOperator(this, function toArray(input) {
@@ -1121,11 +1138,31 @@ export abstract class Seq<T> implements Iterable<T> {
     }
 
     /**
-     * 🦥**Lazily** converts `this` sequence into a {@link Record}, iterating over it and applying
-     * the given key projection to each element to determine its key.
+     * 🦥**Lazily** converts `this` sequence into a Map.
      *
-     * @param kvpProjection
-     * @returns
+     * ⚠️ Has to iterate over the entire sequence.
+     *
+     * @param kvpProjection A function that takes an element and returns a key-value pair.
+     * @returns A 🦥{@link Doddle} that resolves to a Map of the elements in the sequence.
+     */
+    toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
+        // ! POLYMORPHIC !
+        kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
+        return lazyOperator(this, function toMap(input) {
+            return input
+                .map(kvpProjection)
+                .toArray()
+                .map(x => new Map(x))
+                .pull()
+        })
+    }
+    /**
+     * 🦥**Lazily** converts `this` sequence into a plain JS object. Uses the given `kvpProjection`
+     * to determine each key-value pair.
+     *
+     * @param kvpProjection A function that takes an element and returns a key-value pair. Each key
+     *   must be a valid PropertyKey.
+     * @returns A 🦥{@link Doddle} that resolves to a plain JS object.
      */
     toRecord<const Key extends PropertyKey, Value>(
         kvpProjection: Seq.Iteratee<T, readonly [Key, Value]>
@@ -1142,32 +1179,34 @@ export abstract class Seq<T> implements Iterable<T> {
         })
     }
 
-    as<S>() {
-        return this as any as Seq<S>
-    }
-
-    toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
-        // ! POLYMORPHIC !
-        kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
-        return lazyOperator(this, function toMap(input) {
-            return input
-                .map(kvpProjection)
-                .toArray()
-                .map(x => new Map(x))
-                .pull()
-        })
-    }
+    /**
+     * 🦥**Lazily** converts `this` sequence into a Set.
+     *
+     * ⚠️ Has to iterate over the entire sequence.
+     *
+     * @returns A 🦥{@link Doddle} that resolves to a Set of the elements in the sequence.
+     */
     toSet() {
         return lazyOperator(this, function toSet(input) {
             return new Set(input)
         })
     }
-    uniq(projection: Seq.NoIndexIteratee<T, any> = x => x): Seq<T> {
-        chk(this.uniq).projection(projection)
+    /**
+     * Filters out duplicate elements from `this` sequence, optionally using a key projection.
+     *
+     * ℹ️ **Doesn't** need to iterate over the entire sequence.\
+     * ⚠️ Needs to cache the sequence as it's iterated over.
+     *
+     * @param keyProjection A function that takes an element and returns a key used to check for
+     *   uniqueness.
+     * @returns A sequence of unique elements.
+     */
+    uniq(keyProjection: Seq.NoIndexIteratee<T, any> = x => x): Seq<T> {
+        chk(this.uniq).keyProjection(keyProjection)
         return SeqOperator(this, function* uniq(input) {
             const seen = new Set()
             for (const element of input) {
-                const key = pull(projection(element))
+                const key = pull(keyProjection(element))
                 if (!seen.has(key)) {
                     seen.add(key)
                     yield element
@@ -1175,11 +1214,28 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-
+    /**
+     * Splits `this` async sequence into overlapping windows of fixed size, applying a projection to
+     * each window.
+     *
+     * ℹ️ If the sequence is smaller than the window size, one smaller window will yielded.
+     *
+     * @param size The size of each window.
+     * @param projection A function to project each window to a value.
+     * @returns A new sequence of windows or projected results.
+     */
     window<L extends number, S>(
         size: L,
         projection: (...window: getWindowArgsType<T, L>) => S | Doddle<S>
     ): Seq<S>
+    /**
+     * Splits `this` async sequence into overlapping windows of fixed size.
+     *
+     * ℹ️ If the sequence is smaller than the window size, one smaller window will yielded.
+     *
+     * @param size The size of each window.
+     * @returns A new sequence of windows.
+     */
     window<L extends number>(size: L): Seq<getWindowOutputType<T, L>>
     window<L extends number, S>(
         size: L,
@@ -1205,9 +1261,29 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
+    /**
+     * Zips `this` sequence with other sequences, yielding tuples of elements that appear in the
+     * same position in each sequence.
+     *
+     * ℹ️ Sequences that are exhausted will yield `undefined` for their elements.\
+     * ℹ️ The resulting sequence will be as long as the longest input sequence.
+     *
+     * @param others An array of other sequence inputs to zip with.
+     * @returns A new async sequence of tuples containing parallel elements.
+     */
     zip<Xs extends [any, ...any[]]>(others: {
         [K in keyof Xs]: Seq.Input<Xs[K]>
     }): Seq<getZipValuesType<[T, ...Xs]>>
+    /**
+     * Zips `this` sequence with other sequences, applying a projection to each set of elements and
+     * yielding the results.
+     *
+     * ℹ️ Sequences that are exhausted will yield `undefined` for their elements.\
+     * ℹ️ The resulting sequence will be as long as the longest input sequence.
+     *
+     * @param others An array of other sequence inputs to zip with.
+     * @returns A new sequence of elements generated from the zipped values.
+     */
     zip<Xs extends [any, ...any[]], R>(
         others: {
             [K in keyof Xs]: Seq.Input<Xs[K]>
@@ -1245,6 +1321,8 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         }) as any
     }
+    /** @ignore */
+    abstract [Symbol.iterator](): Iterator<T>
 }
 
 /** @internal */
@@ -1267,38 +1345,59 @@ export const SeqOperator = function seq<In, Out>(
  * @category Types
  */
 export namespace Seq {
-    /** A type that can be either a value or a {@link Doddle} of that value. */
+    /**
+     * A type that can be either a value or a {@link Doddle} of that value
+     *
+     * @inline
+     */
     type MaybeDoddle<Value> = Value | Doddle<Value>
-
+    /**
+     * An iteratee that receives only the index and returns a value or promise of a value.
+     *
+     * ℹ️ Useful for operations that depend solely on element position.
+     *
+     * @template O The output type.
+     * @inline
+     */
+    export type ElementOfInput<SeqLike> = SeqLike extends Input<infer Element> ? Element : never
     /**
      * An iteratee that receives consecutive indexes, not elements. Used for generating sequences.
      *
      * @template Out The element type of the sequence.
+     * @inline
      */
     export type IndexIteratee<Out> = (index: number) => MaybeDoddle<Out>
 
     /**
-     * An iteratee that projects sequence elements individually.
+     * A function applied to each element and its index, producing a value or promise of a value.
      *
-     * @template In The input element type.
-     * @template Out The output element type.
+     * ℹ️ Used in most transformation and filtering operations.
+     *
+     * @template E The input element type.
+     * @template O The output value type.
+     * @inline
      */
     export type Iteratee<In, Out> = (element: In, index: number) => MaybeDoddle<Out>
 
     /**
-     * An {@link Iteratee} that doesn't receive element indices. Used when operators should only use
-     * values, such as in key projections.
+     * An iteratee that ignores the index and returns a value or promise.
      *
-     * @template In The input element type.
-     * @template Out The output element type.
+     * ℹ️ Used for operations that ignore the index, such as some key projections.
+     *
+     * @template E The input element type.
+     * @template O The output value type.
+     * @inline
      */
     export type NoIndexIteratee<In, Out> = (element: In) => MaybeDoddle<Out>
 
     /**
-     * An {@link Iteratee} that receives a stage indicator, which can be `"before"` or `"after"`.
+     * A function called at stages "before" or "after" yielding an element.
      *
-     * @template In The input element type.
-     * @template Out The output element type.
+     * ℹ️ Used for operations that call side-effect functions.
+     *
+     * @template E The input element type.
+     * @template O The output type, typically used for side-effects.
+     * @inline
      */
     export type StageIteratee<In, Out> = (
         element: In,
@@ -1307,9 +1406,12 @@ export namespace Seq {
     ) => Out
 
     /**
-     * A predicate {@link Iteratee} that always returns a boolean value, used for filtering.
+     * A predicate function over elements, returning boolean or promise of boolean.
      *
-     * @template In The input element type.
+     * ℹ️ Used for filtering, counting, or skipping elements based on a condition.
+     *
+     * @template E The input element type.
+     * @inline
      */
     export type Predicate<In> = Iteratee<In, boolean>
     /**
@@ -1317,6 +1419,7 @@ export namespace Seq {
      *
      * @template In The input element type.
      * @template Narrowed The narrowed element type.
+     * @inline
      */
     export type TypePredicate<In, Narrowed extends In> = (
         element: In,
@@ -1324,11 +1427,13 @@ export namespace Seq {
     ) => element is Narrowed
 
     /**
-     * A reduction. Takes an accumulator, element, and index. Returns the accumulator value for the
-     * next iteration.
+     * A reducer function combining an accumulator and element to produce a new accumulator.
      *
-     * @template In The element type of the sequence.
-     * @template Result The result of the reduction.
+     * ℹ️ Used in operations like `reduce` or `scan` to accumulate results.
+     *
+     * @template E The element type.
+     * @template O The accumulator type.
+     * @inline
      */
     export type Reduction<In, Result> = (
         acc: Result,
@@ -1337,49 +1442,44 @@ export namespace Seq {
     ) => MaybeDoddle<Result>
 
     /**
-     * A function that takes no arguments and returns an Iterable, Iterator, or ArrayLike.
+     * A function that returns a sequence or iterator, possibly asynchronously.
      *
-     * Converted into a {@link Seq}.
+     * ℹ️ Used in conversions to {@link Seq}.
      *
-     * @template Item The element type of the resulting iterable.
+     * @template E The element type.
      */
     export type FunctionInput<Item> = () => MaybeDoddle<ObjectIterable<MaybeDoddle<Item>>>
 
     /**
      * An Iterable, Iterator, or ArrayLike but **not** a `string`.
      *
-     * Converted into a {@link Seq}.
+     * ℹ️ Used in conversions to {@link Seq}.
      *
      * @template Item The element type of the iterable.
      */
     export type ObjectIterable<Item> = object & (Iterable<Item> | Iterator<Item> | ArrayLike<Item>)
 
     /**
-     * The type of a sequence-like input, with elements of type `Out`.
+     * The general input type for a sequence.s
      *
-     * Converted into a {@link Seq}.
-     *
-     * @template Item The element type of the input.
+     * @template E The element type (may be a promise of something).
      */
     export type Input<Item> = MaybeDoddle<ObjectIterable<Item>> | FunctionInput<Item>
 
     /**
-     * Infers the element type of a sequence-like input.
+     * A zero-argument action for side-effects that may return a doddle-wrapped value.
      *
-     * @template SeqLike The sequence-like input type.
+     * @inline
      */
-    export type ElementOfInput<SeqLike> = SeqLike extends Input<infer Element> ? Element : never
-    /**
-     * A grouping of elements by a key, where `K` is the key type and `V` is the value type.
-     *
-     * @template Key The key type.
-     * @template Val The value type.
-     */
-    export type Group<Key, Val> = readonly [Key, Seq<Val>]
+
+    export type NoInputAction = () => unknown | Doddle<unknown>
 
     /**
-     * A function that takes no arguments but may return a Doddle, which will be pulled before
-     * executing continues.
+     * A grouped output pairing a key with a sub-sequence of elements.
+     *
+     * @template K The group key type.
+     * @template T The element type within the group.
+     * @inline
      */
-    export type NoInputAction = () => unknown | Doddle<unknown>
+    export type Group<Key, Val> = readonly [Key, Seq<Val>]
 }
