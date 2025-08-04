@@ -1,7 +1,13 @@
 import type { Doddle } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
-import { chk, DoddleError, invalidRecursionError, loadCheckers } from "../errors/error.js"
-import { _iter, createCompareKey, orderedStages, returnKvp, shuffleArray, Stage } from "../utils.js"
+import {
+    chk,
+    DoddleError,
+    invalidRecursionError,
+    loadCheckers,
+    reduceOnEmptyError
+} from "../errors/error.js"
+import { _iter, createCompareKey, orderedStages, shuffleArray, Stage } from "../utils.js"
 import {
     SkippingMode,
     type EachCallStage,
@@ -298,14 +304,17 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     count(predicate: Seq.Predicate<T>): Doddle<number>
     count(predicate?: Seq.Predicate<T>): Doddle<number> {
-        // ! POLYMORPHIC !
         predicate ??= () => true
         predicate = chk(this.count).predicate(predicate)
         return lazyOperator(this, function count(input) {
-            return input
-                .filter(predicate as any)
-                .reduce(acc => acc + 1, 0)
-                .pull()
+            let index = 0
+            let count = 0
+            for (const element of input) {
+                if (pull(predicate(element, index++))) {
+                    count++
+                }
+            }
+            return count
         })
     }
     /**
@@ -348,14 +357,16 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that yields `true` if all elements match, or `false` otherwise.
      */
     every(predicate: Seq.Predicate<T>): Doddle<boolean> {
-        // ! POLYMORPHIC !
         predicate = chk(this.every).predicate(predicate)
         return lazyOperator(this, function every(input) {
-            return input
-                .map(predicate)
-                .some(x => !x)
-                .pull()
-        }).map(x => !x)
+            let index = 0
+            for (const element of input) {
+                if (!pull(predicate(element, index++))) {
+                    return false
+                }
+            }
+            return true
+        })
     }
     /**
      * Filters the elements of `this` sequence based on the given type predicate, narrowing the type
@@ -375,9 +386,12 @@ export abstract class Seq<T> implements Iterable<T> {
     filter(predicate: Seq.Predicate<T>) {
         predicate = chk(this.filter).predicate(predicate)
         return SeqOperator(this, function* filter(input) {
-            yield* seq(input).concatMap((element, index) =>
-                pull(predicate(element, index)) ? [element] : []
-            )
+            let index = 0
+            for (const x of input) {
+                if (pull(predicate(x, index++))) {
+                    yield x
+                }
+            }
         })
     }
 
@@ -494,10 +508,15 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     includes<S extends T>(...value: S[]): Doddle<boolean>
     includes(..._values: any[]): Doddle<boolean> {
-        // ! POLYMORPHIC !
         const values = new Set(_values)
         return lazyOperator(this, function includes(input) {
-            return input.some(element => values.has(element)).pull()
+            for (const element of input) {
+                values.delete(element)
+                if (values.size === 0) {
+                    return true
+                }
+            }
+            return false
         })
     }
 
@@ -510,13 +529,14 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param separator The string to use as a separator between elements.
      * @returns A 🦥{@link Doddle} that resolves to the joined string.
      */
-    join(separator: string): Doddle<string> {
+    join(separator: string = ","): Doddle<string> {
         chk(this.join).separator(separator)
         return lazyOperator(this, function join(input) {
-            return input
-                .toArray()
-                .map(x => x.join(separator))
-                .pull()
+            const results = []
+            for (const x of input) {
+                results.push(x)
+            }
+            return results.join(separator)
         })
     }
     /**
@@ -563,7 +583,10 @@ export abstract class Seq<T> implements Iterable<T> {
     map<S>(projection: Seq.Iteratee<T, S>): Seq<S> {
         chk(this.map).projection(projection)
         return SeqOperator(this, function* map(input) {
-            yield* seq(input).concatMap((element, index) => [pull(projection(element, index)) as S])
+            let index = 0
+            for (const element of input) {
+                yield pull(projection(element, index++)) as any
+            }
         })
     }
     /**
@@ -574,18 +597,20 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param alt The value to return if the sequence is empty. Defaults to `undefined`.
      */
     maxBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
-        // ! POLYMORPHIC !
         chk(this.maxBy).projection(projection)
         return lazyOperator(this, function maxBy(input) {
-            return input
-                .map((element, index) => {
-                    return returnKvp(input, projection(element, index), element)
-                })
-                .reduce((max: any, value: any) => {
-                    return max?.[0] >= value[0] ? max : value
-                }, null)
-                .map(x => (x === null ? alt : x[1]))
-                .pull()
+            let curMax = alt as Alt | T
+            let curMaxKey = undefined as K
+            let index = 0
+            for (const element of input) {
+                const curKey = pull(projection(element, index++)) as K
+                if (index === 1 || curKey > curMaxKey) {
+                    curMax = element
+                    curMaxKey = curKey
+                    continue
+                }
+            }
+            return curMax
         })
     }
     /**
@@ -598,18 +623,20 @@ export abstract class Seq<T> implements Iterable<T> {
      *   sequence is empty.
      */
     minBy<K, const Alt = undefined>(projection: Seq.Iteratee<T, K>, alt?: Alt): Doddle<T | Alt> {
-        // ! POLYMORPHIC !
         chk(this.minBy).projection(projection)
         return lazyOperator(this, function minBy(input) {
-            return input
-                .map((element, index) => {
-                    return returnKvp(input, projection(element, index), element)
-                })
-                .reduce((acc: any, cur: any) => {
-                    return acc?.[0] <= cur[0] ? acc : cur
-                }, null)
-                .map(x => (x === null ? alt : x[1]))
-                .pull()
+            let curMin = alt as Alt | T
+            let curMinKey = undefined as K
+            let index = 0
+            for (const element of input) {
+                const curKey = pull(projection(element, index++)) as K
+                if (index === 1 || curKey < curMinKey) {
+                    curMin = element
+                    curMinKey = curKey
+                    continue
+                }
+            }
+            return curMin
         })
     }
 
@@ -643,14 +670,16 @@ export abstract class Seq<T> implements Iterable<T> {
         chk(this.orderBy).descending(descending)
         const compareKey = createCompareKey(descending)
         return SeqOperator(this, function* orderBy(input) {
-            yield* seq(input)
-                .map(e => returnKvp(e, projection(e), e))
-                .toArray()
-                .map(xs => {
-                    void xs.sort(compareKey)
-                    return xs.map((x: any) => x[1])
-                })
-                .pull()
+            const kvps = [] as [K, T][]
+            for (const element of input) {
+                const key = pull(projection(element)) as K
+                kvps.push([key, element])
+            }
+
+            kvps.sort(compareKey)
+            for (const [_, value] of kvps) {
+                yield value
+            }
         })
     }
     /**
@@ -727,19 +756,21 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial: Acc): Doddle<Acc>
     reduce<Acc>(reducer: Seq.Reduction<T, Acc>, initial?: Acc): Doddle<any> {
-        // ! POLYMORPHIC !
         chk(this.reduce).reducer(reducer)
         return lazyOperator(this, function reduce(input) {
-            return input
-                .scan(reducer, initial!)
-                .last(() => true, SPECIAL)
-                .map(x => {
-                    if (x === SPECIAL) {
-                        throw new DoddleError("Cannot reduce empty sequence with no initial value")
-                    }
-                    return x as any
-                })
-                .pull()
+            let acc = initial ?? (SPECIAL as any)
+            let index = 0
+            for (const element of input) {
+                if (acc === SPECIAL) {
+                    acc = element
+                    continue
+                }
+                acc = pull(reducer(acc, element, index++)) as any
+            }
+            if (acc === SPECIAL) {
+                throw new DoddleError(reduceOnEmptyError)
+            }
+            return acc
         }) as any
     }
     /**
@@ -751,10 +782,12 @@ export abstract class Seq<T> implements Iterable<T> {
      */
     reverse() {
         return SeqOperator(this, function* reverse(input) {
-            yield* seq(input)
-                .toArray()
-                .map(x => x.reverse())
-                .pull()
+            const elements: T[] = []
+            for (const element of input) {
+                elements.push(element)
+            }
+
+            yield* elements.reverse()
         })
     }
     /**
@@ -969,10 +1002,6 @@ export abstract class Seq<T> implements Iterable<T> {
         chk(this.skip).count(count)
         return SeqOperator(this, function* skip(input) {
             let myCount = count
-            if (myCount === 0) {
-                yield* seq(input)
-                return
-            }
             if (myCount < 0) {
                 myCount = -myCount
                 yield* seq(input)
@@ -984,7 +1013,13 @@ export abstract class Seq<T> implements Iterable<T> {
                     })
                     .filter(x => x !== SPECIAL2)
             } else {
-                yield* seq(input).skipWhile((_, index) => index < myCount, {})
+                for (const x of input) {
+                    if (myCount > 0) {
+                        myCount--
+                        continue
+                    }
+                    yield x
+                }
             }
         }) as any
     }
@@ -1027,14 +1062,15 @@ export abstract class Seq<T> implements Iterable<T> {
      *   otherwise.
      */
     some(predicate: Seq.Predicate<T>): Doddle<boolean> {
-        // ! POLYMORPHIC !
-
         predicate = chk(this.some).predicate(predicate)
         return lazyOperator(this, function some(input) {
-            return input
-                .first(predicate, SPECIAL2)
-                .map(x => x !== SPECIAL2)
-                .pull()
+            let index = 0
+            for (const element of input) {
+                if (pull(predicate(element, index++))) {
+                    return true
+                }
+            }
+            return false
         })
     }
     /**
@@ -1045,14 +1081,14 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to the sum of the projected elements.
      */
     sumBy(projection: Seq.Iteratee<T, number>) {
-        // ! POLYMORPHIC !
-
         chk(this.sumBy).projection(projection)
         return lazyOperator(this, function sumBy(input) {
-            return input
-                .map(projection)
-                .reduce((acc, element) => acc + element, 0)
-                .pull()
+            let cur = 0
+            let index = 0
+            for (const element of input) {
+                cur += pull(projection(element, index++)) as number
+            }
+            return cur
         })
     }
     /**
@@ -1069,7 +1105,6 @@ export abstract class Seq<T> implements Iterable<T> {
         return SeqOperator(this, function* take(input) {
             let myCount = count
             if (myCount === 0) {
-                yield* []
                 return
             }
             if (myCount < 0) {
@@ -1089,9 +1124,13 @@ export abstract class Seq<T> implements Iterable<T> {
 
                 yield* results
             } else {
-                yield* seq(input).takeWhile((_, index) => index < myCount - 1, {
-                    takeFinal: true
-                })
+                for (const element of input) {
+                    yield element
+                    myCount--
+                    if (myCount <= 0) {
+                        return
+                    }
+                }
             }
         }) as any
     }
@@ -1146,14 +1185,15 @@ export abstract class Seq<T> implements Iterable<T> {
      * @returns A 🦥{@link Doddle} that resolves to a Map of the elements in the sequence.
      */
     toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
-        // ! POLYMORPHIC !
         kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
         return lazyOperator(this, function toMap(input) {
-            return input
-                .map(kvpProjection)
-                .toArray()
-                .map(x => new Map(x))
-                .pull()
+            const m = new Map<K, V>()
+            let index = 0
+            for (const element of input) {
+                const [key, value] = pull(kvpProjection(element, index++)) as readonly [K, V]
+                m.set(key, value)
+            }
+            return m
         })
     }
     /**
@@ -1171,11 +1211,13 @@ export abstract class Seq<T> implements Iterable<T> {
     }> {
         chk(this.toRecord).kvpProjection(kvpProjection)
         return lazyOperator(this, function toObject(input) {
-            return input
-                .map(kvpProjection)
-                .toArray()
-                .map(x => Object.fromEntries(x))
-                .pull() as any
+            const o = {} as any
+            let index = 0
+            for (const element of input) {
+                const [key, value] = pull(kvpProjection(element, index++)) as readonly [Key, Value]
+                o[key] = value
+            }
+            return o
         })
     }
 

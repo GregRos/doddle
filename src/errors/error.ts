@@ -239,25 +239,20 @@ export type Text = TextLeaf | _Text<_Text<_Text<_Text<_Text<string>>>>>
 const __checkers = "__checkers"
 
 const LOADED = Symbol(__checkers)
-export function loadCheckers<X>(t: X) {
-    const target = t as any
-    if (target[LOADED]) {
-        return t
+export function loadCheckers(target: any) {
+    if (LOADED in target) {
+        return target
     }
-    Object.getOwnPropertyNames(target)
-        .filter(key => !key.startsWith("_"))
-        .map(key => target[key])
-        .filter(v => isFunction(v) && !(__checkers in v))
-        .forEach(v => {
+    for (const key of Object.getOwnPropertyNames(target).filter(x => !x.startsWith("_")) as any[]) {
+        const v = target[key]
+        if (isFunction(v) && !(v as any)[__checkers]) {
             Object.defineProperty(v, __checkers, {
-                value: forOperator(`${getClassName(target)}.${v.name}`)
+                value: forOperator(`${getClassName(target)}.${key}`)
             })
-        })
-    Object.defineProperty(target, LOADED, {
-        enumerable: false,
-        value: true
-    })
-    return t!
+        }
+    }
+
+    return Object.defineProperty(target, LOADED, {})
 }
 
 export function chk(input: any): OperatorMessages {
@@ -267,3 +262,5 @@ export function chk(input: any): OperatorMessages {
 export const invalidRecursionError = (parentType: string) => {
     return `Child iterable called its own ${parentType} during iteration, which is illegal.`
 }
+
+export const reduceOnEmptyError = "Cannot reduce empty sequence with no initial value"

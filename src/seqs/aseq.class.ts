@@ -1,13 +1,12 @@
 import type { Doddle, DoddleAsync } from "../doddle/index.js"
 import { doddle, lazyOperator, pull } from "../doddle/index.js"
-import { chk, loadCheckers } from "../errors/error.js"
+import { DoddleError, chk, loadCheckers, reduceOnEmptyError } from "../errors/error.js"
 import type { DoddleReadableStream } from "../readable-stream-polyfill.js"
 import {
     Stage,
     _aiter,
     createCompareKey,
     orderedStages,
-    returnKvp,
     shuffleArray,
     type MaybeDoddle,
     type MaybePromise
@@ -27,7 +26,6 @@ import { Seq } from "./seq.class.js"
 import { seq } from "./seq.ctor.js"
 
 const SPECIAL = Symbol("special")
-const seqPrototype = Seq.prototype
 /**
  * The ASeq class, which wraps an async iterable.
  *
@@ -89,7 +87,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the item at the given index.
      */
     at(index: number): DoddleAsync<T | undefined> {
-        return seqPrototype.at.call(this, index)
+        chk(this.at).index(index)
+        return lazyOperator(this, async function at(input) {
+            if (index < 0) {
+                return input.take(index).first().pull()
+            }
+            return input.skip(index).first().pull() as any
+        })
     }
 
     /**
@@ -341,7 +345,18 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     count(predicate: ASeq.Predicate<T>): DoddleAsync<number>
     count(predicate?: ASeq.Predicate<T>): DoddleAsync<number> {
-        return seqPrototype.count.call(this, predicate as any) as any
+        predicate ??= () => true
+        predicate = chk(this.count).predicate(predicate)
+        return lazyOperator(this, async function count(input) {
+            let index = 0
+            let count = 0
+            for await (const element of input) {
+                if (await pull(predicate(element, index++))) {
+                    count++
+                }
+            }
+            return count
+        })
     }
 
     /**
@@ -382,7 +397,16 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   otherwise.
      */
     every(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return seqPrototype.every.call(this, predicate as any) as any
+        predicate = chk(this.every).predicate(predicate)
+        return lazyOperator(this, async function every(input) {
+            let index = 0
+            for await (const element of input) {
+                if (!(await pull(predicate(element, index++)))) {
+                    return false
+                }
+            }
+            return true
+        })
     }
 
     /**
@@ -404,9 +428,12 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     filter(predicate: ASeq.Predicate<T>) {
         predicate = chk(this.filter).predicate(predicate)
         return ASeqOperator(this, async function* filter(input) {
-            yield* aseq(input).concatMap(async (element, index) =>
-                (await pull(predicate(element, index))) ? [element] : []
-            )
+            let index = 0
+            for await (const element of input) {
+                if (await pull(predicate(element, index++))) {
+                    yield element
+                }
+            }
         })
     }
 
@@ -502,7 +529,7 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *
      * @param values The values to check for inclusion.
      */
-    includes<T extends S, S>(this: ASeq<T>, value: S): DoddleAsync<boolean>
+    includes<T extends S, S>(this: ASeq<T>, ...values: S[]): DoddleAsync<boolean>
     /**
      * 🦥**Lazily** checks if `this` sequence includes one or more values.
      *
@@ -510,10 +537,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *
      * @param values The values to check for inclusion.
      */
-    includes<S extends T>(value: S): DoddleAsync<boolean>
+    includes<S extends T>(...values: S[]): DoddleAsync<boolean>
 
-    includes<S extends T>(value: S): DoddleAsync<boolean> {
-        return seqPrototype.includes.call(this, value) as any
+    includes<S extends T>(..._values: S[]): DoddleAsync<boolean> {
+        const values = new Set(_values)
+        return lazyOperator(this, async function includes(input) {
+            for await (const element of input) {
+                values.delete(element as S)
+                if (values.size === 0) {
+                    return true
+                }
+            }
+            return false
+        })
     }
     /**
      * 🦥**Lazily** joins the elements of `this` sequence into a single string, separated by the
@@ -525,7 +561,14 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the joined string.
      */
     join(separator = ","): DoddleAsync<string> {
-        return seqPrototype.join.call(this, separator) as any
+        chk(this.join).separator(separator)
+        return lazyOperator(this, async function join(input) {
+            const results = []
+            for await (const x of input) {
+                results.push(x)
+            }
+            return results.join(separator)
+        })
     }
 
     /**
@@ -572,9 +615,10 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     map<S>(projection: ASeq.Iteratee<T, S>): ASeq<S> {
         chk(this.map).projection(projection)
         return ASeqOperator(this, async function* map(input) {
-            yield* aseq(input).concatMap(async (element, index) => [
-                (await pull(projection(element, index))) as S
-            ])
+            let index = 0
+            for await (const element of input) {
+                yield pull(projection(element, index++)) as any
+            }
         })
     }
 
@@ -589,7 +633,21 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         projection: ASeq.Iteratee<T, K>,
         alt?: Alt
     ): DoddleAsync<T | Alt> {
-        return seqPrototype.maxBy.call(this, projection, alt)
+        chk(this.maxBy).projection(projection)
+        return lazyOperator(this, async function maxBy(input) {
+            let curMax = alt as Alt | T
+            let curMaxKey = undefined as K
+            let index = 0
+            for await (const element of input) {
+                const curKey = (await pull(projection(element, index++))) as K
+                if (index === 1 || curKey > curMaxKey) {
+                    curMax = element
+                    curMaxKey = curKey
+                    continue
+                }
+            }
+            return curMax
+        })
     }
 
     /**
@@ -607,7 +665,21 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     ): DoddleAsync<T | Alt>
 
     minBy<K>(projection: ASeq.Iteratee<T, K>, alt?: any) {
-        return seqPrototype.minBy.call(this, projection, alt)
+        chk(this.minBy).projection(projection)
+        return lazyOperator(this, async function minBy(input) {
+            let curMin = alt as any
+            let curMinKey = undefined as K
+            let index = 0
+            for await (const element of input) {
+                const curKey = (await pull(projection(element, index++))) as K
+                if (index === 1 || curKey < curMinKey) {
+                    curMin = element
+                    curMinKey = curKey
+                    continue
+                }
+            }
+            return curMin
+        })
     }
     /**
      * Orders the elements of `this` sequence by key, using the given key projection.
@@ -641,14 +713,16 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         c.descending(descending)
         const compareKey = createCompareKey(descending)
         return ASeqOperator(this, async function* orderBy(input) {
-            yield* await aseq(input)
-                .map(e => returnKvp(input, projection(e), e) as any)
-                .toArray()
-                .map(async xs => {
-                    void xs.sort(compareKey)
-                    return xs.map(x => x[1])
-                })
-                .pull()
+            const kvps = [] as [any, T][]
+            for await (const element of input) {
+                const key = (await pull(projection(element))) as any
+                kvps.push([key, element])
+            }
+
+            kvps.sort(compareKey)
+            for (const [_, value] of kvps) {
+                yield value
+            }
         })
     }
 
@@ -726,7 +800,22 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     reduce<Acc>(reducer: ASeq.Reduction<T, Acc>, initial: Acc): DoddleAsync<Acc>
     reduce<Acc>(reducer: ASeq.Reduction<T, Acc>, initial?: Acc): any {
-        return seqPrototype.reduce.call(this, reducer as any, initial)
+        chk(this.reduce).reducer(reducer)
+        return lazyOperator(this, async function reduce(input) {
+            let acc = initial ?? (SPECIAL as any)
+            let index = 0
+            for await (const element of input) {
+                if (acc === SPECIAL) {
+                    acc = element
+                    continue
+                }
+                acc = (await pull(reducer(acc, element, index++))) as any
+            }
+            if (acc === SPECIAL) {
+                throw new DoddleError(reduceOnEmptyError)
+            }
+            return acc
+        }) as any
     }
 
     /**
@@ -738,10 +827,11 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      */
     reverse(): ASeq<T> {
         return ASeqOperator(this, async function* reverse(input) {
-            yield* await aseq(input)
-                .toArray()
-                .map(x => x.reverse())
-                .pull()
+            const elements: T[] = []
+            for await (const element of input) {
+                elements.push(element)
+            }
+            yield* elements.reverse()
         })
     }
 
@@ -952,10 +1042,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         chk(this.skip).count(count)
         return ASeqOperator(this, async function* skip(input) {
             let myCount = count
-            if (myCount === 0) {
-                yield* aseq(input)
-                return
-            }
             if (myCount < 0) {
                 myCount = -myCount
                 yield* aseq(input)
@@ -967,7 +1053,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     })
                     .filter(x => x !== SPECIAL)
             } else {
-                yield* aseq(input).skipWhile((_, index) => index < myCount)
+                for await (const x of input) {
+                    if (myCount > 0) {
+                        myCount--
+                        continue
+                    }
+                    yield x
+                }
             }
         }) as any
     }
@@ -1011,7 +1103,16 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      *   otherwise.
      */
     some(predicate: ASeq.Predicate<T>): DoddleAsync<boolean> {
-        return seqPrototype.some.call(this, predicate as any) as any
+        predicate = chk(this.some).predicate(predicate)
+        return lazyOperator(this, async function some(input) {
+            let index = 0
+            for await (const element of input) {
+                if (await pull(predicate(element, index++))) {
+                    return true
+                }
+            }
+            return false
+        })
     }
 
     /**
@@ -1022,7 +1123,15 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to the sum of the projected elements.
      */
     sumBy(projection: ASeq.Iteratee<T, number>): DoddleAsync<number> {
-        return seqPrototype.sumBy.call(this, projection as any) as any
+        chk(this.sumBy).projection(projection)
+        return lazyOperator(this, async function sumBy(input) {
+            let cur = 0
+            let index = 0
+            for await (const element of input) {
+                cur += (await pull(projection(element, index++))) as number
+            }
+            return cur
+        })
     }
 
     /**
@@ -1057,9 +1166,13 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
                     .pull()) as T[]
                 yield* results
             } else {
-                yield* aseq(input).takeWhile((_, index) => index < myCount - 1, {
-                    takeFinal: true
-                })
+                for await (const element of input) {
+                    yield element
+                    myCount--
+                    if (myCount <= 0) {
+                        return
+                    }
+                }
             }
         }) as any
     }
@@ -1119,7 +1232,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @returns A 🦥{@link DoddleAsync} that resolves to a Map of the elements in the sequence.
      */
     toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): DoddleAsync<Map<K, V>> {
-        return seqPrototype.toMap.call(this, kvpProjection as any) as any
+        kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
+        return lazyOperator(this, async function toMap(input) {
+            const m = new Map<K, V>()
+            let index = 0
+            for await (const element of input) {
+                const [key, value] = (await pull(kvpProjection(element, index++))) as readonly [
+                    K,
+                    V
+                ]
+                m.set(key, value)
+            }
+            return m
+        })
     }
 
     /**
@@ -1133,7 +1258,19 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
     toRecord<const Key extends PropertyKey, Value>(
         kvpProjection: ASeq.Iteratee<T, readonly [Key, Value]>
     ): DoddleAsync<Record<Key, Value>> {
-        return seqPrototype.toRecord.call(this, kvpProjection as any) as any
+        chk(this.toRecord).kvpProjection(kvpProjection)
+        return lazyOperator(this, async function toObject(input) {
+            const o = {} as any
+            let index = 0
+            for await (const element of input) {
+                const [key, value] = (await pull(kvpProjection(element, index++))) as readonly [
+                    Key,
+                    Value
+                ]
+                o[key] = value
+            }
+            return o
+        })
     }
 
     /**

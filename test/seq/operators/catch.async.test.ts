@@ -9,7 +9,6 @@ declare.it("should not be callable without handler", () => {
     // @ts-expect-error
     _seq([1, 2, 3]).catch()
 })
-
 declare.it("callable with void handler gives aseq of same type", expect => {
     expect(type_of(_seq([1, 2, 3]).catch(() => {}))).to_equal(type<_ASeq<number>>)
 })

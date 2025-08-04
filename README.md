@@ -8,16 +8,19 @@
 
 [**Reference**](https://gregros.github.io/doddle/)
 
-Doddle is a tiny yet feature-packed iteration toolkit. It's designed to make working with iterables as convenient as possible, taking inspiration from popular APIs like LINQ, lodash, and rxjs.
+Doddle is a tiny yet feature-packed iteration toolkit, designed to make working with iterables as simple as possible.
 
 Here are some of its features:
 
-- 🪞 One consistent API shared between sync and async iterables.
+- 🪞 One consistent API shared between **sync and async iterables**.
 
-- 🤏 Tiny bundle size, without compromising user experience.
+- 🤏 **Tiny bundle size**, without compromising user experience.
 
-- 🔥 Packed with operators from the best APIs in software.
-- 🤗 Strongly typed and extensively validated. Throws meaningful errors too.
+- 🔥 Packed with operators from the **best APIs in software**.
+
+- 🤗 Strongly typed and extensively validated.
+
+It’s inspired by popular libraries like LINQ, lodash, and rxjs.
 
 Get it now:
 
@@ -30,18 +33,22 @@ npm install doddle
 ```
 
 ## How operators work
-
 Doddle offers its functionality through *operators*. These operators transform or reduce iterables in various ways.
 
 There are lots of them, but they all share a set of common principles.
-
 ### All operators are methods
+Operators are methods defined on wrapper objects, making them easy to find and invoke. 
 
-Operators are methods defined on wrapper objects, making them easy to find and invoke. There are separate wrapper objects for sync and async iterables.
+There are two different wrappers:
 
+- **Seq**, which is used for sync iterables.
+- **ASeq**, which is used for async iterables.
+
+They have exactly the same members, except that **ASeq** supports async inputs, like functions that return promises.
 ### All operators are lazy
+Operators never do anything directly. Instead, they return objects that must be evaluated. This gives you a lot of control over when side-effects happen.
 
-If an operator returns an Iterable, that Iterable must be iterated for anything to happen.
+For example, operators that return Iterables, such as `map`, must be iterated and the function is called right before every element is yielded.
 
 ```ts
 import { seq } from "doddle"
@@ -54,7 +61,7 @@ for (const x of result) {
 }
 ```
 
-Operators that don't return Iterables instead return a lazy primitive called a [Doddle](doddle.md). To compute the value you need to call the Doddle's `pull` method:
+Operators that don't return Iterables instead return a lazy primitive called a [Doddle](doddle.md). You need to call the Doddle’s `pull` method to run to computation and get the result:
 
 ```ts
 import { seq } from "doddle"
@@ -67,9 +74,14 @@ console.log(
     `The minimum value was ${minimum.pull()}`
 )
 ```
+## All operators are debuggable
+Have you ever stared at a stack trace from a library and couldn’t understand anything? 
 
-Doddles are really useful. They chain like Promises and support both sync and async computation. They also support their own set of operators.
+Doddle isn’t like that. It produces legible stack traces with typically one entry per operator. That means stack traces can still be long:
 
+```
+
+```
 ## Seq
 
 This wrapper unifies iterables and generator functions. You create one using the `seq` function.

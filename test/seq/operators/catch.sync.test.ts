@@ -105,7 +105,7 @@ it("catches non-error and turns it into error", () => {
     const s = _seq([1, 2, 3])
         .each(x => {
             if (x === 3) {
-                throw new Error()
+                throw "test"
             }
         })
         .catch(handler)
