@@ -4,9 +4,9 @@ import { declare } from "declare-it"
 
 describe("async", () => {
     declare.it("callable with various returns", async () => {
-        await aseq([]).before(() => {})
-        await aseq([]).before(() => 1)
-        await aseq([]).before(() => [])
+        aseq([]).before(() => {})
+        aseq([]).before(() => 1)
+        aseq([]).before(() => [])
     })
 
     it("empty stays empty", async () => {
@@ -49,9 +49,11 @@ describe("async", () => {
         const beforeFn = jest.fn(() => 1)
         const s = aseq(fn).before(beforeFn)
         for await (const _ of s) {
+            // Drain
         }
         expect(beforeFn).toHaveBeenCalledTimes(1)
         for await (const _ of s) {
+            // Drain
         }
         expect(beforeFn).toHaveBeenCalledTimes(2)
     })

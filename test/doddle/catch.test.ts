@@ -35,12 +35,12 @@ declare.it("sync.catch(sync) = sync", expect => {
 
 declare.it("sync.catch(async) = mixed", expect => {
     // @ts-expect-error Should not allow sync catch with async handler
-    const myDoddle = lazies.sync().catch(handlers.async())
+    const _ = lazies.sync().catch(handlers.async())
 })
 
 declare.it("sync.catch(mixed) = mixed", expect => {
     // @ts-expect-error Should not allow sync catch with mixed handler
-    const myDoddle = lazies.sync().catch(handlers.mixed())
+    const _ = lazies.sync().catch(handlers.mixed())
 })
 
 declare.it("sync.catch(any) = any", expect => {

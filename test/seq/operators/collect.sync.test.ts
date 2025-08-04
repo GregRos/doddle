@@ -13,13 +13,13 @@ declare.it("no change if item", expect => {
 it("all side-effects occur after first element", () => {
     const mock = jest.fn()
     const items = _seq([1, 2, 3]).map(mock).collect()
-    for (const x of items) {
+    for (const _ of items) {
         expect(mock).toHaveBeenCalledTimes(3)
     }
 })
 
 it("no side-effects before pull", () => {
     const mock = jest.fn()
-    const items = _seq([1, 2, 3]).map(mock).collect()
+    _seq([1, 2, 3]).map(mock).collect()
     expect(mock).not.toHaveBeenCalled()
 })

@@ -64,6 +64,7 @@ it("does not provide index", async () => {
     }) as any
     const s = _aseq([1, 2, 3]).uniq(map)
     for await (const _ of s) {
+        // drain
     }
 })
 
@@ -75,6 +76,7 @@ it("no side-effects before pull", async () => {
     const result = input.uniq(() => 1)
     expect(fn).not.toHaveBeenCalled()
     for await (const _ of result) {
+        // drain
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })

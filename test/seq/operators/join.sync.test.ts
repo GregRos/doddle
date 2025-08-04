@@ -1,7 +1,5 @@
-import type { Seq } from "@lib"
 import { seq } from "@lib"
 const _seq = seq
-type _Seq<T> = Seq<T>
 
 it("joins an empty sequence", () => {
     const s = _seq([]).join(",").pull()

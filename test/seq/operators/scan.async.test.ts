@@ -87,6 +87,7 @@ it("calls reducer L - 1 times, without initial value", async () => {
     const s = _seq([1, 2, 3]).scan(f)
     expect(f).not.toHaveBeenCalled()
     for await (const _ of s) {
+        // Drain
     }
 
     expect(f).toHaveBeenCalledTimes(2)
@@ -97,6 +98,7 @@ it("calls reducer L times, with initial value", async () => {
     const s = _seq([1, 2, 3]).scan(f, 0)
     expect(f).not.toHaveBeenCalled()
     for await (const _ of s) {
+        // Drain
     }
 
     expect(f).toHaveBeenCalledTimes(3)
@@ -127,6 +129,7 @@ it("has no side-effects before pull", async () => {
     const doddle = s.scan(() => 1)
     expect(fn).not.toHaveBeenCalled()
     for await (const _ of doddle) {
+        // drain
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })

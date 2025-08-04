@@ -52,6 +52,7 @@ it("has no side-effects, pulls as many as needed", async () => {
     const tkw = _seq(sq).takeWhile(x => x < 2)
     expect(sq).not.toHaveBeenCalled()
     for await (const _ of tkw) {
+        // drain
     }
     expect(sq).toHaveBeenCalledTimes(1)
 })
@@ -60,6 +61,7 @@ it("calls predicate as many times as needed", async () => {
     const f = jest.fn(x => x < 2)
     const s = _seq([1, 2, 3, 4, 5]).takeWhile(f)
     for await (const _ of s) {
+        // drain
     }
     expect(f).toHaveBeenCalledTimes(2)
 })

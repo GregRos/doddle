@@ -36,6 +36,7 @@ it("no side-effects until pulled", async () => {
     expect(sq).not.toHaveBeenCalled()
     expect(map).not.toHaveBeenCalled()
     for await (const _ of c) {
+        // Drain
     }
     expect(sq).toHaveBeenCalledTimes(1)
     expect(map).toHaveBeenCalledTimes(1)
@@ -50,8 +51,10 @@ it("side-effects only once", async () => {
     const c = s.cache()
     expect(map).not.toHaveBeenCalled()
     for await (const _ of c) {
+        // Drain
     }
     for await (const _ of c) {
+        // Drain
     }
     expect(map).toHaveBeenCalledTimes(1)
 })

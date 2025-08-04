@@ -20,6 +20,7 @@ it("throws error based on function returning Error", () => {
     const s = seq.throws(() => new Error("error"))
     expect(() => {
         for (const _ of s) {
+            // Drain
         }
     }).toThrow("error")
 })

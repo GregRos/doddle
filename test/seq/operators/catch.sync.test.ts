@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-throw-literal */
 import type { Seq } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
@@ -49,6 +48,7 @@ it("handler stops seq on void", () => {
         })
         .catch(handler)
     for (const _ of s) {
+        // Drain
     }
 
     expect(handler).toHaveBeenCalledTimes(1)
@@ -77,8 +77,10 @@ it("can iterate twice, calls handler twice, same behavior", () => {
         })
         .catch(handler)
     for (const _ of s) {
+        // Drain
     }
     for (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenNthCalledWith(1, new Error("test"), 2)
     expect(handler).toHaveBeenNthCalledWith(2, new Error("test"), 2)
@@ -103,11 +105,12 @@ it("catches non-error and turns it into error", () => {
     const s = _seq([1, 2, 3])
         .each(x => {
             if (x === 3) {
-                throw "test"
+                throw new Error()
             }
         })
         .catch(handler)
     for (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("test", 2)

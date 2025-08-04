@@ -25,6 +25,7 @@ it("throws error based on function returning Error", async () => {
     const s = aseq.throws(() => new Error("error"))
     await expect(async () => {
         for await (const _ of s) {
+            // Drain
         }
     }).rejects.toThrow("error")
 })

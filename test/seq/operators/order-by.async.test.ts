@@ -63,6 +63,7 @@ it("no side-effects before pull", async () => {
     const result = input.orderBy(x => x)
     expect(fn).not.toHaveBeenCalled()
     for await (const _ of result) {
+        // Drain
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })
@@ -78,6 +79,7 @@ it("pulls, calls iteratee as many as needed", async () => {
     expect(sq).not.toHaveBeenCalled()
     expect(map).not.toHaveBeenCalled()
     for await (const _ of tkw) {
+        // Drain
     }
     expect(map).toHaveBeenCalledTimes(3)
     expect(sq).toHaveBeenCalledTimes(1)

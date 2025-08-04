@@ -4,7 +4,7 @@ import { declare, type, type_of } from "declare-it"
 import { aseq, DoddleAsync } from "@lib"
 
 declare.it("converts a Seq<T> to ASeq<T>", expect => {
-    function generic<T>() {
+    function _<T>() {
         const s = aseq<T>([])
         expect(type_of(s.toSeq())).to_equal(type<DoddleAsync<Seq<T>>>)
     }

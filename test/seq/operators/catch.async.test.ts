@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-throw-literal */
 import { declare, type, type_of } from "declare-it"
 
 import type { ASeq } from "@lib"
@@ -63,6 +62,7 @@ it("handler stops seq on void", async () => {
         })
         .catch(handler)
     for await (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)
@@ -90,8 +90,10 @@ it("can iterate twice, calls handler twice, same behavior", async () => {
         })
         .catch(handler)
     for await (const _ of s) {
+        // Drain
     }
     for await (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(2)
 })
@@ -120,6 +122,7 @@ it("works for rejected promise", async () => {
         })
         .catch(handler)
     for await (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)
@@ -156,6 +159,7 @@ it("works for async handler returning void", async () => {
         })
         .catch(handler)
     for await (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(new Error("test"), 2)
@@ -199,13 +203,13 @@ it("catches non-error and turns it into error", async () => {
         })
         .catch(handler)
     for await (const _ of s) {
+        // Drain
     }
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith("test", 2)
 })
 
 it("allows doddle handler", async () => {
-    const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {
             if (x === 3) {
@@ -217,7 +221,6 @@ it("allows doddle handler", async () => {
 })
 
 it("allows doddle async handler", async () => {
-    const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {
             if (x === 3) {
@@ -229,7 +232,6 @@ it("allows doddle async handler", async () => {
 })
 
 it("allows async doddle async handler", async () => {
-    const handler = jest.fn(() => {})
     const s = _seq([1, 2, 3])
         .each(x => {
             if (x === 3) {

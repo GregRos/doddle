@@ -1,9 +1,8 @@
-import type { Doddle, Seq } from "@lib"
+import type { Doddle } from "@lib"
 import { declare, type, type_of } from "declare-it"
 
 import { seq } from "@lib"
 const _seq = seq
-type _Seq<T> = Seq<T>
 
 declare.it("is typed correctly", expect => {
     const s = _seq([1, 2, 3]).toRecord(x => [x, x])
@@ -12,11 +11,10 @@ declare.it("is typed correctly", expect => {
 
 declare.it("does not allow invalid keys", expect => {
     // @ts-expect-error does not allow invalid keys
-    const s = _seq([1, 2, 3]).toRecord(x => [{}, x])
+    const _ = _seq([1, 2, 3]).toRecord(x => [{}, x])
 })
 
 declare.it("allows symbol string and number keys", expect => {
-    const sym = Symbol("test")
     const s = _seq([1, 2, 3]).toRecord(x => {
         return [0 as symbol | string | number, 0 as unknown]
     })

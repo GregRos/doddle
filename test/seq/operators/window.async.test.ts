@@ -135,6 +135,7 @@ it("calls iteratee as many times as needed", async () => {
     expect(sq).not.toHaveBeenCalled()
     expect(map).not.toHaveBeenCalled()
     for await (const _ of tkw) {
+        // drain
     }
     expect(map).toHaveBeenCalledTimes(2)
     expect(sq).toHaveBeenCalledTimes(1)
@@ -149,6 +150,7 @@ it("calls iteratee with incomplete windows", async () => {
     const map = jest.fn((...args) => args)
     const tkw = _seq(sq).window(4, map)
     for await (const _ of tkw) {
+        // drain
     }
     expect(map).toHaveBeenCalledWith(1, 2, 3)
 })

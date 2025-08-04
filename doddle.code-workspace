@@ -6,7 +6,10 @@
         }
     ],
     "settings": {
-        "eslint.enable": false,
+        "eslint.enable": true,
+        "eslint.run": "onSave",
+        "eslint.lintTask.enable": true,
+        "typescript.tsserver.experimental.enableProjectDiagnostics": true,
         "jest.disabledWorkspaceFolders": ["root"],
         "files.exclude": {
             "tutorials": true,

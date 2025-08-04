@@ -105,6 +105,7 @@ it("throws on iteration if given a function returning a string", () => {
     const iterable = _seq(() => "a" as any)
     expect(() => {
         for (const _ of iterable) {
+            // Drain
         }
     }).toThrow(DoddleError)
 })

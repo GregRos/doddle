@@ -1,6 +1,5 @@
-import { seq, Seq } from "@lib"
+import { seq } from "@lib"
 const _seq = seq
-type _Seq<T> = Seq<T>
 
 it("gives empty on empty", () => {
     const s = _seq([]).share()

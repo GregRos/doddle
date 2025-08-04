@@ -23,6 +23,7 @@ declare.it("group has key", expect => {
         .groupBy(x => x)
         .map((...args) => {
             expect(type_of(args)).to_equal(type<[Seq.Group<number, number>, number]>)
+            return undefined
         })
 })
 

@@ -79,6 +79,7 @@ it("throws on iteration if given a function returning a string", async () => {
     const iterable = _seq(() => "a" as any)
     await expect(async () => {
         for await (const _ of iterable) {
+            // Drain
         }
     }).rejects.toThrow(DoddleError)
 })
@@ -153,6 +154,7 @@ it("errors on iteration when given a function returning something else", async (
     const iterable = _seq(() => 1 as any)
     await expect(async () => {
         for await (const _ of iterable) {
+            // Drain
         }
     }).rejects.toThrow(DoddleError)
 })
@@ -163,6 +165,7 @@ it("errors when iterated if source errors", async () => {
     })
     await expect(async () => {
         for await (const _ of iterable) {
+            // Drain
         }
     }).rejects.toThrow("source error")
 })
@@ -173,6 +176,7 @@ it("errors when iterated if source errors with async", async () => {
     })
     await expect(async () => {
         for await (const _ of iterable) {
+            // Drain
         }
     }).rejects.toThrow("source error")
 })
@@ -194,14 +198,14 @@ it("converts from function returning iterable", async () => {
 
 declare.it("can specify type when converting from empty array", expect => {
     const s = _seq<1>([])
-    expect(type_of(s)).to_equal(type<_Seq<1>>)
+    void expect(type_of(s)).to_equal(type<_Seq<1>>)
 })
 
-it("works for array-like objects", () => {
+it("works for array-like objects", async () => {
     const arrayLike = { 0: 10, 1: 20, 2: 30, length: 3 }
-    expect(_seq(arrayLike)._qr).resolves.toEqual([10, 20, 30])
+    await expect(_seq(arrayLike)._qr).resolves.toEqual([10, 20, 30])
     const int32Array = new Int32Array([1, 2, 3])
-    expect(_seq(int32Array)._qr).resolves.toEqual([1, 2, 3])
+    await expect(_seq(int32Array)._qr).resolves.toEqual([1, 2, 3])
     const emptyArrayLike = { length: 0 }
-    expect(_seq(emptyArrayLike)._qr).resolves.toEqual([])
+    await expect(_seq(emptyArrayLike)._qr).resolves.toEqual([])
 })

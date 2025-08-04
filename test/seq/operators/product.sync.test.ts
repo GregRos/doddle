@@ -125,6 +125,7 @@ it("has no side-effects before pull, pulls only once", () => {
     const result = s.product([[1, 2]])
     expect(fn).not.toHaveBeenCalled()
     for (const _ of result) {
+        // Drain
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })

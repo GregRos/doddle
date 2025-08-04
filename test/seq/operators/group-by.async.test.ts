@@ -8,18 +8,18 @@ declare.it("returns ASeq<ASeq.Group<K, V>>", expect => {
 })
 
 declare.it("iteratee has single argument", async expect => {
-    await _aseq([1, 2, 3]).groupBy((...args) => {
+    _aseq([1, 2, 3]).groupBy((...args) => {
         expect(type_of(args)).to_equal(type<[number]>)
     })
 })
 
 declare.it("iteratee can't have two arguments", async expect => {
     // @ts-expect-error
-    await _aseq([1, 2, 3]).groupBy((_, __) => 1)
+    _aseq([1, 2, 3]).groupBy((_, __) => 1)
 })
 
 declare.it("group has key", async expect => {
-    await _aseq([1, 2, 3])
+    _aseq([1, 2, 3])
         .groupBy(x => x)
         .map(async group => {
             expect(type_of(group)).to_equal(type<ASeq.Group<number, number>>)

@@ -49,6 +49,7 @@ it("calls predicate as many times as needed", () => {
     const f = jest.fn(x => x < 2)
     const s = _seq([1, 2, 3, 4, 5]).takeWhile(f)
     for (const _ of s) {
+        // Drain
     }
     expect(f).toHaveBeenCalledTimes(2)
 })

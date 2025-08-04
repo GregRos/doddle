@@ -1,6 +1,5 @@
-import { aseq, type ASeq } from "@lib"
+import { aseq } from "@lib"
 const _seq = aseq
-type _Seq<T> = ASeq<T>
 
 it("joins an empty sequence", async () => {
     await expect(_seq([]).join(",").pull()).resolves.toEqual("")
