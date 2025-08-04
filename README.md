@@ -60,7 +60,7 @@ for (const x of result) {
 }
 ```
 
-Operators that don't return Iterables instead return a lazy primitive called a [Doddle](doddle.md). You need to call the Doddle’s `pull` method to run to computation and get the result:
+Operators that don't return Iterables instead return a lazy primitive called a **Doddle**. You need to call the Doddle’s `pull` method to run to computation and get the result:
 
 ```ts
 import { seq } from "doddle"

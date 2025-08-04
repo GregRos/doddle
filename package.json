@@ -103,6 +103,7 @@
     "ts-jest": "^29.2.4",
     "typedoc": "^0.28.5",
     "typedoc-material-theme": "^1.4.0",
+    "typedoc-plugin-extras": "^4.0.1",
     "typedoc-plugin-mdn-links": "^5.0.6",
     "typescript": "^5.5.4",
     "yamprint": "^0.8.4"

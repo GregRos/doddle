@@ -10,5 +10,6 @@
   "defaultCategory": "Main",
   "kindSortOrder": ["Class", "Function", "TypeAlias", "Namespace"],
   "categoryOrder": ["Create", "Use", "Types"],
-  "themeColor": "#210A4B"
+  "themeColor": "#210A4B",
+  "favicon": "icon/favicon.ico"
 }
