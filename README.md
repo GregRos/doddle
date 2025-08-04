@@ -5,10 +5,9 @@
 [![Codacy coverage](https://img.shields.io/codacy/coverage/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/coverage)
 [![Doddle minified size(gzip)](https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=gzip)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
 
-
 [**Reference**](https://gregros.github.io/doddle/)
 
-Doddle is a tiny yet feature-packed iteration toolkit, designed to make working with iterables as simple as possible.
+Doddle is a tiny yet feature-packed (async) iteration toolkit, designed to make working with iterables as simple as possible.
 
 Here are some of its features:
 

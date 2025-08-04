@@ -1,7 +1,7 @@
 {
   "name": "doddle",
-  "version": "7.1.5",
-  "description": "Tiny yet feature-packed iteration toolkit.",
+  "version": "7.1.6",
+  "description": "Tiny yet feature-packed (async) iteration toolkit.",
   "keywords": [
     "iteration",
     "iterable",
