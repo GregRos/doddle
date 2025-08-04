@@ -6,15 +6,18 @@
 [![Doddle minified size(gzip)](https://img.shields.io/bundlejs/size/doddle?exports=seq,doddle&style=for-the-badge&label=gzip)](https://bundlejs.com/?q=doddle&treeshake=%5B%7Bseq%2Cdoddle%7D%5D)
 [![Codacy grade](https://img.shields.io/codacy/grade/7650988ddf4741639fe6140bc28ff650?style=for-the-badge)](https://app.codacy.com/gh/GregRos/doddle/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
-Doddle is a tiny yet feature-packed iteration toolkit. It’s inspired by LINQ, lodash, and rxjs.
+[**Reference**](https://gregros.github.io/doddle/)
+
+Doddle is a tiny yet feature-packed iteration toolkit. It's designed to make working with iterables as convenient as possible, taking inspiration from popular APIs like LINQ, lodash, and rxjs.
 
 Here are some of its features:
 
--   🤏 Tiny bundle size, without compromising user experience.
--   🔥 Packed with operators from the best APIs in software.
--   🤗 Strongly typed and extensively validated. Throws meaningful errors too.
--   🪞 One consistent API shared between sync and async iterables.
--   🔍 Produces concise, readable stack traces.
+- 🪞 One consistent API shared between sync and async iterables.
+
+- 🤏 Tiny bundle size, without compromising user experience.
+
+- 🔥 Packed with operators from the best APIs in software.
+- 🤗 Strongly typed and extensively validated. Throws meaningful errors too.
 
 Get it now:
 
@@ -26,28 +29,46 @@ yarn add doddle
 npm install doddle
 ```
 
-## The Doddle
+## How operators work
 
-The Doddle is the library’s lazy primitive. It represents a delayed computation, just like a function.
+Doddle offers its functionality through *operators*. These operators transform or reduce iterables in various ways.
 
-When a Doddle is _pulled_, it’s evaluated and the result is cached. Evaluation only happens once.
+There are lots of them, but they all share a set of common principles.
 
-The Doddle is designed like a Promise. It chains, flattens, and supports several useful operators. Its key method is `pull()`. It’s designed for both sync and async computations.
+### All operators are methods
 
-You can create one using the `doddle` function, passing it a function that will produce the value. This function can return a Promise.
+Operators are methods defined on wrapper objects, making them easy to find and invoke. There are separate wrapper objects for sync and async iterables.
+
+### All operators are lazy
+
+If an operator returns an Iterable, that Iterable must be iterated for anything to happen.
 
 ```ts
-import { doddle } from "doddle"
-
-const d = doddle(() => {
-    console.log("evaluated when pulled")
-    return 5
+import {seq} from "doddle"
+const result = seq([1, 2, 3]).each(() => {
+    console.log("I'm a side-effect!")
 })
-
-d.pull() // 5
+// Nothing happens until we iterate over it:
+for (const x of result) {
+	// Repeatedly prints 'I'm a side-effect.'
+}
 ```
 
-Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more!](https://github.com/GregRos/doddle/doddle.md)
+Operators that don't return Iterables instead return a lazy primitive called a [Doddle](doddle.md). To compute the value you need to call the Doddle's `pull` method:
+
+```ts
+import {seq} from "doddle"
+const minimum = seq([3, 2, 1]).each(() => {
+    console.log("I'm a side-effect!")
+}).minBy(x => x)
+
+// Nothing happens until we pull:
+console.log(
+    `The minimum value was ${minimum.pull()}`
+)
+```
+
+Doddles are really useful. They chain like Promises and support both sync and async computation. They also support their own set of operators.
 
 ## Seq
 
@@ -113,14 +134,39 @@ They never iterate more than they need to and they produce legible stack traces 
 
 They're also **Lazy**. That means they return one of two things:
 
--   Another Seq, which needs to be iterated for anything to happen.
--   A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be _pulled_.
+- Another Seq, which needs to be iterated for anything to happen.
+- A [Doddle](https://github.com/GregRos/doddle/blob/master/doddle.md), which needs to be *pulled*.
 
 This lets you control exactly when the operation is computed.
 
+## The Doddle
+
+The Doddle is the library’s lazy primitive. It represents a delayed computation, just like a function.
+
+When a Doddle is *pulled*, it’s evaluated and the result is cached. Evaluation only happens once.
+
+The Doddle is designed like a Promise. It chains, flattens, and supports several useful operators. Its key method is `pull()`. It’s designed for both sync and async computations.
+
+You can create one using the `doddle` function, passing it a function that will produce the value. This function can return a Promise.
+
+```ts
+ import { doddle } from "doddle"
+ 
+ const d = doddle(() => {
+     console.log("evaluated when pulled")
+     return 5
+ })
+ 
+ d.pull() // 5
+```
+
+Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more!](https://github.com/GregRos/doddle/doddle.md)
+
+##
+
 ## ASeq
 
-This wrapper unifies **async iterables** and **async generator functions**, while also supporting any input that [Seq](#Seq) supports. You create one using the `aseq` function.
+This wrapper unifies **async iterables** and **async generator functions**, while also supporting any input that [Seq](#seq) supports. You create one using the `aseq` function.
 
 You can pass it an async generator:
 
@@ -159,8 +205,8 @@ aseq(async () => aseq([1, 2, 3]))
 
 The **ASeq** wrapper has the same API as **Seq**, except that all inputs can be async. That means:
 
--   You can pass async iterables instead of regular ones.
--   You can pass functions that return promises.
+- You can pass async iterables instead of regular ones.
+- You can pass functions that return promises.
 
 **ASeq** wrapper comes with a carbon copy of all the operators defined on **Seq**, but tweaked for inputs that can be async.
 
@@ -190,7 +236,7 @@ async function example() {
 
 But this code returns a `Promise<ASeq<string>>`, which is really annoying to work with.
 
-There is a better way, though! You can just put the `await` _inside_ the definition of the sequence, like this:
+There is a better way, though! You can just put the `await` *inside* the definition of the sequence, like this:
 
 ```ts
 function example() {
