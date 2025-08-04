@@ -398,9 +398,9 @@ export class Doddle<T> {
  *
  * @param initializer An initializer that will be called once to produce the value.
  */
-export function doddle<X>(initializer: () => Promise<DoddleAsync<X>>): DoddleAsync<X>
-export function doddle<X>(initializer: () => Promise<Doddle<X>>): DoddleAsync<X>
-export function doddle<X>(initializer: () => Promise<X>): DoddleAsync<X>
+export function doddle<X>(initializer: () => PromiseLike<DoddleAsync<X>>): DoddleAsync<X>
+export function doddle<X>(initializer: () => PromiseLike<Doddle<X>>): DoddleAsync<X>
+export function doddle<X>(initializer: () => PromiseLike<X>): DoddleAsync<X>
 export function doddle<T>(initializer: () => Doddle<T>): Doddle<T>
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T>
 export function doddle<T>(initializer: () => T | Doddle<T>): Doddle<T> {

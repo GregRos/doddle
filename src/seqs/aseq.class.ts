@@ -1456,11 +1456,10 @@ export const ASeqOperator = function aseq<In, Out>(
     operand: In,
     impl: (input: In) => AsyncIterable<Out>
 ): ASeq<Out> {
-    const obj = Object.assign(new (ASeq as any)(), [impl.name, operand])
-    Object.defineProperty(obj, Symbol.asyncIterator, {
-        get: () => impl.bind(obj, obj[1])
+    const myASeq = Object.assign(new (ASeq as any)(), [impl.name, operand])
+    return Object.defineProperty(myASeq, Symbol.asyncIterator, {
+        get: () => impl.bind(myASeq, myASeq[1])
     })
-    return obj
 }
 /**
  * A collection of type definitions for asynchronous sequence operations in Doddle.

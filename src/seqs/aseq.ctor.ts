@@ -63,9 +63,9 @@ import { seq } from "./seq.ctor.js"
  * @param input The input to create the {@link ASeq} from.
  */
 export function aseq<E>(input: readonly E[]): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Promise<DoddleAsync<E>>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<DoddleAsync<E>>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<DoddleAsync<E>>): ASeq<E>
-export function aseq<E>(input: ASeq.SimpleInput<Promise<E>>): ASeq<E>
+export function aseq<E>(input: ASeq.SimpleInput<PromiseLike<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<Doddle<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.SimpleInput<MaybePromise<E>>): ASeq<E>
 export function aseq<E>(input: ASeq.Input<E>): ASeq<E>

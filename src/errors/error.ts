@@ -18,7 +18,7 @@ import {
 
 export class DoddleError extends Error {
     constructor(message: Text) {
-        super((!Array.isArray(message) ? [message] : message).flat().join(" "))
+        super((!Array.isArray(message) ? [message] : message).flat(5).join(" "))
     }
 }
 
@@ -91,11 +91,11 @@ const expectStage = expectation(
 )
 const anOrStructure = (a: Text, b: Text) => ["an", a, "or", b] as const
 const expectSyncInputValue = expectation(
-    anOrStructure(["iterable", "iterator", "doddle"].join(", "), "function"),
+    anOrStructure(["iterable", "iterator", "doddle"], "a function"),
     x => isIterable(x) || isFunction(x) || isDoddle(x) || isNextable(x) || isArrayLike(x)
 )
 const expectAsyncInputValue = expectation(
-    anOrStructure([["(async)", "iterable", "iterator"], "doddle"].join(", "), "function"),
+    anOrStructure(["(async) iterable", "iterator", "doddle"].join(", "), "a function"),
     x =>
         isIterable(x) ||
         isAsyncIterable(x) ||
@@ -194,8 +194,8 @@ export const forOperator = (operator: string) => {
 
 export type OperatorMessages = ReturnType<typeof forOperator>
 const wInput = "input"
-const wSeq = "seq"
-const wAseq = "aseq"
+const wSeq = "'seq'"
+const wAseq = "'aseq'"
 export const checkSeqInputValue = <T>(input: T) => {
     const context = ["conversion", wSeq]
     expectSyncInputValue(getSubject(wInput, context, "be"))(input)
@@ -226,7 +226,7 @@ export const checkASeqInputValue = <T>(input: T) => {
 
 export const gotAsyncIteratorInSyncContext = () => {
     throw new DoddleError([
-        getSubject(wInput, ["conversion", wAseq], "be"),
+        getSubject(wInput, [wAseq], "be"),
         iterableOrIterator,
         ["but got", "an async", "iterator"]
     ])

@@ -1372,13 +1372,10 @@ export const SeqOperator = function seq<In, Out>(
     operand: In,
     impl: (input: In) => Iterable<Out>
 ): Seq<Out> {
-    const myAbstractSeq = Object.assign(new (Seq as any)(), [impl.name, operand])
-    Object.defineProperty(myAbstractSeq, Symbol.iterator, {
-        get(this: typeof myAbstractSeq) {
-            return impl.bind(this, this[1])
-        }
+    const mySeq = Object.assign(new (Seq as any)(), [impl.name, operand])
+    return Object.defineProperty(mySeq, Symbol.iterator, {
+        get: () => impl.bind(mySeq, mySeq[1])
     })
-    return myAbstractSeq
 }
 
 /**
