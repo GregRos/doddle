@@ -36,6 +36,7 @@ it("no side-effects before pull", async () => {
     const result = input.uniq()
     expect(fn).not.toHaveBeenCalled()
     for await (const _ of result) {
+        // Drain
     }
     expect(fn).toHaveBeenCalledTimes(1)
 })

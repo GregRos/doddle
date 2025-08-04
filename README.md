@@ -44,20 +44,20 @@ Operators are methods defined on wrapper objects, making them easy to find and i
 If an operator returns an Iterable, that Iterable must be iterated for anything to happen.
 
 ```ts
-import {seq} from "doddle"
+import { seq } from "doddle"
 const result = seq([1, 2, 3]).each(() => {
     console.log("I'm a side-effect!")
 })
 // Nothing happens until we iterate over it:
 for (const x of result) {
-	// Repeatedly prints 'I'm a side-effect.'
+    // Repeatedly prints 'I'm a side-effect.'
 }
 ```
 
 Operators that don't return Iterables instead return a lazy primitive called a [Doddle](doddle.md). To compute the value you need to call the Doddle's `pull` method:
 
 ```ts
-import {seq} from "doddle"
+import { seq } from "doddle"
 const minimum = seq([3, 2, 1]).each(() => {
     console.log("I'm a side-effect!")
 }).minBy(x => x)
@@ -77,7 +77,8 @@ This wrapper unifies iterables and generator functions. You create one using the
 You can pass this function an Iterable, like an array:
 
 ```ts
-seq([1, 2, 3])
+seq( [1, 2, 3] )
+
 ```
 
 Or a generator function:
@@ -150,14 +151,14 @@ The Doddle is designed like a Promise. It chains, flattens, and supports several
 You can create one using the `doddle` function, passing it a function that will produce the value. This function can return a Promise.
 
 ```ts
- import { doddle } from "doddle"
- 
- const d = doddle(() => {
-     console.log("evaluated when pulled")
-     return 5
- })
- 
- d.pull() // 5
+import { doddle } from "doddle"
+
+const d = doddle(() => {
+    console.log("evaluated when pulled")
+    return 5
+})
+
+d.pull() // 5
 ```
 
 Doddles are used throughout the sequence API, but they really come in handy outside it too. [Read more!](https://github.com/GregRos/doddle/doddle.md)
@@ -258,18 +259,9 @@ When **ASeq** encounters one, it will await the resulting promise before continu
 ```ts
 import { setTimeout } from "timers/promises"
 
-aseq([1, 2, 3]).each(async x => {
+aseq([1, 2, 3]).each(async () => {
     await setTimeout(100)
 })
 ```
 
 This makes **ASeq** much easier to work with than observables, since stack traces will always point to where the error occurred and elements will always be yielded in the same order.
-
-However, it does mean that **ASeq** is bad at async processing with I/O that can be parallelized, like this:
-
-```ts
-import { got } from "got"
-
-// Don't do this if you care about performance
-aseq([url1, url2, url3]).map(url => got(url))
-```
