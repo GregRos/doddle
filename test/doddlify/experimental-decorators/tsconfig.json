@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.json",
+  "references": [{ "path": "../../../src/tsconfig.cjs.json" }],
+  "compilerOptions": {
+    "rootDir": ".",
+    "tsBuildInfoFile": "../../../.buildinfo/experimental-decorators.tsbuildinfo",
+    "paths": {
+      "@lib": ["../../../src/index"],
+      "@utils": ["../../../src/utils"],
+      "@error": ["../../../src/errors/error"]
+    },
+    "experimentalDecorators": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["**/dist", "**/node_modules"]
+}

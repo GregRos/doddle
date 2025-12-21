@@ -5,6 +5,9 @@
     },
     {
       "path": "./test/tsconfig.json"
+    },
+    {
+      "path": "./test/doddlify/experimental-decorators/tsconfig.json"
     }
   ],
 

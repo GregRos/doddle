@@ -5,7 +5,7 @@ import {
     isDoddle,
     isFunction,
     isThenable,
-    type MaybeDoddle,
+    type MaybeDoddleAsync,
     type MaybePromise
 } from "../utils.js"
 import type { Is_Any_Mixed, Is_Any_Pure_Async, Matches_Mixed_Value } from "./helpers.js"
@@ -482,7 +482,7 @@ export namespace Doddle {
         | PromiseLike<DoddleAsync<T>>
 
     /** A value, a promise, a doddle, an async doddle, or similar nestings. */
-    export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddle<T>>
+    export type MaybePromised<T> = MaybePromise<DoddleAsync<T> | MaybeDoddleAsync<T>>
 }
 
 /**

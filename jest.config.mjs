@@ -2,6 +2,13 @@
 export default {
     rootDir: ".",
     transform: {
+        "^.+experimental-decorators.+\\.ts$": [
+            "ts-jest",
+            {
+                tsconfig: "<rootDir>/test/doddlify/experimental-decorators/tsconfig.json",
+                transpileOnly: true
+            }
+        ],
         "^.+\\.ts$": [
             "ts-jest",
             {

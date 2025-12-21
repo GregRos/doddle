@@ -16,6 +16,6 @@
       "@error": ["../src/errors/error"]
     }
   },
-  "include": ["**/*.test.ts", "**/*.helper.ts", "extras.d.ts"],
-  "exclude": ["**/dist", "**/node_modules"]
+  "include": ["**/*.ts"],
+  "exclude": ["**/dist", "**/node_modules", "**/experimental-decorators/**"]
 }

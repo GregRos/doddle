@@ -8,7 +8,7 @@ import {
     createCompareKey,
     orderedStages,
     shuffleArray,
-    type MaybeDoddle,
+    type MaybeDoddleAsync,
     type MaybePromise
 } from "../utils.js"
 import { aseq } from "./aseq.ctor.js"
@@ -1222,7 +1222,6 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
             return result
         })
     }
-
     /**
      * 🦥**Lazily** converts `this` sequence into a Map.
      *
@@ -1231,16 +1230,15 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
      * @param kvpProjection A function that takes an element and returns a key-value pair.
      * @returns A 🦥{@link DoddleAsync} that resolves to a Map of the elements in the sequence.
      */
-    toMap<K, V>(kvpProjection: ASeq.Iteratee<T, readonly [K, V]>): DoddleAsync<Map<K, V>> {
+    toMap<Pair extends readonly [any, any]>(
+        kvpProjection: ASeq.Iteratee<T, Pair>
+    ): DoddleAsync<Map<Pair[0], Pair[1]>> {
         kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
         return lazyOperator(this, async function toMap(input) {
-            const m = new Map<K, V>()
+            const m = new Map<Pair[0], Pair[1]>()
             let index = 0
             for await (const element of input) {
-                const [key, value] = (await pull(kvpProjection(element, index++))) as readonly [
-                    K,
-                    V
-                ]
+                const [key, value] = (await pull(kvpProjection(element, index++))) as Pair
                 m.set(key, value)
             }
             return m
@@ -1608,7 +1606,7 @@ export namespace ASeq {
      * @template E The element type.
      */
     export type SimpleInput<E> =
-        | MaybeDoddle<IterableInput<E>>
+        | MaybeDoddleAsync<IterableInput<E>>
         | DoddleAsync<IterableInput<E>>
         | FunctionInput<E>
 
@@ -1620,7 +1618,7 @@ export namespace ASeq {
     export type Input<E> = SimpleInput<MaybePromise<E>>
 
     /** A zero-argument action for side-effects that may return a doddle-wrapped value. * @inline */
-    export type NoInputAction = () => MaybeDoddle<MaybePromise<unknown>>
+    export type NoInputAction = () => MaybeDoddleAsync<MaybePromise<unknown>>
 
     /**
      * A grouped output pairing a key with a sub-sequence of elements.

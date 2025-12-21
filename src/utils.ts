@@ -126,7 +126,8 @@ export function returnKvp(input: any, key: any, value: any) {
     return [key, value]
 }
 export type MaybePromise<T> = T | PromiseLike<T>
-export type MaybeDoddle<T> = T | Doddle<T> | DoddleAsync<T>
+export type MaybeDoddle<T> = T | Doddle<T>
+export type MaybeDoddleAsync<T> = T | Doddle<T> | DoddleAsync<T>
 
 export function shuffleArray<T>(array: T[]) {
     for (let i = array.length - 1; i > 0; i--) {

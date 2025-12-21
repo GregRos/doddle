@@ -21,8 +21,9 @@ export class DoddleError extends Error {
         super((!Array.isArray(message) ? [message] : message).flat(5).join(" "))
     }
 }
-
 /*
+Doddle: While calling 'Seq.filter', argument 'predicate' must be a function,
+but got 'true'.
 Sample error messages:
 > Doddle: Argument 'predicate' of oprator 'Seq.filter' must be a function,
 > but got 'true'.

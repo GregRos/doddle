@@ -1184,13 +1184,13 @@ export abstract class Seq<T> implements Iterable<T> {
      * @param kvpProjection A function that takes an element and returns a key-value pair.
      * @returns A 🦥{@link Doddle} that resolves to a Map of the elements in the sequence.
      */
-    toMap<K, V>(kvpProjection: Seq.Iteratee<T, readonly [K, V]>) {
+    toMap<Pair extends readonly [any, any]>(kvpProjection: Seq.Iteratee<T, Pair>) {
         kvpProjection = chk(this.toMap).kvpProjection(kvpProjection)
         return lazyOperator(this, function toMap(input) {
-            const m = new Map<K, V>()
+            const m = new Map<Pair[0], Pair[1]>()
             let index = 0
             for (const element of input) {
-                const [key, value] = pull(kvpProjection(element, index++)) as readonly [K, V]
+                const [key, value] = pull(kvpProjection(element, index++)) as Pair
                 m.set(key, value)
             }
             return m
