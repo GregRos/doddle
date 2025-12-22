@@ -1,13 +1,15 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../../tsconfig.base.cjs.json",
   "references": [{ "path": "../../../src/tsconfig.cjs.json" }],
   "compilerOptions": {
     "rootDir": ".",
+    "incremental": true,
+    "module": "preserve",
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
     "tsBuildInfoFile": "../../../.buildinfo/experimental-decorators.tsbuildinfo",
     "paths": {
-      "@lib": ["../../../src/index"],
-      "@utils": ["../../../src/utils"],
-      "@error": ["../../../src/errors/error"]
+      "@lib": ["../../../src/index"]
     },
     "experimentalDecorators": true
   },
