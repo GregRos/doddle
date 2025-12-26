@@ -118,6 +118,21 @@ export function aseq<E>(input: ASeq.Input<E>): any {
  */
 export namespace aseq {
     /**
+     * Creates a {@link Seq} from the own, enumerable, string key-value pairs of an object. Values
+     * are produced lazily.
+     *
+     * @template Object Type of the source object.
+     * @param source Source object to create the {@link Seq} from.
+     * @returns A {@link Seq} of key-value pairs from the source object.
+     */
+    export function fromObject<Object extends object>(
+        source: Object
+    ): ASeq<[keyof Object & string, Object[keyof Object]]> {
+        const c = chk(fromObject)
+        c.source(source)
+        return aseq(() => Object.keys(source)).map(key => [key, (source as any)[key]]) as any
+    }
+    /**
      * Creates an {@link ASeq} of items by iterating a projection function.
      *
      * @param count Number of items to iterate.

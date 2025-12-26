@@ -9,6 +9,7 @@ import {
     isInt,
     isIterable,
     isNextable,
+    isObject,
     isPair,
     isPosInt,
     isReadableStream,
@@ -80,7 +81,7 @@ const expectInt = expectation(`a integer`, isInt)
 const expectString = expectation(`a string`, x => typeof x === "string")
 const expectIntOrInfinity = expectation(`an integer or Infinity`, x => isInt(x) || x === Infinity)
 const expectPosInt = expectation(`a positive integer`, isPosInt)
-
+const expectObject = expectation(`an object`, isObject)
 const expectBool = expectation(`true or false`, isBool)
 const expectError = expectation(`an error`, x => x instanceof Error)
 const expectFunc = expectation(`a function`, isFunction)
@@ -185,6 +186,7 @@ export const forOperator = (operator: string) => {
         checkFuncReturn("kvpProjection", expectPair),
         checkFuncReturn("predicate", expectBool),
         checkFuncReturn("thrower", expectError),
+        checkValue("source", expectObject),
         checkValue("ms", expectInt)
     ] as const
 

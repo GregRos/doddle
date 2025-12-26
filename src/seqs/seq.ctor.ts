@@ -107,6 +107,22 @@ export namespace seq {
     }
 
     /**
+     * Creates a {@link Seq} from the own, enumerable, string key-value pairs of an object, evaluated
+     * lazily.
+     *
+     * @template Object Type of the source object.
+     * @param source Source object to create the {@link Seq} from.
+     * @returns A {@link Seq} of key-value pairs from the source object.
+     */
+    export function fromObject<Object extends object>(
+        source: Object
+    ): Seq<[keyof Object & string, Object[keyof Object]]> {
+        const c = chk(fromObject)
+        c.source(source)
+        return seq(() => Object.keys(source)).map(key => [key, (source as any)[key]]) as any
+    }
+
+    /**
      * Creates a {@link Seq} of numbers in the specified range.
      *
      * @param start Starting number of the range.
