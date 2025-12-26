@@ -70,7 +70,6 @@ export abstract class Seq<T> implements Iterable<T> {
     as<S>() {
         return this as any as Seq<S>
     }
-
     /**
      * 🦥**Lazily** gets the element at the given index in `this` sequence, or undefined if the
      * index is out of bounds.
@@ -490,7 +489,6 @@ export abstract class Seq<T> implements Iterable<T> {
             }
         })
     }
-
     /**
      * 🦥**Lazily** checks if `this` sequence includes one or more values by iterating over it.
      *
@@ -1174,6 +1172,15 @@ export abstract class Seq<T> implements Iterable<T> {
         return lazyOperator(this, function toArray(input) {
             return [...input]
         })
+    }
+
+    /**
+     * Returns `this` sequence as an {@link Iterable}.
+     *
+     * @returns An {@link Iterable} of the elements in this sequence.
+     */
+    toIterable(): Iterable<T> {
+        return this
     }
 
     /**

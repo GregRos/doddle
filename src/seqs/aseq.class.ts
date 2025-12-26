@@ -1223,6 +1223,15 @@ export abstract class ASeq<T> implements AsyncIterable<T> {
         })
     }
     /**
+     * Returns `this` sequence as an {@link AsyncIterable}.
+     *
+     * @returns An {@link AsyncIterable} of the elements in this sequence.
+     */
+    toIterable(): AsyncIterable<T> {
+        return this
+    }
+
+    /**
      * 🦥**Lazily** converts `this` sequence into a Map.
      *
      * ⚠️ Has to iterate over the entire sequence.
